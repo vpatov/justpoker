@@ -1,0 +1,27 @@
+{
+  "name": "poker_web",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix; tsfmt -r",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node ./dist/server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.3",
+    "@types/node": "^13.9.2",
+    "@types/ws": "^7.2.3",
+    "tslint": "^6.1.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "ws": "^7.2.3",
+    "@types/node": "^13.9.2"
+  }
+}
