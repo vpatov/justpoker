@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,49 +20,51 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-// TODO before continuing to try to incorporate DI here
-// read up more about Nest.js and see if it is a good fit for you - nestjs handles DI
+const typedi_1 = require("typedi");
 const express_1 = __importDefault(require("express"));
 const http = __importStar(require("http"));
 const WebSocket = __importStar(require("ws"));
-const app = express_1.default();
-// simple http server
-const server = http.createServer(app);
-const defaultPort = 8080; // default port to listen
-const wss = new WebSocket.Server({ server });
-// TODO look at https://livebook.manning.com/book/typescript-quickly/chapter-10/v-9/233
-// where he has a baseclass for a MessageServer, that other MessageServers can extend
-// it could be a good idea to have a separate server for different types of actions
-wss.on('connection', (ws, req) => {
-    const ip = req.connection.remoteAddress;
-    console.log("connected to ip:", ip);
-    ws.on('message', (data) => {
-        if (typeof data === 'string') {
-            const action = JSON.parse(data);
-            const sitDownRequest = action.data;
-            ws.send(`action: ${JSON.stringify(action)}, sitDownRequest: ${JSON.stringify(sitDownRequest)}`);
-        }
-        else {
-            console.log('Received data of unsupported type.');
-        }
-    });
-    ws.send('You have connected to the websocket server.');
-});
-wss.on('connection', function connection(ws, req) {
-    const ip = req.connection.remoteAddress;
-});
-server.listen(process.env.PORT || defaultPort, () => {
-    const port = server.address();
-    console.log(`Server started on address ${JSON.stringify(port)} :)`);
-});
-// define a route handler for the default home page
-app.get("/", (req, res) => {
-    res.send("Hello world!");
-});
-/*
-// start the Express server
-app.listen( port, () => {
-    console.log( `server started at http://localhost:${ port }` );
-} );
-*/
+const messageService_1 = require("./service/messageService");
+let Server = class Server {
+    constructor(messageService) {
+        this.messageService = messageService;
+        this.defaultPort = 8080;
+    }
+    init() {
+        this.app = express_1.default();
+        this.server = http.createServer(this.app);
+        this.wss = new WebSocket.Server({ 'server': this.server });
+        // TODO look at https://livebook.manning.com/book/typescript-quickly/chapter-10/v-9/233
+        // where he has a baseclass for a MessageServer, that other MessageServers can extend
+        // it could be a good idea to have a separate server for different types of actions
+        this.wss.on('connection', (ws, req) => {
+            const ip = req.connection.remoteAddress;
+            console.log("connected to ip:", ip);
+            ws.on('message', (data) => {
+                if (typeof data === 'string') {
+                    const action = JSON.parse(data);
+                    const res = this.messageService.processMessage(action);
+                    ws.send(res);
+                }
+                else {
+                    console.log('Received data of unsupported type.');
+                }
+            });
+            ws.send('You have connected to the websocket server.');
+        });
+        this.server.listen(process.env.PORT || this.defaultPort, () => {
+            const port = this.server.address();
+            console.log(`Server started on address ${JSON.stringify(port)} :)`);
+        });
+        this.app.get("/", (req, res) => {
+            res.send("Poker Web.");
+        });
+    }
+};
+Server = __decorate([
+    typedi_1.Service(),
+    __metadata("design:paramtypes", [messageService_1.MessageService])
+], Server);
+const server = typedi_1.Container.get(Server);
+server.init();
 //# sourceMappingURL=server.js.map

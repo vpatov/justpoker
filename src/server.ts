@@ -1,73 +1,66 @@
 import "reflect-metadata";
-// TODO before continuing to try to incorporate DI here
-// read up more about Nest.js and see if it is a good fit for you - nestjs handles DI
-
+import { Service, Container } from "typedi";
 
 import express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import { AddressInfo } from "net";
 import { Action, SitDownRequest } from './models/wsaction';
+import { MessageService } from './service/messageService';
 
-const app = express();
+@Service()
+class Server {
 
-// simple http server
-const server = http.createServer(app);
+    app: express.Application;
+    server: http.Server;
+    defaultPort = 8080;
+    wss: WebSocket.Server;
 
-const defaultPort = 8080; // default port to listen
-
-const wss = new WebSocket.Server({ server });
-
-
-// TODO look at https://livebook.manning.com/book/typescript-quickly/chapter-10/v-9/233
-// where he has a baseclass for a MessageServer, that other MessageServers can extend
-// it could be a good idea to have a separate server for different types of actions
-
-wss.on('connection', (ws: WebSocket, req) => {
-    const ip = req.connection.remoteAddress;
-    console.log("connected to ip:", ip);
-
-    ws.on('message', (data: WebSocket.Data) => {
-        if (typeof data === 'string') {
-            const action = JSON.parse(data);
-            const sitDownRequest = action.data as SitDownRequest;
+    constructor(private messageService: MessageService) {
 
 
-            ws.send(`action: ${JSON.stringify(action)}, sitDownRequest: ${JSON.stringify(sitDownRequest)}`);
-        } else {
-            console.log('Received data of unsupported type.');
-        }
-    });
+    }
+
+    init() {
+        this.app = express();
+        this.server = http.createServer(this.app);
+
+        this.wss = new WebSocket.Server({ 'server': this.server });
 
 
+        // TODO look at https://livebook.manning.com/book/typescript-quickly/chapter-10/v-9/233
+        // where he has a baseclass for a MessageServer, that other MessageServers can extend
+        // it could be a good idea to have a separate server for different types of actions
 
+        this.wss.on('connection', (ws: WebSocket, req) => {
+            const ip = req.connection.remoteAddress;
+            console.log("connected to ip:", ip);
 
+            ws.on('message', (data: WebSocket.Data) => {
+                if (typeof data === 'string') {
+                    const action = JSON.parse(data);
+                    const res = this.messageService.processMessage(action);
+                    ws.send(res);
+                } else {
+                    console.log('Received data of unsupported type.');
+                }
+            });
 
+            ws.send('You have connected to the websocket server.');
 
+        });
 
+        this.server.listen(process.env.PORT || this.defaultPort, () => {
+            const port = this.server.address() as AddressInfo;
+            console.log(`Server started on address ${JSON.stringify(port)} :)`);
+        });
 
-    ws.send('You have connected to the websocket server.');
+        this.app.get("/", (req, res) => {
+            res.send("Poker Web.");
+        });
 
-});
+    }
+}
 
-wss.on('connection', function connection(ws, req) {
-    const ip = req.connection.remoteAddress;
-});
-
-server.listen(process.env.PORT || defaultPort, () => {
-    const port = server.address() as AddressInfo;
-    console.log(`Server started on address ${JSON.stringify(port)} :)`);
-});
-
-
-// define a route handler for the default home page
-app.get("/", (req, res) => {
-    res.send("Hello world!");
-});
-
-/*
-// start the Express server
-app.listen( port, () => {
-    console.log( `server started at http://localhost:${ port }` );
-} );
-*/
+const server = Container.get(Server);
+server.init();

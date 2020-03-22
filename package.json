@@ -2,6 +2,10 @@
   "name": "poker_web",
   "version": "1.0.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vpatov/poker_web.git"
+  },
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix; tsfmt -r",
     "build": "tsc",
@@ -20,11 +24,9 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@types/node": "^13.9.2",
     "express": "^4.17.1",
-    "inversify": "^5.0.1",
     "reflect-metadata": "^0.1.13",
-    "tsyringe": "^4.1.0",
+    "typedi": "^0.8.0",
     "ws": "^7.2.3"
   }
 }

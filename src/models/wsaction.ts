@@ -5,11 +5,11 @@ export declare interface BetAction {
 
 }
 
-export declare enum ActionType {
-    StartGame,
-    StopGame,
-    SitDown,
-    StandUp,
+export const enum ActionType {
+    StartGame = 'StartGame',
+    StopGame = 'StopGame',
+    SitDown = 'SitDown',
+    StandUp = 'StandUp',
 }
 
 export declare interface SitDownRequest {
