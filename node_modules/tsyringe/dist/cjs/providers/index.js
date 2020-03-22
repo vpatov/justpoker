@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var class_provider_1 = require("./class-provider");
+exports.isClassProvider = class_provider_1.isClassProvider;
+var factory_provider_1 = require("./factory-provider");
+exports.isFactoryProvider = factory_provider_1.isFactoryProvider;
+var injection_token_1 = require("./injection-token");
+exports.isNormalToken = injection_token_1.isNormalToken;
+var token_provider_1 = require("./token-provider");
+exports.isTokenProvider = token_provider_1.isTokenProvider;
+var value_provider_1 = require("./value-provider");
+exports.isValueProvider = value_provider_1.isValueProvider;

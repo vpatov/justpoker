@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var auto_injectable_1 = require("./auto-injectable");
+exports.autoInjectable = auto_injectable_1.default;
+var inject_1 = require("./inject");
+exports.inject = inject_1.default;
+var injectable_1 = require("./injectable");
+exports.injectable = injectable_1.default;
+var registry_1 = require("./registry");
+exports.registry = registry_1.default;
+var singleton_1 = require("./singleton");
+exports.singleton = singleton_1.default;
+var inject_all_1 = require("./inject-all");
+exports.injectAll = inject_all_1.default;
+var scoped_1 = require("./scoped");
+exports.scoped = scoped_1.default;
