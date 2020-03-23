@@ -1,8 +1,13 @@
 import { Action, ActionType, SitDownRequest } from '../models/wsaction';
-import { Service, Container } from "typedi";
+import { GameService } from './gameService';
+import { Service } from "typedi";
 
 @Service()
 export class MessageService {
+
+    constructor(private gameService: GameService) {
+
+    }
 
     processMessage(action: Action) {
 
@@ -15,10 +20,8 @@ export class MessageService {
             2) How you will handle validity of user actions.
             For example, if its not a users turn but their socket sends "BET"
             3) How to handle returning responses?
+            4) Where is the game state going to be? Is there one game state? For now assume one game state
         */
-        console.log("actionType:", actionType);
-        console.log("equal?", actionType === ActionType.SitDown);
-        console.log(ActionType.SitDown);
         switch (actionType) {
             case ActionType.StartGame: {
                 return this.processStartGameMessage(data);
@@ -33,12 +36,26 @@ export class MessageService {
             case ActionType.StandUp: {
                 return this.processStandUpMessage(data);
             }
+
+            // if games are identified by URL, and are non-private, then this isn't necessary.
+            // Also, this probably shouldn't be a socket action.
+            // case ActionType.JoinRoom: {
+            //     return this.processJoinRoomMessage(data);
+            // }
+
+            // should room be created via http request or through websocket?
+
         }
 
     }
 
-    processStartGameMessage(data: any) { }
-    processStopGameMessage(data: any) { }
+    processStartGameMessage(data: any) {
+        return "Received start game message";
+    }
+    processStopGameMessage(data: any) {
+        return "Received stop game message";
+
+    }
 
     // how will this interact with the game?
     // will each instance of node be handling one game?
@@ -48,7 +65,7 @@ export class MessageService {
         return "Received sitdown message";
     }
     processStandUpMessage(data: any) {
+        return "Received stand up message";
 
     }
-
 }

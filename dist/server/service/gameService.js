@@ -7,10 +7,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typedi_1 = require("typedi");
-let GameService = class GameService {
+let GameService = 
+// maybe this can be renamed to RoomService :)
+class GameService {
 };
 GameService = __decorate([
     typedi_1.Service()
+    // maybe this can be renamed to RoomService :)
 ], GameService);
 exports.GameService = GameService;
 //# sourceMappingURL=gameService.js.map

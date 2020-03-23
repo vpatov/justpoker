@@ -1,9 +1,9 @@
-export declare interface UserAction {
-}
+// export declare interface UserAction {
+// }
 
-export declare interface BetAction {
+// export declare interface BetAction {
 
-}
+// }
 
 export const enum ActionType {
     StartGame = 'StartGame',
@@ -23,7 +23,6 @@ export declare interface SitDownRequest {
 export declare interface Action {
     actionType: ActionType;
     data: any;
-
 }
 
 

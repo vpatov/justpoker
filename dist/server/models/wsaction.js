@@ -1,4 +1,6 @@
 "use strict";
+// export declare interface UserAction {
+// }
 Object.defineProperty(exports, "__esModule", { value: true });
 /*
 gameplay actions:

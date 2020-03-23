@@ -36,11 +36,20 @@ class Server {
             const ip = req.connection.remoteAddress;
             console.log("connected to ip:", ip);
 
+
+
             ws.on('message', (data: WebSocket.Data) => {
                 if (typeof data === 'string') {
-                    const action = JSON.parse(data);
-                    const res = this.messageService.processMessage(action);
-                    ws.send(res);
+                    try {
+                        const action = JSON.parse(data);
+                        const res = this.messageService.processMessage(action);
+                        ws.send(res);
+                    }
+                    catch (e) {
+                        console.log("Couldn't parse data.");
+                        ws.send("Couldn't parse data.");
+                    }
+
                 } else {
                     console.log('Received data of unsupported type.');
                 }
@@ -57,6 +66,12 @@ class Server {
 
         this.app.get("/", (req, res) => {
             res.send("Poker Web.");
+        });
+
+        this.app.get("/newgame", (req, res) => {
+            const name = req.query.name;
+
+
         });
 
     }

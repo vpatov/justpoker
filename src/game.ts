@@ -10,20 +10,22 @@ class Game {
     gameParameters: GameParameters;
     currentRound: any; // TODO Round
 
-    constructor() {
+    /*
+        constructor() {
 
-    }
-
-
-    // assuming that players are sitting at table, start gameplay
-    startGame() {
-
-    }
-
-    // while waiting for game to start, players can join by sitting down.
-    addPlayer() {
+        }
 
 
-    }
+        // assuming that players are sitting at table, start gameplay
+        startGame() {
 
+        }
+
+        // while waiting for game to start, players can join by sitting down.
+        addPlayer() {
+
+
+        }
+
+    */
 }
