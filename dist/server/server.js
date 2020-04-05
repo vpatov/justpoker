@@ -25,16 +25,13 @@ const http = __importStar(require("http"));
 const WebSocket = __importStar(require("ws"));
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const request_1 = __importDefault(require("request"));
 const cookie_1 = __importDefault(require("cookie"));
 const messageService_1 = require("./service/messageService");
-const playerService_1 = require("./service/playerService");
-const tableService_1 = require("./service/tableService");
+const gameStateManager_1 = require("./service/gameStateManager");
 let Server = class Server {
-    constructor(messageService, playerService, tableService) {
+    constructor(messageService, gameStateManager) {
         this.messageService = messageService;
-        this.playerService = playerService;
-        this.tableService = tableService;
+        this.gameStateManager = gameStateManager;
         this.defaultPort = 8080;
     }
     initRoutes() {
@@ -47,18 +44,22 @@ let Server = class Server {
         Gonna just do it as a get request instead for sake of progress.
 
         */
+        /*
         router.post('/newgame', (req, res) => {
             console.log(req);
-            const passedRequest = req.body;
+            const passedRequest: Request = req.body as Request
+
             console.log(passedRequest);
-            request_1.default(passedRequest.url, (error, response, body) => {
+
+            request(passedRequest.url, (error: any, response: any, body: any) => {
                 if (!error) {
-                    const newTableForm = JSON.parse(body);
-                    const tableUUID = this.tableService.initTable(newTableForm);
+                    const newGameForm: NewGameForm = JSON.parse(body) as NewGameForm
+                    const tableUUID = this.tableService.initTable(newGameForm);
                     res.json(tableUUID);
                 }
             });
-        });
+        })
+        */
         // its probably okay to cut corners for now and bypass the game url
         // and just use the main game url for simplicity since there is only one game
         // happening right now
@@ -66,13 +67,13 @@ let Server = class Server {
         // this took me less than a minute
         // http://localhost:8080/newgameget?bigBlind=3&smallBlind=1&gameType=NLHOLDEM&password=abc
         router.get('/newgameget', (req, res) => {
-            const newTableForm = {
+            const newGameForm = {
                 smallBlind: req.query.smallBlind,
                 bigBlind: req.query.bigBlind,
                 gameType: req.query.gameType,
                 password: req.query.password
             };
-            const tableUUID = this.tableService.initTable(newTableForm);
+            const tableUUID = this.gameStateManager.initGame(newGameForm);
             res.send(tableUUID);
         });
         this.app.use(body_parser_1.default.json());
@@ -98,6 +99,7 @@ let Server = class Server {
             console.log("req", req.headers);
             const userCookieID = cookie_1.default.parse(req.headers.cookie).id;
             console.log(userCookieID);
+            this.gameStateManager.initConnectedClient(userCookieID);
             // get the connectedClient (or make one)
             // const connectedClient = getConnectedClient(userCookieID);
             ws.on('message', (data) => {
@@ -129,8 +131,7 @@ let Server = class Server {
 Server = __decorate([
     typedi_1.Service(),
     __metadata("design:paramtypes", [messageService_1.MessageService,
-        playerService_1.PlayerService,
-        tableService_1.TableService])
+        gameStateManager_1.GameStateManager])
 ], Server);
 //   this.mountRoutes()
 // }

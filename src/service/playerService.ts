@@ -11,16 +11,28 @@ export class PlayerService {
             name,
             chips,
             holeCards: [],
-            sitting: false
+            sitting: false,
+            uuid: generateUUID()
         };
     }
 
     // TODO determine if usage of redux style object spread is anti-pattern here
+    // TODO validations
+    /*
     addPlayerChips(player: Player, amount: number) {
         return {
             ...player,
             chips: player.chips + amount
         };
     }
+
+
+    sitPlayerDown(player: Player) {
+        return {
+            ...player,
+            sitting: true
+        };
+    }
+    */
 }
 

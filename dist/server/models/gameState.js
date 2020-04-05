@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cleanGameState = {
-    players: [],
+    players: new Map(),
     board: {
         cards: []
     },
@@ -10,12 +10,17 @@ exports.cleanGameState = {
         bigBlind: 0,
         gameType: "NLHOLDEM" /* NLHOLDEM */,
     },
-    dealerPlayer: null,
-    smallBlindPlayer: null,
-    bigBlindPlayer: null,
+    dealerPlayer: '',
+    smallBlindPlayer: '',
+    bigBlindPlayer: '',
     currentBettingRound: "WAITING" /* WAITING */,
     deck: {
         cards: []
     },
+    table: {
+        uuid: '',
+        activeConnections: new Map(),
+        password: '',
+    }
 };
 //# sourceMappingURL=gameState.js.map
