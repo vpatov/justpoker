@@ -2,20 +2,17 @@ import { Board, GameParameters, GameType, BettingRound } from './game';
 import { Player } from './player';
 import { Deck } from './cards'
 
-export declare interface PublicGameState {
-    players: Player[];
-    board: Board;
-    gameParameters: GameParameters;
-    dealerPlayer: Player | null;
-    bigBlindPlayer: Player | null;
-    smallBlindPlayer: Player | null;
-    currentBettingRound: BettingRound;
+export declare interface GameState {
+    players: ReadonlyArray<Player>;
+    board: Readonly<Board>;
+    gameParameters: Readonly<GameParameters>;
+    dealerPlayer: Readonly<Player> | null;
+    bigBlindPlayer: Readonly<Player> | null;
+    smallBlindPlayer: Readonly<Player> | null;
+    currentBettingRound: Readonly<BettingRound>;
+    deck: Readonly<Deck>;
 }
 
-export declare interface SecureGameState {
-    gameState: PublicGameState;
-    deck: Deck;
-}
 
 // should game parameters be part of game state, room, or both?
 export interface Room {
@@ -24,7 +21,7 @@ export interface Room {
     gameParameters?: GameParameters;
 }
 
-export const cleanPublicGameState: PublicGameState = {
+export const cleanGameState: GameState = {
     players: [],
     board: {
         cards: []
@@ -38,12 +35,7 @@ export const cleanPublicGameState: PublicGameState = {
     smallBlindPlayer: null,
     bigBlindPlayer: null,
     currentBettingRound: BettingRound.WAITING,
-}
-
-export const cleanSecureGameState: SecureGameState = {
-    gameState: cleanPublicGameState,
     deck: {
         cards: []
     },
-};
-
+}

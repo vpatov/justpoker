@@ -10,6 +10,7 @@ export const enum ActionType {
     StopGame = 'StopGame',
     SitDown = 'SitDown',
     StandUp = 'StandUp',
+    JoinTable = 'JoinTable',
 }
 
 export declare interface SitDownRequest {
@@ -17,6 +18,14 @@ export declare interface SitDownRequest {
     requestedChips: number;
     notes: string;
     waitForBlind: boolean;
+}
+
+export declare interface JoinTableRequest {
+    name: string;
+    buyin: number;
+    // admin: boolean;
+    // sitdown: boolean;
+    // password?: string;
 }
 
 

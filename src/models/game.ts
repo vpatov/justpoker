@@ -35,11 +35,3 @@ export const enum BettingRound {
     TURN = 'TURN',
     RIVER = 'RIVER',
 }
-
-export declare interface NewTableForm {
-    hostName: string;
-    smallBlind: number;
-    bigBlind: number;
-    gameType: GameType;
-    hostStack: number;
-}

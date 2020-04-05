@@ -1,4 +1,5 @@
-import { SecureGameState, cleanSecureGameState } from './gameState';
+import { GameState, cleanGameState } from './gameState';
+import { GameType } from './game';
 import { Player } from './player';
 
 
@@ -14,12 +15,17 @@ import { Player } from './player';
 */
 
 export declare interface Table {
-    secureGameState: SecureGameState;
+    // gameState: GameState;
+
+    uuid: string;
 
     // map the same person (by cookie) to the same connected client
     // this mapping is established upon their first connection to the table,
     // and for the host, established upon table creation.
     activeConnections: Map<string, ConnectedClient>;
+
+    password: string;
+    // adminOptions
 }
 
 // represents a person that has accessed the game via their browser.
@@ -36,7 +42,10 @@ export const enum ClientState {
     SPECTATING = 'SPECTATING',
 }
 
-export const cleanTable: Table = {
-    secureGameState: cleanSecureGameState,
-    activeConnections: new Map(),
-};
+export declare interface NewTableForm {
+    gameType: GameType;
+    smallBlind: number;
+    bigBlind: number;
+    password?: string;
+    adminOptions?: any;
+}
