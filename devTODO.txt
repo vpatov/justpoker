@@ -1,0 +1,5 @@
+- server fetches connected client and associates it with websocket via cookie
+- start game functionality 
+- actual game play functionality (MVP)
+- determine how to best use functional/redux patterns and avoid anti-pattern usage
+- coordinate interfaces/models with UI and jules
