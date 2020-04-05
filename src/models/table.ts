@@ -23,6 +23,7 @@ export declare interface Table {
     // this mapping is established upon their first connection to the table,
     // and for the host, established upon table creation.
     activeConnections: Map<string, ConnectedClient>;
+    // acitveConnections: { [key: string]: ConnectedClient };
 
     password: string;
     // adminOptions
@@ -33,8 +34,8 @@ export declare interface Table {
 
 export declare interface ConnectedClient {
     cookie: string;
-    clientState: ClientState;
-    gamePlayer: Player | null;
+    // clientState: ClientState;
+    gamePlayer: string;
 }
 
 export const enum ClientState {
@@ -42,7 +43,7 @@ export const enum ClientState {
     SPECTATING = 'SPECTATING',
 }
 
-export declare interface NewTableForm {
+export declare interface NewGameForm {
     gameType: GameType;
     smallBlind: number;
     bigBlind: number;

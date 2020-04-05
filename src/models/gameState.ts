@@ -1,28 +1,23 @@
 import { Board, GameParameters, GameType, BettingRound } from './game';
 import { Player } from './player';
+import { Table } from './table'
 import { Deck } from './cards'
 
 export declare interface GameState {
-    players: ReadonlyArray<Player>;
+    players: ReadonlyMap<string, Player>;
+    // players: { [key: string]: Player };
     board: Readonly<Board>;
     gameParameters: Readonly<GameParameters>;
-    dealerPlayer: Readonly<Player> | null;
-    bigBlindPlayer: Readonly<Player> | null;
-    smallBlindPlayer: Readonly<Player> | null;
+    dealerPlayer: Readonly<string>;
+    bigBlindPlayer: Readonly<string>;
+    smallBlindPlayer: Readonly<string>;
     currentBettingRound: Readonly<BettingRound>;
     deck: Readonly<Deck>;
-}
-
-
-// should game parameters be part of game state, room, or both?
-export interface Room {
-    hosts: Player[];
-    players: Player[];
-    gameParameters?: GameParameters;
+    table: Table;
 }
 
 export const cleanGameState: GameState = {
-    players: [],
+    players: new Map(),
     board: {
         cards: []
     },
@@ -31,11 +26,16 @@ export const cleanGameState: GameState = {
         bigBlind: 0,
         gameType: GameType.NLHOLDEM,
     },
-    dealerPlayer: null,
-    smallBlindPlayer: null,
-    bigBlindPlayer: null,
+    dealerPlayer: '',
+    smallBlindPlayer: '',
+    bigBlindPlayer: '',
     currentBettingRound: BettingRound.WAITING,
     deck: {
         cards: []
     },
+    table: {
+        uuid: '',
+        activeConnections: new Map(),
+        password: '',
+    }
 }

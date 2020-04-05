@@ -10,42 +10,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typedi_1 = require("typedi");
+const tableService_1 = require("./tableService");
 // TODO determine whether the differentiation between
 // ConnectedClient and GamePlayer is all that useful
 let ConnectionService = class ConnectionService {
-    constructor() {
-        this.connectedClients = new Map();
-    }
-    getConnectedClient(cookie, creationAllowed) {
-        const client = this.connectedClients.get(cookie);
-        if (client) {
-            return client;
-        }
-        else if (creationAllowed) {
-            const newClient = this.createConnectedClient(cookie);
-            this.connectedClients.set(cookie, newClient);
-            return newClient;
-        }
-        else {
-            throw Error(`Client with cookie ${cookie} was not found,` +
-                ` and client creation is not allowed.`);
-        }
-    }
-    createConnectedClient(cookie) {
-        return {
-            cookie,
-            clientState: "SPECTATING" /* SPECTATING */,
-            gamePlayer: null
-        };
-    }
-    updateClientWithPlayer(connectedClient, player) {
-    }
-    updateClientWithPlayer2(cookie, player) {
+    // these uuids are private
+    // (frontend should never see other players cookies)
+    // connectedClients: Map<string, ConnectedClient> = new Map();
+    constructor(tableService) {
+        this.tableService = tableService;
     }
 };
 ConnectionService = __decorate([
     typedi_1.Service(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [tableService_1.TableService])
 ], ConnectionService);
 exports.ConnectionService = ConnectionService;
 /*

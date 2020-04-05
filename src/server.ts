@@ -9,11 +9,10 @@ import request from 'request'
 import cookie from 'cookie';
 
 import { AddressInfo } from "net";
-import { Action, SitDownRequest } from './models/wsaction';
 import { MessageService } from './service/messageService';
-import { PlayerService } from './service/playerService';
-import { NewTableForm } from './models/table';
-import { TableService } from './service/tableService';
+import { NewGameForm } from './models/table';
+import { GameStateManager } from './service/gameStateManager';
+
 
 @Service()
 class Server {
@@ -25,8 +24,7 @@ class Server {
 
     constructor(
         private messageService: MessageService,
-        private playerService: PlayerService,
-        private tableService: TableService, ) { }
+        private gameStateManager: GameStateManager, ) { }
 
     private initRoutes(): void {
         const router = express.Router()
@@ -40,6 +38,7 @@ class Server {
         Gonna just do it as a get request instead for sake of progress.
 
         */
+        /*
         router.post('/newgame', (req, res) => {
             console.log(req);
             const passedRequest: Request = req.body as Request
@@ -48,12 +47,13 @@ class Server {
 
             request(passedRequest.url, (error: any, response: any, body: any) => {
                 if (!error) {
-                    const newTableForm: NewTableForm = JSON.parse(body) as NewTableForm
-                    const tableUUID = this.tableService.initTable(newTableForm);
+                    const newGameForm: NewGameForm = JSON.parse(body) as NewGameForm
+                    const tableUUID = this.tableService.initTable(newGameForm);
                     res.json(tableUUID);
                 }
             });
         })
+        */
 
         // its probably okay to cut corners for now and bypass the game url
         // and just use the main game url for simplicity since there is only one game
@@ -63,13 +63,13 @@ class Server {
         // this took me less than a minute
         // http://localhost:8080/newgameget?bigBlind=3&smallBlind=1&gameType=NLHOLDEM&password=abc
         router.get('/newgameget', (req, res) => {
-            const newTableForm = {
+            const newGameForm = {
                 smallBlind: req.query.smallBlind,
                 bigBlind: req.query.bigBlind,
                 gameType: req.query.gameType,
                 password: req.query.password
             };
-            const tableUUID = this.tableService.initTable(newTableForm);
+            const tableUUID = this.gameStateManager.initGame(newGameForm);
             res.send(tableUUID);
         });
 
@@ -104,6 +104,7 @@ class Server {
 
             const userCookieID = cookie.parse(req.headers.cookie).id;
             console.log(userCookieID);
+            this.gameStateManager.initConnectedClient(userCookieID);
 
             // get the connectedClient (or make one)
             // const connectedClient = getConnectedClient(userCookieID);

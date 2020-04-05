@@ -15,9 +15,7 @@ export const enum ActionType {
 
 export declare interface SitDownRequest {
     seatNumber: number;
-    requestedChips: number;
-    notes: string;
-    waitForBlind: boolean;
+    // waitForBlind: boolean;
 }
 
 export declare interface JoinTableRequest {

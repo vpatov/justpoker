@@ -5,7 +5,7 @@ export declare interface Player {
     chips: number;
     holeCards: Card[];
     sitting: boolean;
-    // uuid: string;
+    uuid: string;
 }
 
 /*

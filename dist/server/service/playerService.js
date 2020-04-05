@@ -7,38 +7,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typedi_1 = require("typedi");
+const util_1 = require("../util/util");
 let PlayerService = class PlayerService {
-    /*
-    connectedPlayers = new BehaviorSubject<Map<string, Player>>(new Map());
-
-    async createNewPlayer1(name: string) {
-
-        const players = await this.connectedPlayers.getValue();
-
-        let uuid = generateUUID();
-        while (players.has(uuid)) {
-            uuid = generateUUID();
-        }
-        const newPlayer = {
-            name,
-            uuid,
-        };
-        players.set(uuid, newPlayer);
-        this.connectedPlayers.next(players);
-        return newPlayer;
-    }
-    */
     createNewPlayer(name, chips) {
         return {
             name,
             chips,
             holeCards: [],
-            sitting: false
+            sitting: false,
+            uuid: util_1.generateUUID()
         };
-    }
-    // TODO determine if usage of redux style object spread is anti-pattern here
-    addPlayerChips(player, amount) {
-        return Object.assign(Object.assign({}, player), { chips: player.chips + amount });
     }
 };
 PlayerService = __decorate([
