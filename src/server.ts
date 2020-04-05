@@ -70,6 +70,7 @@ class Server {
                 password: req.query.password
             };
             const tableUUID = this.gameStateManager.initGame(newGameForm);
+            console.log(tableUUID);
             res.send(tableUUID);
         });
 
@@ -114,11 +115,12 @@ class Server {
                 if (typeof data === 'string') {
                     try {
                         const action = JSON.parse(data);
-                        const res = this.messageService
-                            .processMessage(action, userCookieID);
+                        const res = JSON.stringify(this.messageService
+                            .processMessage(action, userCookieID));
                         ws.send(res);
                     }
                     catch (e) {
+                        console.log(e);
                         console.log("Couldn't parse data.");
                         ws.send("Couldn't parse data.");
                     }
