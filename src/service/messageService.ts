@@ -1,11 +1,11 @@
 import { Action, ActionType, SitDownRequest } from '../models/wsaction';
-import { GameService } from './gameService';
+import { TableService } from './tableService';
 import { Service } from "typedi";
 
 @Service()
 export class MessageService {
 
-    constructor(private gameService: GameService) {
+    constructor(private tableService: TableService) {
 
     }
 
@@ -15,12 +15,14 @@ export class MessageService {
         const data = action.data;
 
         /* things to think about:
-            1) Best abstraction for message handling delegation. Services with DI? Inheritance?
+            1) Best abstraction for message handling delegation.
+                Services with DI? Inheritance?
                 A switch statement like this?
             2) How you will handle validity of user actions.
             For example, if its not a users turn but their socket sends "BET"
             3) How to handle returning responses?
-            4) Where is the game state going to be? Is there one game state? For now assume one game state
+            4) Where is the game state going to be? Is there one game state?
+                For now assume one game state
         */
         switch (actionType) {
             case ActionType.StartGame: {
@@ -37,7 +39,9 @@ export class MessageService {
                 return this.processStandUpMessage(data);
             }
 
-            // if games are identified by URL, and are non-private, then this isn't necessary.
+            // if games are identified by URL, and are non-private,
+            // then this isn't necessary.
+
             // Also, this probably shouldn't be a socket action.
             // case ActionType.JoinRoom: {
             //     return this.processJoinRoomMessage(data);
@@ -60,7 +64,7 @@ export class MessageService {
     // how will this interact with the game?
     // will each instance of node be handling one game?
     // for now, and mvp, assume just one game.
-    // can communicate via DI to gameService
+    // can communicate via DI to tableService
     processSitDownMessage(data: SitDownRequest) {
         return "Received sitdown message";
     }

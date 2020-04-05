@@ -3,14 +3,11 @@ import { Card } from './cards';
 export declare interface GameParameters {
     smallBlind: number;
     bigBlind: number;
+    gameType: GameType;
     // add these later
     // straddleType: StraddleType;
     // ante: number;
 }
-
-// TODO learn about other types of poker, and learn how they are
-// diffrent from texas hold em, and figure out where it would be best to
-// capture logic differences. Can the game type go into game parameters?
 
 export const enum StraddleType {
     NoStraddle = "NoStraddle",
@@ -18,13 +15,31 @@ export const enum StraddleType {
     NormalStraddle = "NormalStraddle",
 }
 
+// These are the community cards
 export declare interface Board {
     cards: Card[]
 }
 
-
 export const enum GameType {
-    LimitTexasHoldEm = 'LimitTexasHoldEm',
-    NoLimitTexasHoldEm = 'NoLimitTexasHoldEm',
-    PotLimitOmaha = 'PotLimitOmaha',
+    LHOLDEM = 'LHOLDEM',
+    NLHOLDEM = 'NLHOLDEM',
+    PLOMAHA = 'PLOMAHA',
+}
+
+// The usage of this enum might need to change
+// if expanding app to beyond nlholdem and plo
+export const enum BettingRound {
+    WAITING = 'WAITING',
+    PREFLOP = 'PREFLOP',
+    FLOP = 'FLOP',
+    TURN = 'TURN',
+    RIVER = 'RIVER',
+}
+
+export declare interface NewTableForm {
+    hostName: string;
+    smallBlind: number;
+    bigBlind: number;
+    gameType: GameType;
+    hostStack: number;
 }

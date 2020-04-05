@@ -22,24 +22,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const typedi_1 = require("typedi");
 const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
 const http = __importStar(require("http"));
 const WebSocket = __importStar(require("ws"));
 const messageService_1 = require("./service/messageService");
+const playerService_1 = require("./service/playerService");
 let Server = class Server {
-    constructor(messageService) {
+    constructor(messageService, playerService) {
         this.messageService = messageService;
+        this.playerService = playerService;
         this.defaultPort = 8080;
     }
     init() {
         this.app = express_1.default();
+        this.app.use(body_parser_1.default.json());
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ 'server': this.server });
-        // TODO look at https://livebook.manning.com/book/typescript-quickly/chapter-10/v-9/233
-        // where he has a baseclass for a MessageServer, that other MessageServers can extend
-        // it could be a good idea to have a separate server for different types of actions
+        /* TODO look at
+        https://livebook.manning.com/book/typescript-quickly/chapter-10/v-9/233
+        where he has a baseclass for a MessageServer, that other MessageServers
+        can extend. it could be a good idea to have a separate server for
+        different types of actions
+        */
         this.wss.on('connection', (ws, req) => {
             const ip = req.connection.remoteAddress;
             console.log("connected to ip:", ip);
+            // const player = playerService.newPlayer("vasia");
             ws.on('message', (data) => {
                 if (typeof data === 'string') {
                     try {
@@ -65,14 +73,16 @@ let Server = class Server {
         this.app.get("/", (req, res) => {
             res.send("Poker Web.");
         });
-        this.app.get("/newgame", (req, res) => {
-            const name = req.query.name;
+        this.app.post('/newgame', function (req, res) {
+            this.tableService.createNewTable(req.body);
+            res.send("Dog added!");
         });
     }
 };
 Server = __decorate([
     typedi_1.Service(),
-    __metadata("design:paramtypes", [messageService_1.MessageService])
+    __metadata("design:paramtypes", [messageService_1.MessageService,
+        playerService_1.PlayerService])
 ], Server);
 const server = typedi_1.Container.get(Server);
 server.init();

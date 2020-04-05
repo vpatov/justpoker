@@ -1,6 +1,6 @@
 import { Service } from "typedi";
-import { SecureGameState } from '../models/gameState';
-import { StraddleType, GameType, GameParameters } from '../models/game';
+import { SecureGameState, cleanSecureGameState } from '../models/gameState';
+import { StraddleType, GameType, GameParameters, } from '../models/game';
 import { Player } from '../models/player';
 import { DeckService } from './deckService';
 import { Observable, Subject } from 'rxjs';
@@ -14,21 +14,23 @@ export class GameStateManager {
     constructor(private deckService: DeckService) { }
 
 
-    newGame(players: Player[]): SecureGameState {
-        this.gameState =
-        {
-            gameState: {
-                players,
-                gameType: GameType.NoLimitTexasHoldEm,
-                board: { cards: [] },
-                gameParameters: {
-                    smallBlind: 1,
-                    bigBlind: 2,
-                }
+    initGameState(players: Player[]): SecureGameState {
+        this.gameState = { ...cleanSecureGameState };
 
-            },
-            deck: this.deckService.newDeck(),
-        };
+        // {
+        //     gameState: {
+        //         players,
+        //         board: { cards: [] },
+        //         gameParameters: {
+        //             smallBlind: 1,
+        //             bigBlind: 2,
+        //             gameType: GameType.NLHOLDEM,
+
+        //         }
+
+        //     },
+        //     deck: this.deckService.newDeck(),
+        // };
         return this.gameState;
     }
 }

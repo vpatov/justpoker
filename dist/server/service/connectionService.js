@@ -8,26 +8,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 const typedi_1 = require("typedi");
-const playerService_1 = require("./playerService");
-let TableService = 
-// maybe this can be renamed to RoomService :)
-// or more accurately, TableService
-class TableService {
-    constructor(playerService) {
+let TableService = class TableService {
+    constructor(playerService, gameStateManager) {
         this.playerService = playerService;
+        this.gameStateManager = gameStateManager;
     }
-    newGame(newGameForm) {
-        const player = this.playerService.newPlayer(newGameForm.hostName);
+    // for now there is only one table object
+    initTable(newTableForm) {
+        this.table = Object.assign({}, cleanTable);
     }
 };
 TableService = __decorate([
-    typedi_1.Service()
-    // maybe this can be renamed to RoomService :)
-    // or more accurately, TableService
-    ,
-    __metadata("design:paramtypes", [playerService_1.PlayerService])
+    typedi_1.Service(),
+    __metadata("design:paramtypes", [typeof (_a = typeof PlayerService !== "undefined" && PlayerService) === "function" ? _a : Object, typeof (_b = typeof GameStateManager !== "undefined" && GameStateManager) === "function" ? _b : Object])
 ], TableService);
 exports.TableService = TableService;
-//# sourceMappingURL=gameService.js.map
+//# sourceMappingURL=connectionService.js.map

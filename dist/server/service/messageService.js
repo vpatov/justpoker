@@ -9,22 +9,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const gameService_1 = require("./gameService");
+const tableService_1 = require("./tableService");
 const typedi_1 = require("typedi");
 let MessageService = class MessageService {
-    constructor(gameService) {
-        this.gameService = gameService;
+    constructor(tableService) {
+        this.tableService = tableService;
     }
     processMessage(action) {
         const actionType = action.actionType;
         const data = action.data;
         /* things to think about:
-            1) Best abstraction for message handling delegation. Services with DI? Inheritance?
+            1) Best abstraction for message handling delegation.
+                Services with DI? Inheritance?
                 A switch statement like this?
             2) How you will handle validity of user actions.
             For example, if its not a users turn but their socket sends "BET"
             3) How to handle returning responses?
-            4) Where is the game state going to be? Is there one game state? For now assume one game state
+            4) Where is the game state going to be? Is there one game state?
+                For now assume one game state
         */
         switch (actionType) {
             case "StartGame" /* StartGame */: {
@@ -39,7 +41,8 @@ let MessageService = class MessageService {
             case "StandUp" /* StandUp */: {
                 return this.processStandUpMessage(data);
             }
-            // if games are identified by URL, and are non-private, then this isn't necessary.
+            // if games are identified by URL, and are non-private,
+            // then this isn't necessary.
             // Also, this probably shouldn't be a socket action.
             // case ActionType.JoinRoom: {
             //     return this.processJoinRoomMessage(data);
@@ -56,7 +59,7 @@ let MessageService = class MessageService {
     // how will this interact with the game?
     // will each instance of node be handling one game?
     // for now, and mvp, assume just one game.
-    // can communicate via DI to gameService
+    // can communicate via DI to tableService
     processSitDownMessage(data) {
         return "Received sitdown message";
     }
@@ -66,7 +69,7 @@ let MessageService = class MessageService {
 };
 MessageService = __decorate([
     typedi_1.Service(),
-    __metadata("design:paramtypes", [gameService_1.GameService])
+    __metadata("design:paramtypes", [tableService_1.TableService])
 ], MessageService);
 exports.MessageService = MessageService;
 //# sourceMappingURL=messageService.js.map

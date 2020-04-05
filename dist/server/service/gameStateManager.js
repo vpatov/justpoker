@@ -10,25 +10,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typedi_1 = require("typedi");
+const gameState_1 = require("../models/gameState");
 const deckService_1 = require("./deckService");
 let GameStateManager = class GameStateManager {
     constructor(deckService) {
         this.deckService = deckService;
     }
-    newGame(players) {
-        this.gameState =
-            {
-                gameState: {
-                    players,
-                    gameType: "NoLimitTexasHoldEm" /* NoLimitTexasHoldEm */,
-                    board: { cards: [] },
-                    gameParameters: {
-                        smallBlind: 1,
-                        bigBlind: 2,
-                    }
-                },
-                deck: this.deckService.newDeck(),
-            };
+    initGameState(players) {
+        this.gameState = Object.assign({}, gameState_1.cleanSecureGameState);
+        // {
+        //     gameState: {
+        //         players,
+        //         board: { cards: [] },
+        //         gameParameters: {
+        //             smallBlind: 1,
+        //             bigBlind: 2,
+        //             gameType: GameType.NLHOLDEM,
+        //         }
+        //     },
+        //     deck: this.deckService.newDeck(),
+        // };
         return this.gameState;
     }
 };

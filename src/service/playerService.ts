@@ -1,9 +1,10 @@
 import { Service } from "typedi";
 import { Player } from '../models/player';
+import { generateUUID } from '../util/util';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Service()
-class PlayerService {
+export class PlayerService {
 
     connectedPlayers = new BehaviorSubject<Map<string, Player>>(new Map());
 
@@ -12,9 +13,9 @@ class PlayerService {
 
         const players = await this.connectedPlayers.getValue();
 
-        let uuid = this.generateUUID();
+        let uuid = generateUUID();
         while (players.has(uuid)) {
-            uuid = this.generateUUID();
+            uuid = generateUUID();
         }
         const newPlayer = {
             name,
@@ -25,9 +26,20 @@ class PlayerService {
         return newPlayer;
     }
 
-    generateUUID() {
-        return Math.random().toString(36).substring(2, 15) +
-            Math.random().toString(36).substring(2, 15);
+    /*
+        Upon loading the frontend app, frontend looks up our cookie.
+        1) If it can't find it, it creates a new WSconnection and cookie
+        2) If it finds it, it reuses the cookie and WSconnects with it.
+
+        It is probably best to make the code path for creating a websocket
+        connection the same, regardless of whether client is host creating
+        a table, or someone else joining existing table.
+
+        Therefore, post request for new table should generate
+        a table ID and url.
+    */
+    async createNewConnectedClient() {
+
     }
 }
 
