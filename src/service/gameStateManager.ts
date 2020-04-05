@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import { SecureGameState, cleanSecureGameState } from '../models/gameState';
+import { GameState, cleanGameState } from '../models/gameState';
 import { StraddleType, GameType, GameParameters, } from '../models/game';
 import { Player } from '../models/player';
 import { DeckService } from './deckService';
@@ -9,31 +9,31 @@ import { Observable, Subject } from 'rxjs';
 @Service()
 export class GameStateManager {
 
-    gameState: SecureGameState;
+    gameState: Readonly<GameState>;
 
     constructor(private deckService: DeckService) { }
 
-
-    initGameState(players: Player[]): SecureGameState {
-        this.gameState = { ...cleanSecureGameState };
-
-        // {
-        //     gameState: {
-        //         players,
-        //         board: { cards: [] },
-        //         gameParameters: {
-        //             smallBlind: 1,
-        //             bigBlind: 2,
-        //             gameType: GameType.NLHOLDEM,
-
-        //         }
-
-        //     },
-        //     deck: this.deckService.newDeck(),
-        // };
+    getGameState(): GameState {
         return this.gameState;
     }
+
+    initGameState() {
+        this.gameState = { ...cleanGameState };
+    }
+
+    updateGameParameters(gameParameters: GameParameters) {
+        this.gameState = {
+            ...this.gameState,
+            gameParameters: {
+                ...gameParameters
+            }
+        };
+    }
+
+
 }
+
+// https://github.com/goldfire/pokersolver
 
 
 

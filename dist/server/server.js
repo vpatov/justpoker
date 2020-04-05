@@ -8,9 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -18,24 +15,75 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const typedi_1 = require("typedi");
-const express_1 = __importDefault(require("express"));
-const body_parser_1 = __importDefault(require("body-parser"));
 const http = __importStar(require("http"));
 const WebSocket = __importStar(require("ws"));
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const request_1 = __importDefault(require("request"));
+const cookie_1 = __importDefault(require("cookie"));
 const messageService_1 = require("./service/messageService");
 const playerService_1 = require("./service/playerService");
+const tableService_1 = require("./service/tableService");
 let Server = class Server {
-    constructor(messageService, playerService) {
+    constructor(messageService, playerService, tableService) {
         this.messageService = messageService;
         this.playerService = playerService;
+        this.tableService = tableService;
         this.defaultPort = 8080;
+    }
+    initRoutes() {
+        const router = express_1.default.Router();
+        router.get('/', (req, res) => {
+            res.send("Poker Web.");
+        });
+        /*
+        I can't get this post request working for some reason.
+        Gonna just do it as a get request instead for sake of progress.
+
+        */
+        router.post('/newgame', (req, res) => {
+            console.log(req);
+            const passedRequest = req.body;
+            console.log(passedRequest);
+            request_1.default(passedRequest.url, (error, response, body) => {
+                if (!error) {
+                    const newTableForm = JSON.parse(body);
+                    const tableUUID = this.tableService.initTable(newTableForm);
+                    res.json(tableUUID);
+                }
+            });
+        });
+        // its probably okay to cut corners for now and bypass the game url
+        // and just use the main game url for simplicity since there is only one game
+        // happening right now
+        // lol I spent an hour trying to get post working and
+        // this took me less than a minute
+        // http://localhost:8080/newgameget?bigBlind=3&smallBlind=1&gameType=NLHOLDEM&password=abc
+        router.get('/newgameget', (req, res) => {
+            const newTableForm = {
+                smallBlind: req.query.smallBlind,
+                bigBlind: req.query.bigBlind,
+                gameType: req.query.gameType,
+                password: req.query.password
+            };
+            const tableUUID = this.tableService.initTable(newTableForm);
+            res.send(tableUUID);
+        });
+        this.app.use(body_parser_1.default.json());
+        this.app.use(body_parser_1.default.urlencoded({
+            extended: true
+        }));
+        this.app.use('/', router);
     }
     init() {
         this.app = express_1.default();
-        this.app.use(body_parser_1.default.json());
+        this.initRoutes();
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ 'server': this.server });
         /* TODO look at
@@ -47,12 +95,18 @@ let Server = class Server {
         this.wss.on('connection', (ws, req) => {
             const ip = req.connection.remoteAddress;
             console.log("connected to ip:", ip);
-            // const player = playerService.newPlayer("vasia");
+            console.log("req", req.headers);
+            const userCookieID = cookie_1.default.parse(req.headers.cookie).id;
+            console.log(userCookieID);
+            // get the connectedClient (or make one)
+            // const connectedClient = getConnectedClient(userCookieID);
             ws.on('message', (data) => {
+                console.log("Incoming:", data);
                 if (typeof data === 'string') {
                     try {
                         const action = JSON.parse(data);
-                        const res = this.messageService.processMessage(action);
+                        const res = this.messageService
+                            .processMessage(action, userCookieID);
                         ws.send(res);
                     }
                     catch (e) {
@@ -70,20 +124,16 @@ let Server = class Server {
             const port = this.server.address();
             console.log(`Server started on address ${JSON.stringify(port)} :)`);
         });
-        this.app.get("/", (req, res) => {
-            res.send("Poker Web.");
-        });
-        this.app.post('/newgame', function (req, res) {
-            this.tableService.createNewTable(req.body);
-            res.send("Dog added!");
-        });
     }
 };
 Server = __decorate([
     typedi_1.Service(),
     __metadata("design:paramtypes", [messageService_1.MessageService,
-        playerService_1.PlayerService])
+        playerService_1.PlayerService,
+        tableService_1.TableService])
 ], Server);
+//   this.mountRoutes()
+// }
 const server = typedi_1.Container.get(Server);
 server.init();
 //# sourceMappingURL=server.js.map

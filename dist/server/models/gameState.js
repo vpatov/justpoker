@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cleanPublicGameState = {
+exports.cleanGameState = {
     players: [],
     board: {
         cards: []
@@ -14,9 +14,6 @@ exports.cleanPublicGameState = {
     smallBlindPlayer: null,
     bigBlindPlayer: null,
     currentBettingRound: "WAITING" /* WAITING */,
-};
-exports.cleanSecureGameState = {
-    gameState: exports.cleanPublicGameState,
     deck: {
         cards: []
     },

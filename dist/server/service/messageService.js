@@ -10,24 +10,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const tableService_1 = require("./tableService");
+const connectionService_1 = require("./connectionService");
+const playerService_1 = require("./playerService");
 const typedi_1 = require("typedi");
 let MessageService = class MessageService {
-    constructor(tableService) {
+    constructor(tableService, connectionService, playerService) {
         this.tableService = tableService;
+        this.connectionService = connectionService;
+        this.playerService = playerService;
     }
-    processMessage(action) {
+    processMessage(action, cookie) {
         const actionType = action.actionType;
         const data = action.data;
-        /* things to think about:
-            1) Best abstraction for message handling delegation.
-                Services with DI? Inheritance?
-                A switch statement like this?
-            2) How you will handle validity of user actions.
-            For example, if its not a users turn but their socket sends "BET"
-            3) How to handle returning responses?
-            4) Where is the game state going to be? Is there one game state?
-                For now assume one game state
-        */
+        const connectedClient = this.connectionService.getConnectedClient(cookie, false);
         switch (actionType) {
             case "StartGame" /* StartGame */: {
                 return this.processStartGameMessage(data);
@@ -41,13 +36,9 @@ let MessageService = class MessageService {
             case "StandUp" /* StandUp */: {
                 return this.processStandUpMessage(data);
             }
-            // if games are identified by URL, and are non-private,
-            // then this isn't necessary.
-            // Also, this probably shouldn't be a socket action.
-            // case ActionType.JoinRoom: {
-            //     return this.processJoinRoomMessage(data);
-            // }
-            // should room be created via http request or through websocket?
+            case "JoinTable" /* JoinTable */: {
+                return this.processJoinTableMessage(data, connectedClient);
+            }
         }
     }
     processStartGameMessage(data) {
@@ -56,20 +47,23 @@ let MessageService = class MessageService {
     processStopGameMessage(data) {
         return "Received stop game message";
     }
-    // how will this interact with the game?
-    // will each instance of node be handling one game?
-    // for now, and mvp, assume just one game.
-    // can communicate via DI to tableService
     processSitDownMessage(data) {
         return "Received sitdown message";
     }
     processStandUpMessage(data) {
         return "Received stand up message";
     }
+    processJoinTableMessage(data, client) {
+        const player = this.playerService.createNewPlayer(data.name, data.buyin);
+        client.gamePlayer = player;
+        return `Welcome to the table ${player.name}`;
+    }
 };
 MessageService = __decorate([
     typedi_1.Service(),
-    __metadata("design:paramtypes", [tableService_1.TableService])
+    __metadata("design:paramtypes", [tableService_1.TableService,
+        connectionService_1.ConnectionService,
+        playerService_1.PlayerService])
 ], MessageService);
 exports.MessageService = MessageService;
 //# sourceMappingURL=messageService.js.map

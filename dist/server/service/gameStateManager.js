@@ -16,21 +16,14 @@ let GameStateManager = class GameStateManager {
     constructor(deckService) {
         this.deckService = deckService;
     }
-    initGameState(players) {
-        this.gameState = Object.assign({}, gameState_1.cleanSecureGameState);
-        // {
-        //     gameState: {
-        //         players,
-        //         board: { cards: [] },
-        //         gameParameters: {
-        //             smallBlind: 1,
-        //             bigBlind: 2,
-        //             gameType: GameType.NLHOLDEM,
-        //         }
-        //     },
-        //     deck: this.deckService.newDeck(),
-        // };
+    getGameState() {
         return this.gameState;
+    }
+    initGameState() {
+        this.gameState = Object.assign({}, gameState_1.cleanGameState);
+    }
+    updateGameParameters(gameParameters) {
+        this.gameState = Object.assign(Object.assign({}, this.gameState), { gameParameters: Object.assign({}, gameParameters) });
     }
 };
 GameStateManager = __decorate([
@@ -38,6 +31,7 @@ GameStateManager = __decorate([
     __metadata("design:paramtypes", [deckService_1.DeckService])
 ], GameStateManager);
 exports.GameStateManager = GameStateManager;
+// https://github.com/goldfire/pokersolver
 // export declare interface SecureGameState {
 // gameState: PublicGameState;
 // deck: Deck;
