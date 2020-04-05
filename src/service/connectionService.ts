@@ -38,7 +38,7 @@ export class ConnectionService {
     }
 
     updateClientWithPlayer(connectedClient: ConnectedClient, player: Player) {
-
+        
     }
 
     updateClientWithPlayer2(cookie: string, player: Player) {
