@@ -40,6 +40,7 @@ export class GameStateManager {
                 gameType: newGameForm.gameType
             }
         };
+        return this.gameState.table.uuid;
     }
 
     initTable(newGameForm: NewGameForm) {
