@@ -20,6 +20,7 @@ import { generateUUID } from '../util/util';
 export class GameStateManager {
 
     gameState: Readonly<GameState>;
+    gameTimer: NodeJS.Timer;
 
     constructor(
         private readonly deckService: DeckService,
@@ -112,32 +113,29 @@ export class GameStateManager {
 
     getConnectedClient(cookie: string) {
         const client = this.gameState.table.activeConnections.get(cookie);
-        if (!client) {
-            throw Error(`Client ${cookie} does not exist.`);
-        }
         return client;
     }
 
-    createConnectedClient(cookie: string): ConnectedClient {
+    createConnectedClient(clientUUID: string): ConnectedClient {
         return {
-            cookie,
+            uuid: clientUUID,
             playerUUID: ''
         };
     }
 
-    getPlayer(cookie: string): Player {
-        console.log("\n getPlayer \n");
+    getPlayerByClientUUID(cookie: string): Player {
         const connectedClient = this.getConnectedClient(cookie);
         const playerUUID = connectedClient.playerUUID;
+        return this.getPlayer(playerUUID);
+    }
+
+    getPlayer(playerUUID: string) {
         const player = this.gameState.players[playerUUID];
-        if (!player) {
-            throw Error(`Player ${playerUUID} does not exist. Fatal error.`);
-        }
+
         return player;
     }
 
     associateClientAndPlayer(cookie: string, player: Player) {
-        console.log("\n associateClientAndPlayer \n");
         const connectedClient = this.getConnectedClient(cookie);
         if (connectedClient.playerUUID) {
             throw Error("The client already has a player association.");
@@ -148,10 +146,9 @@ export class GameStateManager {
         };
     }
 
-    addNewPlayerToGame(cookie: string, name: string, buyin: number) {
-        console.log("\n addNewPlayerToGame \n");
+    addNewPlayerToGame(clientUUID: string, name: string, buyin: number) {
         const player = this.playerService.createNewPlayer(name, buyin);
-        const associatedClient = this.associateClientAndPlayer(cookie, player);
+        const associatedClient = this.associateClientAndPlayer(clientUUID, player);
         this.gameState = {
             ...this.gameState,
             players: { ...this.gameState.players, [player.uuid]: player },
@@ -159,12 +156,10 @@ export class GameStateManager {
                 ...this.gameState.table,
                 activeConnections: new Map([
                     ...this.gameState.table.activeConnections,
-                    [associatedClient.cookie, associatedClient]
+                    [associatedClient.uuid, associatedClient]
                 ])
             }
         };
-        console.log(this.gameState);
-        console.log(this.gameState.table);
         return this.gameState;
     }
 
@@ -180,18 +175,22 @@ export class GameStateManager {
     }
 
     // dealer is position X, SB X+1, BB X+2 (wrap around)
-    sitDownPlayer(cookie: string, seatNumber: number) {
-        console.log("\n sitDownPlayer \n");
-        const client = this.getConnectedClient(cookie);
+    sitDownPlayer(playerUUID: string, seatNumber: number) {
         const player = {
-            ...this.gameState.players[client.playerUUID],
+            ...this.gameState.players[playerUUID],
             sitting: true,
             seatNumber,
-
         };
+        const players = { ...this.gameState.players, [player.uuid]: player };
+        const seats: [number, string][] = Object.values(players).map(
+            (player) => [player.seatNumber, player.uuid]
+        );
+        seats.sort();
+
         this.gameState = {
             ...this.gameState,
-            players: { ...this.gameState.players, [player.uuid]: player }
+            players,
+            seats,
         };
         return this.gameState;
     }
@@ -199,26 +198,24 @@ export class GameStateManager {
     // change betting round to preflop
     // start timer
     startGame(cookie: string) {
-        console.log("\n startGame \n");
-
         if (this.gameState.gameInProgress) {
             throw Error(`Cannot start game, game is already in progress.`);
         }
         this.gameState = {
             ...this.gameState,
-            gameInProgress: true
+            gameInProgress: true,
         };
 
         this.startGameTimer();
 
         // TODO this shouldnt stay in this method
         this.initializePreflop();
+
+        return this.gameState;
     }
 
 
     initializePreflop() {
-        console.log("\n initializePreflop \n");
-
         if (!this.gameState.gameInProgress) {
             throw Error(`Game must be in progress to initialize preflop`);
         }
@@ -248,9 +245,48 @@ export class GameStateManager {
 
     // the UI should make it seem like user has X seconds to act, but the server
     // will allow X + 2 seconds to make up for network issues
+
+    // There should be one global timer, and that is the only timer that is running.
     startGameTimer() {
-        console.log("\n startGameTimer \n");
+        const serverTime = Date.now();
+        this.gameState = {
+            ...this.gameState,
+            serverTime
+        };
+
+        this.gameTimer = setTimeout(
+            this.timerFunc, this.gameState.gameParameters.timeToAct);
+    }
+
+    // looks at game state and determines
+    timerFunc() {
 
     }
+
+
+    gamePlayActionCheck() {
+        // determine if check is check allowed
+        // set current player's last action to check
+        // change the current player (whose turn is it to act)
+        // restart timer
+
+    }
+
+    gamePlayActionBet() {
+
+        // determine if bet is allowed
+    }
+
+    isCheckAllowed() {
+
+    }
+
+
+    /*
+        Player actions that all clear the timeout:
+        Standing up, folding, checking, betting, raising, quitting.
+    */
+
+
 
 }

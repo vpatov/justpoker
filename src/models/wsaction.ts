@@ -12,6 +12,12 @@ export const enum ActionType {
     StandUp = 'StandUp',
     JoinTable = 'JoinTable',
     PingState = 'PingState',
+    Check = 'Check',
+    Bet = 'Bet',
+    Raise = 'Raise',
+    Fold = 'Fold',
+    Call = 'Call',
+    Chat = 'Chat',
 }
 
 export declare interface SitDownRequest {

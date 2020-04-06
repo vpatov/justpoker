@@ -1,0 +1,69 @@
+import { Service } from "typedi";
+import { GameStateManager } from './gameStateManager';
+import { SitDownRequest } from '../models/wsaction';
+
+@Service()
+export class ValidationService {
+
+    constructor(
+        private readonly gameStateManager: GameStateManager,
+    ) { }
+
+    validateClientExists(clientUUID: string) {
+        const client = this.gameStateManager.getConnectedClient(clientUUID);
+        if (!client) {
+            throw Error(`Client ${clientUUID} does not exist.`);
+        }
+
+        return client;
+    }
+
+    validateClientIsInGame(clientUUID: string) {
+        const client = this.validateClientExists(clientUUID);
+
+        if (!client.playerUUID) {
+            throw Error(`Client ${clientUUID} has not joined the game.`);
+        }
+
+        const player = this.gameStateManager.getPlayer(client.playerUUID);
+
+        if (!player) {
+            throw Error(`Player ${client.playerUUID} does not exist.`);
+        }
+
+        return player;
+    }
+
+    validateClientIsNotInGame(clientUUID: string) {
+        const client = this.validateClientExists(clientUUID);
+
+        if (client.playerUUID) {
+            throw Error(`Client ${clientUUID} already has player association: ${client.playerUUID}`);
+        }
+    }
+
+    validateSitDownAction(clientUUID: string, request: SitDownRequest) {
+
+        this.validateClientIsInGame(clientUUID);
+
+        const seatNumber = request.seatNumber;
+        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+
+        if (player.chips <= 0) {
+            throw Error(`Player ${player.name} needs chips` +
+                ` to sit down.`);
+        }
+
+        if (!this.gameStateManager.isValidSeat(seatNumber)) {
+            throw Error(`Seat ${seatNumber} is not a valid seat.`);
+        }
+
+        if (this.gameStateManager.isSeatTaken(seatNumber)) {
+            throw Error(`Seat ${seatNumber} is taken.Please` +
+                `pick another`);
+        }
+    }
+
+
+
+}

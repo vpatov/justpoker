@@ -12,9 +12,12 @@ export declare interface GameState {
     bigBlindPlayer: Readonly<string>;
     smallBlindPlayer: Readonly<string>;
     currentBettingRound: Readonly<BettingRound>;
+    currentPlayerToAct: string;
+    seats: ReadonlyArray<[number, string]>,
     gameInProgress: boolean;
     deck: Readonly<Deck>;
     table: Table;
+    serverTime: number;
 }
 
 export const cleanGameState: GameState = {
@@ -33,6 +36,8 @@ export const cleanGameState: GameState = {
     smallBlindPlayer: '',
     bigBlindPlayer: '',
     currentBettingRound: BettingRound.WAITING,
+    currentPlayerToAct: '',
+    seats: [],
     gameInProgress: false,
     deck: {
         cards: []
@@ -41,5 +46,6 @@ export const cleanGameState: GameState = {
         uuid: '',
         activeConnections: new Map(),
         password: '',
-    }
+    },
+    serverTime: 0,
 }
