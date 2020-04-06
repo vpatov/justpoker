@@ -21,6 +21,7 @@ class Server {
     server: http.Server;
     defaultPort = 8080;
     wss: WebSocket.Server;
+    tableInitialized = false;
 
     constructor(
         private messageService: MessageService,
@@ -63,15 +64,25 @@ class Server {
         // this took me less than a minute
         // http://localhost:8080/newgameget?bigBlind=3&smallBlind=1&gameType=NLHOLDEM&password=abc
         router.get('/newgameget', (req, res) => {
-            const newGameForm = {
-                smallBlind: req.query.smallBlind,
-                bigBlind: req.query.bigBlind,
-                gameType: req.query.gameType,
-                password: req.query.password
-            };
-            const tableUUID = this.gameStateManager.initGame(newGameForm);
-            console.log(tableUUID);
-            res.send(tableUUID);
+            // reintroduce when you want to prevent accidental table recreation
+            if (this.tableInitialized && false) {
+                res.send("Table already initialized. Can only make one " +
+                    "table per server instance (restriction is temporary," +
+                    " put in place just for MVP/dev)");
+            }
+
+            else {
+                const newGameForm = {
+                    smallBlind: req.query.smallBlind,
+                    bigBlind: req.query.bigBlind,
+                    gameType: req.query.gameType,
+                    password: req.query.password
+                };
+                const tableUUID = this.gameStateManager.initGame(newGameForm);
+                this.tableInitialized = true;
+                console.log(tableUUID);
+                res.send(JSON.stringify({ "tableUUID": tableUUID }));
+            }
         });
 
         this.app.use(bodyParser.json());
@@ -100,29 +111,34 @@ class Server {
         this.wss.on('connection', (ws: WebSocket, req) => {
             const ip = req.connection.remoteAddress;
             console.log("connected to ip:", ip);
+            let userCookieID = '';
 
-            console.log("req", req.headers);
 
-            const userCookieID = cookie.parse(req.headers.cookie).id;
+            try {
+                userCookieID = cookie.parse(req.headers.cookie).id;
+            }
+            catch (e) {
+                console.log(e);
+                return;
+            }
             console.log(userCookieID);
             this.gameStateManager.initConnectedClient(userCookieID);
-
-            // get the connectedClient (or make one)
-            // const connectedClient = getConnectedClient(userCookieID);
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log("Incoming:", data);
                 if (typeof data === 'string') {
+                    // TODO populate error meaningfully
+                    const error = '';
                     try {
                         const action = JSON.parse(data);
-                        const res = JSON.stringify(this.messageService
-                            .processMessage(action, userCookieID));
-                        ws.send(res);
+                        const res = this.messageService
+                            .processMessage(action, userCookieID);
+                        console.log(res, '\n');
+                        ws.send(JSON.stringify(res));
                     }
                     catch (e) {
                         console.log(e);
-                        console.log("Couldn't parse data.");
-                        ws.send("Couldn't parse data.");
+                        ws.send(error);
                     }
 
                 } else {

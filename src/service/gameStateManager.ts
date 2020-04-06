@@ -53,6 +53,23 @@ export class GameStateManager {
         };
     }
 
+    stripSensitiveFields(cookie: string) {
+        const connectedClient = this.getConnectedClient(cookie);
+        const clientPlayerUUID = connectedClient.playerUUID;
+        const strippedGameState = {
+            ...this.gameState,
+            players: Object.keys(this.gameState.players).map(
+                (uuid) => (uuid === clientPlayerUUID ?
+                    this.gameState.players[uuid] :
+                    { ...this.gameState.players[uuid], holeCards: [] })
+            ),
+        };
+        delete strippedGameState.deck;
+        delete strippedGameState.table;
+
+        return strippedGameState;
+    }
+
     updateGameParameters(gameParameters: GameParameters) {
         this.gameState = {
             ...this.gameState,
@@ -92,27 +109,50 @@ export class GameStateManager {
     createConnectedClient(cookie: string): ConnectedClient {
         return {
             cookie,
-            gamePlayer: ''
+            playerUUID: ''
         };
     }
 
-    associateClientAndPlayer(connectedClient: ConnectedClient, player: Player) {
-        if (connectedClient.gamePlayer) {
+    getPlayer(cookie: string): Player {
+        console.log("\n getPlayer \n");
+        const connectedClient = this.getConnectedClient(cookie);
+        const playerUUID = connectedClient.playerUUID;
+        const player = this.gameState.players[playerUUID];
+        if (!player) {
+            throw Error(`Player ${playerUUID} does not exist. Fatal error.`);
+        }
+        return player;
+    }
+
+    associateClientAndPlayer(cookie: string, player: Player) {
+        console.log("\n associateClientAndPlayer \n");
+        const connectedClient = this.getConnectedClient(cookie);
+        if (connectedClient.playerUUID) {
             throw Error("The client already has a player association.");
         }
         return {
             ...connectedClient,
-            gamePlayer: player.uuid
+            playerUUID: player.uuid
         };
     }
 
-    addNewPlayerToGame(client: ConnectedClient, name: string, buyin: number) {
+    addNewPlayerToGame(cookie: string, name: string, buyin: number) {
+        console.log("\n addNewPlayerToGame \n");
         const player = this.playerService.createNewPlayer(name, buyin);
-        this.associateClientAndPlayer(client, player);
+        const associatedClient = this.associateClientAndPlayer(cookie, player);
         this.gameState = {
             ...this.gameState,
-            players: { ...this.gameState.players, [player.uuid]: player }
+            players: { ...this.gameState.players, [player.uuid]: player },
+            table: {
+                ...this.gameState.table,
+                activeConnections: new Map([
+                    ...this.gameState.table.activeConnections,
+                    [associatedClient.cookie, associatedClient]
+                ])
+            }
         };
+        console.log(this.gameState);
+        console.log(this.gameState.table);
         return this.gameState;
     }
 
@@ -127,14 +167,11 @@ export class GameStateManager {
         return true;
     }
 
-    // TODO think about clean way to mutate player state.
-    // Perhaps gameState object should be brand new, but player
-    // objects can be recycled?
-    // TODO when keeping game state history,
-    // keep json record not literal record
-    sitDownPlayer(client: ConnectedClient, seatNumber: number) {
+    sitDownPlayer(cookie: string, seatNumber: number) {
+        console.log("\n sitDownPlayer \n");
+        const client = this.getConnectedClient(cookie);
         const player = {
-            ...this.gameState.players.get(client.gamePlayer),
+            ...this.gameState.players[client.playerUUID],
             sitting: true
         };
         this.gameState = {
@@ -144,27 +181,18 @@ export class GameStateManager {
         return this.gameState;
     }
 
-    /*
-    export declare interface GameState {
-        players: ReadonlyArray<Player>;
-        board: Readonly<Board>;
-        gameParameters: Readonly<GameParameters>;
-        dealerPlayer: Readonly<Player> | null;
-        bigBlindPlayer: Readonly<Player> | null;
-        smallBlindPlayer: Readonly<Player> | null;
-        currentBettingRound: Readonly<BettingRound>;
-        deck: Readonly<Deck>;
+    // change betting round to preflop
+    // distribute cards to all players that are sitting down
+    // start timer
+    startGame(cookie: string) {
+        if (this.gameState.gameInProgress) {
+            throw Error(`Cannot start game, game is already in progress.`);
+        }
+        this.gameState = {
+            ...this.gameState,
+            gameInProgress: true
+        };
     }
-    */
-
-    /*
-    export declare interface Player {
-        name: string;
-        chips: number;
-        holeCards: Card[];
-        sitting: boolean;
-    }
-    */
 }
 
 // TODO
