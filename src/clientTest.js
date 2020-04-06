@@ -36,11 +36,26 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
     );
 
     ws1.on('message', (data) => {
-        // console.log("Server sent: ", data);
+        console.log("Player 1 receives:");
+        try {
+           obj = JSON.parse(data);
+           console.log(obj.players[obj.clientPlayerUUID].holeCards);
+        }
+        catch(e){
+            console.log(data);
+        }
     });
 
     ws2.on('message', (data) => {
-        // console.log("Server sent: ", data);
+        console.log("Player 2 receives:");
+
+        try {
+           obj = JSON.parse(data);
+           console.log(obj.players[obj.clientPlayerUUID].holeCards);
+        } 
+        catch(e){
+            console.log(data);
+        }   
     });
 
     setTimeout(() => {
@@ -93,7 +108,7 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
 
     }, 2500);
 
-     setTimeout(() => {
+    setTimeout(() => {
         ws1.send(JSON.stringify(
             {
                 actionType: "StartGame"
@@ -102,6 +117,14 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
 
     }, 3000);
 
+    setTimeout(() => {
+        ws2.send(JSON.stringify(
+            {
+                actionType: "PingState"
+            }
+        ));
+
+    }, 3500);
 
 });
 

@@ -59,14 +59,23 @@ export class GameStateManager {
     stripSensitiveFields(cookie: string) {
         const connectedClient = this.getConnectedClient(cookie);
         const clientPlayerUUID = connectedClient.playerUUID;
-        const strippedGameState = {
-            ...this.gameState,
-            players: Object.keys(this.gameState.players).map(
-                (uuid) => (uuid === clientPlayerUUID ?
+
+        const players = Object.fromEntries(Object.entries(this.gameState.players).map(
+            ([uuid, player]) => [
+                uuid,
+                (uuid === clientPlayerUUID ?
                     this.gameState.players[uuid] :
                     { ...this.gameState.players[uuid], holeCards: [] })
-            ),
+            ]
+        ));
+
+        const strippedGameState = {
+            ...this.gameState,
+            players,
+            clientPlayerUUID
+
         };
+
         delete strippedGameState.deck;
         delete strippedGameState.table;
 
@@ -160,14 +169,14 @@ export class GameStateManager {
     }
 
 
-    // TODO implement
     isSeatTaken(seatNumber: number) {
-        return false;
+        return Object.entries(this.gameState.players).some(([uuid, player]) => {
+            player.seatNumber === seatNumber
+        });
     }
 
-    // TODO implement
     isValidSeat(seatNumber: number) {
-        return true;
+        return seatNumber >= 0 && seatNumber < this.gameState.gameParameters.maxPlayers;
     }
 
     // dealer is position X, SB X+1, BB X+2 (wrap around)
@@ -190,6 +199,8 @@ export class GameStateManager {
     // change betting round to preflop
     // start timer
     startGame(cookie: string) {
+        console.log("\n startGame \n");
+
         if (this.gameState.gameInProgress) {
             throw Error(`Cannot start game, game is already in progress.`);
         }
@@ -199,10 +210,15 @@ export class GameStateManager {
         };
 
         this.startGameTimer();
+
+        // TODO this shouldnt stay in this method
+        this.initializePreflop();
     }
 
 
     initializePreflop() {
+        console.log("\n initializePreflop \n");
+
         if (!this.gameState.gameInProgress) {
             throw Error(`Game must be in progress to initialize preflop`);
         }

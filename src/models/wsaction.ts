@@ -11,6 +11,7 @@ export const enum ActionType {
     SitDown = 'SitDown',
     StandUp = 'StandUp',
     JoinTable = 'JoinTable',
+    PingState = 'PingState',
 }
 
 export declare interface SitDownRequest {
