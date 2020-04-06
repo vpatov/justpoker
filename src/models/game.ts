@@ -4,6 +4,8 @@ export declare interface GameParameters {
     smallBlind: number;
     bigBlind: number;
     gameType: GameType;
+    timeToAct: number;
+    maxPlayers: number;
     // add these later
     // straddleType: StraddleType;
     // ante: number;
