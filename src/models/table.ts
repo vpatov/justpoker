@@ -33,14 +33,8 @@ export declare interface Table {
 // can be playing or not playing (spectating or in game).
 
 export declare interface ConnectedClient {
-    cookie: string;
-    // clientState: ClientState;
+    uuid: string;
     playerUUID: string;
-}
-
-export const enum ClientState {
-    INGAME = 'INGAME',
-    SPECTATING = 'SPECTATING',
 }
 
 export declare interface NewGameForm {

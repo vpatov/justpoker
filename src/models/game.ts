@@ -1,5 +1,17 @@
 import { Card } from './cards';
 
+export declare interface GamePlayAction {
+    actionType: GamePlayActionType;
+    amount: number;
+}
+
+export const enum GamePlayActionType {
+    CHECK = 'CHECK',
+    BET = 'BET',
+    RAISE = 'RAISE',
+    FOLD = 'FOLD',
+}
+
 export declare interface GameParameters {
     smallBlind: number;
     bigBlind: number;

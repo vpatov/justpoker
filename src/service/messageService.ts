@@ -2,6 +2,7 @@ import { Action, ActionType, SitDownRequest, JoinTableRequest } from '../models/
 import { ConnectedClient } from '../models/table';
 import { GameStateManager } from './gameStateManager';
 import { PlayerService } from './playerService';
+import { ValidationService } from './validationService';
 import { Service } from "typedi";
 
 
@@ -12,25 +13,27 @@ export class MessageService {
     constructor(
         private readonly playerService: PlayerService,
         private readonly gameStateManager: GameStateManager,
+        private readonly validationService: ValidationService,
     ) { }
 
-    processMessage(action: Action, cookie: string) {
+    processMessage(action: Action, clientUUID: string) {
 
         const actionType = action.actionType;
         const data = action.data;
-        const client = this.gameStateManager.getConnectedClient(cookie);
+
+        this.validationService.validateClientExists(clientUUID);
 
         switch (actionType) {
             case ActionType.StartGame: {
-                this.processStartGameMessage(cookie);
+                this.processStartGameMessage(clientUUID);
                 break;
             }
             case ActionType.StopGame: {
-                this.processStopGameMessage(cookie);
+                this.processStopGameMessage(clientUUID);
                 break;
             }
             case ActionType.SitDown: {
-                this.processSitDownMessage(data, client);
+                this.processSitDownMessage(clientUUID, data);
                 break;
             }
             case ActionType.StandUp: {
@@ -38,8 +41,12 @@ export class MessageService {
                 break;
             }
             case ActionType.JoinTable: {
-                this.processJoinTableMessage(data, client);
+                this.processJoinTableMessage(clientUUID, data);
                 break;
+            }
+
+            case ActionType.Check: {
+                this.processCheckMessage();
             }
 
             case ActionType.PingState: {
@@ -47,49 +54,28 @@ export class MessageService {
             }
         }
 
-        return this.gameStateManager.stripSensitiveFields(cookie);
+        return this.gameStateManager.stripSensitiveFields(clientUUID);
 
     }
 
     // Preconditions: at least two players are sitting down.
-    processStartGameMessage(cookie: string) {
+    processStartGameMessage(clientUUID: string) {
         console.log("\n processStartGameMessage \n");
-        this.gameStateManager.startGame(cookie);
+        this.gameStateManager.startGame(clientUUID);
     }
 
     // Preconditions: the game is in progress.
-    processStopGameMessage(cookie: string) {
+    processStopGameMessage(clientUUID: string) {
         console.log("\n processStopGameMessage \n");
     }
 
-    processSitDownMessage(request: SitDownRequest, client: ConnectedClient) {
+    processSitDownMessage(clientUUID: string, request: SitDownRequest) {
         console.log("\n processSitDownMessage \n");
 
-        const seatNumber = request.seatNumber;
+        this.validationService.validateSitDownAction(clientUUID, request)
+        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        if (client.playerUUID === '') {
-            throw Error(`Client ${client.cookie} needs to be in ` +
-                `game to sit down.`);
-        }
-
-        const player = this.gameStateManager.getPlayer(client.cookie);
-
-        // TODO they should need at least one big blind technically
-        if (player.chips <= 0) {
-            throw Error(`Player ${player.name} needs chips` +
-                ` to sit down.`);
-        }
-
-        if (!this.gameStateManager.isValidSeat(seatNumber)) {
-            throw Error(`Seat ${seatNumber} is not a valid seat.`);
-        }
-
-        if (this.gameStateManager.isSeatTaken(seatNumber)) {
-            throw Error(`Seat ${seatNumber} is taken. Please ` +
-                `pick another`);
-        }
-
-        this.gameStateManager.sitDownPlayer(client.cookie, seatNumber);
+        this.gameStateManager.sitDownPlayer(player.uuid, request.seatNumber);
     }
 
     // Preconditions: client is in the game and player is sitting down.
@@ -98,23 +84,19 @@ export class MessageService {
     }
 
     // Preconditions: connectedClient.playerUUID == null
-    processJoinTableMessage(data: JoinTableRequest, client: ConnectedClient) {
+    processJoinTableMessage(clientUUID: string, request: JoinTableRequest) {
         console.log("\n processJoinTableMessage \n");
 
-        // TODO consider two cases:
-        // 1) client already has player association
-        // 2) client does not have player association
-        // Perhaps if client is not in game, they cannot have a player association
-        // as a rule. For now, make that assumption.
+        this.validationService.validateClientIsNotInGame(clientUUID);
 
-        // TODO break out precondition validation logic into separate file
-        // do this later to avoid premature overengineering
-        console.log(client);
-        if (client.playerUUID != '') {
-            throw Error(`Client ${client.cookie} already has player association.`);
-        }
+        const gameState = this.gameStateManager.addNewPlayerToGame(clientUUID, request.name, request.buyin);
+    }
 
-        const gameState = this.gameStateManager.addNewPlayerToGame(client.cookie, data.name, data.buyin);
-        console.log(`Welcome to the table ${data.name}`);
+    // TODO perhaps create one actionType for a gamePlayAction, and then validate to make sure
+    // that only messages from the current player to act are processed.
+
+    processCheckMessage() {
+        // const player = this.gameStateManager.getPlayerByClientID(clientUUID);
+        this.gameStateManager.gamePlayActionCheck();
     }
 }

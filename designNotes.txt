@@ -129,6 +129,36 @@ The gamestate is updated when
     - A timer event occurs
 
 
+=================================================
+Service Responsibility Separation
+=================================================
+
+MessageService: 
+    - receives incoming messages
+    - asks ValidationService to validate them (legality of actions)
+    - converts clientIDs to playerUUIDs
+    - asks gameState to perform actions
+    - sends responses/updates to clients
+ValidationService:
+    - Validates incoming action with respect to current gameState
+    - Throws errors when input is invalid/illegal
+GameStateManager:
+    - Does no validation, assumes that it is only asked to do something when it can/should do it.
+    - Performs structured updates to game state
+
+PlayerManager, DeckManager, ClientManager:
+    - Helper managers for updating game state. They do not udpate the game state themselves,
+    but return objects that can be used in updates.
+    - Unclear how necessary they are, and how to split responsibility cleanly between them
+    and gameStateManager
+
+
+For performing actions like bet, check, fold, etc, gameStateManager should not be receiving playerID
+as an argument, because only one player can act a time. Validation layer should just make sure that
+incoming action is coming from correct player, and only process it if that is the case.
+
+Maybe gamePlayActions can be broken out into their own manager.
+
 
 
 

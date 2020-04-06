@@ -5,6 +5,7 @@
 - Design timing aspect of gameplay
 - It seems like the gameStateManager file is going to become very bloated. Find the best way to ameliorate this.
 - Integrate https://github.com/goldfire/pokersolver for hand solving
+- cleaner design would be to allow gameStateManager to assume that all operations it is being asked to perform are legal. Insert a validation layer between the messageService and the gameStateManager. 
 
 
 Done:

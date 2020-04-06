@@ -3,6 +3,9 @@ import { Player } from '../models/player';
 import { generateUUID } from '../util/util';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+// TODO design functions here such that they receive as input
+// the players object, and return as output the players object
+
 @Service()
 export class PlayerService {
 
@@ -12,12 +15,14 @@ export class PlayerService {
             chips,
             holeCards: [],
             sitting: false,
+            inHand: false,
+            lastAction: null,
             seatNumber: -1,
             uuid: generateUUID()
         };
     }
 
-    // TODO determine if usage of redux style object spread is anti-pattern here
+
     // TODO validations
     /*
     addPlayerChips(player: Player, amount: number) {
