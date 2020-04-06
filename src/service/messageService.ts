@@ -60,35 +60,27 @@ export class MessageService {
 
     // Preconditions: at least two players are sitting down.
     processStartGameMessage(clientUUID: string) {
-        console.log("\n processStartGameMessage \n");
         this.gameStateManager.startGame(clientUUID);
     }
 
     // Preconditions: the game is in progress.
     processStopGameMessage(clientUUID: string) {
-        console.log("\n processStopGameMessage \n");
     }
 
     processSitDownMessage(clientUUID: string, request: SitDownRequest) {
-        console.log("\n processSitDownMessage \n");
-
         this.validationService.validateSitDownAction(clientUUID, request)
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-
         this.gameStateManager.sitDownPlayer(player.uuid, request.seatNumber);
     }
 
-    // Preconditions: client is in the game and player is sitting down.
-    processStandUpMessage(data: any) {
-        console.log("\n processStandUpMessage \n");
+    processStandUpMessage(clientUUID: string) {
+        this.validationService.validateStandUpAction(clientUUID);
+        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        this.gameStateManager.standUpPlayer(player.uuid);
     }
 
-    // Preconditions: connectedClient.playerUUID == null
     processJoinTableMessage(clientUUID: string, request: JoinTableRequest) {
-        console.log("\n processJoinTableMessage \n");
-
         this.validationService.validateClientIsNotInGame(clientUUID);
-
         const gameState = this.gameStateManager.addNewPlayerToGame(clientUUID, request.name, request.buyin);
     }
 
