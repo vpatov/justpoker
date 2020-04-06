@@ -26,6 +26,8 @@ export const cleanGameState: GameState = {
         smallBlind: 0,
         bigBlind: 0,
         gameType: GameType.NLHOLDEM,
+        timeToAct: 0,
+        maxPlayers: 9,
     },
     dealerPlayer: '',
     smallBlindPlayer: '',

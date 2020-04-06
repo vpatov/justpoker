@@ -6,6 +6,7 @@ export declare interface Player {
     holeCards: Card[];
     sitting: boolean;
     uuid: string;
+    seatNumber: number;
 }
 
 /*

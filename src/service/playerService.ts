@@ -12,6 +12,7 @@ export class PlayerService {
             chips,
             holeCards: [],
             sitting: false,
+            seatNumber: -1,
             uuid: generateUUID()
         };
     }

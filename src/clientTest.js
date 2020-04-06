@@ -36,11 +36,11 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
     );
 
     ws1.on('message', (data) => {
-        console.log("Server sent: ", data);
+        // console.log("Server sent: ", data);
     });
 
     ws2.on('message', (data) => {
-        console.log("Server sent: ", data);
+        // console.log("Server sent: ", data);
     });
 
     setTimeout(() => {
@@ -92,6 +92,17 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
         ));
 
     }, 2500);
+
+     setTimeout(() => {
+        ws1.send(JSON.stringify(
+            {
+                actionType: "StartGame"
+            }
+        ));
+
+    }, 3000);
+
+
 });
 
 

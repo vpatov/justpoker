@@ -24,4 +24,8 @@ export class DeckService {
         }
     }
 
+    drawCard(deck: Deck) {
+        return deck.cards.pop();
+    }
+
 }
