@@ -1,7 +1,7 @@
 import { Service } from "typedi";
 import { Player } from '../models/player';
+import { ConnectedClient } from '../models/table';
 import { generateUUID } from '../util/util';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 // TODO design functions here such that they receive as input
 // the players object, and return as output the players object
@@ -22,23 +22,12 @@ export class PlayerService {
         };
     }
 
-
-    // TODO validations
-    /*
-    addPlayerChips(player: Player, amount: number) {
+    createConnectedClient(clientUUID: string): ConnectedClient {
         return {
-            ...player,
-            chips: player.chips + amount
+            uuid: clientUUID,
+            playerUUID: ''
         };
     }
 
-
-    sitPlayerDown(player: Player) {
-        return {
-            ...player,
-            sitting: true
-        };
-    }
-    */
 }
 

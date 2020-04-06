@@ -49,18 +49,18 @@ export class ValidationService {
         const seatNumber = request.seatNumber;
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
+        const errorPrefix = `Cannot SitDown\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
+
         if (player.chips <= 0) {
-            throw Error(`Player ${player.uuid} (${player.name}) needs chips` +
-                ` to sit down.`);
+            throw Error(`${errorPrefix} Player needs chips to sit down.`);
         }
 
         if (!this.gameStateManager.isValidSeat(seatNumber)) {
-            throw Error(`Seat ${seatNumber} is not a valid seat.`);
+            throw Error(`${errorPrefix} Seat ${seatNumber} is not a valid seat.`);
         }
 
         if (this.gameStateManager.isSeatTaken(seatNumber)) {
-            throw Error(`Seat ${seatNumber} is taken.Please` +
-                `pick another`);
+            throw Error(`${errorPrefix} Seat ${seatNumber} is taken. Please pick another`);
         }
     }
 
@@ -68,9 +68,24 @@ export class ValidationService {
         this.validateClientIsInGame(clientUUID);
 
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const errorPrefix = `Cannot StandUp\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
         if (!player.sitting) {
-            throw Error(`Player ${player.uuid} (${player.name}) is already standing.`)
+            throw Error(`${errorPrefix} Player is already standing.`)
+        }
+    }
+
+    validateStartGameAction(clientUUID: string) {
+        // TODO validate that client is admin
+        if (this.gameStateManager.isGameInProgress()) {
+            throw Error(`Cannot StartGame: Game is already in progress.`);
+        }
+    }
+
+    validateStopGameAction(clientUUID: string) {
+        // TODO validate that client is admin
+        if (!this.gameStateManager.isGameInProgress()) {
+            throw Error(`Cannot StopGame: Game is not in progress.`);
         }
     }
 

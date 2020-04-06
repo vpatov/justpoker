@@ -60,11 +60,14 @@ export class MessageService {
 
     // Preconditions: at least two players are sitting down.
     processStartGameMessage(clientUUID: string) {
+        this.validationService.validateStartGameAction(clientUUID);
         this.gameStateManager.startGame(clientUUID);
     }
 
     // Preconditions: the game is in progress.
     processStopGameMessage(clientUUID: string) {
+        this.validationService.validateStopGameAction(clientUUID);
+        this.gameStateManager.startGame(clientUUID);
     }
 
     processSitDownMessage(clientUUID: string, request: SitDownRequest) {
