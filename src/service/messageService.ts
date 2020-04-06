@@ -41,9 +41,12 @@ export class MessageService {
                 this.processJoinTableMessage(data, client);
                 break;
             }
+
+            case ActionType.PingState: {
+                break;
+            }
         }
 
-        // these methods dont need to return gamestate then.
         return this.gameStateManager.stripSensitiveFields(cookie);
 
     }
@@ -51,7 +54,6 @@ export class MessageService {
     // Preconditions: at least two players are sitting down.
     processStartGameMessage(cookie: string) {
         console.log("\n processStartGameMessage \n");
-
         this.gameStateManager.startGame(cookie);
     }
 
