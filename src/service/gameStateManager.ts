@@ -7,31 +7,81 @@ import { PlayerService } from './playerService';
 import { DeckService } from './deckService';
 import { generateUUID } from '../util/util';
 
-// TODO gameState updates should return gameState
-// TODO validations dont return game state but return booleans, thus
-// they should probably go in a different file?
-
 
 // all dependencies of gameState should only be called by gamestate
 // functionality of all dependencies of gameStateManager could be placed
 // in gameStateManager, but this is avoided only for code clarity /modularity
 
+/*
+
+*/
+
 @Service()
 export class GameStateManager {
 
-    gameState: Readonly<GameState>;
-    gameTimer: NodeJS.Timer;
+    private gameState: Readonly<GameState>;
+    private gameTimer: NodeJS.Timer;
 
     constructor(
         private readonly deckService: DeckService,
         private readonly playerService: PlayerService) { }
 
+    /* Getters */
+
     getGameState(): GameState {
         return this.gameState;
     }
 
-    initGame(newGameForm: NewGameForm) {
+    getConnectedClient(cookie: string) {
+        return this.gameState.table.activeConnections.get(cookie);
+    }
 
+    getPlayerByClientUUID(cookie: string): Player {
+        const connectedClient = this.getConnectedClient(cookie);
+        const playerUUID = connectedClient.playerUUID;
+        return this.getPlayer(playerUUID);
+    }
+
+    getPlayer(playerUUID: string): Player {
+        return this.gameState.players[playerUUID];
+    }
+
+    isSeatTaken(seatNumber: number) {
+        return Object.entries(this.gameState.players).some(([uuid, player]) => {
+            player.seatNumber === seatNumber
+        });
+    }
+
+    isValidSeat(seatNumber: number) {
+        return seatNumber >= 0 && seatNumber < this.gameState.gameParameters.maxPlayers;
+    }
+
+    isGameInProgress() {
+        return this.gameState.gameInProgress;
+    }
+
+
+    /* Initialization methods */
+
+    initConnectedClient(cookie: string) {
+        const client = this.gameState.table.activeConnections.get(cookie);
+        if (!client) {
+            const newClient = this.playerService.createConnectedClient(cookie);
+            this.gameState = {
+                ...this.gameState,
+                table: {
+                    ...this.gameState.table,
+                    activeConnections: new Map([
+                        ...this.gameState.table.activeConnections,
+                        [cookie, newClient]
+                    ])
+                }
+            }
+        }
+        return this.gameState;
+    }
+
+    initGame(newGameForm: NewGameForm) {
         this.gameState = {
             ...cleanGameState,
             table: this.initTable(newGameForm),
@@ -57,6 +107,8 @@ export class GameStateManager {
         };
     }
 
+    /* Transformers */
+
     stripSensitiveFields(cookie: string) {
         const connectedClient = this.getConnectedClient(cookie);
         const clientPlayerUUID = connectedClient.playerUUID;
@@ -65,8 +117,8 @@ export class GameStateManager {
             ([uuid, player]) => [
                 uuid,
                 (uuid === clientPlayerUUID ?
-                    this.gameState.players[uuid] :
-                    { ...this.gameState.players[uuid], holeCards: [] })
+                    this.getPlayer(uuid) :
+                    { ...this.getPlayer(uuid), holeCards: [] })
             ]
         ));
 
@@ -83,6 +135,8 @@ export class GameStateManager {
         return strippedGameState;
     }
 
+    /* Updaters */
+
     updateGameParameters(gameParameters: GameParameters) {
         this.gameState = {
             ...this.gameState,
@@ -93,53 +147,9 @@ export class GameStateManager {
         return this.gameState;
     }
 
-    initConnectedClient(cookie: string) {
-        const client = this.gameState.table.activeConnections.get(cookie);
-        if (!client) {
-            const newClient = this.createConnectedClient(cookie);
-            this.gameState = {
-                ...this.gameState,
-                table: {
-                    ...this.gameState.table,
-                    activeConnections: new Map([
-                        ...this.gameState.table.activeConnections,
-                        [cookie, newClient]
-                    ])
-                }
-            }
-        }
-        return this.gameState;
-    }
 
-    getConnectedClient(cookie: string) {
-        const client = this.gameState.table.activeConnections.get(cookie);
-        return client;
-    }
-
-    createConnectedClient(clientUUID: string): ConnectedClient {
-        return {
-            uuid: clientUUID,
-            playerUUID: ''
-        };
-    }
-
-    getPlayerByClientUUID(cookie: string): Player {
+    associateClientAndPlayer(cookie: string, player: Player): ConnectedClient {
         const connectedClient = this.getConnectedClient(cookie);
-        const playerUUID = connectedClient.playerUUID;
-        return this.getPlayer(playerUUID);
-    }
-
-    getPlayer(playerUUID: string) {
-        const player = this.gameState.players[playerUUID];
-
-        return player;
-    }
-
-    associateClientAndPlayer(cookie: string, player: Player) {
-        const connectedClient = this.getConnectedClient(cookie);
-        if (connectedClient.playerUUID) {
-            throw Error("The client already has a player association.");
-        }
         return {
             ...connectedClient,
             playerUUID: player.uuid
@@ -163,40 +173,15 @@ export class GameStateManager {
         return this.gameState;
     }
 
-
-    isSeatTaken(seatNumber: number) {
-        return Object.entries(this.gameState.players).some(([uuid, player]) => {
-            player.seatNumber === seatNumber
-        });
-    }
-
-    isValidSeat(seatNumber: number) {
-        return seatNumber >= 0 && seatNumber < this.gameState.gameParameters.maxPlayers;
-    }
-
     // dealer is position X, SB X+1, BB X+2 (wrap around)
     sitDownPlayer(playerUUID: string, seatNumber: number) {
 
-
-
-
         const player = {
-            ...this.gameState.players[playerUUID],
+            ...this.getPlayer(playerUUID),
             sitting: true,
             seatNumber,
         };
         const players = { ...this.gameState.players, [player.uuid]: player };
-
-        // there is no need to calculate seats for each gameState update. If its convenient for the UI
-        // to have the seats object, then either
-        //     - UI should compute it
-        //     - server should compute it once before sending state to UI
-        /*
-        const seats: [number, string][] = Object.values(players).filter(player => player.seatNumber >= 0).map(
-            (player) => [player.seatNumber, player.uuid]
-        );
-        seats.sort();
-        */
 
         this.gameState = {
             ...this.gameState,
@@ -207,25 +192,20 @@ export class GameStateManager {
 
     standUpPlayer(playerUUID: string) {
         const player = {
-            ...this.gameState.players[playerUUID],
+            ...this.getPlayer(playerUUID),
             sitting: false,
             seatNumber: -1
         };
         const players = { ...this.gameState.players, [player.uuid]: player };
-        /*
-        const seats: [number, string][] = Object.values(players).filter(player => player.seatNumber >= 0).map(
-            (player) => [player.seatNumber, player.uuid]
-        );
-        seats.sort();
-        */
 
         this.gameState = {
             ...this.gameState,
             players,
         };
         return this.gameState;
-
     }
+
+
 
     // change betting round to preflop
     // start timer
@@ -248,9 +228,6 @@ export class GameStateManager {
 
 
     initializePreflop() {
-        if (!this.gameState.gameInProgress) {
-            throw Error(`Game must be in progress to initialize preflop`);
-        }
         const deck = this.deckService.newDeck();
         const players = Object.fromEntries(Object.entries(this.gameState.players).map(
             ([uuid, player]) => [
@@ -266,7 +243,6 @@ export class GameStateManager {
                     player
             ]
         ));
-
 
         this.gameState = {
             ...this.gameState,
@@ -309,9 +285,6 @@ export class GameStateManager {
         // determine if bet is allowed
     }
 
-    isCheckAllowed() {
-
-    }
 
 
     /*

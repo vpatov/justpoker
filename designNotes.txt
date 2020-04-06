@@ -160,5 +160,55 @@ incoming action is coming from correct player, and only process it if that is th
 Maybe gamePlayActions can be broken out into their own manager.
 
 
+=================================================
+Question of Responsibility Separation for State Management
+=================================================
+Approach 1
+GameStateManager allows other services to update gameState
+
+Pros
+- GameStateManager is greatly reduced in size
+- GameStateManager has less responsibility, less complex
+
+Cons
+- Other services that wish to update state need to interface with multiple services
+- Complex updates that require more than one services will require logic to be in GameStateManager
+- GameStateManager is no longer authoritative
+- Circular dependency
+
+
+Approach 2
+GameStateManager uses other services/files as specific object helpers
+
+Pros
+- GameStateManager is slightly reduced in size
+- GameStateManager can be used as sole interface for state updates
+- GameStateManager remains authoritative
+
+Cons
+- GameStateManager will have a lot of glue methods that call the helpers
+
+Approach 3 (lets try this one)
+Services are grouped by semantics of update rather than gameState sub-field,
+service functions can take entire game state, and return new GameState to
+main GameStateManager which can then handle updating the source of truth state.
+
+Pros
+- GameStateManager is greatly reduced in size
+- GameStateManager has less responsibility, less complex
+- GameStateManager remains authoritative
+
+Cons
+- Unclear how to have a consistent separation by semantics
+- Complex updates that require more than one services will require logic to be in GameStateManager (it seems that this would have been the case regardless.)
+- Circular dependency
+
+
+Main problem around picking approach is figuring out separation of responsibility, and dependency graph.
+I think you can continue the same way right now, and once you identify where you are repeating yourself, then you
+can try to abstract it away
+
+
+
 
 

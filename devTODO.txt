@@ -6,9 +6,22 @@
 - It seems like the gameStateManager file is going to become very bloated. Find the best way to ameliorate this.
 - Integrate https://github.com/goldfire/pokersolver for hand solving
 - cleaner design would be to allow gameStateManager to assume that all operations it is being asked to perform are legal. Insert a validation layer between the messageService and the gameStateManager. 
+-Include seats code where you need it:
+        // there is no need to calculate seats for each gameState update. If its convenient for the UI
+        // to have the seats object, then either
+        //     - UI should compute it
+        //     - server should compute it once before sending state to UI
+        /*
+        const seats: [number, string][] = Object.values(players).filter(player => player.seatNumber >= 0).map(
+            (player) => [player.seatNumber, player.uuid]
+        );
+        seats.sort();
+        */
 
+- System for queueing actions. For example, adding on chips, sitting out next hand, checking in the dark, etc.
 
 Done:
 - server fetches connected client and associates it with websocket via cookie
 - Map object is problematic to serialize to JSON. Consider replacing it with a simple object. Just be sure that it doesn't become a tricky soruce of bugs later. 
 - Create filter that removes sensitive data from gameState object before sending it to UI (cards, cookies, etc)
+
