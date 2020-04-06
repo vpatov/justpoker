@@ -35,7 +35,7 @@ export declare interface Table {
 export declare interface ConnectedClient {
     cookie: string;
     // clientState: ClientState;
-    gamePlayer: string;
+    playerUUID: string;
 }
 
 export const enum ClientState {

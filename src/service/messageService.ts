@@ -4,6 +4,8 @@ import { GameStateManager } from './gameStateManager';
 import { PlayerService } from './playerService';
 import { Service } from "typedi";
 
+
+
 @Service()
 export class MessageService {
 
@@ -16,64 +18,63 @@ export class MessageService {
 
         const actionType = action.actionType;
         const data = action.data;
-
         const client = this.gameStateManager.getConnectedClient(cookie);
-
-        // TODO validate the action
-        // for example, a connectedClient that is not in
-        // the game cannot sit down/stand up. Non-admin cannot
-        // start/stop game, etc.
-        // This validations layer should be checking to make
-        // sure that actions that shouldn't be available to the user in the
-        // UI are not being performed.
 
         switch (actionType) {
             case ActionType.StartGame: {
-                return this.processStartGameMessage(data);
+                this.processStartGameMessage(cookie);
+                break;
             }
             case ActionType.StopGame: {
-                return this.processStopGameMessage(data);
+                this.processStopGameMessage(cookie);
+                break;
             }
             case ActionType.SitDown: {
-                return this.processSitDownMessage(data, client);
+                this.processSitDownMessage(data, client);
+                break;
             }
             case ActionType.StandUp: {
-                return this.processStandUpMessage(data);
+                this.processStandUpMessage(data);
+                break;
             }
             case ActionType.JoinTable: {
-                return this.processJoinTableMessage(data, client);
+                this.processJoinTableMessage(data, client);
+                break;
             }
         }
+
+        // these methods dont need to return gamestate then.
+        return this.gameStateManager.stripSensitiveFields(cookie);
 
     }
 
     // Preconditions: at least two players are sitting down.
-    processStartGameMessage(data: any) {
-        return "Received start game message";
+    processStartGameMessage(cookie: string) {
+        console.log("\n processStartGameMessage \n");
+
+        this.gameStateManager.startGame(cookie);
     }
 
     // Preconditions: the game is in progress.
-    processStopGameMessage(data: any) {
-        return "Received stop game message";
+    processStopGameMessage(cookie: string) {
+        console.log("\n processStopGameMessage \n");
     }
 
-    // Preconditions:
-    // client has player
-    // player has chips
-    // seat is valid seat
-    // seat isn't taken
     processSitDownMessage(request: SitDownRequest, client: ConnectedClient) {
+        console.log("\n processSitDownMessage \n");
 
         const seatNumber = request.seatNumber;
 
-        /*
-        if (client.gamePlayer == null) {
+        if (client.playerUUID === '') {
             throw Error(`Client ${client.cookie} needs to be in ` +
                 `game to sit down.`);
         }
+
+        const player = this.gameStateManager.getPlayer(client.cookie);
+
         // TODO they should need at least one big blind technically
-        if (client.gamePlayer.chips <= 0) {
-            throw Error(`Player ${client.gamePlayer.name} needs chips` +
+        if (player.chips <= 0) {
+            throw Error(`Player ${player.name} needs chips` +
                 ` to sit down.`);
         }
 
@@ -85,19 +86,19 @@ export class MessageService {
             throw Error(`Seat ${seatNumber} is taken. Please ` +
                 `pick another`);
         }
-        */
 
-        this.gameStateManager.sitDownPlayer(client, seatNumber);
-        return "Received sitdown message";
+        this.gameStateManager.sitDownPlayer(client.cookie, seatNumber);
     }
 
     // Preconditions: client is in the game and player is sitting down.
     processStandUpMessage(data: any) {
-        return "Received stand up message";
+        console.log("\n processStandUpMessage \n");
     }
 
-    // Preconditions: connectedClient.gamePlayer == null
+    // Preconditions: connectedClient.playerUUID == null
     processJoinTableMessage(data: JoinTableRequest, client: ConnectedClient) {
+        console.log("\n processJoinTableMessage \n");
+
         // TODO consider two cases:
         // 1) client already has player association
         // 2) client does not have player association
@@ -106,14 +107,12 @@ export class MessageService {
 
         // TODO break out precondition validation logic into separate file
         // do this later to avoid premature overengineering
-        if (client.gamePlayer != '') {
+        console.log(client);
+        if (client.playerUUID != '') {
             throw Error(`Client ${client.cookie} already has player association.`);
         }
 
-        const gameState = this.gameStateManager.addNewPlayerToGame(client, data.name, data.buyin);
+        const gameState = this.gameStateManager.addNewPlayerToGame(client.cookie, data.name, data.buyin);
         console.log(`Welcome to the table ${data.name}`);
-
-        return gameState;
-
     }
 }

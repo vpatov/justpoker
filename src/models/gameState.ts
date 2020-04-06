@@ -4,20 +4,21 @@ import { Table } from './table'
 import { Deck } from './cards'
 
 export declare interface GameState {
-    players: ReadonlyMap<string, Player>;
-    // players: { [key: string]: Player };
+    // players: ReadonlyMap<string, Player>;
+    players: { [key: string]: Player };
     board: Readonly<Board>;
     gameParameters: Readonly<GameParameters>;
     dealerPlayer: Readonly<string>;
     bigBlindPlayer: Readonly<string>;
     smallBlindPlayer: Readonly<string>;
     currentBettingRound: Readonly<BettingRound>;
+    gameInProgress: boolean;
     deck: Readonly<Deck>;
     table: Table;
 }
 
 export const cleanGameState: GameState = {
-    players: new Map(),
+    players: {},
     board: {
         cards: []
     },
@@ -30,6 +31,7 @@ export const cleanGameState: GameState = {
     smallBlindPlayer: '',
     bigBlindPlayer: '',
     currentBettingRound: BettingRound.WAITING,
+    gameInProgress: false,
     deck: {
         cards: []
     },
