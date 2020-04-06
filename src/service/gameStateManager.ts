@@ -176,23 +176,55 @@ export class GameStateManager {
 
     // dealer is position X, SB X+1, BB X+2 (wrap around)
     sitDownPlayer(playerUUID: string, seatNumber: number) {
+
+
+
+
         const player = {
             ...this.gameState.players[playerUUID],
             sitting: true,
             seatNumber,
         };
         const players = { ...this.gameState.players, [player.uuid]: player };
-        const seats: [number, string][] = Object.values(players).map(
+
+        // there is no need to calculate seats for each gameState update. If its convenient for the UI
+        // to have the seats object, then either
+        //     - UI should compute it
+        //     - server should compute it once before sending state to UI
+        /*
+        const seats: [number, string][] = Object.values(players).filter(player => player.seatNumber >= 0).map(
             (player) => [player.seatNumber, player.uuid]
         );
         seats.sort();
+        */
 
         this.gameState = {
             ...this.gameState,
             players,
-            seats,
         };
         return this.gameState;
+    }
+
+    standUpPlayer(playerUUID: string) {
+        const player = {
+            ...this.gameState.players[playerUUID],
+            sitting: false,
+            seatNumber: -1
+        };
+        const players = { ...this.gameState.players, [player.uuid]: player };
+        /*
+        const seats: [number, string][] = Object.values(players).filter(player => player.seatNumber >= 0).map(
+            (player) => [player.seatNumber, player.uuid]
+        );
+        seats.sort();
+        */
+
+        this.gameState = {
+            ...this.gameState,
+            players,
+        };
+        return this.gameState;
+
     }
 
     // change betting round to preflop

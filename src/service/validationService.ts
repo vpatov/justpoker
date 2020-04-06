@@ -50,7 +50,7 @@ export class ValidationService {
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
         if (player.chips <= 0) {
-            throw Error(`Player ${player.name} needs chips` +
+            throw Error(`Player ${player.uuid} (${player.name}) needs chips` +
                 ` to sit down.`);
         }
 
@@ -61,6 +61,16 @@ export class ValidationService {
         if (this.gameStateManager.isSeatTaken(seatNumber)) {
             throw Error(`Seat ${seatNumber} is taken.Please` +
                 `pick another`);
+        }
+    }
+
+    validateStandUpAction(clientUUID: string) {
+        this.validateClientIsInGame(clientUUID);
+
+        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+
+        if (!player.sitting) {
+            throw Error(`Player ${player.uuid} (${player.name}) is already standing.`)
         }
     }
 

@@ -8,12 +8,12 @@ export declare interface GameState {
     players: { [key: string]: Player };
     board: Readonly<Board>;
     gameParameters: Readonly<GameParameters>;
-    dealerPlayer: Readonly<string>;
-    bigBlindPlayer: Readonly<string>;
-    smallBlindPlayer: Readonly<string>;
+    dealerUUID: Readonly<string>;
+    smallBlindUUID: Readonly<string>;
+    bigBlindUUID: Readonly<string>;
     currentBettingRound: Readonly<BettingRound>;
     currentPlayerToAct: string;
-    seats: ReadonlyArray<[number, string]>,
+    // seats: ReadonlyArray<[number, string]>,
     gameInProgress: boolean;
     deck: Readonly<Deck>;
     table: Table;
@@ -32,12 +32,11 @@ export const cleanGameState: GameState = {
         timeToAct: 0,
         maxPlayers: 9,
     },
-    dealerPlayer: '',
-    smallBlindPlayer: '',
-    bigBlindPlayer: '',
+    dealerUUID: '',
+    smallBlindUUID: '',
+    bigBlindUUID: '',
     currentBettingRound: BettingRound.WAITING,
     currentPlayerToAct: '',
-    seats: [],
     gameInProgress: false,
     deck: {
         cards: []
