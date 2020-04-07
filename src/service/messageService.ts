@@ -47,6 +47,7 @@ export class MessageService {
 
             case ActionType.Check: {
                 this.processCheckMessage();
+                break;
             }
 
             case ActionType.PingState: {
