@@ -5,10 +5,19 @@ var request = require('request');
 var justPokerCookie1 = '12345678';
 var justPokerCookie2 = 'abcdefgh';
 
+const readline = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+
+
 // See if there is a cookie namd "JustPokerCookie" (or whatever you want to call it) present locally already
 // if not, generate one and store it
 
 // http://localhost:8080/newgameget?bigBlind=3&smallBlind=1&gameType=NLHOLDEM&password=abc
+
+
 
 
 var queryParams = { bigBlind:3, smallBlind:1, gameType:"NLHOLDEM", password:"abc" };
@@ -61,7 +70,7 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
     setTimeout(() => {
         ws1.send(JSON.stringify(
             {
-                actionType: "JoinTable",
+                actionType: "JOINTABLE",
                 data : {
                     name: "Vasia1",
                     buyin: 1000
@@ -69,12 +78,12 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
             }
         ));
 
-    }, 1000);
+    }, 200);
 
         setTimeout(() => {
         ws2.send(JSON.stringify(
             {
-                actionType: "JoinTable",
+                actionType: "JOINTABLE",
                 data : {
                     name: "Vasia2",
                     buyin: 2000
@@ -82,60 +91,68 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
             }
         ));
 
-    }, 1500);
+    }, 400);
 
     setTimeout(() => {
         ws1.send(JSON.stringify(
             {
-                actionType: "SitDown",
+                actionType: "SITDOWN",
                 data : {
                     seatNumber: 0
                 }
             }
         ));
 
-    }, 2000);
+    }, 600);
 
     setTimeout(() => {
         ws2.send(JSON.stringify(
             {
-                actionType: "SitDown",
+                actionType: "SITDOWN",
                 data : {
                     seatNumber: 1
                 }
             }
         ));
 
-    }, 2500);
+    }, 800);
 
     setTimeout(() => {
         ws1.send(JSON.stringify(
             {
-                actionType: "StartGame"
+                actionType: "STARTGAME"
             }
         ));
 
-    }, 3000);
+    }, 1000);
 
-    setTimeout(() => {
-        ws2.send(JSON.stringify(
-            {
-                actionType: "Check"
+
+    function prompt(){
+        console.log("executing prompt");
+        readline.question('Command: ', (data) => {
+            if (data === 'exit'){
+              return readline.close(); 
+            } 
+
+            [number,action] = data.split(",");
+            if (action.toUpperCase() === "CHECK"){
+                (number === '1' ? ws1 : ws2).send(
+                    JSON.stringify({actionType: "CHECK"})
+                )
             }
-        ));
 
-    }, 4500);
+            prompt(); //Calling this function again to ask new question
+        });
+    }
 
-    setTimeout(() => {
-        ws1.send(JSON.stringify(
-            {
-                actionType: "Check"
-            }
-        ));
-
-    }, 5500);
+    setTimeout(prompt,1200);
 
 });
+
+    
+
+
+
 
 
 

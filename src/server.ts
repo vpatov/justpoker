@@ -128,8 +128,6 @@ class Server {
             ws.on('message', (data: WebSocket.Data) => {
                 console.log("Incoming:", data);
                 if (typeof data === 'string') {
-                    // TODO populate error meaningfully
-                    const error = '';
                     try {
                         const action = JSON.parse(data);
                         const res = this.messageService
@@ -142,11 +140,16 @@ class Server {
                     }
                     catch (e) {
                         console.log(e);
-                        ws.send(error);
+
+                        // TODO if you send errors this way, ensure that
+                        // they dont contain sensitive information
+                        ws.send(JSON.stringify(e));
                     }
 
                 } else {
-                    console.log('Received data of unsupported type.');
+                    const unsupportedMsg = "Received data of unsupported type.";
+                    console.log(unsupportedMsg);
+                    ws.send(unsupportedMsg);
                 }
             });
 
