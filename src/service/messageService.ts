@@ -1,4 +1,5 @@
 import { Action, ActionType, SitDownRequest, JoinTableRequest } from '../models/wsaction';
+import { CHECK_ACTION, FOLD_ACTION } from '../models/game';
 import { ConnectedClient } from '../models/table';
 import { GameStateManager } from './gameStateManager';
 import { PlayerService } from './playerService';
@@ -21,7 +22,7 @@ export class MessageService {
         const actionType = action.actionType;
         const data = action.data;
 
-        this.validationService.validateClientExists(clientUUID);
+        this.validationService.ensureClientExists(clientUUID);
 
         switch (actionType) {
             case ActionType.StartGame: {
@@ -37,7 +38,7 @@ export class MessageService {
                 break;
             }
             case ActionType.StandUp: {
-                this.processStandUpMessage(data);
+                this.processStandUpMessage(clientUUID);
                 break;
             }
             case ActionType.JoinTable: {
@@ -46,8 +47,7 @@ export class MessageService {
             }
 
             case ActionType.Check: {
-                this.processCheckMessage();
-                break;
+                this.processCheckMessage(clientUUID);
             }
 
             case ActionType.PingState: {
@@ -55,44 +55,45 @@ export class MessageService {
             }
         }
 
+        this.gameStateManager.pollForGameContinuation();
         return this.gameStateManager.stripSensitiveFields(clientUUID);
 
     }
 
     // Preconditions: at least two players are sitting down.
     processStartGameMessage(clientUUID: string) {
-        this.validationService.validateStartGameAction(clientUUID);
-        this.gameStateManager.startGame(clientUUID);
+        this.validationService.validateStartGameRequest(clientUUID);
+        this.gameStateManager.startGame();
     }
 
     // Preconditions: the game is in progress.
     processStopGameMessage(clientUUID: string) {
-        this.validationService.validateStopGameAction(clientUUID);
-        this.gameStateManager.startGame(clientUUID);
+        this.validationService.validateStopGameRequest(clientUUID);
+        this.gameStateManager.stopGame();
     }
 
     processSitDownMessage(clientUUID: string, request: SitDownRequest) {
-        this.validationService.validateSitDownAction(clientUUID, request)
+        this.validationService.validateSitDownRequest(clientUUID, request)
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         this.gameStateManager.sitDownPlayer(player.uuid, request.seatNumber);
     }
 
     processStandUpMessage(clientUUID: string) {
-        this.validationService.validateStandUpAction(clientUUID);
+        this.validationService.validateStandUpRequest(clientUUID);
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         this.gameStateManager.standUpPlayer(player.uuid);
     }
 
     processJoinTableMessage(clientUUID: string, request: JoinTableRequest) {
-        this.validationService.validateClientIsNotInGame(clientUUID);
+        this.validationService.validateJoinTableRequest(clientUUID, request);
         const gameState = this.gameStateManager.addNewPlayerToGame(clientUUID, request.name, request.buyin);
     }
 
     // TODO perhaps create one actionType for a gamePlayAction, and then validate to make sure
     // that only messages from the current player to act are processed.
 
-    processCheckMessage() {
-        // const player = this.gameStateManager.getPlayerByClientID(clientUUID);
-        this.gameStateManager.gamePlayActionCheck();
+    processCheckMessage(clientUUID: string) {
+        this.validationService.validateCheckAction(clientUUID);
+        this.gameStateManager.performBettingRoundAction(CHECK_ACTION);
     }
 }

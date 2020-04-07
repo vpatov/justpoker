@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { Service, Container } from "typedi";
 
+import util from 'util';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import express from 'express'
@@ -103,8 +104,11 @@ class Server {
                         const action = JSON.parse(data);
                         const res = this.messageService
                             .processMessage(action, userCookieID);
-                        console.log(res, '\n');
-                        ws.send(JSON.stringify(res));
+                        const jsonRes = JSON.stringify(res);
+                        console.log(util.inspect(
+                            res, false, null, true));
+
+                        ws.send(jsonRes);
                     }
                     catch (e) {
                         console.log(e);

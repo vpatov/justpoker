@@ -1,20 +1,12 @@
 import { Service } from "typedi";
 import { GameState, cleanGameState } from '../models/gameState';
-import { StraddleType, GameType, GameParameters, } from '../models/game';
+import { StraddleType, GameType, GameParameters, BettingRoundStage, BettingRoundAction, BettingRoundActionType, CHECK_ACTION, FOLD_ACTION } from '../models/game';
 import { NewGameForm, ConnectedClient } from '../models/table';
 import { Player } from '../models/player';
 import { PlayerService } from './playerService';
 import { DeckService } from './deckService';
 import { generateUUID } from '../util/util';
 
-
-// all dependencies of gameState should only be called by gamestate
-// functionality of all dependencies of gameStateManager could be placed
-// in gameStateManager, but this is avoided only for code clarity /modularity
-
-/*
-
-*/
 
 @Service()
 export class GameStateManager {
@@ -44,6 +36,57 @@ export class GameStateManager {
 
     getPlayer(playerUUID: string): Player {
         return this.gameState.players[playerUUID];
+    }
+
+    getCurrentPlayerToAct() {
+        return this.gameState.currentPlayerToAct;
+    }
+
+    getSB() {
+        return this.gameState.gameParameters.smallBlind;
+    }
+
+    getBB() {
+        return this.gameState.gameParameters.bigBlind;
+    }
+
+    // TODO these are unsorted. Make sure thats okay.
+    getBettingRoundActions() {
+        return Object.values(this.gameState.players)
+            .filter(player => player.lastAction)
+            .map(player => player.lastAction);
+    }
+
+    getBettingRoundStage() {
+        return this.gameState.bettingRoundStage;
+    }
+
+    getNumberPlayersSitting() {
+        return Object.entries(this.gameState.players)
+            .filter(([uuid, player]) => player.sitting).length;
+    }
+
+    getSeats() {
+        const seats: [number, string][] = Object.values(this.gameState.players)
+            .filter(player => player.seatNumber >= 0)
+            .map((player) => [player.seatNumber, player.uuid]);
+        seats.sort();
+        return seats;
+    }
+
+    getDeck() {
+        return this.gameState.deck;
+    }
+
+    getNextPlayerUUID(currentPlayerUUID: string) {
+        const seats = this.getSeats();
+        const currentIndex = seats.findIndex(
+            ([seatNumber, uuid]) => uuid === currentPlayerUUID);
+
+        // if input is empty string, then there hasn't been a dealer yet, pick index 0
+        const nextIndex = currentPlayerUUID ? (currentIndex + 1) % seats.length : 0;
+        const [_, nextPlayerUUID] = seats[nextIndex];
+        return nextPlayerUUID;
     }
 
     isSeatTaken(seatNumber: number) {
@@ -78,7 +121,6 @@ export class GameStateManager {
                 }
             }
         }
-        return this.gameState;
     }
 
     initGame(newGameForm: NewGameForm) {
@@ -144,9 +186,10 @@ export class GameStateManager {
                 ...gameParameters
             }
         };
-        return this.gameState;
     }
 
+
+    /* Player operations */
 
     associateClientAndPlayer(cookie: string, player: Player): ConnectedClient {
         const connectedClient = this.getConnectedClient(cookie);
@@ -170,10 +213,8 @@ export class GameStateManager {
                 ])
             }
         };
-        return this.gameState;
     }
 
-    // dealer is position X, SB X+1, BB X+2 (wrap around)
     sitDownPlayer(playerUUID: string, seatNumber: number) {
 
         const player = {
@@ -187,7 +228,6 @@ export class GameStateManager {
             ...this.gameState,
             players,
         };
-        return this.gameState;
     }
 
     standUpPlayer(playerUUID: string) {
@@ -202,33 +242,132 @@ export class GameStateManager {
             ...this.gameState,
             players,
         };
-        return this.gameState;
     }
 
-
-
-    // change betting round to preflop
-    // start timer
-    startGame(cookie: string) {
-        if (this.gameState.gameInProgress) {
-            throw Error(`Cannot start game, game is already in progress.`);
+    setNextPlayerToAct() {
+        this.gameState = {
+            ...this.gameState,
+            currentPlayerToAct: this.getNextPlayerUUID(this.getCurrentPlayerToAct())
         }
+    }
+
+    setPlayerLastAction(playerUUID: string, lastAction: BettingRoundAction) {
+        const player = {
+            ...this.getPlayer(playerUUID),
+            lastAction
+        };
+        const players = { ...this.gameState.players, [player.uuid]: player };
+        this.gameState = {
+            ...this.gameState,
+            players,
+        };
+    }
+
+    /* Gameplay functionality */
+
+    // if game is started, and state is waiting, try to initializeGameRound
+    // perform this check after every incoming message
+    // this way, you don't have to check explicit events
+    startGame() {
+        // start the timer
+        // set the game to in progress
+
         this.gameState = {
             ...this.gameState,
             gameInProgress: true,
+
         };
+    }
 
-        this.startGameTimer();
+    // TODO wipe gameplay game state.
+    stopGame() {
+        this.gameState = {
+            ...this.gameState,
+            gameInProgress: false,
+        }
+    }
 
-        // TODO this shouldnt stay in this method
-        this.initializePreflop();
+    // executed after every message processed
+    pollForGameContinuation() {
+        if (!this.isGameInProgress()) {
+            return;
+        }
+        if (this.getBettingRoundStage() === BettingRoundStage.WAITING) {
+            this.startHand();
+        }
+    }
 
-        return this.gameState;
+    initializeDealerButton() {
+        const playerUUID = this.getNextPlayerUUID(this.gameState.dealerUUID);
+
+        this.gameState = {
+            ...this.gameState,
+            dealerUUID: playerUUID
+        };
     }
 
 
+
+    /*
+        TODO ensure that the players have enough to cover the blinds, and if not, put them
+        all-in. Don't let a player get this point if they have zero chips, stand them up earlier.
+        TODO substract chips from the players
+        TODO place blinds correctly when there are only two people
+    */
+    placeBlinds() {
+        const smallBlindUUID = this.getNextPlayerUUID(this.gameState.dealerUUID);
+        const bigBlindUUID = this.getNextPlayerUUID(smallBlindUUID);
+
+        const sbPlayer = {
+            ...this.getPlayer(smallBlindUUID),
+            lastAction: {
+                type: BettingRoundActionType.BET,
+                amount: this.getSB(),
+                allin: false
+            }
+        };
+        const bbPlayer = {
+            ...this.getPlayer(bigBlindUUID),
+            lastAction: {
+                type: BettingRoundActionType.BET,
+                amount: this.getBB(),
+                allin: false
+            }
+        };
+
+        const firstToActPreflop = this.getNextPlayerUUID(bigBlindUUID);
+
+        this.gameState = {
+            ...this.gameState,
+            // players: { ...this.gameState.players, [sbPlayer.uuid]: sbPlayer, [bbPlayer.uuid]: bbPlayer },
+            currentPlayerToAct: firstToActPreflop
+        };
+    }
+
+
+    startHand() {
+        // if less than 2 people are sitting, do nothing
+        if (this.getNumberPlayersSitting() >= 2) {
+            this.initializeDealerButton();
+            this.initializePreflop();
+        }
+
+    }
+
     initializePreflop() {
+        this.placeBlinds();
+
         const deck = this.deckService.newDeck();
+        this.gameState = {
+            ...this.gameState,
+            deck,
+            bettingRoundStage: BettingRoundStage.PREFLOP,
+        };
+        this.distributeHoleCards();
+    }
+
+    distributeHoleCards() {
+        const deck = this.getDeck();
         const players = Object.fromEntries(Object.entries(this.gameState.players).map(
             ([uuid, player]) => [
                 uuid,
@@ -243,54 +382,93 @@ export class GameStateManager {
                     player
             ]
         ));
-
         this.gameState = {
             ...this.gameState,
-            deck,
             players
         };
     }
 
-    // the UI should make it seem like user has X seconds to act, but the server
-    // will allow X + 2 seconds to make up for network issues
 
-    // There should be one global timer, and that is the only timer that is running.
-    startGameTimer() {
-        const serverTime = Date.now();
+    /* FLOP */
+
+    dealFlop() {
+        const deck = this.getDeck();
         this.gameState = {
             ...this.gameState,
-            serverTime
+            board: {
+                cards: [
+                    // TODO make this variant agnostic
+                    this.deckService.drawCard(deck),
+                    this.deckService.drawCard(deck),
+                    this.deckService.drawCard(deck),
+                ]
+            },
+            deck,
+            bettingRoundStage: BettingRoundStage.FLOP,
         };
-
-        this.gameTimer = setTimeout(
-            this.timerFunc, this.gameState.gameParameters.timeToAct);
-    }
-
-    // looks at game state and determines
-    timerFunc() {
-
-    }
-
-
-    gamePlayActionCheck() {
-        // determine if check is check allowed
-        // set current player's last action to check
-        // change the current player (whose turn is it to act)
-        // restart timer
-
-    }
-
-    gamePlayActionBet() {
-
-        // determine if bet is allowed
     }
 
 
 
-    /*
-        Player actions that all clear the timeout:
-        Standing up, folding, checking, betting, raising, quitting.
-    */
+    /* Betting Round Actions */
+
+    performBettingRoundAction(action: BettingRoundAction) {
+        switch (action.type) {
+            case BettingRoundActionType.CHECK: {
+                this.check();
+                break;
+            }
+        }
+        if (this.haveAllPlayersActed()) {
+            this.finishBettingRound();
+
+            if (!this.currentHandHasResult()) {
+                this.nextBettingRound();
+            }
+        }
+        else {
+            this.setNextPlayerToAct();
+        }
+    }
+
+    check() {
+        const currentPlayerToAct = this.getCurrentPlayerToAct();
+        this.setPlayerLastAction(currentPlayerToAct, CHECK_ACTION);
+    }
+
+
+
+
+
+
+    haveAllPlayersActed() {
+        /*
+            Everyone has gone if:
+            For every player that is not folded,
+                they have either matched the highest bet,
+                or they are all-in.
+        */
+        return false;
+    }
+
+
+    currentHandHasResult() {
+        return false;
+    }
+
+    finishBettingRound() {
+        // put all bets in pot
+        // clear the player to act
+        // check for victory condition:
+        // either everyone folded but one person,
+        // or this is the river and its time for showdown
+
+        // if someone wins, add the hand result to the gameState (UI shows victory)
+    }
+
+    nextBettingRound() {
+
+    }
 
 
 
