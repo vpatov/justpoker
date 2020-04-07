@@ -1,14 +1,17 @@
 import { Card } from './cards';
 
-export declare interface GamePlayAction {
-    actionType: GamePlayActionType;
+export declare interface BettingRoundAction {
+    type: BettingRoundActionType;
     amount: number;
+    allin: boolean;
 }
 
-export const enum GamePlayActionType {
+export const enum BettingRoundActionType {
+    CALL = 'CALL',
     CHECK = 'CHECK',
     BET = 'BET',
-    RAISE = 'RAISE',
+    // distinction between bet and raise may be unnecessary
+    // RAISE = 'RAISE',
     FOLD = 'FOLD',
 }
 
@@ -42,10 +45,22 @@ export const enum GameType {
 
 // The usage of this enum might need to change
 // if expanding app to beyond nlholdem and plo
-export const enum BettingRound {
+export const enum BettingRoundStage {
     WAITING = 'WAITING',
     PREFLOP = 'PREFLOP',
     FLOP = 'FLOP',
     TURN = 'TURN',
     RIVER = 'RIVER',
 }
+
+export const CHECK_ACTION: BettingRoundAction = {
+    type: BettingRoundActionType.CHECK,
+    amount: 0,
+    allin: false
+};
+
+export const FOLD_ACTION: BettingRoundAction = {
+    type: BettingRoundActionType.FOLD,
+    amount: 0,
+    allin: false
+};

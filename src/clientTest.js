@@ -120,11 +120,20 @@ request({url:'http://localhost:8080/newgameget', qs:queryParams}, function(err, 
     setTimeout(() => {
         ws2.send(JSON.stringify(
             {
-                actionType: "PingState"
+                actionType: "Check"
             }
         ));
 
-    }, 3500);
+    }, 4500);
+
+    setTimeout(() => {
+        ws1.send(JSON.stringify(
+            {
+                actionType: "Check"
+            }
+        ));
+
+    }, 5500);
 
 });
 

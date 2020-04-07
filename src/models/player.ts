@@ -1,5 +1,5 @@
 import { Card } from './cards';
-import { GamePlayAction } from './game';
+import { BettingRoundAction } from './game';
 
 export declare interface Player {
     name: string;
@@ -9,7 +9,7 @@ export declare interface Player {
     sitting: boolean;
     uuid: string;
     seatNumber: number;
-    lastAction: GamePlayAction | null;
+    lastAction: BettingRoundAction | null;
 }
 
 /*
