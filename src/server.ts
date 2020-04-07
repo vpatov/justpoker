@@ -36,7 +36,7 @@ class Server {
             res.send("Poker Web.");
         })
 
-        router.post('/create', (req, res) => {
+        router.post('/createGame', (req, res) => {
             // if (this.tableInitialized && false) {
             //     res.send("Table already initialized. Can only make one " +
             //         "table per server instance (restriction is temporary," +
@@ -48,10 +48,10 @@ class Server {
                 gameType: req.body.gameType,
                 password: req.body.password
             };
-            const tableUUID = this.gameStateManager.initGame(newGameForm);
+            const tableId = this.gameStateManager.initGame(newGameForm);
             this.tableInitialized = true;
-            console.log(tableUUID);
-            res.send(JSON.stringify({ "tableUUID": tableUUID }));
+            console.log(tableId);
+            res.send(JSON.stringify({ "tableId": tableId }));
 
         });
 
@@ -81,19 +81,22 @@ class Server {
         this.wss.on('connection', (ws: WebSocket, req) => {
             const ip = req.connection.remoteAddress;
             console.log("connected to ip:", ip);
-            let userCookieID = '';
-
-            console.log(req.headers);
-
+            let clientId = '';
             try {
-                userCookieID = cookie.parse(req.headers.cookie).id;
+                clientId = cookie.parse(req.headers.cookie).id;
             }
             catch (e) {
-                console.log(e);
-                return;
+                clientId = generateUUID()
             }
-            console.log(userCookieID);
-            this.gameStateManager.initConnectedClient(userCookieID);
+            console.log("clientId: ", clientId);
+            this.gameStateManager.initConnectedClient(clientId);
+
+            ws.send(JSON.stringify({
+                status: 200,
+                clientId: clientId,
+            }));
+
+            ws.send(JSON.stringify(this.messageService.getGameStateMessageForUI()))
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log("Incoming:", data);
@@ -103,7 +106,7 @@ class Server {
                     try {
                         const action = JSON.parse(data);
                         const res = this.messageService
-                            .processMessage(action, userCookieID);
+                            .processMessage(action, clientId);
                         const jsonRes = JSON.stringify(res);
                         console.log(util.inspect(
                             res, false, null, true));
@@ -119,8 +122,6 @@ class Server {
                     console.log('Received data of unsupported type.');
                 }
             });
-
-            ws.send('You have connected to the websocket server.');
 
         });
 

@@ -5,6 +5,7 @@ import { GameStateManager } from './gameStateManager';
 import { PlayerService } from './playerService';
 import { ValidationService } from './validationService';
 import { Service } from "typedi";
+import { GameState } from '../models/gameState';
 
 
 
@@ -16,6 +17,37 @@ export class MessageService {
         private readonly gameStateManager: GameStateManager,
         private readonly validationService: ValidationService,
     ) { }
+
+
+    processGameStateForUI(gameState: GameState) {
+
+        // need to define translation!!
+
+        const UIState = {
+            missionControl: {
+                heroStack: 0,
+                pot: 0,
+            },
+            table: {
+                spots: 9,
+                pot: 0,
+                communityCards: [] as any[],
+                players: [] as any[],
+
+            },
+        }
+
+        return UIState
+
+    }
+
+    getGameStateMessageForUI() {
+
+        const gs = this.gameStateManager.getGameState()
+        const gsUI = this.processGameStateForUI(gs)
+
+        return { game: gsUI }
+    }
 
     processMessage(action: Action, clientUUID: string) {
 
