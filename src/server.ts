@@ -12,6 +12,7 @@ import { AddressInfo } from "net";
 import { MessageService } from './service/messageService';
 import { NewGameForm } from './models/table';
 import { GameStateManager } from './service/gameStateManager';
+import { generateUUID } from './util/util';
 
 
 @Service()
@@ -34,55 +35,23 @@ class Server {
             res.send("Poker Web.");
         })
 
-        /*
-        I can't get this post request working for some reason.
-        Gonna just do it as a get request instead for sake of progress.
+        router.post('/create', (req, res) => {
+            // if (this.tableInitialized && false) {
+            //     res.send("Table already initialized. Can only make one " +
+            //         "table per server instance (restriction is temporary," +
+            //         " put in place just for MVP/dev)");
+            // }
+            const newGameForm = {
+                smallBlind: req.body.smallBlind,
+                bigBlind: req.body.bigBlind,
+                gameType: req.body.gameType,
+                password: req.body.password
+            };
+            const tableUUID = this.gameStateManager.initGame(newGameForm);
+            this.tableInitialized = true;
+            console.log(tableUUID);
+            res.send(JSON.stringify({ "tableUUID": tableUUID }));
 
-        */
-        /*
-        router.post('/newgame', (req, res) => {
-            console.log(req);
-            const passedRequest: Request = req.body as Request
-
-            console.log(passedRequest);
-
-            request(passedRequest.url, (error: any, response: any, body: any) => {
-                if (!error) {
-                    const newGameForm: NewGameForm = JSON.parse(body) as NewGameForm
-                    const tableUUID = this.tableService.initTable(newGameForm);
-                    res.json(tableUUID);
-                }
-            });
-        })
-        */
-
-        // its probably okay to cut corners for now and bypass the game url
-        // and just use the main game url for simplicity since there is only one game
-        // happening right now
-
-        // lol I spent an hour trying to get post working and
-        // this took me less than a minute
-        // http://localhost:8080/newgameget?bigBlind=3&smallBlind=1&gameType=NLHOLDEM&password=abc
-        router.get('/newgameget', (req, res) => {
-            // reintroduce when you want to prevent accidental table recreation
-            if (this.tableInitialized && false) {
-                res.send("Table already initialized. Can only make one " +
-                    "table per server instance (restriction is temporary," +
-                    " put in place just for MVP/dev)");
-            }
-
-            else {
-                const newGameForm = {
-                    smallBlind: req.query.smallBlind,
-                    bigBlind: req.query.bigBlind,
-                    gameType: req.query.gameType,
-                    password: req.query.password
-                };
-                const tableUUID = this.gameStateManager.initGame(newGameForm);
-                this.tableInitialized = true;
-                console.log(tableUUID);
-                res.send(JSON.stringify({ "tableUUID": tableUUID }));
-            }
         });
 
         this.app.use(bodyParser.json());
@@ -113,6 +82,7 @@ class Server {
             console.log("connected to ip:", ip);
             let userCookieID = '';
 
+            console.log(req.headers);
 
             try {
                 userCookieID = cookie.parse(req.headers.cookie).id;
