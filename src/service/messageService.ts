@@ -57,33 +57,38 @@ export class MessageService {
         this.validationService.ensureClientExists(clientUUID);
 
         switch (actionType) {
-            case ActionType.StartGame: {
+            case ActionType.STARTGAME: {
                 this.processStartGameMessage(clientUUID);
                 break;
             }
-            case ActionType.StopGame: {
+            case ActionType.STOPGAME: {
                 this.processStopGameMessage(clientUUID);
                 break;
             }
-            case ActionType.SitDown: {
+            case ActionType.SITDOWN: {
                 this.processSitDownMessage(clientUUID, data);
                 break;
             }
-            case ActionType.StandUp: {
+            case ActionType.STANDUP: {
                 this.processStandUpMessage(clientUUID);
                 break;
             }
-            case ActionType.JoinTable: {
+            case ActionType.JOINTABLE: {
                 this.processJoinTableMessage(clientUUID, data);
                 break;
             }
 
-            case ActionType.Check: {
+            case ActionType.CHECK: {
                 this.processCheckMessage(clientUUID);
+                break;
             }
 
-            case ActionType.PingState: {
+            case ActionType.PINGSTATE: {
                 break;
+            }
+
+            default: {
+                throw Error(`Unrecognized action type: ${actionType}`);
             }
         }
 
@@ -125,6 +130,7 @@ export class MessageService {
     // that only messages from the current player to act are processed.
 
     processCheckMessage(clientUUID: string) {
+        console.log("processCheckMessage");
         this.validationService.validateCheckAction(clientUUID);
         this.gameStateManager.performBettingRoundAction(CHECK_ACTION);
     }

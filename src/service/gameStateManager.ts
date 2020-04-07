@@ -90,9 +90,8 @@ export class GameStateManager {
     }
 
     isSeatTaken(seatNumber: number) {
-        return Object.entries(this.gameState.players).some(([uuid, player]) => {
-            player.seatNumber === seatNumber
-        });
+        return Object.entries(this.gameState.players)
+            .some(([uuid, player]) => player.seatNumber === seatNumber);
     }
 
     isValidSeat(seatNumber: number) {
@@ -413,6 +412,8 @@ export class GameStateManager {
     /* Betting Round Actions */
 
     performBettingRoundAction(action: BettingRoundAction) {
+        console.log("Executing performBettingRoundAction");
+
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
                 this.check();
@@ -432,6 +433,7 @@ export class GameStateManager {
     }
 
     check() {
+        console.log("Executing check");
         const currentPlayerToAct = this.getCurrentPlayerToAct();
         this.setPlayerLastAction(currentPlayerToAct, CHECK_ACTION);
     }

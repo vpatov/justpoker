@@ -6,18 +6,18 @@
 // }
 
 export const enum ActionType {
-    StartGame = 'StartGame',
-    StopGame = 'StopGame',
-    SitDown = 'SitDown',
-    StandUp = 'StandUp',
-    JoinTable = 'JoinTable',
-    PingState = 'PingState',
-    Check = 'Check',
-    Bet = 'Bet',
-    Raise = 'Raise',
-    Fold = 'Fold',
-    Call = 'Call',
-    Chat = 'Chat',
+    STARTGAME = 'STARTGAME',
+    STOPGAME = 'STOPGAME',
+    SITDOWN = 'SITDOWN',
+    STANDUP = 'STANDUP',
+    JOINTABLE = 'JOINTABLE',
+    PINGSTATE = 'PINGSTATE',
+    CHECK = 'CHECK',
+    BET = 'BET',
+    RAISE = 'RAISE',
+    FOLD = 'FOLD',
+    CALL = 'CALL',
+    CHAT = 'CHAT',
 }
 
 export declare interface SitDownRequest {
