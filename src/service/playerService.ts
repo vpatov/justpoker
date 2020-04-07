@@ -11,14 +11,14 @@ export class PlayerService {
 
     createNewPlayer(name: string, chips: number): Player {
         return {
+            uuid: generateUUID(),
             name,
             chips,
             holeCards: [],
             sitting: false,
             inHand: false,
-            lastAction: null,
             seatNumber: -1,
-            uuid: generateUUID()
+            lastAction: null,
         };
     }
 

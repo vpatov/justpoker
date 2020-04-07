@@ -1,4 +1,4 @@
-import { Board, GameParameters, GameType, BettingRound } from './game';
+import { Board, GameParameters, GameType, BettingRoundStage, BettingRoundAction } from './game';
 import { Player } from './player';
 import { Table } from './table'
 import { Deck } from './cards'
@@ -10,7 +10,8 @@ export declare interface GameState {
     dealerUUID: Readonly<string>;
     smallBlindUUID: Readonly<string>;
     bigBlindUUID: Readonly<string>;
-    currentBettingRound: Readonly<BettingRound>;
+    bettingRoundStage: Readonly<BettingRoundStage>;
+    // bettingRoundActions: ReadonlyArray<BettingRoundAction>
     currentPlayerToAct: Readonly<string>;
     // seats: ReadonlyArray<[number, string]>,
     gameInProgress: Readonly<boolean>;
@@ -34,7 +35,8 @@ export const cleanGameState: GameState = {
     dealerUUID: '',
     smallBlindUUID: '',
     bigBlindUUID: '',
-    currentBettingRound: BettingRound.WAITING,
+    bettingRoundStage: BettingRoundStage.WAITING,
+    // bettingRoundActions: [],
     currentPlayerToAct: '',
     gameInProgress: false,
     deck: {
