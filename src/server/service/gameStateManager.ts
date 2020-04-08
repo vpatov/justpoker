@@ -39,6 +39,10 @@ export class GameStateManager {
         return this.gameState.players[playerUUID];
     }
 
+    getPlayers(): Readonly<{ [key: string]: Player }>{
+        return this.gameState.players;
+    }
+
     getCurrentPlayerToAct() {
         return this.gameState.currentPlayerToAct;
     }
@@ -164,34 +168,6 @@ export class GameStateManager {
             activeConnections: new Map(),
             password: newGameForm.password,
         };
-    }
-
-    /* Transformers */
-
-    stripSensitiveFields(cookie: string) {
-        const connectedClient = this.getConnectedClient(cookie);
-        const clientPlayerUUID = connectedClient.playerUUID;
-
-        const players = Object.fromEntries(Object.entries(this.gameState.players).map(
-            ([uuid, player]) => [
-                uuid,
-                (uuid === clientPlayerUUID ?
-                    player :
-                    { ...player, holeCards: [] })
-            ]
-        ));
-
-        const strippedGameState = {
-            ...this.gameState,
-            players,
-            clientPlayerUUID
-
-        };
-
-        delete strippedGameState.deck;
-        delete strippedGameState.table;
-
-        return strippedGameState;
     }
 
     /* Updaters */
@@ -447,25 +423,25 @@ export class GameStateManager {
 
     }
 
+    // TODO Probably want to remove WAITING case from here.
     initializeBettingRound() {
         // TODO timer - this seems like it would a good place to handle the timer
 
+        const stage = this.getBettingRoundStage();
 
         // players are gonna be "waiting to act" at the beginning of flop, turn, river, showDown
         // but not preflop
-        const players = Object.fromEntries(Object.entries(this.gameState.players).map(
+        this.gameState = {
+            ...this.gameState,
+            players: Object.fromEntries(Object.entries(this.gameState.players).map(
             ([uuid, player]) => [
                 uuid,
                 (player.sitting ? { ...player, lastAction: WAITING_TO_ACT } : player)
             ]
-        ));
-
-        this.gameState = {
-            ...this.gameState,
-            players
+        ))
         };
 
-        switch (this.getBettingRoundStage()) {
+        switch (stage) {
             case BettingRoundStage.WAITING: {
                 this.nextBettingRound();
 
@@ -506,7 +482,6 @@ export class GameStateManager {
                 break;
             }
         }
-        debugger;
 
         // this logic could probably be placed in its own method
         // do that later once you figure out a good name for it

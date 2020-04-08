@@ -75,10 +75,10 @@ class Server {
 
             let clientId = '';
             try {
-                // try to get clientId from cookie
+                // try to get clientId from cookie (local script testing)
                 clientId = cookie.parse(req.headers.cookie).clientId;
 
-                // try to get clientId from url
+                // try to get clientId from url (frontend)
                 if (!clientId){
                     const regEx = /clientId\=(\w+)/g;
                     clientId = Array.from(req.url.matchAll(regEx), m => m[1])[0];
@@ -93,14 +93,9 @@ class Server {
 
             ws.send(JSON.stringify({
                 status: 200,
-                clientId: clientId,
+                clientId,
             }));
 
-            // Is it important for this message to come after the status200?
-            // Is it guaranteed that it will arrive afterwards?
-            ws.send(JSON.stringify(
-                this.messageService.getGameStateMessageForUI()
-            ));
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log("Incoming:", data);
@@ -132,6 +127,7 @@ class Server {
 
             // TODO replace all string responses with structured jsons
             ws.send(JSON.stringify({"log":'You have connected to the websocket server.'}));
+
 
         });
 

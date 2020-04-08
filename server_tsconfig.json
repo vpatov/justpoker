@@ -17,7 +17,7 @@
         "types": ["reflect-metadata"]
     },
     "include": [
-        "src/server/**/*",
+        "src/server/**/*"
     ],
     "exclude": [
       "dist",
