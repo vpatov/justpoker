@@ -7,7 +7,6 @@
     "url": "git://github.com/vpatov/poker_web.git"
   },
   "scripts": {
-    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix; tsfmt -r",
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node ./dist/server/server.js",
@@ -24,7 +23,7 @@
     "@types/node": "^13.9.2",
     "@types/request": "^2.48.4",
     "@types/ws": "^7.2.3",
-    "tslint": "^6.1.0",
+    "tslint": "^6.1.1",
     "typescript": "^3.8.3"
   },
   "dependencies": {
