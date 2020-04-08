@@ -11,8 +11,8 @@
     "prebuild_server": "tslint -c server_tslint.json 'src/**/*.ts'",
     "build_server": "tsc --build server_tsconfig.json",
     "run_server": "node ./dist/server/server.js",
-    "start_server": "npm run prebuild_server && npm run build_server && npm run run_server",
-    "debugstart_server": "node inspect ./dist/server/server.js",
+    "server": "npm run prebuild_server && npm run build_server && npm run run_server",
+    "debug_server": "npm run build_server && node inspect ./dist/server/server.js",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"

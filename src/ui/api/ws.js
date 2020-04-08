@@ -16,6 +16,8 @@ export function OpenWs() {
   server.ws = new WebSocket(wsURI, []);
 
   server.ws.onmessage = (msg) => {
+    console.log(msg);
+    
     const jsonData = JSON.parse(get(msg, "data", {}));
 
     console.log(jsonData);
