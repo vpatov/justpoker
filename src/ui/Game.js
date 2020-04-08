@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "./Table";
+import Menu from "./Menu";
 import MissionControl from "./MissionControl";
 // import DarkMode from "./DarkMode";
 
@@ -19,6 +20,7 @@ function Game(props) {
 
   return (
     <div className={classes.root}>
+      <Menu/>
       <Table table={table} />
       <MissionControl missionControl={missionControl} />
     </div>
