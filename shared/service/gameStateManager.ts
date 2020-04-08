@@ -121,7 +121,7 @@ export class GameStateManager {
 
 
     /* Initialization methods */
-
+    // TODO validation around this method. Shouldn't be executed when table is not intialized.
     initConnectedClient(cookie: string) {
         const client = this.gameState.table.activeConnections.get(cookie);
         if (!client) {
