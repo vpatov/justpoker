@@ -14,10 +14,16 @@ export declare interface GameState {
     // bettingRoundActions: ReadonlyArray<BettingRoundAction>
     currentPlayerToAct: Readonly<string>;
     // seats: ReadonlyArray<[number, string]>,
+    pots: ReadonlyArray<Pot>;
     gameInProgress: Readonly<boolean>;
     deck: Readonly<Deck>;
     table: Readonly<Table>;
     serverTime: Readonly<number>;
+}
+
+export declare interface Pot {
+    value: number;
+    contestors: ReadonlyArray<Player>;
 }
 
 export const cleanGameState: GameState = {
@@ -42,6 +48,7 @@ export const cleanGameState: GameState = {
     deck: {
         cards: []
     },
+    pots: [],
     table: {
         uuid: '',
         activeConnections: new Map(),

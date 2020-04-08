@@ -16,7 +16,6 @@ export class PlayerService {
             chips,
             holeCards: [],
             sitting: false,
-            inHand: false,
             seatNumber: -1,
             lastAction: null,
         };

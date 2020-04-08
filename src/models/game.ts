@@ -13,6 +13,7 @@ export const enum BettingRoundActionType {
     // distinction between bet and raise may be unnecessary
     // RAISE = 'RAISE',
     FOLD = 'FOLD',
+    WAITING_TO_ACT = 'WAITING_TO_ACT',
 }
 
 export declare interface GameParameters {
@@ -51,7 +52,17 @@ export const enum BettingRoundStage {
     FLOP = 'FLOP',
     TURN = 'TURN',
     RIVER = 'RIVER',
+    SHOWDOWN = 'SHOWDOWN',
 }
+
+export const BETTING_ROUND_STAGES = [
+    BettingRoundStage.WAITING,
+    BettingRoundStage.PREFLOP,
+    BettingRoundStage.FLOP,
+    BettingRoundStage.TURN,
+    BettingRoundStage.RIVER,
+    BettingRoundStage.SHOWDOWN,
+];
 
 export const CHECK_ACTION: BettingRoundAction = {
     type: BettingRoundActionType.CHECK,
@@ -64,3 +75,10 @@ export const FOLD_ACTION: BettingRoundAction = {
     amount: 0,
     allin: false
 };
+
+export const WAITING_TO_ACT: BettingRoundAction = {
+    type: BettingRoundActionType.WAITING_TO_ACT,
+    amount: 0,
+    allin: false
+};
+

@@ -9,8 +9,12 @@ import { SitDownRequest, JoinTableRequest } from '../models/wsaction';
         - validateAction methods called externall, ensureCondition methods called internally
 */
 
-const MAX_NAME_LENGTH = 32;
-
+/**
+* Validation layer that ensures that all incoming action requests are valid and
+* legal. All preconditions are checked before any game state updates are
+* performed, which allows the gaurantee of atomic operations (either they
+* completely succeed, or completely fail).
+*/
 @Service()
 export class ValidationService {
 
@@ -76,7 +80,6 @@ export class ValidationService {
         }
     }
 
-
     validateSitDownRequest(clientUUID: string, request: SitDownRequest) {
         this.ensureClientIsInGame(clientUUID);
 
@@ -119,7 +122,6 @@ export class ValidationService {
         }
     }
 
-
     validateCheckAction(clientUUID: string) {
         this.ensureCorrectPlayerToAct(clientUUID);
 
@@ -133,6 +135,6 @@ export class ValidationService {
         }
     }
 
-
-
 }
+
+const MAX_NAME_LENGTH = 32;
