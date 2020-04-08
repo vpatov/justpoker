@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "target": "es6",
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "./dist/server",
+        "baseUrl": ".",
+        "typeRoots":[
+          "node_modules/@types"
+        ],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "lib": ["es6", "dom", "esnext"],
+        "types": ["reflect-metadata"]
+    },
+    "include": [
+        "src/**/*",
+        "../../service/**/*",
+        "../../util/**/*",
+        "../../models/**/*"
+    ],
+    "exclude": [
+      "dist",
+      "node_modules"
+    ]
+}
+
