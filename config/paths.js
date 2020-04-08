@@ -67,6 +67,10 @@ module.exports = {
   publicUrlOrPath,
 };
 
-
+/* JUSTPOKER note - if you want to reinclude ui_tsconfig, be sure to 
+ exclude the server source files in the exclude_dir proerpty of the ui_tsconfig,
+ otherwise it will try to compile the server using the ui's typescript config
+ and it will fail
+*/
 
 module.exports.moduleFileExtensions = moduleFileExtensions;
