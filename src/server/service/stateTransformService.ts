@@ -7,20 +7,25 @@ export class StateTransformService {
 
     constructor(private readonly gameStateManager: GameStateManager){}
 
-    transformGameStateToUIState(clientUUID: string, gameState: GameState) {
+    transformGameStateToUIState(clientUUID: string, strippedGameState: GameState) {
+        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const pot = this.gameStateManager.getTotalPot();
+        const communityCards = this.gameStateManager.getBoard().cards;
 
         // need to define translation
         // need to define interfaces for UIState
 
+        /* const { stack, hand, name, toAct, hero, bet, button } = props.player; */
+
         const UIState = {
             missionControl: {
-                heroStack: 0,
-                pot: 0,
+                heroStack: player.chips,
+                pot,
             },
             table: {
                 spots: 9,
-                pot: 0,
-                communityCards: [] as any[],
+                pot,
+                communityCards,
                 players: [] as any[],
 
             },

@@ -59,6 +59,14 @@ export class GameStateManager {
         return this.gameState.gameParameters.bigBlind;
     }
 
+    getBoard(){
+        return this.gameState.board;
+    }
+
+    getTotalPot(){
+        return this.gameState.pots.reduce((sum, pot) => pot.value + sum, 0);
+    }
+
     // TODO these are unsorted. Make sure thats okay.
     getBettingRoundActions() {
         return Object.values(this.gameState.players)
