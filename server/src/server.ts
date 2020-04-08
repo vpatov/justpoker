@@ -76,6 +76,14 @@ class Server {
             let clientId = '';
             try {
                 clientId = cookie.parse(req.headers.cookie).id;
+                // try to get clientId from cookie
+                clientId = cookie.parse(req.headers.cookie).clientId;
+
+                // try to get clientId from url
+                if (!clientId){
+                    const regEx = /clientId\=(\w+)/g;
+                    clientId = Array.from(req.url.matchAll(regEx), m => m[1])[0];
+                }
             }
             catch (e) {
                 clientId = generateUUID()
@@ -124,7 +132,8 @@ class Server {
             });
 
             // TODO replace all string responses with structured jsons
-            ws.send('You have connected to the websocket server.');
+            ws.send(JSON.stringify(
+                {"log":'You have connected to the websocket server.'}));
 
         });
 
