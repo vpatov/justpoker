@@ -1,6 +1,8 @@
 export function generateUUID() {
-    return Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 }
 
 // export function debugMethod(target: any, name: any, desc: any) {
@@ -12,6 +14,10 @@ export function generateUUID() {
 //     }
 // }
 
-export function debugMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    console.log(propertyKey);
+export function debugMethod(
+  target: any,
+  propertyKey: string,
+  descriptor: PropertyDescriptor
+) {
+  console.log(propertyKey);
 }
