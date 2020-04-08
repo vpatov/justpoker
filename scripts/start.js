@@ -19,7 +19,12 @@ const fs = require('fs');
 const chalk = require('react-dev-utils/chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const clearConsole = require('react-dev-utils/clearConsole');
+
+// Put this in to prevent the fucking clearing of the console on build
+require('react-dev-utils/clearConsole');
+const clearConsole = ()=>{}
+require.cache[require.resolve('react-dev-utils/clearConsole')].exports = clearConsole
+
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const {
   choosePort,
