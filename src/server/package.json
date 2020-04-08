@@ -1,0 +1,39 @@
+{
+  "name": "poker_web",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vpatov/poker_web.git"
+  },
+  "scripts": {
+    "prebuild": "tslint -c tslint.json ../../**/*",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node ./dist/server/server/src/server.js",
+    "debugStart": "node inspect ./dist/server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/cookie": "^0.3.3",
+    "@types/express": "^4.17.3",
+    "@types/node": "^13.9.2",
+    "@types/request": "^2.48.4",
+    "@types/ws": "^7.2.3",
+    "tslint": "^6.1.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "reflect-metadata": "^0.1.13",
+    "request": "^2.88.2",
+    "rxjs": "^6.5.4",
+    "typedi": "^0.8.0",
+    "ws": "^7.2.3"
+  }
+}
