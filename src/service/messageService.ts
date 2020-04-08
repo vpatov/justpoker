@@ -60,10 +60,17 @@ export class MessageService {
             }
         }
 
-        this.gameStateManager.pollForGameContinuation();
+        this.gameStateManager.startHandIfReady();
         return this.gameStateManager.stripSensitiveFields(clientUUID);
 
     }
+
+    /*
+         Idea for reducing gameStateManager bloat:
+         The other services could follow the same pattern as the validationService,
+         and have the gameStateManager as a dependency.
+         BettingActionService could
+    */
 
     // Preconditions: at least two players are sitting down.
     processStartGameMessage(clientUUID: string) {

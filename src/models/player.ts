@@ -2,15 +2,38 @@ import { Card } from './cards';
 import { BettingRoundAction } from './game';
 
 export declare interface Player {
-    name: string;
-    chips: number;
-    holeCards: Card[];
-    inHand: boolean;
-    sitting: boolean;
+
+    /** Unique identifier for player. */
     uuid: string;
+
+    /** Player's display name at the table. */
+    name: string;
+
+    /** Amount of chips that the player has. (Rename to stack?) */
+    chips: number;
+
+    /** Player's hole cards. */
+    holeCards: Card[];
+
+    /**
+     * If a player is sitting they are either playing/have played
+     * in the current hand, or are waiting to be dealt in the next hand.
+     */
+    sitting: boolean;
+
+    /** Gameplay goes from lower seat number to higher seat number and wraps around. */
     seatNumber: number;
+
+    /**
+     * The last action that the player has performed (check, bet, etc.) If they are in the
+     * current hand, but have not acted yet, lastAction.type === WAITING_TO_ACT . This
+     * property is used to determine whether a play is in a hand (rather than something like
+     * an additional boolean "inHand").
+     */
     lastAction: BettingRoundAction | null;
 }
+
+
 
 /*
 export declare interface PlayerGameData {

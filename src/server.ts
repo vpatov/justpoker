@@ -98,22 +98,12 @@ class Server {
         this.app = express();
         this.initRoutes();
         this.server = http.createServer(this.app);
-
         this.wss = new WebSocket.Server({ 'server': this.server });
-
-
-        /* TODO look at
-        https://livebook.manning.com/book/typescript-quickly/chapter-10/v-9/233
-        where he has a baseclass for a MessageServer, that other MessageServers
-        can extend. it could be a good idea to have a separate server for
-        different types of actions
-        */
 
         this.wss.on('connection', (ws: WebSocket, req) => {
             const ip = req.connection.remoteAddress;
             console.log("connected to ip:", ip);
             let userCookieID = '';
-
 
             try {
                 userCookieID = cookie.parse(req.headers.cookie).id;
@@ -153,6 +143,7 @@ class Server {
                 }
             });
 
+            // TODO replace all string responses with structured jsons
             ws.send('You have connected to the websocket server.');
 
         });
@@ -166,11 +157,6 @@ class Server {
 
     }
 }
-
-//   this.mountRoutes()
-// }
-
-
 
 const server = Container.get(Server);
 server.init();
