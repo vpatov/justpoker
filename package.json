@@ -8,7 +8,7 @@
     "url": "git://github.com/vpatov/poker_web.git"
   },
   "scripts": {
-    "prebuild_server": "tslint -c server_tslint.json 'src/**/*.ts'",
+    "prebuild_server": "tslint -c server_tslint.json 'src/server/**/*.ts'",
     "build_server": "tsc --build server_tsconfig.json",
     "run_server": "node ./dist/server/server.js",
     "server": "npm run prebuild_server && npm run build_server && npm run run_server",
