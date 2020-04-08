@@ -1,20 +1,17 @@
 {
-  "name": "justpoker",
+  "name": "poker",
   "version": "0.1.0",
   "description": "",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/vpatov/poker_web.git"
   },
   "scripts": {
-    "prebuild_server": "tslint -c tslint.json 'src/**/*.ts'",
-    "build_server": "tsc --build server_tsconfig.json",
-    "run_server": "node ./dist/server/server.js",
-    "start_server": "npm run prebuild_server && npm run build_server && npm run run_server",
-    "debugstart_server": "node inspect ./dist/server/server.js",
-    "start": "react-scripts start",
+    "prebuild": "tslint -c tslint.json 'src/**/**/**/*.ts'",
     "build": "react-scripts build",
+    "prestart": "npm run build",
+    "start": "react-scripts start",
+    "debugStart": "node inspect ./dist/server/server.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -32,6 +29,13 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "reflect-metadata": "^0.1.13",
+    "request": "^2.88.2",
+    "rxjs": "^6.5.4",
+    "typedi": "^0.8.0",
+    "ws": "^7.2.3",
     "@material-ui/core": "^4.9.9",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -45,15 +49,9 @@
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
-    "uifx": "^2.0.7",
-    "body-parser": "^1.19.0",
-    "express": "^4.17.1",
-    "reflect-metadata": "^0.1.13",
-    "request": "^2.88.2",
-    "rxjs": "^6.5.4",
-    "typedi": "^0.8.0",
-    "ws": "^7.2.3"
+    "uifx": "^2.0.7"
   },
+  "private": true,
   "eslintConfig": {
     "extends": "react-app"
   },
