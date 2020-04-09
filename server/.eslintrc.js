@@ -18,6 +18,5 @@ module.exports = {
   rules: {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     "@typescript-eslint/no-empty-function": "off"
-
   },
 };

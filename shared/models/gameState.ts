@@ -1,5 +1,4 @@
 import {
-  Board,
   GameParameters,
   GameType,
   BettingRoundStage,
@@ -7,24 +6,34 @@ import {
 } from "./game";
 import { Player } from "./player";
 import { Table } from "./table";
-import { Deck } from "./cards";
+import { Card, Deck } from "./cards";
 
 export declare interface GameState {
   players: Readonly<{ [key: string]: Player }>;
-  board: Readonly<Board>;
+
+  board: ReadonlyArray<Card>;
+
   gameParameters: Readonly<GameParameters>;
+
   dealerUUID: Readonly<string>;
+
+  bettingRoundStage: Readonly<BettingRoundStage>;
+
+  currentPlayerToAct: Readonly<string>;
+
+  pots: ReadonlyArray<Pot>;
+
+  gameInProgress: Readonly<boolean>;
+
+  deck: Readonly<Deck>;
+
+  table: Readonly<Table>;
+
+  serverTime: Readonly<number>;
+
   // smallBlindUUID: Readonly<string>;
   // bigBlindUUID: Readonly<string>;
-  bettingRoundStage: Readonly<BettingRoundStage>;
   // bettingRoundActions: ReadonlyArray<BettingRoundAction>
-  currentPlayerToAct: Readonly<string>;
-  // seats: ReadonlyArray<[number, string]>,
-  pots: ReadonlyArray<Pot>;
-  gameInProgress: Readonly<boolean>;
-  deck: Readonly<Deck>;
-  table: Readonly<Table>;
-  serverTime: Readonly<number>;
 }
 
 export declare interface Pot {
@@ -34,10 +43,7 @@ export declare interface Pot {
 
 export const cleanGameState: GameState = {
   players: {},
-  board: {
-    cards: [],
-  },
-
+  board: [],
   gameParameters: {
     smallBlind: 0,
     bigBlind: 0,

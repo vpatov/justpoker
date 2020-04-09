@@ -34,9 +34,9 @@ export const enum StraddleType {
 }
 
 // These are the community cards
-export declare interface Board {
-  cards: Card[];
-}
+// export declare interface Board {
+//   cards: Card[];
+// }
 
 export const enum GameType {
   LHOLDEM = "LHOLDEM",

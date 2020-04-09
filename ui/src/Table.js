@@ -120,6 +120,7 @@ function Table(props) {
       } else {
         ans.push(
           <OpenSeat
+            seatNumber={index}
             className={classes.spot}
             style={{
               transform: `translate(${xPos * playerPosScale}px,${
@@ -142,7 +143,7 @@ function Table(props) {
           {communityCards.map((c) => (
             <Card
               suit={c.suit}
-              number={c.number}
+              rank={c.rank}
               fontSize={44}
               style={{
                 width: "18%",

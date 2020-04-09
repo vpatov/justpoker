@@ -100,9 +100,9 @@ class Server {
                     try {
                         const action = JSON.parse(data);
                         const res = this.messageService.processMessage(action, clientId);
-                        const jsonRes = JSON.stringify(res);
                         console.log(util.inspect(res, false, null, true));
 
+                        const jsonRes = JSON.stringify(res);
                         ws.send(jsonRes);
                     } catch (e) {
                         console.log(e);

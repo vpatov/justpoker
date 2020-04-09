@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { generateStringFromSuitNumber, SUITS } from "./utils";
+import { generateStringFromSuitAndRank, SUITS } from "./utils";
 import classnames from "classnames";
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Card(props) {
   const classes = useStyles();
-  const { suit, number, textPosition, fontSize, style, hidden } = props;
+  const { suit, rank, textPosition, fontSize, style, hidden } = props;
 
   if (hidden) {
     return (
@@ -64,7 +64,7 @@ function Card(props) {
         )}
         style={{ fontSize: fontSize }}
       >
-        {generateStringFromSuitNumber(suit, number)}
+        {generateStringFromSuitAndRank(suit, rank)}
       </div>
     </div>
   );

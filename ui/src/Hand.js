@@ -23,7 +23,7 @@ function Hand(props) {
       {cards.map((c) => (
         <Card
           suit={c.suit}
-          number={c.number}
+          rank={c.rank}
           hidden={hidden}
           textPosition="top"
         />

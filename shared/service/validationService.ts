@@ -8,7 +8,7 @@ const MAX_NAME_LENGTH = 32;
 /*
     TODO: Redesign error message construction
     TODO: Split methods into validateAction and ensureCondition
-        - validateAction methods called externall, ensureCondition methods called internally
+        - validateAction methods called externally, ensureCondition methods called internally
 */
 
 /**
