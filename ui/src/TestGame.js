@@ -9,23 +9,23 @@ const TestGame = {
     communityCards: [
       {
         suit: "CLUBS",
-        number: 11,
+        rank: 11,
       },
       {
         suit: "SPADES",
-        number: 12,
+        rank: 12,
       },
       {
         suit: "HEARTS",
-        number: 1,
+        rank: 1,
       },
       {
         suit: "DIAMONDS",
-        number: 4,
+        rank: 4,
       },
       {
         suit: "CLUBS",
-        number: 2,
+        rank: 2,
       },
     ],
     players: [
@@ -39,11 +39,11 @@ const TestGame = {
           cards: [
             {
               suit: "CLUBS",
-              number: 11,
+              rank: 11,
             },
             {
               suit: "CLUBS",
-              number: 10,
+              rank: 10,
             },
           ],
         },
@@ -57,11 +57,11 @@ const TestGame = {
           cards: [
             {
               suit: "HEARTS",
-              number: 4,
+              rank: 4,
             },
             {
               suit: "CLUBS",
-              number: 2,
+              rank: 2,
             },
           ],
         },
@@ -75,11 +75,11 @@ const TestGame = {
           cards: [
             {
               suit: "DIAMONDS",
-              number: 11,
+              rank: 11,
             },
             {
               suit: "CLUBS",
-              number: 12,
+              rank: 12,
             },
           ],
         },
@@ -93,11 +93,11 @@ const TestGame = {
           cards: [
             {
               suit: "DIAMONDS",
-              number: 1,
+              rank: 1,
             },
             {
               suit: "DIAMONDS",
-              number: 2,
+              rank: 2,
             },
           ],
         },
@@ -113,11 +113,11 @@ const TestGame = {
           cards: [
             {
               suit: "HEARTS",
-              number: 6,
+              rank: 6,
             },
             {
               suit: "HEARTS",
-              number: 1,
+              rank: 1,
             },
           ],
         },
@@ -131,11 +131,11 @@ const TestGame = {
       //     cards: [
       //       {
       //         suit: "SPADES",
-      //         number: 3,
+      //         rank: 3,
       //       },
       //       {
       //         suit: "SPADES",
-      //         number: 12,
+      //         rank: 12,
       //       },
       //     ],
       //   },
@@ -150,11 +150,11 @@ const TestGame = {
           cards: [
             {
               suit: "DIAMONDS",
-              number: 1,
+              rank: 1,
             },
             {
               suit: "CLUBS",
-              number: 6,
+              rank: 6,
             },
           ],
         },
@@ -168,11 +168,11 @@ const TestGame = {
           cards: [
             {
               suit: "HEARTS",
-              number: 11,
+              rank: 11,
             },
             {
               suit: "HEARTS",
-              number: 12,
+              rank: 12,
             },
           ],
         },
@@ -186,11 +186,11 @@ const TestGame = {
       //     cards: [
       //       {
       //         suit: "HEARTS",
-      //         number: 11,
+      //         rank: 11,
       //       },
       //       {
       //         suit: "HEARTS",
-      //         number: 12,
+      //         rank: 12,
       //       },
       //     ],
       //   },

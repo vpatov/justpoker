@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
   const classes = useStyles();
   const { className, style } = props;
-  const { stack, hand, name, toAct, hero, bet, button } = props.player;
+  const { stack, hand, name, toAct, hero, bet, button, position } = props.player;
 
   return (
     <div

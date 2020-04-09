@@ -61,6 +61,10 @@ export class GameStateManager {
     return this.gameState.dealerUUID;
   }
 
+  getBoard() {
+    return this.gameState.board;
+  }
+
   getSB() {
     return this.gameState.gameParameters.smallBlind;
   }
@@ -409,9 +413,7 @@ export class GameStateManager {
     );
     this.gameState = {
       ...this.gameState,
-      board: {
-        cards: [...this.gameState.board.cards, ...newCards],
-      },
+      board: [...this.gameState.board, ...newCards],
     };
   }
 

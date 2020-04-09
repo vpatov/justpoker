@@ -31,7 +31,13 @@ export function OpenWs() {
     });
   };
 
+
+
   return true;
+}
+
+server.send = function(data) {
+  server.ws.send(JSON.stringify(data));
 }
 
 export function Subscribe(key, onMessage) {

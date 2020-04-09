@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import classnames from "classnames";
 import Hand from "./Hand";
+import { server } from "./api/ws";
 
+import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import yellow from "@material-ui/core/colors/yellow";
 import grey from "@material-ui/core/colors/grey";
@@ -28,14 +30,34 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
 function OpenSeat(props) {
   const classes = useStyles();
-  const { className, style } = props;
+  const { className, style, seatNumber } = props;
+
+  // TODO change this to onRequestSitDown, because the player has to request to sit down,
+  // declare their name, chips, waitForBigBlind?, etc...
+  function onSitDown(){
+    server.send({
+      actionType: 'JOINTABLEANDSITDOWN',
+      data: {
+        name: "VasVas",
+        buyin: 54100,
+        seatNumber: seatNumber
+      }
+    });
+  }
 
   return (
-    <div className={classnames(classes.root, className)} style={style}>
-      <Typography variant="body2">Sit Here</Typography>
-    </div>
+    <Button
+      variant="contained"
+      className={classnames(classes.root, className)}
+      style={style}
+      onClick={() => onSitDown()}
+    >
+       <Typography variant="body2">Sit Here</Typography>
+    </Button>
   );
 }
 

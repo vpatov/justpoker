@@ -5,7 +5,6 @@ import {
   JoinTableRequest,
 } from "../models/wsaction";
 import { CHECK_ACTION, FOLD_ACTION } from "../models/game";
-import { ConnectedClient } from "../models/table";
 import { GameStateManager } from "./gameStateManager";
 import { PlayerService } from "./playerService";
 import { ValidationService } from "./validationService";
@@ -50,6 +49,11 @@ export class MessageService {
         break;
       }
 
+      case ActionType.JOINTABLEANDSITDOWN: {
+        this.processJoinTableAndSitDownMessage(clientUUID, data);
+        break;
+      }
+
       case ActionType.CHECK: {
         this.processCheckMessage(clientUUID);
         break;
@@ -76,42 +80,51 @@ export class MessageService {
     */
 
   // Preconditions: at least two players are sitting down.
-  processStartGameMessage(clientUUID: string) {
+  processStartGameMessage(clientUUID: string): void {
     this.validationService.validateStartGameRequest(clientUUID);
     this.gameStateManager.startGame();
   }
 
   // Preconditions: the game is in progress.
-  processStopGameMessage(clientUUID: string) {
+  processStopGameMessage(clientUUID: string): void {
     this.validationService.validateStopGameRequest(clientUUID);
     this.gameStateManager.stopGame();
   }
 
-  processSitDownMessage(clientUUID: string, request: SitDownRequest) {
+  processSitDownMessage(clientUUID: string, request: SitDownRequest): void {
     this.validationService.validateSitDownRequest(clientUUID, request);
     const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
     this.gameStateManager.sitDownPlayer(player.uuid, request.seatNumber);
   }
 
-  processStandUpMessage(clientUUID: string) {
+  processStandUpMessage(clientUUID: string): void {
     this.validationService.validateStandUpRequest(clientUUID);
     const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
     this.gameStateManager.standUpPlayer(player.uuid);
   }
 
-  processJoinTableMessage(clientUUID: string, request: JoinTableRequest) {
+  processJoinTableMessage(clientUUID: string, request: JoinTableRequest): void {
     this.validationService.validateJoinTableRequest(clientUUID, request);
-    const gameState = this.gameStateManager.addNewPlayerToGame(
+    this.gameStateManager.addNewPlayerToGame(
       clientUUID,
       request.name,
       request.buyin
     );
   }
 
+  // TODO you wont be able to stand up and sit back down while this is the case
+  processJoinTableAndSitDownMessage(
+    clientUUID: string,
+    request: JoinTableRequest & SitDownRequest
+  ): void {
+    this.processJoinTableMessage(clientUUID, request);
+    this.processSitDownMessage(clientUUID, request);
+  }
+
   // TODO perhaps create one actionType for a gamePlayAction, and then validate to make sure
   // that only messages from the current player to act are processed.
 
-  processCheckMessage(clientUUID: string) {
+  processCheckMessage(clientUUID: string): void {
     console.log("processCheckMessage");
     this.validationService.validateCheckAction(clientUUID);
     this.gameStateManager.performBettingRoundAction(CHECK_ACTION);

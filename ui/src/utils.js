@@ -5,7 +5,9 @@ export const SUITS = {
   DIAMONDS: "DIAMONDS",
 };
 
-export function generateStringFromSuitNumber(suit, number) {
+// TODO change ranks to 0-12 and change Ace to high card
+// rather than low card
+export function generateStringFromSuitAndRank(suit, rank) {
   let suitString = "ERR_SUIT";
   let numberString = "ERR_NUMBER";
   switch (suit) {
@@ -23,10 +25,10 @@ export function generateStringFromSuitNumber(suit, number) {
       break;
   }
 
-  if (2 <= number && number <= 10) {
-    numberString = `${number}`;
+  if (2 <= rank && rank <= 10) {
+    numberString = `${rank}`;
   } else {
-    switch (number) {
+    switch (rank) {
       case 1:
         numberString = "A";
         break;

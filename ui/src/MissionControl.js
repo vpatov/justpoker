@@ -64,7 +64,7 @@ function MissionControl(props) {
 
   const [betAmt, setBetAmt] = useState(0);
 
-  const changeBetAmonut = (newAmt) => {
+  const changeBetAmount = (newAmt) => {
     setBetAmt(Math.min(Math.floor(newAmt), heroStack));
   };
 
@@ -124,35 +124,35 @@ function MissionControl(props) {
             <Button
               variant="outlined"
               className={classes.sizeButton}
-              onClick={(e) => changeBetAmonut(pot * 0.5)}
+              onClick={(e) => changeBetAmount(pot * 0.5)}
             >
               1/2
             </Button>
             <Button
               variant="outlined"
               className={classes.sizeButton}
-              onClick={(e) => changeBetAmonut(pot * 0.75)}
+              onClick={(e) => changeBetAmount(pot * 0.75)}
             >
               3/4
             </Button>
             <Button
               variant="outlined"
               className={classes.sizeButton}
-              onClick={(e) => changeBetAmonut(pot * 1)}
+              onClick={(e) => changeBetAmount(pot * 1)}
             >
               Pot
             </Button>
             <Button
               variant="outlined"
               className={classes.sizeButton}
-              onClick={(e) => changeBetAmonut(pot * (Math.random() + 1))}
+              onClick={(e) => changeBetAmount(pot * (Math.random() + 1))}
             >
               Overbet
             </Button>
             <Button
               variant="outlined"
               className={classes.sizeButton}
-              onClick={(e) => changeBetAmonut(heroStack)}
+              onClick={(e) => changeBetAmount(heroStack)}
             >
               Shuv
             </Button>
