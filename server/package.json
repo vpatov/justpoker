@@ -8,7 +8,7 @@
   },
   "scripts": {
     "prebuild": "npm run lint",
-    "lint": "eslint --fix --config .eslintrc.js ./src/*.ts ../shared/**/*.ts",
+    "lint": "eslint --quiet --fix --config .eslintrc.js ./src/*.ts ../shared/**/*.ts",
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node ./dist/server/server/src/server.js",

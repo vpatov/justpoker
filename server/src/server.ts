@@ -10,10 +10,11 @@ import request from 'request';
 import cookie from 'cookie';
 
 import { AddressInfo } from 'net';
+import { ActionType } from '../../shared/models/wsaction';
 import { MessageService } from '../../shared/service/messageService';
 import { NewGameForm } from '../../shared/models/table';
 import { GameStateManager } from '../../shared/service/gameStateManager';
-import { generateUUID } from '../../shared/util/util';
+import { generateUUID, printObj } from '../../shared/util/util';
 
 @Service()
 class Server {
@@ -70,37 +71,49 @@ class Server {
             const ip = req.connection.remoteAddress;
             console.log('connected to ip:', ip);
 
-            let clientId = '';
-            try {
-                // try to get clientId from cookie (local script testing)
-                clientId = cookie.parse(req.headers.cookie).clientId;
+            // try to get clientID from cookie (local script testing)
+            let clientID = cookie.parse(req.headers.cookie).clientID;
 
-                // try to get clientId from url (frontend)
-                if (!clientId) {
-                    const regEx = /clientId\=(\w+)/g;
-                    clientId = Array.from(req.url.matchAll(regEx), (m) => m[1])[0];
-                }
-            } catch (e) {
-                clientId = generateUUID();
+            // try to get clientID from url (frontend)
+            if (!clientID) {
+                const regEx = /clientID\=(\w+)/g;
+                clientID = Array.from(req.url.matchAll(regEx), (m) => m[1])[0];
             }
-            console.log('clientId: ', clientId);
 
-            this.gameStateManager.initConnectedClient(clientId);
+            if (!clientID) {
+                clientID = generateUUID();
+            }
+
+            console.log('clientID: ', clientID);
+
+            this.gameStateManager.initConnectedClient(clientID);
 
             ws.send(
                 JSON.stringify({
                     status: 200,
-                    clientId,
+                    clientID,
                 }),
             );
 
+            ws.send(
+                JSON.stringify(
+                    this.messageService.processMessage({ actionType: ActionType.PINGSTATE, data: {} }, clientID),
+                ),
+            );
+
             ws.on('message', (data: WebSocket.Data) => {
-                console.log('Incoming:', data);
+                console.log('Incoming data:', util.inspect(data, false, null, true));
+
                 if (typeof data === 'string') {
                     try {
                         const action = JSON.parse(data);
-                        const res = this.messageService.processMessage(action, clientId);
+                        const res = this.messageService.processMessage(action, clientID);
+
+                        console.log('\n\nServer is sending to UI:\n');
                         console.log(util.inspect(res, false, null, true));
+
+                        console.log('\n\nServer game state:\n');
+                        console.log(util.inspect(this.gameStateManager.getGameState(), false, null, true));
 
                         const jsonRes = JSON.stringify(res);
                         ws.send(jsonRes);

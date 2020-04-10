@@ -125,7 +125,6 @@ export class MessageService {
   // that only messages from the current player to act are processed.
 
   processCheckMessage(clientUUID: string): void {
-    console.log("processCheckMessage");
     this.validationService.validateCheckAction(clientUUID);
     this.gameStateManager.performBettingRoundAction(CHECK_ACTION);
   }

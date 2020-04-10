@@ -3,25 +3,25 @@ import { BettingRoundAction } from "./game";
 
 export declare interface Player {
   /** Unique identifier for player. */
-  uuid: string;
+  readonly uuid: string;
 
   /** Player's display name at the table. */
-  name: string;
+  readonly name: string;
 
   /** Amount of chips that the player has. (Rename to stack?) */
-  chips: number;
+  readonly chips: number;
 
   /** Player's hole cards. */
-  holeCards: Card[];
+  readonly holeCards: Card[];
 
   /**
    * If a player is sitting they are either playing/have played
    * in the current hand, or are waiting to be dealt in the next hand.
    */
-  sitting: boolean;
+  readonly sitting: boolean;
 
   /** Gameplay goes from lower seat number to higher seat number and wraps around. */
-  seatNumber: number;
+  readonly seatNumber: number;
 
   /**
    * The last action that the player has performed (check, bet, etc.) If they are in the
@@ -29,7 +29,7 @@ export declare interface Player {
    * property is used to determine whether a play is in a hand (rather than something like
    * an additional boolean "inHand").
    */
-  lastAction: BettingRoundAction | null;
+  readonly lastAction: BettingRoundAction | null;
 }
 
 /*
