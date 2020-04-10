@@ -20,11 +20,13 @@ import { Player } from "../models/player";
 import { PlayerService } from "./playerService";
 import { DeckService } from "./deckService";
 import { generateUUID, printObj } from "../util/util";
+import { Subject } from "rxjs";
 
 @Service()
 export class GameStateManager {
   private gameState: Readonly<GameState> = cleanGameState;
   private gameTimer: NodeJS.Timer;
+  private updateEmitter: Subject<void> = new Subject<void>();
 
   constructor(
     private readonly deckService: DeckService,
@@ -35,6 +37,10 @@ export class GameStateManager {
 
   getGameState(): GameState {
     return this.gameState;
+  }
+
+  observeUpdates() {
+    return this.updateEmitter.asObservable();
   }
 
   getConnectedClient(clientUUID: string) {
@@ -333,8 +339,29 @@ export class GameStateManager {
       this.getBettingRoundStage() === BettingRoundStage.WAITING &&
       this.getNumberPlayersSitting() >= 2
     ) {
+      this.clearStateOfRoundInfo();
       this.initializeBettingRound();
     }
+  }
+
+  clearStateOfRoundInfo() {
+    this.gameState = {
+      ...this.gameState,
+      players: Object.fromEntries(
+        Object.entries(this.gameState.players).map(([uuid, player]) => [
+          uuid,
+          { ...player, lastAction: null, holeCards: [], winner: false },
+        ])
+      ),
+      board: [],
+      bettingRoundStage: BettingRoundStage.WAITING,
+      currentPlayerToAct: "",
+      pots: [],
+      gameInProgress: true,
+      deck: {
+        cards: [],
+      },
+    };
   }
 
   initializePreflop() {
@@ -495,14 +522,28 @@ export class GameStateManager {
     };
   }
 
-  // TODO Probably want to remove WAITING case from here.
+  finishHand() {
+    console.log("\nfinishHand\n");
+    this.gameTimer = global.setTimeout(
+      this.globalTimerFn.bind(this, this.clearBettingRoundStage),
+      2000
+    );
+  }
+
+  globalTimerFn(fn: () => any) {
+    console.log("globalTimerFn\n");
+
+    // fn();
+    this.clearBettingRoundStage();
+    this.startHandIfReady();
+    this.updateEmitter.next();
+  }
+
   initializeBettingRound() {
     // TODO timer - this seems like it would a good place to handle the timer
 
     const stage = this.getBettingRoundStage();
 
-    // players are gonna be "waiting to act" at the beginning of flop, turn, river, showDown
-    // but not preflop
     this.gameState = {
       ...this.gameState,
       players: Object.fromEntries(
@@ -516,11 +557,7 @@ export class GameStateManager {
     switch (stage) {
       case BettingRoundStage.WAITING: {
         this.nextBettingRound();
-
-        // having this recursive call is not an optimal design
-        // you're also executing the code at the top of this function twice
-        this.initializeBettingRound();
-        break;
+        /* intentional switch-fallthrough */
       }
       case BettingRoundStage.PREFLOP: {
         this.initializePreflop();
@@ -540,6 +577,7 @@ export class GameStateManager {
       }
       case BettingRoundStage.SHOWDOWN: {
         this.showDown();
+        this.finishHand();
         break;
       }
     }
@@ -653,6 +691,13 @@ export class GameStateManager {
     this.gameState = {
       ...this.gameState,
       bettingRoundStage: nextStage,
+    };
+  }
+
+  clearBettingRoundStage() {
+    this.gameState = {
+      ...this.gameState,
+      bettingRoundStage: BettingRoundStage.WAITING,
     };
   }
 }

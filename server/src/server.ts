@@ -88,12 +88,33 @@ class Server {
         this.app.use('/', router);
     }
 
+    sendUpdatesToClients() {
+        for (const client of this.gameStateManager.getConnectedClients()) {
+            const res = this.stateTransformService.getUIState(client.uuid);
+            const jsonRes = JSON.stringify(res);
+            client.ws.send(jsonRes);
+
+            /* Debug Logging */
+            const playerName = client.playerUUID
+                ? this.gameStateManager.getPlayer(client.playerUUID).name
+                : 'err_unnamed';
+            console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);
+            console.log(util.inspect(res, false, null, true));
+            /* -------------- */
+        }
+    }
+
     //refactor this mess of a function
     init() {
         this.app = express();
         this.initRoutes();
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ server: this.server });
+
+        this.gameStateManager.observeUpdates().subscribe(() => {
+            console.log('from observeUpdates');
+            this.sendUpdatesToClients();
+        });
 
         this.wss.on('connection', (ws: WebSocket, req) => {
             const ip = req.connection.remoteAddress;
@@ -135,23 +156,16 @@ class Server {
                         const action = JSON.parse(data);
                         this.messageService.processMessage(action, clientID);
 
-                        for (const client of this.gameStateManager.getConnectedClients()) {
-                            const res = this.stateTransformService.getUIState(client.uuid);
-                            const jsonRes = JSON.stringify(res);
-                            client.ws.send(jsonRes);
+                        this.sendUpdatesToClients();
 
-                            console.log('\n\nServer is sending to UI:\n');
-                            console.log(util.inspect(res, false, null, true));
-                        }
+                        /* Debug Logging */
                         logGameState(this.gameStateManager.getGameState());
+                        /* -------------- */
                     } catch (e) {
+                        /* Debug Logging */
                         console.log(e);
-
                         logGameState(this.gameStateManager.getGameState());
-
-                        // TODO if you send errors this way, ensure that
-                        // they dont contain sensitive information
-                        // ws.send(JSON.stringify({ error: e }));
+                        /* -------------- */
                     }
                 } else {
                     const unsupportedMsg = 'Received data of unsupported type.';

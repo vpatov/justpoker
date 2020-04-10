@@ -43,6 +43,7 @@ function MakeGame(props) {
   const [gameType, setGameType] = useState("NLHOLDEM");
 
   function canCreate() {
+    return true;
     if (name && bigBlind && smallBlind && buyin) {
       return true;
     }
@@ -76,7 +77,7 @@ function MakeGame(props) {
         label="Name"
         variant="outlined"
         onChange={(event) => setName(event.target.value)}
-        value={name}
+        value={"DefaultPlayerName"}
       />
       <Select
         variant="outlined"
@@ -91,7 +92,7 @@ function MakeGame(props) {
         label="Small Blind"
         variant="outlined"
         onChange={(event) => setSmallBlind(event.target.value)}
-        value={smallBlind}
+        value={1}
         type="number"
       />
       <TextField
@@ -99,7 +100,7 @@ function MakeGame(props) {
         label="Big Blind"
         variant="outlined"
         onChange={(event) => setBigBlind(event.target.value)}
-        value={bigBlind}
+        value={2}
         type="number"
       />
       <TextField
@@ -107,7 +108,7 @@ function MakeGame(props) {
         label="Buyin"
         variant="outlined"
         onChange={(event) => setBuyin(event.target.value)}
-        value={buyin}
+        value={200}
         type="number"
       />
       <TextField
