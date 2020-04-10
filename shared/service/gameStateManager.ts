@@ -17,11 +17,11 @@ import { NewGameForm, ConnectedClient } from "../models/table";
 import { Player } from "../models/player";
 import { PlayerService } from "./playerService";
 import { DeckService } from "./deckService";
-import { generateUUID } from "../util/util";
+import { generateUUID, printObj } from "../util/util";
 
 @Service()
 export class GameStateManager {
-  private gameState: Readonly<GameState>;
+  private gameState: Readonly<GameState> = cleanGameState;
   private gameTimer: NodeJS.Timer;
 
   constructor(
@@ -63,6 +63,10 @@ export class GameStateManager {
 
   getBoard() {
     return this.gameState.board;
+  }
+
+  getPot() {
+    return this.gameState.pots.reduce((sum, pot) => pot.value + sum, 0);
   }
 
   getSB() {

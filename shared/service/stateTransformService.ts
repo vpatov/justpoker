@@ -11,20 +11,19 @@ export class StateTransformService {
   transformGameStateToUIState(clientUUID: string, secureGameState: GameState) {
     // need to define translation
     // need to define interfaces for UIState
+    // needs to be refactored after types and state are better understood
 
     const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+    const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : null;
     const board = this.gameStateManager.getBoard();
 
     const UIState = {
       game: {
-        missionControl: {
-          heroStack: heroPlayer.chips,
-          pot: 0,
-        },
+        missionControl: heroPlayer ? this.getMissionControl(heroPlayer) : {},
         table: {
           spots: 9,
           pot: 0,
-          communityCards: board.map((card) => this.transformCard(card)),
+          communityCards: board,
           players: Object.entries(
             secureGameState.players
           ).map(([uuid, player]) => this.transformPlayer(player, uuid)),
@@ -35,6 +34,13 @@ export class StateTransformService {
     return UIState;
   }
 
+  getMissionControl(player: Player) {
+    return {
+      heroStack: player.chips,
+      pot: this.gameStateManager.getPot(),
+    };
+  }
+
   // TODO (players might want to show their hand)
   // TODO should table be in state?
   stripSensitiveFields(clientUUID: string): GameState {
@@ -42,8 +48,6 @@ export class StateTransformService {
       clientUUID
     );
     const clientPlayerUUID = connectedClient.playerUUID;
-
-    connectedClient.uuid = "a";
 
     const players = Object.fromEntries(
       Object.entries(
@@ -66,18 +70,11 @@ export class StateTransformService {
     return strippedGameState;
   }
 
-  transformCard(card: Card) {
-    return {
-      suit: card.suit,
-      number: card.rank,
-    };
-  }
-
   transformPlayer(player: Player, heroPlayerUUID: string) {
     return {
       stack: player.chips,
       hand: {
-        cards: player.holeCards.map((card) => this.transformCard(card)),
+        cards: player.holeCards,
         hidden: heroPlayerUUID !== player.uuid,
       },
       name: player.name,

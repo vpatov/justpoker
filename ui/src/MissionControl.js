@@ -79,6 +79,10 @@ function MissionControl(props) {
     server.send("check!");
   }
 
+  if (props.missionControl){
+    return null;
+  }
+
   return (
     <div className={classes.root}>
       <div className={classes.sizeAndBetActionsCont}>

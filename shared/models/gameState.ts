@@ -9,6 +9,7 @@ import { Table } from "./table";
 import { Card, Deck } from "./cards";
 
 export declare interface GameState {
+  /** Sensitive field. */
   players: Readonly<{ [key: string]: Player }>;
 
   board: ReadonlyArray<Card>;
@@ -25,8 +26,10 @@ export declare interface GameState {
 
   gameInProgress: Readonly<boolean>;
 
+  /* Sensitive field. */
   deck: Readonly<Deck>;
 
+  /* Sensitive field. */
   table: Readonly<Table>;
 
   serverTime: Readonly<number>;

@@ -2,6 +2,7 @@ import { Service } from "typedi";
 import { GameStateManager } from "./gameStateManager";
 import { BettingRoundActionType, BettingRoundAction } from "../models/game";
 import { SitDownRequest, JoinTableRequest } from "../models/wsaction";
+import { printObj } from "../util/util";
 
 const MAX_NAME_LENGTH = 32;
 
@@ -30,6 +31,7 @@ export class ValidationService {
 
   ensureClientIsInGame(clientUUID: string) {
     const client = this.gameStateManager.getConnectedClient(clientUUID);
+
     if (!client.playerUUID) {
       throw Error(`Client ${clientUUID} has not joined the game.`);
     }

@@ -7,9 +7,9 @@ const wsSubscriptions = {};
 export function OpenWs() {
   let wsURI = "ws://localhost:8080";
 
-  const clientId = docCookies.getItem("clientId");
-  if (clientId) {
-    wsURI += `?clientId=${clientId}`;
+  const clientID = docCookies.getItem("clientID");
+  if (clientID) {
+    wsURI += `?clientID=${clientID}`;
   }
 
   // open websocket
@@ -20,8 +20,8 @@ export function OpenWs() {
 
     console.log(jsonData);
 
-    if (jsonData.clientId) {
-      docCookies.setItem("clientId", jsonData.clientId);
+    if (jsonData.clientID) {
+      docCookies.setItem("clientID", jsonData.clientID);
     }
 
     Object.keys(wsSubscriptions).forEach((key) => {

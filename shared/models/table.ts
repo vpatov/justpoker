@@ -16,15 +16,15 @@ import { Player } from "./player";
 export declare interface Table {
   // gameState: GameState;
 
-  uuid: string;
+  readonly uuid: string;
 
   // map the same person (by cookie) to the same connected client
   // this mapping is established upon their first connection to the table,
   // and for the host, established upon table creation.
-  activeConnections: Map<string, ConnectedClient>;
+  readonly activeConnections: Map<string, ConnectedClient>;
   // acitveConnections: { [key: string]: ConnectedClient };
 
-  password: string;
+  readonly password: string;
   // adminOptions
 }
 
@@ -32,8 +32,8 @@ export declare interface Table {
 // can be playing or not playing (spectating or in game).
 
 export declare interface ConnectedClient {
-  uuid: string;
-  playerUUID: string;
+  readonly uuid: string;
+  readonly playerUUID: string;
 }
 
 export declare interface NewGameForm {
