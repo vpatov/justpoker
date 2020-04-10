@@ -621,7 +621,7 @@ export class GameStateManager {
   }
 
   wasPlayerDealtIn(playerUUID: string) {
-    return !!this.gameState.players[playerUUID].lastAction;
+    return this.gameState.players[playerUUID].holeCards.length > 0;
   }
 
   getHighestBet() {
