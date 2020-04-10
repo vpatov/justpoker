@@ -14,13 +14,13 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "lib": ["es6", "dom", "esnext"],
-        "types": ["reflect-metadata"]
+        "types": ["reflect-metadata"],
     },
     "include": [
         "src/**/*",
-        "../../service/**/*",
-        "../../util/**/*",
-        "../../models/**/*"
+        "../shared/service/**/*",
+        "../shared/util/**/*",
+        "../shared/models/**/*"
     ],
     "exclude": [
       "dist",

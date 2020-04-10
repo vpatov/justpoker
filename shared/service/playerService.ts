@@ -18,6 +18,7 @@ export class PlayerService {
       sitting: false,
       seatNumber: -1,
       lastAction: null,
+      winner: false,
     };
   }
 

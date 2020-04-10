@@ -83,6 +83,7 @@ export class StateTransformService {
       position: player.seatNumber,
       bet: 0,
       button: this.gameStateManager.getDealerUUID() === heroPlayerUUID,
+      winner: player.winner,
     };
   }
 

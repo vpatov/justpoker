@@ -30,6 +30,9 @@ export declare interface Player {
    * an additional boolean "inHand").
    */
   readonly lastAction: BettingRoundAction | null;
+
+  /** Is set to true when the player has won the hand. */
+  readonly winner: boolean;
 }
 
 /*

@@ -16,11 +16,12 @@ import { NewGameForm } from '../../shared/models/table';
 import { GameState } from '../../shared/models/gameState';
 import { GameStateManager } from '../../shared/service/gameStateManager';
 import { StateTransformService } from '../../shared/service/stateTransformService';
+import { DeckService } from '../../shared/service/deckService';
 import { generateUUID, printObj } from '../../shared/util/util';
 
 function logGameState(gameState: GameState) {
     console.log('\n\nServer game state:\n');
-    const gameStateWithoutWS = {
+    const minimizedGameState = {
         ...gameState,
         table: {
             ...gameState.table,
@@ -32,8 +33,9 @@ function logGameState(gameState: GameState) {
                 },
             ]),
         },
+        deck: [] as any,
     };
-    console.log(util.inspect(gameStateWithoutWS, false, null, true));
+    console.log(util.inspect(minimizedGameState, false, null, true));
 }
 
 @Service()
@@ -48,6 +50,7 @@ class Server {
         private messageService: MessageService,
         private gameStateManager: GameStateManager,
         private stateTransformService: StateTransformService,
+        private deckService: DeckService,
     ) {}
 
     private initRoutes(): void {
