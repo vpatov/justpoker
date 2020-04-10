@@ -69,7 +69,6 @@ export class MessageService {
     }
 
     this.gameStateManager.startHandIfReady();
-    return this.stateTransformService.getUIState(clientUUID);
   }
 
   /*

@@ -1,4 +1,6 @@
 import { Service } from "typedi";
+import WebSocket from "ws";
+
 import { strict as assert } from "assert";
 import { GameState, cleanGameState } from "../models/gameState";
 import {
@@ -35,12 +37,16 @@ export class GameStateManager {
     return this.gameState;
   }
 
-  getConnectedClient(cookie: string) {
-    return this.gameState.table.activeConnections.get(cookie);
+  getConnectedClient(clientUUID: string) {
+    return this.gameState.table.activeConnections.get(clientUUID);
   }
 
-  getPlayerByClientUUID(cookie: string): Player {
-    const connectedClient = this.getConnectedClient(cookie);
+  getConnectedClients() {
+    return this.gameState.table.activeConnections.values();
+  }
+
+  getPlayerByClientUUID(clientUUID: string): Player {
+    const connectedClient = this.getConnectedClient(clientUUID);
     const playerUUID = connectedClient.playerUUID;
     return this.getPlayer(playerUUID);
   }
@@ -153,17 +159,20 @@ export class GameStateManager {
   /* Initialization methods */
 
   // TODO validation around this method. Shouldn't be executed when table is not intialized.
-  initConnectedClient(cookie: string) {
-    const client = this.gameState.table.activeConnections.get(cookie);
+  initConnectedClient(clientUUID: string, ws: WebSocket) {
+    const client = this.gameState.table.activeConnections.get(clientUUID);
     if (!client) {
-      const newClient = this.playerService.createConnectedClient(cookie);
+      const newClient = this.playerService.createConnectedClient(
+        clientUUID,
+        ws
+      );
       this.gameState = {
         ...this.gameState,
         table: {
           ...this.gameState.table,
           activeConnections: new Map([
             ...this.gameState.table.activeConnections,
-            [cookie, newClient],
+            [clientUUID, newClient],
           ]),
         },
       };
@@ -208,8 +217,11 @@ export class GameStateManager {
 
   /* Player operations */
 
-  associateClientAndPlayer(cookie: string, player: Player): ConnectedClient {
-    const connectedClient = this.getConnectedClient(cookie);
+  associateClientAndPlayer(
+    clientUUID: string,
+    player: Player
+  ): ConnectedClient {
+    const connectedClient = this.getConnectedClient(clientUUID);
     return {
       ...connectedClient,
       playerUUID: player.uuid,
@@ -311,8 +323,9 @@ export class GameStateManager {
   // to be dependent on those actions
   startHandIfReady() {
     if (
+      // this.isGameInProgress() &&
       this.getBettingRoundStage() === BettingRoundStage.WAITING &&
-      this.getNumberPlayersSitting() >= 2
+      this.getNumberPlayersSitting() >= 3
     ) {
       this.initializeBettingRound();
     }

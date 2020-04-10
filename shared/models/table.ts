@@ -1,6 +1,7 @@
 import { GameState, cleanGameState } from "./gameState";
 import { GameType } from "./game";
 import { Player } from "./player";
+import WebSocket from "ws";
 
 /*
     table has:
@@ -34,6 +35,7 @@ export declare interface Table {
 export declare interface ConnectedClient {
   readonly uuid: string;
   readonly playerUUID: string;
+  readonly ws: WebSocket;
 }
 
 export declare interface NewGameForm {

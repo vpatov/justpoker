@@ -16,9 +16,10 @@ export function OpenWs() {
   server.ws = new WebSocket(wsURI, []);
 
   server.ws.onmessage = (msg) => {
+    console.log("Incoming message from sever:\n", msg);
+
     const jsonData = JSON.parse(get(msg, "data", {}));
 
-    console.log(jsonData);
 
     if (jsonData.clientID) {
       docCookies.setItem("clientID", jsonData.clientID);
