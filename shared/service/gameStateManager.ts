@@ -112,6 +112,12 @@ export class GameStateManager {
     return this.gameState.deck;
   }
 
+  getPlayersInHand() {
+    return Object.values(this.gameState.players).filter((player) =>
+      this.isPlayerInHand(player.uuid)
+    );
+  }
+
   isPlayerInHand(playerUUID: string) {
     return (
       !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID)
@@ -325,7 +331,7 @@ export class GameStateManager {
     if (
       // this.isGameInProgress() &&
       this.getBettingRoundStage() === BettingRoundStage.WAITING &&
-      this.getNumberPlayersSitting() >= 3
+      this.getNumberPlayersSitting() >= 2
     ) {
       this.initializeBettingRound();
     }
@@ -459,7 +465,34 @@ export class GameStateManager {
   }
 
   showDown() {
-    // TODO integrate poker solver and compute winner
+    const board = this.getBoard();
+    const playersHands = Object.fromEntries(
+      this.getPlayersInHand().map((player) => [
+        player.uuid,
+        this.deckService.computeBestHandFromCards([
+          ...player.holeCards,
+          ...board,
+        ]),
+      ])
+    );
+
+    const winningHands = this.deckService.getWinningHands(
+      Object.values(playersHands)
+    );
+
+    const winningPlayers = Object.entries(playersHands)
+      .filter(([uuid, hand]) => winningHands.includes(hand))
+      .map(([uuid, hand]) => uuid);
+
+    this.gameState = {
+      ...this.gameState,
+      players: Object.fromEntries(
+        Object.entries(this.getPlayers()).map(([uuid, player]) => [
+          uuid,
+          { ...player, winner: winningPlayers.includes(uuid) },
+        ])
+      ),
+    };
   }
 
   // TODO Probably want to remove WAITING case from here.
@@ -587,6 +620,7 @@ export class GameStateManager {
 
   clearActionsForPlayersInHand() {
     // TODO DRY w.r.t logic in initializeBettingRound
+    // TODO DRY w.r.t setting a property for a group of players
   }
 
   clearCurrentPlayerToAct() {

@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
   const classes = useStyles();
   const { className, style } = props;
-  const { stack, hand, name, toAct, hero, bet, button, position } = props.player;
+  const { stack, hand, name, toAct, hero, bet, button, position, winner } = props.player;
 
   return (
     <div
@@ -92,7 +92,7 @@ function Player(props) {
       >
         <Typography variant="subtitle">{stack}</Typography>
         <Typography variant="body1" className={classes.name}>
-          {name}
+          {name + " " + winner}
         </Typography>
       </div>
     </div>
