@@ -67,6 +67,7 @@ export class MessageService {
         throw Error(`Unrecognized action type: ${actionType}`);
       }
     }
+    // TODO should messageService subscribe to gameState update from timer?
 
     this.gameStateManager.startHandIfReady();
   }
