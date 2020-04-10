@@ -13,8 +13,28 @@ import { AddressInfo } from 'net';
 import { ActionType } from '../../shared/models/wsaction';
 import { MessageService } from '../../shared/service/messageService';
 import { NewGameForm } from '../../shared/models/table';
+import { GameState } from '../../shared/models/gameState';
 import { GameStateManager } from '../../shared/service/gameStateManager';
+import { StateTransformService } from '../../shared/service/stateTransformService';
 import { generateUUID, printObj } from '../../shared/util/util';
+
+function logGameState(gameState: GameState) {
+    console.log('\n\nServer game state:\n');
+    const gameStateWithoutWS = {
+        ...gameState,
+        table: {
+            ...gameState.table,
+            activeConnections: Object.entries(gameState.table.activeConnections).map(([uuid, client]) => [
+                uuid,
+                {
+                    ...client,
+                    ws: 'ommittedWebSocket',
+                },
+            ]),
+        },
+    };
+    console.log(util.inspect(gameStateWithoutWS, false, null, true));
+}
 
 @Service()
 class Server {
@@ -24,7 +44,11 @@ class Server {
     wss: WebSocket.Server;
     tableInitialized = false;
 
-    constructor(private messageService: MessageService, private gameStateManager: GameStateManager) {}
+    constructor(
+        private messageService: MessageService,
+        private gameStateManager: GameStateManager,
+        private stateTransformService: StateTransformService,
+    ) {}
 
     private initRoutes(): void {
         const router = express.Router();
@@ -61,6 +85,7 @@ class Server {
         this.app.use('/', router);
     }
 
+    //refactor this mess of a function
     init() {
         this.app = express();
         this.initRoutes();
@@ -71,22 +96,24 @@ class Server {
             const ip = req.connection.remoteAddress;
             console.log('connected to ip:', ip);
 
-            // try to get clientID from cookie (local script testing)
-            let clientID = cookie.parse(req.headers.cookie).clientID;
-
-            // try to get clientID from url (frontend)
-            if (!clientID) {
-                const regEx = /clientID\=(\w+)/g;
-                clientID = Array.from(req.url.matchAll(regEx), (m) => m[1])[0];
-            }
-
-            if (!clientID) {
+            let clientID = '';
+            try {
+                // try to get clientID from cookie (local script testing)
+                clientID = cookie.parse(req.headers.cookie).clientID;
+                // try to get clientID from url (frontend)
+                if (!clientID) {
+                    const regEx = /clientID\=(\w+)/g;
+                    clientID = Array.from(req.url.matchAll(regEx), (m) => m[1])[0];
+                }
+                if (!clientID) {
+                    clientID = generateUUID();
+                }
+            } catch (e) {
                 clientID = generateUUID();
             }
-
             console.log('clientID: ', clientID);
 
-            this.gameStateManager.initConnectedClient(clientID);
+            this.gameStateManager.initConnectedClient(clientID, ws);
 
             ws.send(
                 JSON.stringify({
@@ -95,11 +122,7 @@ class Server {
                 }),
             );
 
-            ws.send(
-                JSON.stringify(
-                    this.messageService.processMessage({ actionType: ActionType.PINGSTATE, data: {} }, clientID),
-                ),
-            );
+            ws.send(JSON.stringify(this.stateTransformService.getUIState(clientID)));
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log('Incoming data:', util.inspect(data, false, null, true));
@@ -107,22 +130,25 @@ class Server {
                 if (typeof data === 'string') {
                     try {
                         const action = JSON.parse(data);
-                        const res = this.messageService.processMessage(action, clientID);
+                        this.messageService.processMessage(action, clientID);
 
-                        console.log('\n\nServer is sending to UI:\n');
-                        console.log(util.inspect(res, false, null, true));
+                        for (const client of this.gameStateManager.getConnectedClients()) {
+                            const res = this.stateTransformService.getUIState(client.uuid);
+                            const jsonRes = JSON.stringify(res);
+                            client.ws.send(jsonRes);
 
-                        console.log('\n\nServer game state:\n');
-                        console.log(util.inspect(this.gameStateManager.getGameState(), false, null, true));
-
-                        const jsonRes = JSON.stringify(res);
-                        ws.send(jsonRes);
+                            console.log('\n\nServer is sending to UI:\n');
+                            console.log(util.inspect(res, false, null, true));
+                        }
+                        logGameState(this.gameStateManager.getGameState());
                     } catch (e) {
                         console.log(e);
 
+                        logGameState(this.gameStateManager.getGameState());
+
                         // TODO if you send errors this way, ensure that
                         // they dont contain sensitive information
-                        ws.send(JSON.stringify(e));
+                        // ws.send(JSON.stringify({ error: e }));
                     }
                 } else {
                     const unsupportedMsg = 'Received data of unsupported type.';
@@ -130,9 +156,6 @@ class Server {
                     ws.send(JSON.stringify({ error: unsupportedMsg }));
                 }
             });
-
-            // TODO replace all string responses with structured jsons
-            ws.send(JSON.stringify({ log: 'You have connected to the websocket server.' }));
         });
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {

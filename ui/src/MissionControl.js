@@ -73,13 +73,13 @@ function MissionControl(props) {
     server.send("bet!");
   }
   function onFold() {
-    server.send("fold!");
+    server.send({actionType:"FOLD"});
   }
   function onCheckCall() {
-    server.send("check!");
+    server.send({actionType:"CHECK"});
   }
 
-  if (props.missionControl){
+  if (!props.missionControl){
     return null;
   }
 

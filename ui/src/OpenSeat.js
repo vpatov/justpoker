@@ -42,7 +42,7 @@ function OpenSeat(props) {
     server.send({
       actionType: 'JOINTABLEANDSITDOWN',
       data: {
-        name: "VasVas",
+        name: `Player${seatNumber}`,
         buyin: 54100,
         seatNumber: seatNumber
       }

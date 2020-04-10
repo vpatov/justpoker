@@ -1,4 +1,5 @@
 import { Service } from "typedi";
+import WebSocket from "ws";
 import { Player } from "../models/player";
 import { ConnectedClient } from "../models/table";
 import { generateUUID } from "../util/util";
@@ -20,10 +21,11 @@ export class PlayerService {
     };
   }
 
-  createConnectedClient(clientUUID: string): ConnectedClient {
+  createConnectedClient(clientUUID: string, ws: WebSocket): ConnectedClient {
     return {
       uuid: clientUUID,
       playerUUID: "",
+      ws,
     };
   }
 }
