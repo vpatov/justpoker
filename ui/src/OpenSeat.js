@@ -11,8 +11,8 @@ import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "9vmin",
-    height: "9vmin",
+    width: "6vmin",
+    height: "6vmin",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -24,13 +24,15 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: grey[400],
     cursor: "pointer",
     "&:hover": {
-      borderColor: grey[100],
+      borderColor: "black",
       backgroundColor: grey[200],
     },
   },
+  text: {
+    fontSize: "1.3vmin",
+    textTransform: "none",
+  },
 }));
-
-
 
 function OpenSeat(props) {
   const classes = useStyles();
@@ -38,14 +40,14 @@ function OpenSeat(props) {
 
   // TODO change this to onRequestSitDown, because the player has to request to sit down,
   // declare their name, chips, waitForBigBlind?, etc...
-  function onSitDown(){
+  function onSitDown() {
     server.send({
-      actionType: 'JOINTABLEANDSITDOWN',
+      actionType: "JOINTABLEANDSITDOWN",
       joinTableAndSitDownRequest: {
         name: `Player${seatNumber}`,
         buyin: 54100,
-        seatNumber: seatNumber
-      }
+        seatNumber: seatNumber,
+      },
     });
   }
 
@@ -56,7 +58,9 @@ function OpenSeat(props) {
       style={style}
       onClick={() => onSitDown()}
     >
-       <Typography variant="body2">Sit Here</Typography>
+      <Typography className={classes.text} variant="body2">
+        Sit Here
+      </Typography>
     </Button>
   );
 }

@@ -8,8 +8,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     height: "100vh",
     width: "100vw",
-    display: "flex",
-    flexDirection: "column",
     ...theme.BACKGROUND,
   },
 }));

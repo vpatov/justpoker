@@ -15,14 +15,12 @@ const tableWidthPercent = 65;
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100%",
-    width: "100%",
+    width: "80%",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    margin: "auto",
   },
   table: {
-    transform: "translateY(-5%)",
     height: tableHeightPercent + "vmin",
     width: tableWidthPercent + "vmin",
     borderRadius: "50%",

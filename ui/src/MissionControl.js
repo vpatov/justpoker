@@ -13,10 +13,11 @@ import Slider from "@material-ui/core/Slider";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "100%",
-    height: "10%",
+    width: "20%",
+    height: "100%",
     position: "absolute",
-    bottom: 0,
+    right: 0,
+    top: 0,
     zIndex: 2,
     ...theme.CONTROLLER,
   },
@@ -25,17 +26,18 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: "100%",
     display: "flex",
-    flexDirection: "row-reverse",
+    flexDirection: "column",
   },
   betActionsCont: {
-    width: "30%",
-    height: "100%",
+    height: "30%",
+    width: "100%",
     display: "flex",
     justifyContent: "space-evenly",
     alignItems: "center",
+    flexDirection: "column",
   },
   betSizeCont: {
-    width: "30%",
+    width: "100%",
   },
   sliderCont: {
     paddingTop: 10,
@@ -48,17 +50,19 @@ const useStyles = makeStyles((theme) => ({
   amounts: {
     width: "100%",
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-evenly",
   },
   slider: {
-    width: "100%",
+    width: "80%",
   },
   button: {
-    width: "30%",
-    height: "50%",
+    width: "80%",
+    height: "20%",
     backgroundColor: "white",
   },
   sizeButton: {
+    margin: 6,
     backgroundColor: "white",
   },
 }));
@@ -74,17 +78,25 @@ function MissionControl(props) {
   };
 
   function onBet() {
-    server.send({actionType:"BET", bettingRoundAction: {type: "BET", amount: betAmt}});
-
+    server.send({
+      actionType: "BET",
+      bettingRoundAction: { type: "BET", amount: betAmt },
+    });
   }
   function onFold() {
-    server.send({actionType:"FOLD", bettingRoundAction: {type: "FOLD", amount: 0}});
+    server.send({
+      actionType: "FOLD",
+      bettingRoundAction: { type: "FOLD", amount: 0 },
+    });
   }
   function onCheckCall() {
-    server.send({actionType:"CHECK", bettingRoundAction: {type: "CHECK", amount: 0}});
+    server.send({
+      actionType: "CHECK",
+      bettingRoundAction: { type: "CHECK", amount: 0 },
+    });
   }
 
-  if (!props.missionControl){
+  if (!props.missionControl) {
     return null;
   }
 
@@ -92,14 +104,6 @@ function MissionControl(props) {
     <div className={classes.root}>
       <div className={classes.sizeAndBetActionsCont}>
         <div className={classes.betActionsCont}>
-          <Button
-            variant="contained"
-            className={classes.button}
-            style={{ color: green[800] }}
-            onClick={() => onBet()}
-          >
-            Bet
-          </Button>
           <Button
             variant="contained"
             className={classes.button}
@@ -116,9 +120,25 @@ function MissionControl(props) {
           >
             Check
           </Button>
+          <Button
+            variant="contained"
+            className={classes.button}
+            style={{ color: green[800] }}
+            onClick={() => onBet()}
+          >
+            {`Bet ${betAmt ? betAmt : ""}`}
+          </Button>
+          <TextField
+            className={classes.slider}
+            onChange={(event) => setBetAmt(event.target.value)}
+            value={betAmt}
+            type="number"
+            variant="outlined"
+          />
         </div>
         <div className={classes.betSizeCont}>
-          <div className={classes.sliderCont}>
+          <div></div>
+          {/* <div className={classes.sliderCont}>
             <Slider
               className={classes.slider}
               value={betAmt}
@@ -128,7 +148,7 @@ function MissionControl(props) {
               max={heroStack}
               onChange={(e, v) => setBetAmt(v)}
             />
-          </div>
+          </div> */}
           <div className={classes.amounts}>
             <Button
               variant="outlined"
@@ -166,14 +186,6 @@ function MissionControl(props) {
               Shuv
             </Button>
           </div>
-        </div>
-        <div>
-          <TextField
-            className={classes.betInput}
-            onChange={(event) => setBetAmt(event.target.value)}
-            value={betAmt}
-            type="number"
-          />
         </div>
       </div>
     </div>
