@@ -23,7 +23,7 @@ const NormalThemeObject = {
 
   BACKGROUND: {
     background:
-      "radial-gradient(circle, rgba(194,231,237,1) 0%, rgba(141,178,238,1) 100%)",
+      "radial-gradient(circle at 40%, rgba(194,231,237,1) 0%, rgba(141,178,238,1) 100%)",
   },
 
   TABLE: {

@@ -1,7 +1,25 @@
 const TestGame = {
   missionControl: {
-    heroStack: 5500,
-    pot: 12000,
+    unsetCheckCall: true,
+    min: 25,
+    max: 1000,
+    sizeButtons: [
+      {
+        label: "1/2",
+        value: 6000,
+      },
+    ],
+    actionButtons: [
+      {
+        action: "FOLD",
+      },
+      {
+        action: "CHECK",
+      },
+      {
+        action: "BET",
+      },
+    ],
   },
   table: {
     spots: 9,
