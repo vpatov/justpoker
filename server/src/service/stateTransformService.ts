@@ -21,6 +21,7 @@ export class StateTransformService {
         const UIState = {
             game: {
                 gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
+                heroInGame: this.gameStateManager.isPlayerInGame(heroPlayerUUID),
                 missionControl: heroPlayer ? this.getMissionControl(heroPlayer) : {},
                 table: {
                     spots: 9,
@@ -79,10 +80,9 @@ export class StateTransformService {
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
             bet: player.lastAction ? player.lastAction.amount : 0,
-            button: this.gameStateManager.getDealerUUID() === heroPlayerUUID,
+            button: this.gameStateManager.getDealerUUID() === player.uuid,
             winner: player.winner,
         };
-        console.log(player, heroPlayerUUID, newPlayer);
         return newPlayer;
     }
 

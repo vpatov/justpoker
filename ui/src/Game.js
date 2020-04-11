@@ -15,11 +15,11 @@ const useStyles = makeStyles((theme) => ({
 
 function Game(props) {
   const classes = useStyles();
-  const { table, missionControl } = props.game;
+  const { table, missionControl, heroInGame } = props.game;
 
   return (
     <div className={classes.root}>
-      <Table table={table} />
+      <Table table={table} heroInGame={heroInGame} />
       <MissionControl missionControl={missionControl} />
     </div>
   );

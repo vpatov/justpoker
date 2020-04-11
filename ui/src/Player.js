@@ -39,7 +39,21 @@ const useStyles = makeStyles((theme) => ({
   act: {
     backgroundColor: "rgba(0, 236, 255, 1)",
   },
-  beacon: {
+
+  winner: {
+    "&:before": {
+      zIndex: -1,
+      position: "absolute",
+      content: '""',
+      width: "100%",
+      height: "100%",
+      borderRadius: "50%",
+      boxShadow: `0px 0px 3px 3px rgba(5,255,5,1)`,
+      "-webkit-animation": "$beacon 0.8s infinite linear",
+      animation: "$beacon 0.5s infinite linear",
+    },
+  },
+  toAct: {
     "&:before": {
       zIndex: -1,
       position: "absolute",
@@ -50,9 +64,6 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: `0px 0px 16px 16px rgba(0,236,255,1)`,
       "-webkit-animation": "$beacon 1.8s infinite linear",
       animation: "$beacon 1.8s infinite linear",
-    },
-    "&:hover": {
-      "-webkit-transform": "scale(1.3)",
     },
   },
   "@keyframes beacon": {
@@ -73,12 +84,23 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
   const classes = useStyles();
   const { className, style } = props;
-  const { stack, hand, name, toAct, hero, bet, button, position, winner } = props.player;
+  const {
+    stack,
+    hand,
+    name,
+    toAct,
+    hero,
+    bet,
+    button,
+    position,
+    winner,
+  } = props.player;
 
   return (
     <div
       className={classnames(classes.root, className, {
-        [classes.beacon]: toAct,
+        [classes.toAct]: toAct,
+        [classes.winner]: winner,
       })}
       style={style}
     >
@@ -92,7 +114,7 @@ function Player(props) {
       >
         <Typography variant="subtitle">{stack}</Typography>
         <Typography variant="body1" className={classes.name}>
-          {name + " " + winner}
+          {name}
         </Typography>
       </div>
     </div>
