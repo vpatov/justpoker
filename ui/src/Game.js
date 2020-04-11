@@ -16,6 +16,7 @@ function Game(props) {
   const classes = useStyles();
   const { table, controller, heroInGame } = props.game;
 
+  console.log(controller);
   return (
     <div className={classes.root}>
       <Table table={table} heroInGame={heroInGame} />
