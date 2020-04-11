@@ -75,6 +75,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Table(props) {
   const classes = useStyles();
+  const { heroInGame } = props;
   const { players, communityCards, spots, pot } = props.table;
 
   const playerPosScale = 0.35;
@@ -117,7 +118,7 @@ function Table(props) {
             ) : null}
           </Fragment>
         );
-      } else {
+      } else if (!heroInGame) {
         ans.push(
           <OpenSeat
             seatNumber={index}
@@ -129,6 +130,8 @@ function Table(props) {
             }}
           />
         );
+      } else {
+        ans.push(null);
       }
     }
     return ans;

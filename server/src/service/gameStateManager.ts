@@ -117,6 +117,10 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerInHand(playerUUID));
     }
 
+    isPlayerInGame(playerUUID: string) {
+        return Object.entries(this.gameState.players).some(([uuid, player]) => player.uuid === playerUUID);
+    }
+
     isPlayerReadyToPlay(playerUUID: string) {
         return this.getPlayer(playerUUID).sitting;
     }

@@ -16,10 +16,9 @@ export function OpenWs() {
   server.ws = new WebSocket(wsURI, []);
 
   server.ws.onmessage = (msg) => {
-    console.log("Incoming message from sever:\n", msg);
-
     const jsonData = JSON.parse(get(msg, "data", {}));
 
+    console.log("Data from sever:\n", jsonData);
 
     if (jsonData.clientID) {
       docCookies.setItem("clientID", jsonData.clientID);
@@ -32,14 +31,12 @@ export function OpenWs() {
     });
   };
 
-
-
   return true;
 }
 
-server.send = function(data) {
+server.send = function (data) {
   server.ws.send(JSON.stringify(data));
-}
+};
 
 // TODO create stricter api for sending messages to server. DOM node source shouldnt be responsible
 // for correctly constructing messages.
