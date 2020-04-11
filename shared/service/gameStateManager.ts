@@ -402,7 +402,7 @@ export class GameStateManager {
     const seats = this.getSeats();
     const [_, seatZeroPlayerUUID] = seats[0];
     const dealerUUID = this.gameState.dealerUUID
-      ? this.getNextPlayerInHandUUID(this.gameState.dealerUUID)
+      ? this.getNextPlayerReadyToPlayUUID(this.gameState.dealerUUID)
       : seatZeroPlayerUUID;
 
     this.gameState = {
@@ -441,7 +441,7 @@ export class GameStateManager {
 
     // If heads up, dealer is first to act
     const firstToActPreflop =
-      this.getPlayersDealtIn().length === 2
+      this.getPlayersReadyToPlay().length === 2
         ? this.gameState.dealerUUID
         : this.getNextPlayerReadyToPlayUUID(bigBlindUUID);
 
@@ -670,6 +670,12 @@ export class GameStateManager {
   getPlayersDealtIn() {
     return Object.values(this.gameState.players).filter((player) =>
       this.wasPlayerDealtIn(player.uuid)
+    );
+  }
+
+  getPlayersReadyToPlay() {
+    return Object.values(this.gameState.players).filter((player) =>
+      this.isPlayerReadyToPlay(player.uuid)
     );
   }
 
