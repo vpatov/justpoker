@@ -165,8 +165,8 @@ export class ValidationService {
       bet is at least the previous raice
 
   */
+  //TODO complete
   validateBetAction(clientUUID: string, action: BettingRoundAction) {
-    debugger;
     this.ensureCorrectPlayerToAct(clientUUID);
 
     const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);

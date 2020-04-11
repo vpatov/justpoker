@@ -152,7 +152,6 @@ class Server {
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log('Incoming data:', util.inspect(data, false, null, true));
-                debugger;
                 if (typeof data === 'string') {
                     try {
                         const action = JSON.parse(data);
