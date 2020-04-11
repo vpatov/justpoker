@@ -7,6 +7,7 @@ import blue from "@material-ui/core/colors/blue";
 import red from "@material-ui/core/colors/red";
 import green from "@material-ui/core/colors/green";
 
+import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Slider from "@material-ui/core/Slider";
 
@@ -40,6 +41,10 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: 10,
     width: "100%",
   },
+  betInput: {
+    paddingRight: 50,
+    paddingTop: 25,
+  },
   amounts: {
     width: "100%",
     display: "flex",
@@ -69,14 +74,14 @@ function MissionControl(props) {
   };
 
   function onBet() {
-    console.log("bet");
-    server.send("bet!");
+    server.send({actionType:"BET", bettingRoundAction: {type: "BET", amount: betAmt}});
+
   }
   function onFold() {
-    server.send({actionType:"FOLD"});
+    server.send({actionType:"FOLD", bettingRoundAction: {type: "FOLD", amount: 0}});
   }
   function onCheckCall() {
-    server.send({actionType:"CHECK"});
+    server.send({actionType:"CHECK", bettingRoundAction: {type: "CHECK", amount: 0}});
   }
 
   if (!props.missionControl){
@@ -161,6 +166,14 @@ function MissionControl(props) {
               Shuv
             </Button>
           </div>
+        </div>
+        <div>
+          <TextField
+            className={classes.betInput}
+            onChange={(event) => setBetAmt(event.target.value)}
+            value={betAmt}
+            type="number"
+          />
         </div>
       </div>
     </div>

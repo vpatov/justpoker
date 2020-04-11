@@ -77,7 +77,7 @@ export class GameStateManager {
     return this.gameState.board;
   }
 
-  getPot() {
+  getTotalPot() {
     return this.gameState.pots.reduce((sum, pot) => pot.value + sum, 0);
   }
 
@@ -119,9 +119,13 @@ export class GameStateManager {
   }
 
   getPlayersInHand() {
-    return Object.values(this.gameState.players).filter((player) =>
-      this.isPlayerInHand(player.uuid)
+    return Object.keys(this.gameState.players).filter((playerUUID) =>
+      this.isPlayerInHand(playerUUID)
     );
+  }
+
+  isPlayerReadyToPlay(playerUUID: string) {
+    return this.getPlayer(playerUUID).sitting;
   }
 
   isPlayerInHand(playerUUID: string) {
@@ -134,6 +138,22 @@ export class GameStateManager {
     return (
       this.getPlayer(playerUUID).lastAction.type === BettingRoundActionType.FOLD
     );
+  }
+
+  getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
+    const seats = this.getSeats();
+    const currentIndex = seats.findIndex(
+      ([seatNumber, uuid]) => uuid === currentPlayerUUID
+    );
+
+    // find the next player that is in the hand
+    let nextIndex = (currentIndex + 1) % seats.length;
+    let [_, nextPlayerUUID] = seats[nextIndex];
+    while (!this.isPlayerReadyToPlay(nextPlayerUUID)) {
+      nextIndex = (nextIndex + 1) % seats.length;
+      [_, nextPlayerUUID] = seats[nextIndex];
+    }
+    return nextPlayerUUID;
   }
 
   getNextPlayerInHandUUID(currentPlayerUUID: string) {
@@ -395,13 +415,12 @@ export class GameStateManager {
         TODO ensure that the players have enough to cover the blinds, and if not, put them
         all-in. Don't let a player get this point if they have zero chips, stand them up earlier.
         TODO substract chips from the players
-        TODO place blinds correctly when there are only two people
     */
   placeBlinds() {
-    const smallBlindUUID = this.getNextPlayerInHandUUID(
+    const smallBlindUUID = this.getNextPlayerReadyToPlayUUID(
       this.gameState.dealerUUID
     );
-    const bigBlindUUID = this.getNextPlayerInHandUUID(smallBlindUUID);
+    const bigBlindUUID = this.getNextPlayerReadyToPlayUUID(smallBlindUUID);
 
     const sbPlayer = {
       ...this.getPlayer(smallBlindUUID),
@@ -424,7 +443,7 @@ export class GameStateManager {
     const firstToActPreflop =
       this.getPlayersDealtIn().length === 2
         ? this.gameState.dealerUUID
-        : this.getNextPlayerInHandUUID(bigBlindUUID);
+        : this.getNextPlayerReadyToPlayUUID(bigBlindUUID);
 
     this.gameState = {
       ...this.gameState,
@@ -494,10 +513,10 @@ export class GameStateManager {
   showDown() {
     const board = this.getBoard();
     const playersHands = Object.fromEntries(
-      this.getPlayersInHand().map((player) => [
-        player.uuid,
+      this.getPlayersInHand().map((playerUUID) => [
+        playerUUID,
         this.deckService.computeBestHandFromCards([
-          ...player.holeCards,
+          ...this.getPlayer(playerUUID).holeCards,
           ...board,
         ]),
       ])
@@ -544,6 +563,7 @@ export class GameStateManager {
 
     const stage = this.getBettingRoundStage();
 
+    // this is incorrect - if someone has folded, this unfolds them.
     this.gameState = {
       ...this.gameState,
       players: Object.fromEntries(
@@ -591,6 +611,20 @@ export class GameStateManager {
         this.check();
         break;
       }
+
+      case BettingRoundActionType.FOLD: {
+        this.fold();
+        break;
+      }
+
+      case BettingRoundActionType.BET: {
+        this.bet(action);
+        break;
+      }
+
+      case BettingRoundActionType.CALL: {
+        this.callBet(action);
+      }
     }
 
     // this logic could probably be placed in its own method
@@ -608,9 +642,28 @@ export class GameStateManager {
     }
   }
 
+  // if the validation layer takes care of most things,
+  // then its possible to get rid of these methods, and of
+  // the CHECK_ACTION / FOLD_ACTION constants
   check() {
     const currentPlayerToAct = this.getCurrentPlayerToAct();
     this.setPlayerLastAction(currentPlayerToAct, CHECK_ACTION);
+  }
+
+  fold() {
+    const currentPlayerToAct = this.getCurrentPlayerToAct();
+    this.setPlayerLastAction(currentPlayerToAct, FOLD_ACTION);
+  }
+
+  bet(action: BettingRoundAction) {
+    const currentPlayerToAct = this.getCurrentPlayerToAct();
+    console.log("setting Player last action to action:", action);
+    this.setPlayerLastAction(currentPlayerToAct, action);
+  }
+
+  callBet(action: BettingRoundAction) {
+    const currentPlayerToAct = this.getCurrentPlayerToAct();
+    this.setPlayerLastAction(currentPlayerToAct, action);
   }
 
   /** Includes all players that were dealt in pre-flop. */
@@ -633,13 +686,18 @@ export class GameStateManager {
     }, 0);
   }
 
+  // TODO implement
+  isPlayerAllIn(playerUUID: string) {
+    const player = this.getPlayer(playerUUID);
+  }
+
   haveAllPlayersActed() {
     return this.getPlayersDealtIn().every(
       (player) =>
         player.lastAction.type !== BettingRoundActionType.WAITING_TO_ACT &&
         (this.hasPlayerFolded(player.uuid) ||
           player.lastAction.amount === this.getHighestBet() ||
-          player.lastAction.allin)
+          this.isPlayerAllIn(player.uuid))
     );
   }
 
@@ -647,7 +705,22 @@ export class GameStateManager {
     return false;
   }
 
-  placeBetsInPot() {}
+  placeBetsInPot() {
+    this.gameState = {
+      ...this.gameState,
+      pots: [
+        ...this.gameState.pots,
+        {
+          value: Object.values(this.gameState.players).reduce(
+            (sum, player) =>
+              player.lastAction ? player.lastAction.amount + sum : 0,
+            0
+          ),
+          contestors: [...this.getPlayersInHand()],
+        },
+      ],
+    };
+  }
 
   checkForVictoryCondition() {
     // check for victory condition:

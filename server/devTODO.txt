@@ -16,6 +16,8 @@
         seats.sort();
         */
 
+- Add input validation on data coming from frontend. Would save you a lot of bugs/headaches during development...
+
 - It would be good to be aware of the scenario when the (pertinent) ui state is different from the game state. This could be done by getting a fingerprint of the state on the ui side and including it in messages to the server. Server will check the incoming fingerprint and compare it to the last outgoing fingerprint and ensure they are the same. I imagine this would only be used for diagnostic purposes, to understand more about production conditions/states.
 
 - Timer functionality

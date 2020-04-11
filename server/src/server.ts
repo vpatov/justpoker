@@ -24,15 +24,17 @@ function logGameState(gameState: GameState) {
     const minimizedGameState = {
         ...gameState,
         table: {
-            ...gameState.table,
+            uuid: gameState.table.uuid,
             activeConnections: Object.entries(gameState.table.activeConnections).map(([uuid, client]) => [
-                uuid,
                 {
                     ...client,
                     ws: 'ommittedWebSocket',
                 },
             ]),
         },
+        gameParameters: undefined as string,
+        board: undefined as string,
+
         deck: [] as any,
     };
     console.log(util.inspect(minimizedGameState, false, null, true));
@@ -150,7 +152,7 @@ class Server {
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log('Incoming data:', util.inspect(data, false, null, true));
-
+                debugger;
                 if (typeof data === 'string') {
                     try {
                         const action = JSON.parse(data);

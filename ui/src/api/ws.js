@@ -41,6 +41,9 @@ server.send = function(data) {
   server.ws.send(JSON.stringify(data));
 }
 
+// TODO create stricter api for sending messages to server. DOM node source shouldnt be responsible
+// for correctly constructing messages.
+
 export function Subscribe(key, onMessage) {
   if (wsSubscriptions[key]) {
     wsSubscriptions[key].push(onMessage);
