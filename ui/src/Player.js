@@ -14,27 +14,32 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
   },
-  name: {
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
-    overflow: "hidden",
-    textAlign: "center",
-    fontSize: "14px",
-  },
-  stack: {
+
+  stackCont: {
     marginTop: -12,
-    padding: 4,
+    padding: "0.5vmin",
     width: "100%",
     textAlign: "center",
     fontSize: "18px",
     ...theme.STACK,
   },
+  name: {
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    textAlign: "center",
+    fontSize: "1.2vmin",
+  },
+  stack: {
+    fontSize: "1.7vmin",
+  },
 
   button: {
     position: "absolute",
-    height: 40,
-    right: -4,
-    top: -18,
+    height: "2.2vmin",
+    left: 0,
+    top: "50%",
+    zIndex: 5,
   },
   act: {
     backgroundColor: "rgba(0, 236, 255, 1)",
@@ -104,15 +109,17 @@ function Player(props) {
       })}
       style={style}
     >
-      {button ? <img src={ButtonSvg} className={classes.button} /> : null}
-
       <Hand hand={hand} hidden={!hero} />
       <div
-        className={classnames(classes.stack, {
+        className={classnames(classes.stackCont, {
           [classes.act]: toAct,
         })}
       >
-        <Typography variant="subtitle">{stack}</Typography>
+        {button ? <img src={ButtonSvg} className={classes.button} /> : null}
+
+        <Typography variant="h4" className={classes.stack}>
+          {stack.toLocaleString()}
+        </Typography>
         <Typography variant="body1" className={classes.name}>
           {name}
         </Typography>

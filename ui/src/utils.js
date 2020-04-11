@@ -23,5 +23,16 @@ export function generateStringFromSuitAndRank(suit, rank) {
       break;
   }
 
-  return (rank == 'T' ? '10' : rank) + suitString;
+  return (rank == "T" ? "10" : rank) + suitString;
+}
+
+export function debounce(fn, ms) {
+  let timer;
+  return (_) => {
+    clearTimeout(timer);
+    timer = setTimeout((_) => {
+      timer = null;
+      fn.apply(this, arguments);
+    }, ms);
+  };
 }
