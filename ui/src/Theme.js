@@ -3,6 +3,10 @@ import { createMuiTheme } from "@material-ui/core/styles";
 import green from "@material-ui/core/colors/green";
 import blue from "@material-ui/core/colors/blue";
 import red from "@material-ui/core/colors/red";
+import grey from "@material-ui/core/colors/grey";
+
+import TableTopImage from "./imgs/tableTop.png";
+import CardBackImage from "./imgs/cardBack2.png";
 
 const NormalThemeObject = {
   HEARTS: {
@@ -18,7 +22,10 @@ const NormalThemeObject = {
     backgroundColor: green[800],
   },
   HIDDEN: {
-    backgroundColor: "grey",
+    background: `${grey[500]} url(${CardBackImage})`,
+    backgroundSize: "20vmin",
+    backgroundPosition: "50% 50%",
+    border: "2px solid black",
   },
 
   BACKGROUND: {
@@ -27,9 +34,13 @@ const NormalThemeObject = {
   },
 
   TABLE: {
-    // boxShadow: "0 5px 10px rgba(0, 0, 0, 0.4)",
-    border: `8px solid ${blue[900]}`,
-    backgroundColor: blue[300],
+    border: `18px solid rgba(255,255,255,0.7)`,
+    boxShadow: `0 0 0 5px black, 0 6px 6px 6px grey`,
+    background: `${green[300]} url(${TableTopImage})`,
+    backgroundSize: "100%",
+    backgroundPosition: "50% 50%",
+    backgroundRepeat: "no-repeat",
+    backgroundBlendMode: "screen",
   },
   STACK: {
     borderRadius: 40,
@@ -41,7 +52,7 @@ const NormalThemeObject = {
   },
   BET: {
     border: "1px solid white",
-    backgroundColor: green[300],
+    backgroundColor: green[600],
   },
 
   ACTION_BUTTONS: {
