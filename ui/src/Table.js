@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
 import Player from "./Player";
 import OpenSeat from "./OpenSeat";
+import Bet from "./Bet";
 import CommunityCards from "./CommunityCards";
 import { debounce } from "./utils";
 
@@ -49,18 +50,6 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 10,
     backgroundColor: "gold",
     width: 30,
-  },
-
-  bet: {
-    position: "absolute",
-    fontSize: "1.4vmin",
-    borderRadius: 30,
-    padding: "1vmin",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 2,
-    ...theme.BET,
   },
 }));
 
@@ -113,16 +102,14 @@ function Table(props) {
               }}
             />
             {player.bet ? (
-              <Typography
-                className={classes.bet}
+              <Bet
                 style={{
                   transform: `translate(${xPos * betPosScale}px,${
                     yPos * betPosScale
                   }px)`,
                 }}
-              >
-                {player.bet}
-              </Typography>
+                amount={player.bet}
+              />
             ) : null}
           </Fragment>
         );

@@ -11,8 +11,8 @@ import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "6vmin",
-    height: "6vmin",
+    width: "8vmin",
+    height: "8vmin",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -59,7 +59,7 @@ function OpenSeat(props) {
       onClick={() => onSitDown()}
     >
       <Typography className={classes.text} variant="body2">
-        Sit Here
+        Sit
       </Typography>
     </Button>
   );
