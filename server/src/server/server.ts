@@ -10,14 +10,14 @@ import request from 'request';
 import cookie from 'cookie';
 
 import { AddressInfo } from 'net';
-import { ActionType } from '../../shared/models/wsaction';
-import { MessageService } from './service/messageService';
-import { NewGameForm } from '../../shared/models/table';
-import { GameState } from '../../shared/models/gameState';
-import { GameStateManager } from './service/gameStateManager';
-import { StateTransformService } from './service/stateTransformService';
-import { DeckService } from './service/deckService';
-import { generateUUID, printObj } from '../../shared/util/util';
+import { ActionType } from '../../../shared/models/wsaction';
+import { MessageService } from '../service/messageService';
+import { NewGameForm } from '../../../shared/models/table';
+import { GameState } from '../../../shared/models/gameState';
+import { GameStateManager } from '../service/gameStateManager';
+import { StateTransformService } from '../service/stateTransformService';
+import { DeckService } from '../service/deckService';
+import { generateUUID, printObj } from '../../../shared/util/util';
 
 function logGameState(gameState: GameState) {
     console.log('\n\nServer game state:\n');
