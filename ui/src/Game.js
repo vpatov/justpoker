@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100vw",
     display: "flex",
     flexDirection: "column",
+    ...theme.BACKGROUND,
   },
 }));
 

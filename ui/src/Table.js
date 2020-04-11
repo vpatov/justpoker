@@ -1,7 +1,8 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import Player from "./Player";
 import OpenSeat from "./OpenSeat";
-import Card from "./Card";
+import CommunityCards from "./CommunityCards";
+import { debounce } from "./utils";
 
 import { makeStyles } from "@material-ui/core/styles";
 import green from "@material-ui/core/colors/green";
@@ -10,7 +11,6 @@ import Typography from "@material-ui/core/Typography";
 
 const tableHeightPercent = 65;
 const tableWidthPercent = 65;
-const tableAspectRatio = tableWidthPercent / tableHeightPercent;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,12 +19,12 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    ...theme.BACKGROUND,
+    margin: "auto",
   },
   table: {
-    transform: "translateY(-8%)",
-    height: tableHeightPercent + "%",
-    width: tableWidthPercent + "%",
+    transform: "translateY(-5%)",
+    height: tableHeightPercent + "vmin",
+    width: tableWidthPercent + "vmin",
     borderRadius: "50%",
     margin: "auto",
     display: "flex",
@@ -36,14 +36,9 @@ const useStyles = makeStyles((theme) => ({
   spot: {
     position: "absolute",
   },
-  communityCards: {
-    height: "25%",
-    width: "65%",
-    display: "flex",
-    justifyContent: "flex-start",
-  },
+
   pot: {
-    fontSize: 42,
+    fontSize: "3vmin",
     position: "absolute",
     transform: "translateY(-12vh)",
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -60,11 +55,9 @@ const useStyles = makeStyles((theme) => ({
 
   bet: {
     position: "absolute",
-    fontSize: "16px",
+    fontSize: "1.4vmin",
     borderRadius: 30,
-    minWidth: "30px",
-    padding: "0 10px",
-    height: "40px",
+    padding: "1vmin",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -78,18 +71,35 @@ function Table(props) {
   const { heroInGame } = props;
   const { players, communityCards, spots, pot } = props.table;
 
-  const playerPosScale = 0.35;
-  const betPosScale = 0.27;
+  const [dimensions, setDimensions] = useState({
+    height: window.innerHeight,
+    width: window.innerWidth,
+  });
+  useEffect(() => {
+    const debouncedHandleResize = debounce(function handleResize() {
+      setDimensions({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
+    }, 350);
+
+    window.addEventListener("resize", debouncedHandleResize);
+
+    return (_) => {
+      window.removeEventListener("resize", debouncedHandleResize);
+    };
+  });
+
+  const playerPosScale = 0.38;
+  const betPosScale = 0.25;
 
   function createSpotsAtTable() {
     const ans = [];
 
     for (let index = 0; index < spots; index++) {
-      const xPos =
-        Math.cos((2 * 3.14 * index) / spots) *
-        window.innerWidth *
-        tableAspectRatio;
-      const yPos = Math.sin((2 * 3.14 * index) / spots) * window.innerHeight;
+      const vmin = Math.min(dimensions.width, dimensions.height);
+      const xPos = Math.cos((2 * 3.14 * index) / spots) * vmin;
+      const yPos = Math.sin((2 * 3.14 * index) / spots) * vmin;
 
       const player = players.find((p) => p.position === index);
       if (player) {
@@ -139,22 +149,9 @@ function Table(props) {
   return (
     <div className={classes.root}>
       <div className={classes.table}>
-        <div className={classes.pot}>
-          <Typography variant="h4">{`POT: ${pot}`}</Typography>
-        </div>
-        <div className={classes.communityCards}>
-          {communityCards.map((c) => (
-            <Card
-              suit={c.suit}
-              rank={c.rank}
-              fontSize={44}
-              style={{
-                width: "18%",
-                margin: 6,
-              }}
-            />
-          ))}
-        </div>
+        <Typography className={classes.pot}>{`POT: ${pot}`}</Typography>
+
+        <CommunityCards communityCards={communityCards} />
         {createSpotsAtTable()}
       </div>
     </div>

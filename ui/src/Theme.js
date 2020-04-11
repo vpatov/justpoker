@@ -1,4 +1,4 @@
-import { createMuiTheme, responsiveFontSizes } from "@material-ui/core/styles";
+import { createMuiTheme } from "@material-ui/core/styles";
 
 import green from "@material-ui/core/colors/green";
 import blue from "@material-ui/core/colors/blue";
@@ -44,7 +44,7 @@ const NormalThemeObject = {
     backgroundColor: green[300],
   },
   typography: {
-    fontFamily: "Avenir, Helvetica, Arial, sans-serif",
+    fontFamily: "Futura, Avenir, Helvetica, Arial, sans-serif",
   },
 };
 
@@ -100,8 +100,8 @@ const DarkThemeObject = {
   },
 };
 
-const NormalTheme = responsiveFontSizes(createMuiTheme(NormalThemeObject));
-const DarkTheme = responsiveFontSizes(createMuiTheme(DarkThemeObject));
+const NormalTheme = createMuiTheme(NormalThemeObject);
+const DarkTheme = createMuiTheme(DarkThemeObject);
 
 export let Theme = NormalTheme;
 let ThemeSetter = false;
