@@ -43,6 +43,21 @@ const NormalThemeObject = {
     border: "1px solid white",
     backgroundColor: green[300],
   },
+
+  ACTION_BUTTONS: {
+    FOLD: {
+      color: red[600],
+    },
+    BET: {
+      color: green[600],
+    },
+    CHECK: {
+      color: blue[500],
+    },
+    CALL: {
+      color: blue[800],
+    },
+  },
   typography: {
     fontFamily: "Futura, Avenir, Helvetica, Arial, sans-serif",
   },

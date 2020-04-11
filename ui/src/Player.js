@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
   const classes = useStyles();
   const { className, style } = props;
-  const { stack, hand, name, toAct, hero, winner } = props.player;
+  const { stack, hand, name, toAct, hero, winner, button } = props.player;
 
   return (
     <div
@@ -82,7 +82,7 @@ function Player(props) {
       style={style}
     >
       <Hand hand={hand} hidden={!hero} />
-      <PlayerStack name={name} stack={stack} toAct button />
+      <PlayerStack name={name} stack={stack} button={button} />
     </div>
   );
 }

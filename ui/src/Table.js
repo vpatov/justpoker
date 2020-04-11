@@ -113,7 +113,7 @@ function Table(props) {
               }}
             />
             {player.bet ? (
-              <div
+              <Typography
                 className={classes.bet}
                 style={{
                   transform: `translate(${xPos * betPosScale}px,${
@@ -122,7 +122,7 @@ function Table(props) {
                 }}
               >
                 {player.bet}
-              </div>
+              </Typography>
             ) : null}
           </Fragment>
         );

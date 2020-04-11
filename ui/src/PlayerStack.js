@@ -1,6 +1,4 @@
 import React from "react";
-import get from "lodash/get";
-import classnames from "classnames";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -95,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Default(props) {
+function PlayerStack(props) {
   const classes = useStyles();
   const { stack, name, button } = props;
 
@@ -112,4 +110,4 @@ function Default(props) {
   );
 }
 
-export default Default;
+export default PlayerStack;
