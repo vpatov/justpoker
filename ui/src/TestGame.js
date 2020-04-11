@@ -1,23 +1,40 @@
 const TestGame = {
-  missionControl: {
+  controller: {
+    toAct: true,
     unsetCheckCall: true,
     min: 25,
-    max: 1000,
-    sizeButtons: [
+    max: 43000,
+    pot: 12000,
+    sizingButtons: [
       {
         label: "1/2",
         value: 6000,
+      },
+      {
+        label: "3/4",
+        value: 9000,
+      },
+      {
+        label: "Pot",
+        value: 12000,
+      },
+      {
+        label: "All In",
+        value: 43000,
       },
     ],
     actionButtons: [
       {
         action: "FOLD",
+        label: "Fold",
       },
       {
         action: "CHECK",
+        label: "Check",
       },
       {
         action: "BET",
+        label: "Bet",
       },
     ],
   },

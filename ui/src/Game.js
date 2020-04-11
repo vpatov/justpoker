@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "./Table";
-import MissionControl from "./MissionControl";
+import Controller from "./Controller";
 // import DarkMode from "./DarkMode";
 
 const useStyles = makeStyles((theme) => ({
@@ -14,12 +14,12 @@ const useStyles = makeStyles((theme) => ({
 
 function Game(props) {
   const classes = useStyles();
-  const { table, missionControl, heroInGame } = props.game;
+  const { table, controller, heroInGame } = props.game;
 
   return (
     <div className={classes.root}>
       <Table table={table} heroInGame={heroInGame} />
-      <MissionControl missionControl={missionControl} />
+      <Controller controller={controller} />
     </div>
   );
 }

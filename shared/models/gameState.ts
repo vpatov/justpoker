@@ -5,9 +5,11 @@ import {
   BettingRoundAction,
 } from "./game";
 
+import { ActionType } from "./wsaction";
 import { Player } from "./player";
 import { Table } from "./table";
 import { Card, Deck } from "./cards";
+import { Controller } from "./Controller";
 
 export declare interface GameState {
   /** Sensitive field. */
