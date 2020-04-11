@@ -3,10 +3,14 @@ import { Card } from "./cards";
 export declare interface BettingRoundAction {
   type: BettingRoundActionType;
   amount: number;
-  allin: boolean;
+  // allin: boolean;
+  // Is there a reason to set all in in this object?
+  // the amount of chips the player bets will always
+  // be equal to their stack if this is the case
 }
 
 export const enum BettingRoundActionType {
+  // distinction between bet and call may be unnecessary
   CALL = "CALL",
   CHECK = "CHECK",
   BET = "BET",
@@ -67,17 +71,14 @@ export const BETTING_ROUND_STAGES = [
 export const CHECK_ACTION: BettingRoundAction = {
   type: BettingRoundActionType.CHECK,
   amount: 0,
-  allin: false,
 };
 
 export const FOLD_ACTION: BettingRoundAction = {
   type: BettingRoundActionType.FOLD,
   amount: 0,
-  allin: false,
 };
 
 export const WAITING_TO_ACT: BettingRoundAction = {
   type: BettingRoundActionType.WAITING_TO_ACT,
   amount: 0,
-  allin: false,
 };

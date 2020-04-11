@@ -1,10 +1,10 @@
 import {
-  Action,
+  IncomingClientWsMessage,
   ActionType,
   SitDownRequest,
   JoinTableRequest,
 } from "../models/wsaction";
-import { CHECK_ACTION, FOLD_ACTION } from "../models/game";
+import { CHECK_ACTION, FOLD_ACTION, BettingRoundAction } from "../models/game";
 import { GameStateManager } from "./gameStateManager";
 import { PlayerService } from "./playerService";
 import { ValidationService } from "./validationService";
@@ -21,13 +21,10 @@ export class MessageService {
     private readonly stateTransformService: StateTransformService
   ) {}
 
-  processMessage(action: Action, clientUUID: string) {
-    const actionType = action.actionType;
-    const data = action.data;
-
+  processMessage(message: IncomingClientWsMessage, clientUUID: string) {
     this.validationService.ensureClientExists(clientUUID);
 
-    switch (actionType) {
+    switch (message.actionType) {
       case ActionType.STARTGAME: {
         this.processStartGameMessage(clientUUID);
         break;
@@ -37,7 +34,7 @@ export class MessageService {
         break;
       }
       case ActionType.SITDOWN: {
-        this.processSitDownMessage(clientUUID, data);
+        this.processSitDownMessage(clientUUID, message.sitDownRequest);
         break;
       }
       case ActionType.STANDUP: {
@@ -45,12 +42,15 @@ export class MessageService {
         break;
       }
       case ActionType.JOINTABLE: {
-        this.processJoinTableMessage(clientUUID, data);
+        this.processJoinTableMessage(clientUUID, message.joinTableRequest);
         break;
       }
 
       case ActionType.JOINTABLEANDSITDOWN: {
-        this.processJoinTableAndSitDownMessage(clientUUID, data);
+        this.processJoinTableAndSitDownMessage(
+          clientUUID,
+          message.joinTableAndSitDownRequest
+        );
         break;
       }
 
@@ -59,12 +59,22 @@ export class MessageService {
         break;
       }
 
+      case ActionType.BET: {
+        this.processBetMessage(clientUUID, message.bettingRoundAction);
+        break;
+      }
+
+      case ActionType.FOLD: {
+        this.processFoldMessage(clientUUID);
+        break;
+      }
+
       case ActionType.PINGSTATE: {
         break;
       }
 
       default: {
-        throw Error(`Unrecognized action type: ${actionType}`);
+        throw Error(`Unrecognized action type: ${message.actionType}`);
       }
     }
     // TODO should messageService subscribe to gameState update from timer?
@@ -127,5 +137,19 @@ export class MessageService {
   processCheckMessage(clientUUID: string): void {
     this.validationService.validateCheckAction(clientUUID);
     this.gameStateManager.performBettingRoundAction(CHECK_ACTION);
+  }
+
+  procesCallMessage(clientUUID: string): void {
+    // this.validationService.validateCallAction(clientUUID);
+  }
+
+  processBetMessage(clientUUID: string, action: BettingRoundAction): void {
+    this.validationService.validateBetAction(clientUUID, action);
+    this.gameStateManager.performBettingRoundAction(action);
+  }
+
+  processFoldMessage(clientUUID: string): void {
+    this.validationService.validateFoldAction(clientUUID);
+    this.gameStateManager.performBettingRoundAction(FOLD_ACTION);
   }
 }

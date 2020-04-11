@@ -1,3 +1,5 @@
+import { BettingRoundAction } from "../models/game";
+
 // export declare interface UserAction {
 // }
 
@@ -34,9 +36,12 @@ export declare interface JoinTableRequest {
   // password?: string;
 }
 
-export declare interface Action {
+export declare interface IncomingClientWsMessage {
   actionType: ActionType;
-  data: any;
+  sitDownRequest: SitDownRequest;
+  joinTableRequest: JoinTableRequest;
+  joinTableAndSitDownRequest: SitDownRequest & JoinTableRequest;
+  bettingRoundAction: BettingRoundAction;
 }
 
 /*

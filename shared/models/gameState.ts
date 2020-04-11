@@ -42,7 +42,7 @@ export declare interface GameState {
 
 export declare interface Pot {
   value: number;
-  contestors: ReadonlyArray<Player>;
+  contestors: ReadonlyArray<string>;
 }
 
 export const cleanGameState: GameState = {

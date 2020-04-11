@@ -37,7 +37,7 @@ export class StateTransformService {
   getMissionControl(player: Player) {
     return {
       heroStack: player.chips,
-      pot: this.gameStateManager.getPot(),
+      pot: this.gameStateManager.getTotalPot(),
     };
   }
 
@@ -81,7 +81,7 @@ export class StateTransformService {
       toAct: this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID,
       hero: player.uuid === heroPlayerUUID,
       position: player.seatNumber,
-      bet: 0,
+      bet: player.lastAction ? player.lastAction.amount : 0,
       button: this.gameStateManager.getDealerUUID() === heroPlayerUUID,
       winner: player.winner,
     };

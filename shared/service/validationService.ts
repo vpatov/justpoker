@@ -147,4 +147,31 @@ export class ValidationService {
       }
     }
   }
+
+  // You can fold anytime. In the future, would be nice to implement
+  // "Are you sure you want to fold?" prompt if user tries to fold
+  // without facing a bet
+  validateFoldAction(clientUUID: string) {
+    this.ensureCorrectPlayerToAct(clientUUID);
+  }
+
+  // Preconditions:
+  /* 
+    User can place X amount of chips in the pot when:
+    - It is their turn to act
+    - Nobody has placed a bet before them
+    - The highest bet before them was X amount
+    - The amount by which X is greater than the previous 
+      bet is at least the previous raice
+
+  */
+  validateBetAction(clientUUID: string, action: BettingRoundAction) {
+    debugger;
+    this.ensureCorrectPlayerToAct(clientUUID);
+
+    const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+
+    // TODO implement this after you implement basic betting, so that you
+    // know how betting affects the state
+  }
 }
