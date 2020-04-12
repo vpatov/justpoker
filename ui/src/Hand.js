@@ -6,10 +6,8 @@ import Card from "./Card";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "90%",
-    height: "50%",
     display: "flex",
-    justifyContent: "space-evenly",
+    height: "50%",
   },
 }));
 
@@ -21,12 +19,7 @@ function Hand(props) {
   return (
     <div className={classes.root}>
       {cards.map((c) => (
-        <Card
-          suit={c.suit}
-          rank={c.rank}
-          hidden={hidden}
-          textPosition="top"
-        />
+        <Card suit={c.suit} rank={c.rank} hidden={hidden} size="small" />
       ))}
     </div>
   );

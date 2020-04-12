@@ -5,8 +5,9 @@ import Typography from "@material-ui/core/Typography";
 import ButtonSvg from "./imgs/button.svg";
 
 const useStyles = makeStyles((theme) => ({
-  root: {},
-
+  root: {
+    zIndex: 2,
+  },
   stackCont: {
     marginTop: -12,
     padding: "0.5vmin",
@@ -25,11 +26,17 @@ const useStyles = makeStyles((theme) => ({
   stack: {
     fontSize: "1.7vmin",
   },
-
-  button: {
+  buttonL: {
     position: "absolute",
-    height: "2.2vmin",
+    height: "1.8vmin",
     left: 0,
+    top: "50%",
+    zIndex: 5,
+  },
+  buttonR: {
+    position: "absolute",
+    height: "1.8vmin",
+    right: 0,
     top: "50%",
     zIndex: 5,
   },
@@ -99,7 +106,8 @@ function PlayerStack(props) {
 
   return (
     <div className={classes.stackCont}>
-      {button ? <img src={ButtonSvg} className={classes.button} /> : null}
+      {button ? <img src={ButtonSvg} className={classes.buttonL} /> : null}
+      {button ? <img src={ButtonSvg} className={classes.buttonR} /> : null}
       <Typography variant="h4" className={classes.stack}>
         {stack.toLocaleString()}
       </Typography>

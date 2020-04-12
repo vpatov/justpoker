@@ -40,14 +40,13 @@ function Bet(props) {
       }px 0 0px black `;
       curSpot += stackSize + spaceSize;
     }
-    console.log(boxShadow);
     return boxShadow;
   }
   return (
     <Typography
       className={classnames(classes.bet, className)}
       style={{
-        boxShadow: generateBetBoxShadow(),
+        // boxShadow: generateBetBoxShadow(),
         ...style,
       }}
     >

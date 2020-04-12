@@ -1,9 +1,13 @@
 import { createMuiTheme } from "@material-ui/core/styles";
 
+import lightGreen from "@material-ui/core/colors/lightGreen";
+import lightBlue from "@material-ui/core/colors/lightBlue";
 import green from "@material-ui/core/colors/green";
 import blue from "@material-ui/core/colors/blue";
 import red from "@material-ui/core/colors/red";
 import grey from "@material-ui/core/colors/grey";
+import teal from "@material-ui/core/colors/teal";
+import cyan from "@material-ui/core/colors/cyan";
 
 import TableTopImage from "./imgs/tableTop.png";
 import CardBackImage from "./imgs/cardBack2.png";
@@ -13,34 +17,33 @@ const NormalThemeObject = {
     backgroundColor: red[800],
   },
   DIAMONDS: {
-    backgroundColor: blue[800],
+    backgroundColor: lightBlue[800],
   },
   SPADES: {
     backgroundColor: "black",
   },
   CLUBS: {
-    backgroundColor: green[800],
+    backgroundColor: green[600],
   },
   HIDDEN: {
-    background: `${grey[500]} url(${CardBackImage})`,
-    backgroundSize: "20vmin",
+    backgroundColor: `${grey[900]}`,
+    backgroundImage: `url("https://www.transparenttextures.com/patterns/black-thread-light.png")`,
+    backgroundSize: "50% 26%",
     backgroundPosition: "50% 50%",
-    border: "2px solid black",
   },
-
   BACKGROUND: {
     background:
-      "radial-gradient(circle at 40%, rgba(194,231,237,1) 0%, rgba(141,178,238,1) 100%)",
+      " radial-gradient(circle, rgba(50,112,173,1) 0%, rgba(14,47,83,1) 100%)",
   },
-
   TABLE: {
-    border: `18px solid rgba(255,255,255,0.7)`,
-    boxShadow: `0 0 0 5px black, 0 6px 6px 6px grey`,
-    background: `${green[300]} url(${TableTopImage})`,
-    backgroundSize: "100%",
-    backgroundPosition: "50% 50%",
-    backgroundRepeat: "no-repeat",
-    backgroundBlendMode: "screen",
+    border: `14px solid rgba(255,255,255,0.7)`,
+    boxShadow: `0 0 0 4px black, 0 4px 4px 4px black`,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    // background: `radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);`,
+    // backgroundSize: "100%",
+    // backgroundPosition: "50% 50%",
+    // backgroundRepeat: "no-repeat",
+    // backgroundBlendMode: "screen",
   },
   STACK: {
     borderRadius: 40,
@@ -48,13 +51,12 @@ const NormalThemeObject = {
     boxShadow: "0 5px 10px rgba(59, 43, 91, 0.7)",
   },
   CONTROLLER: {
-    backgroundColor: "rgba(0,0,0,0.24)",
+    backgroundColor: "rgba(255,255,255,0.24)",
   },
   BET: {
     border: "1px solid white",
-    backgroundColor: green[600],
+    backgroundColor: teal[200],
   },
-
   ACTION_BUTTONS: {
     FOLD: {
       color: red[600],
@@ -70,7 +72,7 @@ const NormalThemeObject = {
     },
   },
   typography: {
-    fontFamily: "Futura, Avenir, Helvetica, Arial, sans-serif",
+    fontFamily: "Roboto, Avenir, Helvetica, Arial, sans-serif",
   },
 };
 
