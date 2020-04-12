@@ -35,10 +35,10 @@ function MakeGame(props) {
   const classes = useStyles();
   const { history } = props;
 
-  const [name, setName] = useState("");
-  const [bigBlind, setBigBlind] = useState("");
-  const [smallBlind, setSmallBlind] = useState("");
-  const [buyin, setBuyin] = useState("");
+  const [name, setName] = useState("DefaultPlayer");
+  const [bigBlind, setBigBlind] = useState(2);
+  const [smallBlind, setSmallBlind] = useState(1);
+  const [buyin, setBuyin] = useState(200);
   const [password, setPassword] = useState("");
   const [gameType, setGameType] = useState("NLHOLDEM");
 
@@ -70,6 +70,11 @@ function MakeGame(props) {
     createGame(createReq, createSuccess, createFailure);
   }
 
+  // setName("DefaultPlayer");
+  // setBuyin(200);
+  // setBigBlind(2);
+  // setSmallBlind(1);
+
   return (
     <div className={classes.root}>
       <TextField
@@ -77,7 +82,7 @@ function MakeGame(props) {
         label="Name"
         variant="outlined"
         onChange={(event) => setName(event.target.value)}
-        value={"DefaultPlayerName"}
+        value={name}
       />
       <Select
         variant="outlined"
@@ -92,7 +97,7 @@ function MakeGame(props) {
         label="Small Blind"
         variant="outlined"
         onChange={(event) => setSmallBlind(event.target.value)}
-        value={1}
+        value={smallBlind}
         type="number"
       />
       <TextField
@@ -100,7 +105,7 @@ function MakeGame(props) {
         label="Big Blind"
         variant="outlined"
         onChange={(event) => setBigBlind(event.target.value)}
-        value={2}
+        value={bigBlind}
         type="number"
       />
       <TextField
@@ -108,7 +113,7 @@ function MakeGame(props) {
         label="Buyin"
         variant="outlined"
         onChange={(event) => setBuyin(event.target.value)}
-        value={200}
+        value={buyin}
         type="number"
       />
       <TextField

@@ -62,6 +62,18 @@ export class GameStateManager {
         return this.gameState.players;
     }
 
+    getPreviousRaise() {
+        return this.gameState.previousRaise;
+    }
+
+    getPartialAllInLeftOver() {
+        return this.gameState.partialAllInLeftOver;
+    }
+
+    getMinRaiseDiff() {
+        return this.gameState.minRaiseDiff;
+    }
+
     getCurrentPlayerToAct() {
         return this.gameState.currentPlayerToAct;
     }
@@ -87,10 +99,10 @@ export class GameStateManager {
     }
 
     // TODO these are unsorted. Make sure thats okay.
-    getBettingRoundActions() {
+    getBettingRoundActionTypes() {
         return Object.values(this.gameState.players)
             .filter((player) => this.wasPlayerDealtIn(player.uuid))
-            .map((player) => player.lastAction);
+            .map((player) => player.lastActionType);
     }
 
     getBettingRoundStage() {
@@ -130,7 +142,7 @@ export class GameStateManager {
     }
 
     hasPlayerFolded(playerUUID: string) {
-        return this.getPlayer(playerUUID).lastAction.type === BettingRoundActionType.FOLD;
+        return this.getPlayer(playerUUID).lastActionType === BettingRoundActionType.FOLD;
     }
 
     getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
@@ -291,10 +303,22 @@ export class GameStateManager {
         this.setCurrentPlayerToAct(this.getNextPlayerInHandUUID(this.getCurrentPlayerToAct()));
     }
 
-    setPlayerLastAction(playerUUID: string, lastAction: BettingRoundAction) {
+    setPlayerLastActionType(playerUUID: string, lastActionType: BettingRoundActionType) {
         const player = {
             ...this.getPlayer(playerUUID),
-            lastAction,
+            lastActionType,
+        };
+        const players = { ...this.gameState.players, [player.uuid]: player };
+        this.gameState = {
+            ...this.gameState,
+            players,
+        };
+    }
+
+    setPlayerBetAmount(playerUUID: string, betAmount: number) {
+        const player = {
+            ...this.getPlayer(playerUUID),
+            betAmount,
         };
         const players = { ...this.gameState.players, [player.uuid]: player };
         this.gameState = {
@@ -344,7 +368,7 @@ export class GameStateManager {
             players: Object.fromEntries(
                 Object.entries(this.gameState.players).map(([uuid, player]) => [
                     uuid,
-                    { ...player, lastAction: null, holeCards: [], winner: false },
+                    { ...player, lastActionType: BettingRoundActionType.NOT_IN_HAND, holeCards: [], winner: false },
                 ]),
             ),
             board: [],
@@ -391,24 +415,24 @@ export class GameStateManager {
         TODO substract chips from the players
     */
     placeBlinds() {
-        const smallBlindUUID = this.getNextPlayerReadyToPlayUUID(this.gameState.dealerUUID);
+        const numPlayersReadyToPlay = this.getPlayersReadyToPlay().length;
+        const smallBlindUUID =
+            numPlayersReadyToPlay === 2
+                ? this.gameState.dealerUUID
+                : this.getNextPlayerReadyToPlayUUID(this.gameState.dealerUUID);
         const bigBlindUUID = this.getNextPlayerReadyToPlayUUID(smallBlindUUID);
 
-        const sbPlayer = {
+        // the players have to be waiting to act because they can still raise even if everyone before them calls
+
+        const sbPlayer: Player = {
             ...this.getPlayer(smallBlindUUID),
-            lastAction: {
-                type: BettingRoundActionType.BET,
-                amount: this.getSB(),
-                allin: false,
-            },
+            lastActionType: BettingRoundActionType.WAITING_TO_ACT,
+            betAmount: this.getSB(),
         };
-        const bbPlayer = {
+        const bbPlayer: Player = {
             ...this.getPlayer(bigBlindUUID),
-            lastAction: {
-                type: BettingRoundActionType.BET,
-                amount: this.getBB(),
-                allin: false,
-            },
+            lastActionType: BettingRoundActionType.WAITING_TO_ACT,
+            betAmount: this.getBB(),
         };
 
         // If heads up, dealer is first to act
@@ -420,8 +444,10 @@ export class GameStateManager {
         this.gameState = {
             ...this.gameState,
             // TODO uncomment this line to actually put blinds in
-            // players: { ...this.gameState.players, [sbPlayer.uuid]: sbPlayer, [bbPlayer.uuid]: bbPlayer },
+            players: { ...this.gameState.players, [sbPlayer.uuid]: sbPlayer, [bbPlayer.uuid]: bbPlayer },
             currentPlayerToAct: firstToActPreflop,
+            minRaiseDiff: this.getBB(),
+            previousRaise: this.getBB(),
         };
     }
 
@@ -506,9 +532,29 @@ export class GameStateManager {
         console.log('globalTimerFn\n');
 
         // fn();
+        this.givePotToWinner();
         this.clearBettingRoundStage();
         this.startHandIfReady();
         this.updateEmitter.next();
+    }
+
+    // TODO side pots
+    givePotToWinner() {
+        const numWinners = Object.entries(this.gameState.players).filter(([uuid, player]) => player.winner).length;
+        this.gameState = {
+            ...this.gameState,
+            players: Object.fromEntries(
+                Object.entries(this.gameState.players).map(([uuid, player]) => [
+                    uuid,
+                    player.winner
+                        ? {
+                              ...player,
+                              chips: player.chips + this.getTotalPot() / numWinners,
+                          }
+                        : player,
+                ]),
+            ),
+        };
     }
 
     initializeBettingRound() {
@@ -522,9 +568,18 @@ export class GameStateManager {
             players: Object.fromEntries(
                 Object.entries(this.gameState.players).map(([uuid, player]) => [
                     uuid,
-                    player.sitting ? { ...player, lastAction: WAITING_TO_ACT } : player,
+                    this.isPlayerInHand(uuid)
+                        ? {
+                              ...player,
+                              lastActionType: BettingRoundActionType.WAITING_TO_ACT,
+                              betAmount: 0,
+                          }
+                        : player,
                 ]),
             ),
+            minRaiseDiff: this.getBB(),
+            previousRaise: 0,
+            partialAllInLeftOver: 0,
         };
 
         switch (stage) {
@@ -600,23 +655,36 @@ export class GameStateManager {
     // the CHECK_ACTION / FOLD_ACTION constants
     check() {
         const currentPlayerToAct = this.getCurrentPlayerToAct();
-        this.setPlayerLastAction(currentPlayerToAct, CHECK_ACTION);
+        this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.CHECK);
     }
 
     fold() {
         const currentPlayerToAct = this.getCurrentPlayerToAct();
-        this.setPlayerLastAction(currentPlayerToAct, FOLD_ACTION);
+        this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.FOLD);
     }
 
+    //abc
     bet(action: BettingRoundAction) {
         const currentPlayerToAct = this.getCurrentPlayerToAct();
-        console.log('setting Player last action to action:', action);
-        this.setPlayerLastAction(currentPlayerToAct, action);
+        this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.BET);
+        this.setPlayerBetAmount(currentPlayerToAct, action.amount);
+
+        this.gameState = {
+            ...this.gameState,
+            minRaiseDiff: action.amount - this.gameState.previousRaise,
+            previousRaise: action.amount,
+            partialAllInLeftOver: 0,
+        };
+
+        // put chips in the pot
+        // set raiser variables
     }
 
     callBet(action: BettingRoundAction) {
         const currentPlayerToAct = this.getCurrentPlayerToAct();
-        this.setPlayerLastAction(currentPlayerToAct, action);
+        // TODO verify if this is ever incorrect
+        this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.CALL);
+        this.setPlayerBetAmount(currentPlayerToAct, this.gameState.previousRaise);
     }
 
     /** Includes all players that were dealt in pre-flop. */
@@ -637,7 +705,7 @@ export class GameStateManager {
         assert(playersInHand.length > 0, 'playersInHand.length was <= 0');
 
         return playersInHand.reduce((max, player) => {
-            return player.lastAction.amount > max ? player.lastAction.amount : max;
+            return player.betAmount > max ? player.betAmount : max;
         }, 0);
     }
 
@@ -649,9 +717,9 @@ export class GameStateManager {
     haveAllPlayersActed() {
         return this.getPlayersDealtIn().every(
             (player) =>
-                player.lastAction.type !== BettingRoundActionType.WAITING_TO_ACT &&
+                player.lastActionType !== BettingRoundActionType.WAITING_TO_ACT &&
                 (this.hasPlayerFolded(player.uuid) ||
-                    player.lastAction.amount === this.getHighestBet() ||
+                    player.betAmount === this.getHighestBet() ||
                     this.isPlayerAllIn(player.uuid)),
         );
     }
@@ -660,19 +728,23 @@ export class GameStateManager {
         return false;
     }
 
+    // TODO method doesnt account for allins properly.
     placeBetsInPot() {
         this.gameState = {
             ...this.gameState,
             pots: [
                 ...this.gameState.pots,
                 {
-                    value: Object.values(this.gameState.players).reduce(
-                        (sum, player) => (player.lastAction ? player.lastAction.amount + sum : 0),
-                        0,
-                    ),
+                    value: Object.values(this.gameState.players).reduce((sum, player) => player.betAmount + sum, 0),
                     contestors: [...this.getPlayersInHand()],
                 },
             ],
+            players: Object.fromEntries(
+                Object.entries(this.gameState.players).map(([uuid, player]) => [
+                    uuid,
+                    { ...player, chips: player.chips - player.betAmount, betAmount: 0 },
+                ]),
+            ),
         };
     }
 

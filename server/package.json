@@ -7,12 +7,12 @@
     "url": "git://github.com/vpatov/poker_web.git"
   },
   "scripts": {
-    "prebuild": "npm run lint",
+    "prebuild": "npm run lint; rm -rf dist",
     "lint": "eslint --quiet --fix --config .eslintrc.js ./src/**/*.ts ../shared/**/*.ts",
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node ./dist/server/server/src/server.js",
-    "debug": "npm run build && node inspect ./dist/server/server/src/server.js",
+    "start": "node ./dist/server/server/src/server/server.js",
+    "debug": "npm run build && node inspect ./dist/server/server/src/server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -2,7 +2,7 @@ import { Card } from "./cards";
 
 export declare interface BettingRoundAction {
   type: BettingRoundActionType;
-  amount: number;
+  amount?: number;
   // allin: boolean;
   // Is there a reason to set all in in this object?
   // the amount of chips the player bets will always
@@ -18,6 +18,7 @@ export const enum BettingRoundActionType {
   // RAISE = 'RAISE',
   FOLD = "FOLD",
   WAITING_TO_ACT = "WAITING_TO_ACT",
+  NOT_IN_HAND = "NOT_IN_HAND",
 }
 
 export declare interface GameParameters {
@@ -70,15 +71,16 @@ export const BETTING_ROUND_STAGES = [
 
 export const CHECK_ACTION: BettingRoundAction = {
   type: BettingRoundActionType.CHECK,
-  amount: 0,
 };
 
 export const FOLD_ACTION: BettingRoundAction = {
   type: BettingRoundActionType.FOLD,
-  amount: 0,
 };
 
 export const WAITING_TO_ACT: BettingRoundAction = {
   type: BettingRoundActionType.WAITING_TO_ACT,
-  amount: 0,
+};
+
+export const CALL_ACTION: BettingRoundAction = {
+  type: BettingRoundActionType.CALL,
 };

@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   betActionsCont: {
-    height: "30%",
+    height: "50%",
     width: "100%",
     display: "flex",
     justifyContent: "space-evenly",
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     width: "80%",
-    height: "20%",
+    height: "40px",
     backgroundColor: "white",
   },
   sizeButton: {
@@ -84,7 +84,7 @@ function Controller(props) {
   function onClickActionButton(action) {
     server.send({
       actionType: action,
-      bettingRoundAction: { type: "CHECK", amount: 0 },
+      bettingRoundAction: { type: action, amount: Number(betAmt) },
     });
   }
 

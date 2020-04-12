@@ -1,4 +1,4 @@
-const TestGame = {
+export const TestGame = {
   controller: {
     toAct: true,
     unsetCheckCall: true,
@@ -234,4 +234,29 @@ const TestGame = {
   },
 };
 
-export default TestGame;
+export const CleanGame = {
+  controller: {
+    toAct: false,
+    unsetCheckCall: true,
+    min: 0,
+    max: 0,
+    pot: 0,
+    sizingButtons: [
+     
+    ],
+    actionButtons: [
+     
+    ],
+  },
+  table: {
+    spots: 9,
+    pot: 0,
+    communityCards: [
+      
+    ],
+    players: [
+    ],
+  },
+};
+
+export default CleanGame;

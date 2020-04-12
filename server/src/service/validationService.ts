@@ -127,12 +127,21 @@ export class ValidationService {
         this.ensureCorrectPlayerToAct(clientUUID);
 
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const bettingRoundActions = this.gameStateManager.getBettingRoundActions();
+        const bettingRoundActions = this.gameStateManager.getBettingRoundActionTypes();
+        const playerBetAmt = player.betAmount;
 
-        for (const action of bettingRoundActions) {
-            if (action.type === BettingRoundActionType.BET) {
+        // Check to see if anyone has bet before us
+        for (const actionType of bettingRoundActions) {
+            if (actionType === BettingRoundActionType.BET) {
                 throw Error(`You cannot check when someone before you has bet.`);
             }
+        }
+
+        // Blinds aren't considered a betAction, so make sure our bet matches
+        // the highest bet if we are checking. This way, only the big blind and
+        // those who post a blind can check.
+        if (playerBetAmt != this.gameStateManager.getHighestBet()) {
+            throw Error(`You cannot check without calling the blinds.`);
         }
     }
 
@@ -145,21 +154,64 @@ export class ValidationService {
 
     // Preconditions:
     /* 
-    User can place X amount of chips in the pot when:
+    User can bet with X amount of chips in the pot when:
     - It is their turn to act
-    - Nobody has placed a bet before them
+    - They are not calling here
     - The highest bet before them was X amount
     - The amount by which X is greater than the previous 
       bet is at least the previous raice
+    - player has at least X chips
+    - player hasnt folded (if a player has folded, it should never be their turn to act)
 
-  */
+    */
     //TODO complete
     validateBetAction(clientUUID: string, action: BettingRoundAction) {
         this.ensureCorrectPlayerToAct(clientUUID);
 
+        const betAmount = typeof action.amount === 'number' ? action.amount : Number(action.amount);
+
+        // if (typeof betAmount !== 'number') {
+        //     throw Error(`Bet amount should be a number. Received ${typeof betAmount}`);
+        // }
+
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const errorPrefix = `Cannot Bet\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
+
+        if (player.chips < betAmount) {
+            throw Error(`${errorPrefix} Player cannot bet ${betAmount}, they only have ${player.chips} chips.`);
+        }
+
+        if (!this.gameStateManager.isPlayerInHand(player.uuid)) {
+            throw Error(`${errorPrefix} FATAL ERROR: Player is not in the hand, they should not be able to bet.`);
+        }
+
+        const minRaiseDiff = this.gameStateManager.getMinRaiseDiff();
+        const previousRaise = this.gameStateManager.getPreviousRaise();
+        const partialAllInLeftOver = this.gameStateManager.getPartialAllInLeftOver();
+        const minimumBet = minRaiseDiff + previousRaise + partialAllInLeftOver;
+
+        const isPlayerAllIn = player.chips === betAmount;
+
+        if (!isPlayerAllIn && betAmount < minimumBet) {
+            throw Error(
+                `${errorPrefix} Player cannot bet ${betAmount}\nminimum bet is ${minimumBet},` +
+                    ` previousRaise is ${previousRaise}, minRaiseDiff is ${minRaiseDiff}, ` +
+                    `partialAllInLeftOver is ${partialAllInLeftOver}`,
+            );
+        }
 
         // TODO implement this after you implement basic betting, so that you
         // know how betting affects the state
+    }
+
+    // Preconditions
+    /*
+        Player can call if they are not already all-in.
+        Player can call if they havent folded
+    */
+    validateCallAction(clientUUID: string) {
+        // this should be all we need, because if a player has folded, it will never be their turn to act,
+        // and if they are all in, it shouldn't be their turn to act either.
+        this.ensureCorrectPlayerToAct(clientUUID);
     }
 }

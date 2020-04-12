@@ -1,5 +1,5 @@
 import { IncomingClientWsMessage, ActionType, SitDownRequest, JoinTableRequest } from '../../../shared/models/wsaction';
-import { CHECK_ACTION, FOLD_ACTION, BettingRoundAction } from '../../../shared/models/game';
+import { CHECK_ACTION, FOLD_ACTION, BettingRoundAction, CALL_ACTION } from '../../../shared/models/game';
 import { GameStateManager } from './gameStateManager';
 import { PlayerService } from './playerService';
 import { ValidationService } from './validationService';
@@ -58,6 +58,11 @@ export class MessageService {
 
             case ActionType.FOLD: {
                 this.processFoldMessage(clientUUID);
+                break;
+            }
+
+            case ActionType.CALL: {
+                this.processCallMessage(clientUUID);
                 break;
             }
 
@@ -124,8 +129,9 @@ export class MessageService {
         this.gameStateManager.performBettingRoundAction(CHECK_ACTION);
     }
 
-    procesCallMessage(clientUUID: string): void {
-        // this.validationService.validateCallAction(clientUUID);
+    processCallMessage(clientUUID: string): void {
+        this.validationService.validateCallAction(clientUUID);
+        this.gameStateManager.performBettingRoundAction(CALL_ACTION);
     }
 
     processBetMessage(clientUUID: string, action: BettingRoundAction): void {

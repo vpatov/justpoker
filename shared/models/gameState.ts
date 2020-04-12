@@ -28,13 +28,22 @@ export declare interface GameState {
 
   gameInProgress: Readonly<boolean>;
 
-  /* Sensitive field. */
+  /** Sensitive field. */
   deck: Readonly<Deck>;
 
-  /* Sensitive field. */
+  /** Sensitive field. */
   table: Readonly<Table>;
 
   serverTime: Readonly<number>;
+
+  /** The minimum amount by which the next player can raise. */
+  minRaiseDiff: Readonly<number>;
+
+  /** The size of the bet of the last aggressor. It will not include callers and partial all-ins. */
+  previousRaise: number;
+
+  /** The extra amount put into the pot by an all-in that was below the min-raise. */
+  partialAllInLeftOver: number;
 
   // smallBlindUUID: Readonly<string>;
   // bigBlindUUID: Readonly<string>;
@@ -73,4 +82,7 @@ export const cleanGameState: GameState = {
     password: "",
   },
   serverTime: 0,
+  minRaiseDiff: 0,
+  previousRaise: 0,
+  partialAllInLeftOver: 0,
 };

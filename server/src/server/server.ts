@@ -25,15 +25,17 @@ function logGameState(gameState: GameState) {
         ...gameState,
         table: {
             uuid: gameState.table.uuid,
-            activeConnections: Object.entries(gameState.table.activeConnections).map(([uuid, client]) => [
-                {
-                    ...client,
-                    ws: 'ommittedWebSocket',
-                },
-            ]),
+            activeConnections: [
+                ...Object.entries(gameState.table.activeConnections).map(([uuid, client]) => [
+                    {
+                        ...client,
+                        ws: 'ommittedWebSocket',
+                    },
+                ]),
+            ],
         },
-        gameParameters: undefined as string,
-        board: undefined as string,
+        // gameParameters: undefined as string,
+        // board: undefined as string,
 
         deck: [] as any,
     };
