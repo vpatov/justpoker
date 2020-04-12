@@ -21,6 +21,12 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
   },
+  tableCont: {
+    // transition: "transform 2s linear 0s",
+    // "&:hover": {
+    //   transform: "translate(0vw, -100vh)",
+    // },
+  },
   table: {
     height: tableHeightPercent + "vmin",
     width: tableWidthPercent + "vmin",
@@ -31,6 +37,10 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     flexDirection: "column",
     ...theme.TABLE,
+    // transition: "transform 2s linear 0s",
+    // "&:hover": {
+    //   transform: "rotateX(720deg)",
+    // },
   },
   spot: {
     position: "absolute",
@@ -126,13 +136,15 @@ function Table(props) {
   }
   return (
     <div className={classes.root}>
-      <div className={classes.table}>
-        <Typography
-          className={classes.pot}
-        >{`POT: ${pot.toLocaleString()}`}</Typography>
-        <CommunityCards communityCards={communityCards} />
-        {createSpotsAtTable()}
+      <div className={classes.tableCont}>
+        <div className={classes.table}>
+          <Typography
+            className={classes.pot}
+          >{`${pot.toLocaleString()}`}</Typography>
+          <CommunityCards communityCards={communityCards} />
+        </div>
       </div>
+      {createSpotsAtTable()}
     </div>
   );
 }

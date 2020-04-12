@@ -28,7 +28,7 @@ const NormalThemeObject = {
   HIDDEN: {
     backgroundColor: `${grey[900]}`,
     backgroundImage: `url("https://www.transparenttextures.com/patterns/black-thread-light.png")`,
-    backgroundSize: "50% 26%",
+    backgroundSize: "30% 20%",
     backgroundPosition: "50% 50%",
   },
   BACKGROUND: {
