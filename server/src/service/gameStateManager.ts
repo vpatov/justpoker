@@ -658,6 +658,7 @@ export class GameStateManager {
         this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.CHECK);
     }
 
+    //TODO finish implementing fold logic
     fold() {
         const currentPlayerToAct = this.getCurrentPlayerToAct();
         this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.FOLD);
@@ -724,8 +725,14 @@ export class GameStateManager {
         );
     }
 
+    getWinners() {
+        return Object.entries(this.gameState.players)
+            .filter(([uuid, player]) => player.winner)
+            .map(([uuid, player]) => uuid);
+    }
+
     currentHandHasResult() {
-        return false;
+        return this.getWinners().length > 0;
     }
 
     // TODO method doesnt account for allins properly.
@@ -749,6 +756,18 @@ export class GameStateManager {
     }
 
     checkForVictoryCondition() {
+        const playersInHand = this.getPlayersInHand();
+        if (playersInHand.length === 1) {
+            const winnerUUID = playersInHand[0];
+            this.gameState = {
+                ...this.gameState,
+                players: {
+                    ...this.gameState.players,
+                    [winnerUUID]: { ...this.getPlayer(winnerUUID), winner: true },
+                },
+            };
+            this.finishHand();
+        }
         // check for victory condition:
         // either everyone folded but one person,
         // or this is the river and its time for showdown
