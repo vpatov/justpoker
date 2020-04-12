@@ -101,7 +101,7 @@ class Server {
             /* Debug Logging */
             const playerName = client.playerUUID
                 ? this.gameStateManager.getPlayer(client.playerUUID).name
-                : 'err_unnamed';
+                : 'Anonymous Client';
             console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);
             console.log(util.inspect(res, false, null, true));
             /* -------------- */

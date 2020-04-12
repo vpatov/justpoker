@@ -1,4 +1,4 @@
-- actual game play functionality (MVP)
+
 - determine how to best use functional/redux patterns and avoid anti-pattern usage
 - coordinate interfaces/models with UI and jules
 - Design timing aspect of gameplay
@@ -6,15 +6,8 @@
         This should be the first thing you try to de-duplicate, you've now reached three code repeats.
 - It seems like the gameStateManager file is going to become very bloated. Find the best way to ameliorate this.
 - Consider replacing uuid string with uuid type
-- Integrate https://github.com/goldfire/pokersolver for hand solving
+
 - cleaner design would be to allow gameStateManager to assume that all operations it is being asked to perform are legal. Insert a validation layer between the messageService and the gameStateManager. 
-- Having seats is convenient for processing, but it is duplication of data and you should avoid it for that reason.
-        /*
-        const seats: [number, string][] = Object.values(players).filter(player => player.seatNumber >= 0).map(
-            (player) => [player.seatNumber, player.uuid]
-        );
-        seats.sort();
-        */
 
 - Add input validation on data coming from frontend. Would save you a lot of bugs/headaches during development...
 
@@ -51,4 +44,12 @@ Done:
 - Map object is problematic to serialize to JSON. Consider replacing it with a simple object. Just be sure that it doesn't become a tricky soruce of bugs later. 
 - Create filter that removes sensitive data from gameState object before sending it to UI (cards, cookies, etc)
 - start game functionality 
-
+- actual game play functionality (MVP)
+- Integrate https://github.com/goldfire/pokersolver for hand solving
+- Having seats is convenient for processing, but it is duplication of data and you should avoid it for that reason.
+        /*
+        const seats: [number, string][] = Object.values(players).filter(player => player.seatNumber >= 0).map(
+            (player) => [player.seatNumber, player.uuid]
+        );
+        seats.sort();
+        */

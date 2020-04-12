@@ -40,6 +40,27 @@ export class GameStateManager {
         return this.updateEmitter.asObservable();
     }
 
+    updateGameState(updates: Partial<GameState>) {
+        this.gameState = {
+            ...this.gameState,
+            ...updates,
+        };
+    }
+
+    updatePlayer(playerUUID: string, updates: Partial<Player>) {
+        const player = this.getPlayer(playerUUID);
+
+        this.updateGameState({
+            players: {
+                ...this.gameState.players,
+                [player.uuid]: { ...player, ...updates },
+            },
+        });
+    }
+    updatePlayers(updateFn: (player: Player) => Partial<Player>) {
+        Object.entries(this.gameState.players).forEach(([uuid, player]) => this.updatePlayer(uuid, updateFn(player)));
+    }
+
     getConnectedClient(clientUUID: string) {
         return this.gameState.table.activeConnections.get(clientUUID);
     }
@@ -98,7 +119,6 @@ export class GameStateManager {
         return this.gameState.gameParameters.bigBlind;
     }
 
-    // TODO these are unsorted. Make sure thats okay.
     getBettingRoundActionTypes() {
         return Object.values(this.gameState.players)
             .filter((player) => this.wasPlayerDealtIn(player.uuid))
@@ -265,31 +285,11 @@ export class GameStateManager {
     }
 
     sitDownPlayer(playerUUID: string, seatNumber: number) {
-        const player = {
-            ...this.getPlayer(playerUUID),
-            sitting: true,
-            seatNumber,
-        };
-        const players = { ...this.gameState.players, [player.uuid]: player };
-
-        this.gameState = {
-            ...this.gameState,
-            players,
-        };
+        this.updatePlayer(playerUUID, { sitting: true, seatNumber: seatNumber });
     }
 
     standUpPlayer(playerUUID: string) {
-        const player = {
-            ...this.getPlayer(playerUUID),
-            sitting: false,
-            seatNumber: -1,
-        };
-        const players = { ...this.gameState.players, [player.uuid]: player };
-
-        this.gameState = {
-            ...this.gameState,
-            players,
-        };
+        this.updatePlayer(playerUUID, { sitting: false, seatNumber: -1 });
     }
 
     setCurrentPlayerToAct(playerUUID: string) {
@@ -304,27 +304,11 @@ export class GameStateManager {
     }
 
     setPlayerLastActionType(playerUUID: string, lastActionType: BettingRoundActionType) {
-        const player = {
-            ...this.getPlayer(playerUUID),
-            lastActionType,
-        };
-        const players = { ...this.gameState.players, [player.uuid]: player };
-        this.gameState = {
-            ...this.gameState,
-            players,
-        };
+        this.updatePlayer(playerUUID, { lastActionType });
     }
 
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
-        const player = {
-            ...this.getPlayer(playerUUID),
-            betAmount,
-        };
-        const players = { ...this.gameState.players, [player.uuid]: player };
-        this.gameState = {
-            ...this.gameState,
-            players,
-        };
+        this.updatePlayer(playerUUID, { betAmount });
     }
 
     /* Gameplay functionality */
@@ -363,14 +347,13 @@ export class GameStateManager {
     }
 
     clearStateOfRoundInfo() {
-        this.gameState = {
-            ...this.gameState,
-            players: Object.fromEntries(
-                Object.entries(this.gameState.players).map(([uuid, player]) => [
-                    uuid,
-                    { ...player, lastActionType: BettingRoundActionType.NOT_IN_HAND, holeCards: [], winner: false },
-                ]),
-            ),
+        this.updatePlayers((player) => ({
+            lastActionType: BettingRoundActionType.NOT_IN_HAND,
+            holeCards: [],
+            winner: false,
+        }));
+
+        this.updateGameState({
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
             currentPlayerToAct: '',
@@ -379,7 +362,7 @@ export class GameStateManager {
             deck: {
                 cards: [],
             },
-        };
+        });
     }
 
     initializePreflop() {
@@ -387,12 +370,10 @@ export class GameStateManager {
         this.initializeDealerButton();
         this.placeBlinds();
 
-        const deck = this.deckService.newDeck();
-        this.gameState = {
-            ...this.gameState,
-            deck,
+        this.updateGameState({
+            deck: this.deckService.newDeck(),
             bettingRoundStage: BettingRoundStage.PREFLOP,
-        };
+        });
         this.distributeHoleCards();
     }
 
@@ -403,10 +384,7 @@ export class GameStateManager {
             ? this.getNextPlayerReadyToPlayUUID(this.gameState.dealerUUID)
             : seatZeroPlayerUUID;
 
-        this.gameState = {
-            ...this.gameState,
-            dealerUUID,
-        };
+        this.updateGameState({ dealerUUID });
     }
 
     /*
@@ -422,18 +400,17 @@ export class GameStateManager {
                 : this.getNextPlayerReadyToPlayUUID(this.gameState.dealerUUID);
         const bigBlindUUID = this.getNextPlayerReadyToPlayUUID(smallBlindUUID);
 
-        // the players have to be waiting to act because they can still raise even if everyone before them calls
-
-        const sbPlayer: Player = {
-            ...this.getPlayer(smallBlindUUID),
+        // the players have to be waiting to act because they can still raise even
+        // if everyone before them calls
+        this.updatePlayer(smallBlindUUID, {
             lastActionType: BettingRoundActionType.WAITING_TO_ACT,
             betAmount: this.getSB(),
-        };
-        const bbPlayer: Player = {
-            ...this.getPlayer(bigBlindUUID),
+        });
+
+        this.updatePlayer(bigBlindUUID, {
             lastActionType: BettingRoundActionType.WAITING_TO_ACT,
             betAmount: this.getBB(),
-        };
+        });
 
         // If heads up, dealer is first to act
         const firstToActPreflop =
@@ -441,42 +418,28 @@ export class GameStateManager {
                 ? this.gameState.dealerUUID
                 : this.getNextPlayerReadyToPlayUUID(bigBlindUUID);
 
-        this.gameState = {
-            ...this.gameState,
-            // TODO uncomment this line to actually put blinds in
-            players: { ...this.gameState.players, [sbPlayer.uuid]: sbPlayer, [bbPlayer.uuid]: bbPlayer },
+        this.updateGameState({
             currentPlayerToAct: firstToActPreflop,
             minRaiseDiff: this.getBB(),
             previousRaise: this.getBB(),
-        };
+        });
     }
 
     distributeHoleCards() {
         const deck = this.getDeck();
-        const players = Object.fromEntries(
-            Object.entries(this.gameState.players).map(([uuid, player]) => [
-                uuid,
-                player.sitting
-                    ? {
-                          ...player,
-                          holeCards: [this.deckService.drawCard(deck), this.deckService.drawCard(deck)],
-                      }
-                    : player,
-            ]),
+        this.updatePlayers((player) =>
+            player.sitting
+                ? {
+                      holeCards: [this.deckService.drawCard(deck), this.deckService.drawCard(deck)],
+                  }
+                : {},
         );
-        this.gameState = {
-            ...this.gameState,
-            players,
-        };
     }
 
     /* STREETS */
     dealCardsToBoard(amount: number) {
         const newCards = [...Array(amount).keys()].map((_) => this.deckService.drawCard(this.getDeck()));
-        this.gameState = {
-            ...this.gameState,
-            board: [...this.gameState.board, ...newCards],
-        };
+        this.updateGameState({ board: [...this.gameState.board, ...newCards] });
     }
 
     initializeFlop() {
@@ -505,22 +468,12 @@ export class GameStateManager {
                 this.deckService.computeBestHandFromCards([...this.getPlayer(playerUUID).holeCards, ...board]),
             ]),
         );
-
         const winningHands = this.deckService.getWinningHands(Object.values(playersHands));
-
         const winningPlayers = Object.entries(playersHands)
             .filter(([uuid, hand]) => winningHands.includes(hand))
             .map(([uuid, hand]) => uuid);
 
-        this.gameState = {
-            ...this.gameState,
-            players: Object.fromEntries(
-                Object.entries(this.getPlayers()).map(([uuid, player]) => [
-                    uuid,
-                    { ...player, winner: winningPlayers.includes(uuid) },
-                ]),
-            ),
-        };
+        this.updatePlayers((player) => ({ winner: winningPlayers.includes(player.uuid) }));
     }
 
     finishHand() {
@@ -541,20 +494,9 @@ export class GameStateManager {
     // TODO side pots
     givePotToWinner() {
         const numWinners = Object.entries(this.gameState.players).filter(([uuid, player]) => player.winner).length;
-        this.gameState = {
-            ...this.gameState,
-            players: Object.fromEntries(
-                Object.entries(this.gameState.players).map(([uuid, player]) => [
-                    uuid,
-                    player.winner
-                        ? {
-                              ...player,
-                              chips: player.chips + this.getTotalPot() / numWinners,
-                          }
-                        : player,
-                ]),
-            ),
-        };
+        this.updatePlayers((player) =>
+            player.winner ? { chips: player.chips + this.getTotalPot() / numWinners } : {},
+        );
     }
 
     initializeBettingRound() {
@@ -562,29 +504,18 @@ export class GameStateManager {
 
         const stage = this.getBettingRoundStage();
 
-        // this is incorrect - if someone has folded, this unfolds them.
-        this.gameState = {
-            ...this.gameState,
-            players: Object.fromEntries(
-                Object.entries(this.gameState.players).map(([uuid, player]) => [
-                    uuid,
-                    this.isPlayerInHand(uuid)
-                        ? {
-                              ...player,
-                              lastActionType: BettingRoundActionType.WAITING_TO_ACT,
-                              betAmount: 0,
-                          }
-                        : player,
-                ]),
-            ),
-            minRaiseDiff: this.getBB(),
-            previousRaise: 0,
-            partialAllInLeftOver: 0,
-        };
+        this.updatePlayers((player) =>
+            this.isPlayerInHand(player.uuid)
+                ? { lastActionType: BettingRoundActionType.WAITING_TO_ACT, betAmount: 0 }
+                : {},
+        );
+
+        this.updateGameState({ minRaiseDiff: this.getBB(), previousRaise: 0, partialAllInLeftOver: 0 });
 
         switch (stage) {
             case BettingRoundStage.WAITING: {
                 this.nextBettingRound();
+                // TODO get rid of switch fallthrough
                 /* intentional switch-fallthrough */
             }
             case BettingRoundStage.PREFLOP: {
@@ -670,21 +601,18 @@ export class GameStateManager {
         this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.BET);
         this.setPlayerBetAmount(currentPlayerToAct, action.amount);
 
-        this.gameState = {
-            ...this.gameState,
+        this.updateGameState({
             minRaiseDiff: action.amount - this.gameState.previousRaise,
             previousRaise: action.amount,
             partialAllInLeftOver: 0,
-        };
-
-        // put chips in the pot
-        // set raiser variables
+        });
     }
 
     callBet(action: BettingRoundAction) {
         const currentPlayerToAct = this.getCurrentPlayerToAct();
-        // TODO verify if this is ever incorrect
         this.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.CALL);
+
+        // TODO verify if this is ever incorrect
         this.setPlayerBetAmount(currentPlayerToAct, this.gameState.previousRaise);
     }
 
@@ -698,7 +626,7 @@ export class GameStateManager {
     }
 
     wasPlayerDealtIn(playerUUID: string) {
-        return this.gameState.players[playerUUID].holeCards.length > 0;
+        return this.getPlayer(playerUUID).holeCards.length > 0;
     }
 
     getHighestBet() {
@@ -736,9 +664,10 @@ export class GameStateManager {
     }
 
     // TODO method doesnt account for allins properly.
+    // TODO Redesign pot structure to make it simple.
     placeBetsInPot() {
-        this.gameState = {
-            ...this.gameState,
+        // put bets in pot
+        this.updateGameState({
             pots: [
                 ...this.gameState.pots,
                 {
@@ -746,26 +675,16 @@ export class GameStateManager {
                     contestors: [...this.getPlayersInHand()],
                 },
             ],
-            players: Object.fromEntries(
-                Object.entries(this.gameState.players).map(([uuid, player]) => [
-                    uuid,
-                    { ...player, chips: player.chips - player.betAmount, betAmount: 0 },
-                ]),
-            ),
-        };
+        });
+        // update players chip counts
+        this.updatePlayers((player) => ({ chips: player.chips - player.betAmount, betAmount: 0 }));
     }
 
     checkForVictoryCondition() {
         const playersInHand = this.getPlayersInHand();
         if (playersInHand.length === 1) {
             const winnerUUID = playersInHand[0];
-            this.gameState = {
-                ...this.gameState,
-                players: {
-                    ...this.gameState.players,
-                    [winnerUUID]: { ...this.getPlayer(winnerUUID), winner: true },
-                },
-            };
+            this.updatePlayer(winnerUUID, { winner: true });
             this.finishHand();
         }
         // check for victory condition:
@@ -774,22 +693,15 @@ export class GameStateManager {
         // if someone wins, add the hand result to the gameState (UI shows victory)
     }
 
-    clearActionsForPlayersInHand() {
-        // TODO DRY w.r.t logic in initializeBettingRound
-        // TODO DRY w.r.t setting a property for a group of players
-    }
-
     clearCurrentPlayerToAct() {
-        this.gameState = {
-            ...this.gameState,
+        this.updateGameState({
             currentPlayerToAct: '',
-        };
+        });
     }
 
     finishBettingRound() {
         this.placeBetsInPot();
         this.checkForVictoryCondition();
-        this.clearActionsForPlayersInHand();
         this.clearCurrentPlayerToAct();
     }
 
@@ -800,17 +712,10 @@ export class GameStateManager {
     }
 
     nextBettingRound() {
-        const nextStage = this.getNextBettingRoundStage();
-        this.gameState = {
-            ...this.gameState,
-            bettingRoundStage: nextStage,
-        };
+        this.updateGameState({ bettingRoundStage: this.getNextBettingRoundStage() });
     }
 
     clearBettingRoundStage() {
-        this.gameState = {
-            ...this.gameState,
-            bettingRoundStage: BettingRoundStage.WAITING,
-        };
+        this.updateGameState({ bettingRoundStage: BettingRoundStage.WAITING });
     }
 }
