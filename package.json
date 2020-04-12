@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "preinstall": "cd server && npm install; cd ..; cd ui && npm install; cd ..; cd shared && npm install; ",
+    "server": "cd server && npm start",
+    "ui": "cd ui && npm start",
+    "start": "concurrently \"npm run server\" \"npm run ui\""
+  },
+  "devDependencies": {
+    "concurrently": "^1.0.0"
+  }
+}
