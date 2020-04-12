@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import { Player } from '../../../shared/models/player';
 import { ConnectedClient } from '../../../shared/models/table';
 import { generateUUID } from '../../../shared/util/util';
+import { BettingRoundActionType } from '../../../shared/models/game';
 
 // TODO design functions here such that they receive as input
 // the players object, and return as output the players object
@@ -17,7 +18,8 @@ export class PlayerService {
             holeCards: [],
             sitting: false,
             seatNumber: -1,
-            lastAction: null,
+            lastActionType: BettingRoundActionType.NOT_IN_HAND,
+            betAmount: 0,
             winner: false,
         };
     }

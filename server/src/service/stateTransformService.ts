@@ -7,12 +7,10 @@ import { GameStateManager } from './gameStateManager';
 import {
     Controller,
     cleanController,
-    FOLD_BUTTON,
-    CHECK_BUTTON,
-    BET_BUTTON,
-    PREFLOP_SIZING_BUTTONS,
-    POSTFLOP_SIZING_BUTTONS,
-    NOT_FACING_BET_ACTION_BUTTONS,
+    ALL_ACTION_BUTTONS,
+    SizingButton,
+    COMMON_BB_SIZINGS,
+    COMMON_POT_SIZINGS,
 } from '../../../shared/models/controller';
 
 @Service()
@@ -36,7 +34,7 @@ export class StateTransformService {
                 controller: clientPlayerIsInGame ? this.getUIController(heroPlayer) : cleanController,
                 table: {
                     spots: 9,
-                    pot: 0,
+                    pot: this.gameStateManager.getTotalPot(),
                     communityCards: board,
                     players: Object.entries(secureGameState.players).map(([uuid, player]) =>
                         this.transformPlayer(player, heroPlayerUUID),
@@ -52,17 +50,22 @@ export class StateTransformService {
 
     getUIController(heroPlayer: Player): Controller {
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
+        const bbValue = this.gameStateManager.getBB();
+        const potSize = this.gameStateManager.getTotalPot();
+        console.log('bbvalue, potsize', bbValue, potSize);
         const controller: Controller = {
             toAct: this.gameStateManager.getCurrentPlayerToAct() === heroPlayer.uuid,
             unsetCheckCall: false,
             min: 0,
             max: heroPlayer.chips,
-            pot: this.gameStateManager.getTotalPot(),
+            pot: potSize,
             sizingButtons:
                 bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
-                    ? PREFLOP_SIZING_BUTTONS
-                    : POSTFLOP_SIZING_BUTTONS,
-            actionButtons: NOT_FACING_BET_ACTION_BUTTONS,
+                    ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
+                    : COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
+                          this.createPotSizeButton(numerator, denominator, potSize),
+                      ),
+            actionButtons: ALL_ACTION_BUTTONS,
         };
 
         return controller;
@@ -94,7 +97,7 @@ export class StateTransformService {
 
     transformPlayer(player: Player, heroPlayerUUID: string) {
         const newPlayer = {
-            stack: player.chips,
+            stack: player.chips - player.betAmount,
             hand: {
                 cards:
                     heroPlayerUUID !== player.uuid ? player.holeCards.map(() => ({ hidden: true })) : player.holeCards,
@@ -103,7 +106,7 @@ export class StateTransformService {
             toAct: this.gameStateManager.getCurrentPlayerToAct() === player.uuid,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
-            bet: player.lastAction ? player.lastAction.amount : 0,
+            bet: player.betAmount,
             button: this.gameStateManager.getDealerUUID() === player.uuid,
             winner: player.winner,
         };
@@ -114,5 +117,20 @@ export class StateTransformService {
         const strippedState = this.stripSensitiveFields(clientUUID);
         const uiState = this.transformGameStateToUIState(clientUUID, strippedState);
         return uiState;
+    }
+
+    createPotSizeButton(numerator: number, denominator: number, potSize: number): SizingButton {
+        return {
+            label:
+                numerator > denominator ? 'Overbet' : numerator === denominator ? 'POT' : `${numerator}/${denominator}`,
+            value: Math.floor((numerator / denominator) * potSize),
+        };
+    }
+
+    createBBSizeButton(numBlinds: number, bbValue: number) {
+        return {
+            label: `${numBlinds} BB`,
+            value: numBlinds * bbValue,
+        };
     }
 }

@@ -45,7 +45,7 @@ function OpenSeat(props) {
       actionType: "JOINTABLEANDSITDOWN",
       joinTableAndSitDownRequest: {
         name: `Player${seatNumber}`,
-        buyin: 54100,
+        buyin: 200,
         seatNumber: seatNumber,
       },
     });

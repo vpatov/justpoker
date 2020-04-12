@@ -1,5 +1,5 @@
 import { Card } from "./cards";
-import { BettingRoundAction } from "./game";
+import { BettingRoundAction, BettingRoundActionType } from "./game";
 
 export declare interface Player {
   /** Unique identifier for player. */
@@ -25,14 +25,15 @@ export declare interface Player {
 
   /**
    * The last action that the player has performed (check, bet, etc.) If they are in the
-   * current hand, but have not acted yet, lastAction.type === WAITING_TO_ACT . This
-   * property is used to determine whether a play is in a hand (rather than something like
-   * an additional boolean "inHand").
+   * current hand, but have not acted yet, lastAction.type === WAITING_TO_ACT.
    */
-  readonly lastAction: BettingRoundAction | null;
+  readonly lastActionType: BettingRoundActionType;
 
   /** Is set to true when the player has won the hand. */
   readonly winner: boolean;
+
+  /** The amount of chips the player is about to put into the pot. */
+  readonly betAmount: number;
 }
 
 /*
