@@ -1,1 +1,1 @@
-declare module "pokersolver";
+declare module 'pokersolver';
