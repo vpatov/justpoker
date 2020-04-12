@@ -12,11 +12,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  communityCard: {
-    width: "15%",
-    height: "50%",
-    margin: 4,
-  },
+  communityCard: {},
 }));
 
 function CommunityCards(props) {
@@ -27,6 +23,7 @@ function CommunityCards(props) {
     <div className={classes.communityCardsCont}>
       {communityCards.map((c) => (
         <Card
+          size="large"
           suit={c.suit}
           rank={c.rank}
           fontSize={"2.5vmin"}

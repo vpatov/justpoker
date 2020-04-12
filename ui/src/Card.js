@@ -1,6 +1,6 @@
 import React from "react";
 
-import { generateStringFromSuitAndRank, SUITS } from "./utils";
+import { generateStringFromSuit, SUITS } from "./utils";
 import classnames from "classnames";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -8,31 +8,43 @@ import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: "100%",
-    width: "40%",
     border: "2px solid white",
     borderRadius: 6,
     display: "inline-block",
     textAlign: "center",
+    position: "relative",
   },
-  valueText: {
-    fontSize: "1.8vmin",
+  large: {
+    height: "8vmin",
+    width: "6vmin",
+    fontSize: "4vmin",
+    margin: 4,
+  },
+  small: {
+    zIndex: -1,
+    height: "6vmin",
+    width: "5vmin",
+    fontSize: "2.8vmin",
+    margin: 2,
+  },
+  rankText: {
+    fontSize: "inherit",
+    position: "absolute",
+    top: -6,
+    left: 6,
+    color: "white",
+    display: "inline-block",
+  },
+  suitText: {
+    fontSize: "inherit",
+    position: "absolute",
+    bottom: -6,
+    right: 6,
     color: "white",
     display: "inline-block",
   },
   hidden: {
     ...theme.HIDDEN,
-  },
-  center: {
-    position: "relative",
-    top: "50%",
-    transform: "translateY(-50%)",
-    textAlign: "center",
-  },
-  top: {
-    paddingTop: "0.5vmin",
-    position: "relative",
-    textAlign: "center",
   },
   side: {
     position: "relative",
@@ -55,38 +67,42 @@ const useStyles = makeStyles((theme) => ({
 
 function Card(props) {
   const classes = useStyles();
-  const {
-    suit,
-    rank,
-    textPosition,
-    fontSize,
-    style,
-    hidden,
-    className,
-  } = props;
+  const { suit, rank, size, style, hidden, className } = props;
 
   if (hidden) {
     return (
       <div
-        className={classnames(classes.root, classes.hidden, className)}
+        className={classnames(
+          classes.root,
+          classes.hidden,
+          classes[size],
+          className
+        )}
         style={style}
       />
     );
   }
   return (
     <div
-      className={classnames(classes.root, classes[suit], className)}
+      className={classnames(
+        classes.root,
+        classes[suit],
+        className,
+        classes[size]
+      )}
       style={style}
     >
       <Typography
-        className={classnames(
-          classes.valueText,
-          classes[textPosition || "center"],
-          classes[suit]
-        )}
-        style={{ fontSize: fontSize }}
+        className={classnames(classes.valueText, classes.rankText)}
+        style={size === "small" ? { top: -2 } : null}
       >
-        {generateStringFromSuitAndRank(suit, rank)}
+        {rank}
+      </Typography>
+      <Typography
+        className={classnames(classes.valueText, classes.suitText)}
+        style={size === "small" ? { top: -2 } : null}
+      >
+        {generateStringFromSuit(suit)}
       </Typography>
     </div>
   );
