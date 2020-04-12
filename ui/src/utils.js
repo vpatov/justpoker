@@ -5,9 +5,8 @@ export const SUITS = {
   DIAMONDS: "DIAMONDS",
 };
 
-export function generateStringFromSuitAndRank(suit, rank) {
+export function generateStringFromSuit(suit) {
   let suitString = "ERR_SUIT";
-  let numberString = "ERR_NUMBER";
   switch (suit) {
     case SUITS.HEARTS:
       suitString = "\u2665";
@@ -23,7 +22,7 @@ export function generateStringFromSuitAndRank(suit, rank) {
       break;
   }
 
-  return (rank == "T" ? "10" : rank) + suitString;
+  return suitString;
 }
 
 export function debounce(fn, ms) {

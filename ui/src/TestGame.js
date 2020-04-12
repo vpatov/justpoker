@@ -44,15 +44,15 @@ export const TestGame = {
     communityCards: [
       {
         suit: "CLUBS",
-        rank: 11,
+        rank: "T",
       },
       {
         suit: "SPADES",
-        rank: 12,
+        rank: "K",
       },
       {
         suit: "HEARTS",
-        rank: 1,
+        rank: "Q",
       },
       {
         suit: "DIAMONDS",

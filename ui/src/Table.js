@@ -35,21 +35,14 @@ const useStyles = makeStyles((theme) => ({
   spot: {
     position: "absolute",
   },
-
   pot: {
     fontSize: "3vmin",
     position: "absolute",
-    transform: "translateY(-12vh)",
+    transform: "translateY(-10vh)",
     backgroundColor: "rgba(0,0,0,0.4)",
     color: "white",
     borderRadius: 40,
     padding: "12px 36px",
-  },
-  button: {
-    position: "absolute",
-    zIndex: 10,
-    backgroundColor: "gold",
-    width: 30,
   },
 }));
 
@@ -77,8 +70,8 @@ function Table(props) {
     };
   });
 
-  const playerPosScale = 0.38;
-  const betPosScale = 0.25;
+  const playerPosScale = 0.4;
+  const betPosScale = 0.26;
 
   function createSpotsAtTable() {
     const ans = [];
@@ -134,8 +127,9 @@ function Table(props) {
   return (
     <div className={classes.root}>
       <div className={classes.table}>
-        <Typography className={classes.pot}>{`POT: ${pot}`}</Typography>
-
+        <Typography
+          className={classes.pot}
+        >{`POT: ${pot.toLocaleString()}`}</Typography>
         <CommunityCards communityCards={communityCards} />
         {createSpotsAtTable()}
       </div>
