@@ -87,7 +87,7 @@ export const TestGame = {
         name: "Marty Shakus",
         position: 1,
         stack: 425323,
-        bet: 18400,
+        bet: 999900,
         hand: {
           cards: [
             {
@@ -105,7 +105,7 @@ export const TestGame = {
         name: "Dean Markus",
         position: 2,
         stack: 323,
-        bet: 200,
+        bet: 239,
         hand: {
           cards: [
             {
@@ -122,8 +122,8 @@ export const TestGame = {
       {
         name: "Tommy Bones",
         position: 3,
-        stack: 323,
-        bet: 100,
+        stack: 1,
+        bet: 1,
         hand: {
           cards: [
             {
@@ -142,7 +142,7 @@ export const TestGame = {
         name: "Langus Yanger",
         position: 4,
         stack: 323,
-        bet: 4500,
+        bet: 1000000000,
 
         hand: {
           cards: [
@@ -180,7 +180,7 @@ export const TestGame = {
         name: "Jimmy Dean",
         position: 6,
         stack: 43020,
-        bet: 4500,
+        bet: 12345,
         hand: {
           cards: [
             {
@@ -196,7 +196,7 @@ export const TestGame = {
       },
       {
         name: "Nicki Lam",
-        stack: 20440,
+        stack: 20499,
         position: 7,
         bet: 450,
         hand: {
@@ -241,21 +241,14 @@ export const CleanGame = {
     min: 0,
     max: 0,
     pot: 0,
-    sizingButtons: [
-     
-    ],
-    actionButtons: [
-     
-    ],
+    sizingButtons: [],
+    actionButtons: [],
   },
   table: {
     spots: 9,
     pot: 0,
-    communityCards: [
-      
-    ],
-    players: [
-    ],
+    communityCards: [],
+    players: [],
   },
 };
 
