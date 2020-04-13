@@ -110,10 +110,7 @@ export class GamePlayService {
             }
         }
 
-        // this logic could probably be placed in its own method
-        // do that later once you figure out a good name for it
-        // also dont overdo it with the functions rofl
-        if (this.gsm.haveAllPlayersActed()) {
+        if (this.gsm.haveAllPlayersActed() || this.gsm.getPlayersInHand().length === 1) {
             this.finishBettingRound();
 
             if (!this.gsm.currentHandHasResult()) {
