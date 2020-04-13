@@ -122,7 +122,7 @@ export const TestGame = {
       {
         name: "Tommy Bones",
         position: 3,
-        stack: 1,
+        stack: 323,
         bet: 1,
         hand: {
           cards: [
@@ -142,7 +142,7 @@ export const TestGame = {
         name: "Langus Yanger",
         position: 4,
         stack: 323,
-        bet: 1000000000,
+        bet: 4500,
 
         hand: {
           cards: [

@@ -10,12 +10,13 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // flexDirection: "column",
+    width: "11vmin",
+    flexWrap: "wrap",
+    flexDirection: "row-reverse",
   },
   svgCont: {
     position: "relative",
-    // height: "4vmin",
-    // width: "3vmin",
+    marginTop: "-3vmin",
   },
 }));
 
@@ -25,7 +26,7 @@ function ChipStack(props) {
 
   function generateAStackOfChips(chipSize, numChips) {
     const chips = [];
-    const chipOffest = 4.5;
+    const chipOffest = 4;
     let yPos = 80;
     for (let i = 0; i < numChips; i++) {
       yPos -= chipOffest;
@@ -37,7 +38,6 @@ function ChipStack(props) {
         viewBox="0 0 100 200"
         width="3vmin"
         height="6vmin"
-        preserveAspectRatio="none"
       >
         {chips}
       </svg>

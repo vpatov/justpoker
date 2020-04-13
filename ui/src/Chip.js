@@ -58,7 +58,7 @@ function Chip(props) {
       className={classes.svgCircle}
       fill={"none"}
       stroke={hue[700]}
-      strokeDasharray="5%, 5%"
+      strokeDasharray="15%, 15%"
       style={{ cy: yPos, cx: xPos }}
     />,
     <circle
