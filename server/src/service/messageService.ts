@@ -6,14 +6,15 @@ import { ValidationService } from './validationService';
 import { StateTransformService } from './stateTransformService';
 import { Service } from 'typedi';
 import { GameState } from '../../../shared/models/gameState';
+import { GamePlayService } from './gamePlayService';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Service()
 export class MessageService {
     constructor(
-        private readonly playerService: PlayerService,
         private readonly gameStateManager: GameStateManager,
         private readonly validationService: ValidationService,
-        private readonly stateTransformService: StateTransformService,
+        private readonly gamePlayService: GamePlayService,
     ) {}
 
     processMessage(message: IncomingClientWsMessage, clientUUID: string) {
@@ -66,6 +67,14 @@ export class MessageService {
                 break;
             }
 
+            // TODO formalize debug messages system
+            // TODO turn off debug messages in prod obv
+            case ActionType.SETCHIPSDEBUG: {
+                this.gameStateManager.updatePlayer(this.gameStateManager.getPlayerByClientUUID(clientUUID).uuid, {
+                    chips: message.debugMessage.chipAmt,
+                });
+            }
+
             case ActionType.PINGSTATE: {
                 break;
             }
@@ -74,30 +83,25 @@ export class MessageService {
                 throw Error(`Unrecognized action type: ${message.actionType}`);
             }
         }
-        // TODO should messageService subscribe to gameState update from timer?
 
-        this.gameStateManager.startHandIfReady();
+        this.gamePlayService.startHandIfReady();
     }
-
-    /*
-         Idea for reducing gameStateManager bloat:
-         The other services could follow the same pattern as the validationService,
-         and have the gameStateManager as a dependency.
-         BettingActionService could
-    */
 
     // Preconditions: at least two players are sitting down.
     processStartGameMessage(clientUUID: string): void {
         this.validationService.validateStartGameRequest(clientUUID);
-        this.gameStateManager.startGame();
+        this.gamePlayService.startGame();
     }
 
     // Preconditions: the game is in progress.
     processStopGameMessage(clientUUID: string): void {
         this.validationService.validateStopGameRequest(clientUUID);
-        this.gameStateManager.stopGame();
+        this.gamePlayService.stopGame();
     }
 
+    // TODO should sitdown, standup, jointable, chat, add chips, be put into their own service?
+    // something like room service? or administrative service? how to name the aspects of gameplay
+    // that are not directly related to gameplay (sitting down, buying chips, talking)
     processSitDownMessage(clientUUID: string, request: SitDownRequest): void {
         this.validationService.validateSitDownRequest(clientUUID, request);
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
@@ -126,21 +130,21 @@ export class MessageService {
 
     processCheckMessage(clientUUID: string): void {
         this.validationService.validateCheckAction(clientUUID);
-        this.gameStateManager.performBettingRoundAction(CHECK_ACTION);
+        this.gamePlayService.performBettingRoundAction(CHECK_ACTION);
     }
 
     processCallMessage(clientUUID: string): void {
         this.validationService.validateCallAction(clientUUID);
-        this.gameStateManager.performBettingRoundAction(CALL_ACTION);
+        this.gamePlayService.performBettingRoundAction(CALL_ACTION);
     }
 
     processBetMessage(clientUUID: string, action: BettingRoundAction): void {
         this.validationService.validateBetAction(clientUUID, action);
-        this.gameStateManager.performBettingRoundAction(action);
+        this.gamePlayService.performBettingRoundAction(action);
     }
 
     processFoldMessage(clientUUID: string): void {
         this.validationService.validateFoldAction(clientUUID);
-        this.gameStateManager.performBettingRoundAction(FOLD_ACTION);
+        this.gamePlayService.performBettingRoundAction(FOLD_ACTION);
     }
 }

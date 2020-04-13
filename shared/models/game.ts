@@ -19,6 +19,7 @@ export const enum BettingRoundActionType {
   FOLD = "FOLD",
   WAITING_TO_ACT = "WAITING_TO_ACT",
   NOT_IN_HAND = "NOT_IN_HAND",
+  ALL_IN = "ALL_IN",
 }
 
 export declare interface GameParameters {
