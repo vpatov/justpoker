@@ -7,6 +7,10 @@ import { BettingRoundAction } from "../models/game";
 
 // }
 
+// export declare interface UserAction {
+// }
+// export declare interface BetAction {
+// }
 export const enum ActionType {
   STARTGAME = "STARTGAME",
   STOPGAME = "STOPGAME",
@@ -21,6 +25,7 @@ export const enum ActionType {
   FOLD = "FOLD",
   CALL = "CALL",
   CHAT = "CHAT",
+  SETCHIPSDEBUG = "SETCHIPSDEBUG",
 }
 
 export declare interface SitDownRequest {
@@ -42,6 +47,7 @@ export declare interface IncomingClientWsMessage {
   joinTableRequest: JoinTableRequest;
   joinTableAndSitDownRequest: SitDownRequest & JoinTableRequest;
   bettingRoundAction: BettingRoundAction;
+  debugMessage: any;
 }
 
 /*

@@ -91,6 +91,7 @@ class Server {
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
+            continue;
             /* Debug Logging */
             const playerName = client.playerUUID
                 ? this.gameStateManager.getPlayer(client.playerUUID).name

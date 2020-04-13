@@ -7,6 +7,7 @@ import { StateTransformService } from './stateTransformService';
 import { Service } from 'typedi';
 import { GameState } from '../../../shared/models/gameState';
 import { GamePlayService } from './gamePlayService';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Service()
 export class MessageService {
@@ -64,6 +65,14 @@ export class MessageService {
             case ActionType.CALL: {
                 this.processCallMessage(clientUUID);
                 break;
+            }
+
+            // TODO formalize debug messages system
+            // TODO turn off debug messages in prod obv
+            case ActionType.SETCHIPSDEBUG: {
+                this.gameStateManager.updatePlayer(this.gameStateManager.getPlayerByClientUUID(clientUUID).uuid, {
+                    chips: message.debugMessage.chipAmt,
+                });
             }
 
             case ActionType.PINGSTATE: {

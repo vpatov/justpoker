@@ -64,7 +64,7 @@ export const ALL_ACTION_BUTTONS = [
   CHECK_BUTTON,
   CALL_BUTTON,
   BET_BUTTON,
-  RAISE_BUTTON,
+  // RAISE_BUTTON,
 ];
 
 /* Common bet sizes */

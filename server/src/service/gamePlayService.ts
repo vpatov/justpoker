@@ -4,6 +4,7 @@ import { BettingRoundAction, BettingRoundActionType, BettingRoundStage } from '.
 import { strict as assert } from 'assert';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
+import { Pot } from '../../../shared/models/gameState';
 
 @Service()
 export class GamePlayService {
@@ -47,12 +48,25 @@ export class GamePlayService {
         // TODO timer - this seems like it would a good place to handle the timer
 
         const stage = this.gsm.getBettingRoundStage();
+        const playersEligibleToActNext = this.gsm.getPlayersEligibleToActNext();
 
-        this.gsm.updatePlayers((player) =>
-            this.gsm.isPlayerInHand(player.uuid)
-                ? { lastActionType: BettingRoundActionType.WAITING_TO_ACT, betAmount: 0 }
-                : {},
-        );
+        /**
+         * The betting round is in all-in run out if either everyone has gone all in,
+         * or there is one person who is not all in, but they have called the all-in.
+         */
+        debugger;
+        const isAllInRunOut = playersEligibleToActNext.length === 1;
+
+        if (isAllInRunOut) {
+            const lonePlayerUUID = playersEligibleToActNext[0];
+            this.gsm.setPlayerLastActionType(lonePlayerUUID, BettingRoundActionType.CALL);
+        } else {
+            this.gsm.updatePlayers((player) =>
+                this.gsm.isPlayerEligibleToActNext(player.uuid)
+                    ? { lastActionType: BettingRoundActionType.WAITING_TO_ACT, betAmount: 0 }
+                    : {},
+            );
+        }
 
         this.gsm.updateGameState({ minRaiseDiff: this.gsm.getBB(), previousRaise: 0, partialAllInLeftOver: 0 });
 
@@ -80,9 +94,14 @@ export class GamePlayService {
             }
             case BettingRoundStage.SHOWDOWN: {
                 this.showDown();
-                this.finishHand();
+                this.triggerFinishHand();
                 break;
             }
+        }
+
+        // TODO timer if everyone is all in
+        if (this.gsm.isBettingRoundOver()) {
+            this.triggerFinishBettingRound();
         }
     }
 
@@ -110,13 +129,8 @@ export class GamePlayService {
             }
         }
 
-        if (this.gsm.haveAllPlayersActed() || this.gsm.getPlayersInHand().length === 1) {
-            this.finishBettingRound();
-
-            if (!this.gsm.currentHandHasResult()) {
-                this.gsm.nextBettingRound();
-                this.initializeBettingRound();
-            }
+        if (this.gsm.isBettingRoundOver()) {
+            this.triggerFinishBettingRound();
         } else {
             this.gsm.setNextPlayerToAct();
         }
@@ -131,26 +145,69 @@ export class GamePlayService {
 
     fold() {
         this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.FOLD);
+
+        // TODO only if player is facing bet
     }
 
     bet(action: BettingRoundAction) {
         const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
-        this.gsm.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.BET);
         this.gsm.setPlayerBetAmount(currentPlayerToAct, action.amount);
+        const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
 
-        this.gsm.updateGameState({
-            minRaiseDiff: action.amount - this.gsm.getPreviousRaise(),
-            previousRaise: action.amount,
-            partialAllInLeftOver: 0,
-        });
+        this.gsm.setPlayerLastActionType(
+            currentPlayerToAct,
+            isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.BET,
+        );
+
+        /* 
+           Also ensure that other players cannot reraise after this.
+           This will be done by 
+           1) changing buttons available to UI
+           2) validation in the validationservice
+           Determine boolean expression that represents whether a player can raise.
+           playerCanRaise = facingRaise || waitingToAct
+           facingRaise = lastAmountPutInPot > yourLastBet + minRaiseDiff ???
+        */
+
+        // actualBetAmount should never differ from action.amount.
+        // TODO remove assertion
+        const actualBetAmount = this.gsm.getPlayerBetAmount(currentPlayerToAct);
+        assert(actualBetAmount === action.amount);
+
+        const previousRaise = this.gsm.getPreviousRaise();
+        const minRaiseDiff = action.amount - previousRaise;
+
+        // if player is all in, and is not reraising, it is considered a call. However, since
+        // they are putting more chips in the pot, it will still go through this code path.
+        // In thise case, we do not update the minRaiseDiff or previousRaise, but only the
+        // partialAllInLeftOver.
+        if (actualBetAmount > previousRaise && actualBetAmount < previousRaise + minRaiseDiff) {
+            // TODO remove assertion
+            assert(isPlayerAllIn);
+            const partialAllInLeftOver = actualBetAmount - previousRaise;
+            this.gsm.updateGameState({
+                partialAllInLeftOver,
+            });
+        } else {
+            this.gsm.updateGameState({
+                minRaiseDiff: action.amount - previousRaise,
+                previousRaise: action.amount,
+            });
+        }
     }
 
     callBet(action: BettingRoundAction) {
         const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
-        this.gsm.setPlayerLastActionType(currentPlayerToAct, BettingRoundActionType.CALL);
 
-        // TODO verify if this is ever incorrect
+        // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
+        // TODO find the cleanest way to do this. Should that logic be handled in setPlayerBetAmount, or here?
         this.gsm.setPlayerBetAmount(currentPlayerToAct, this.gsm.getPreviousRaise());
+
+        const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
+        this.gsm.setPlayerLastActionType(
+            currentPlayerToAct,
+            isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
+        );
     }
 
     initializePreflop() {
@@ -261,12 +318,11 @@ export class GamePlayService {
         this.gsm.updatePlayers((player) => ({ winner: winningPlayers.includes(player.uuid) }));
     }
 
-    finishHand() {
-        console.log('\nfinishHand\n');
-        this.timerManager.setTimer(this, this.finishRound, 2000);
+    triggerFinishHand() {
+        this.timerManager.setTimer(this, this.finishHand, 4000);
     }
 
-    finishRound() {
+    finishHand() {
         this.givePotToWinner();
         this.gsm.clearBettingRoundStage();
         this.startHandIfReady();
@@ -283,17 +339,45 @@ export class GamePlayService {
     // TODO method doesnt account for allins properly.
     // TODO Redesign pot structure to make it simple.
     // TODO create elegant methods for pot control in gameStateManager
+
+    // 1) Give uncalled bets back to bettor
+    // (hero raise to 100, villain1 goes all in for 20, everyone else folds, hero gets back 80)
+    // 2) Those who are going all-in are only eligible to win what they put in.
+    // you are eligible to win less than you put in if: your bet isnt fully matched by others
+    //
     placeBetsInPot() {
         // put bets in pot
+
+        let playerBets: [number, string][] = Object.entries(this.gsm.getPlayers()).map(([uuid, player]) => [
+            player.betAmount,
+            uuid,
+        ]);
+
+        const pots = [];
+
+        while (playerBets.length > 0) {
+            const minimumBet: number = playerBets.reduce(
+                (prev: number, [betAmount, uuid]) => (betAmount < prev ? betAmount : prev),
+                playerBets[0][0],
+            );
+
+            const pot: Pot = {
+                value: minimumBet * playerBets.length,
+                contestors: playerBets.map(([betAmount, uuid]) => uuid),
+            };
+
+            pots.push(pot);
+
+            // TODO why is the cast necessary? compiler errors without it
+            playerBets = playerBets
+                .map(([betAmount, uuid]) => [betAmount - minimumBet, uuid] as [number, string])
+                .filter(([betAmount, uuid]) => betAmount > 0);
+        }
+
         this.gsm.updateGameState({
-            pots: [
-                ...this.gsm.getGameState().pots,
-                {
-                    value: Object.values(this.gsm.getPlayers()).reduce((sum, player) => player.betAmount + sum, 0),
-                    contestors: [...this.gsm.getPlayersInHand()],
-                },
-            ],
+            pots: [...this.gsm.getGameState().pots, ...pots],
         });
+
         // update players chip counts
         this.gsm.updatePlayers((player) => ({ chips: player.chips - player.betAmount, betAmount: 0 }));
     }
@@ -303,7 +387,7 @@ export class GamePlayService {
         if (playersInHand.length === 1) {
             const winnerUUID = playersInHand[0];
             this.gsm.updatePlayer(winnerUUID, { winner: true });
-            this.finishHand();
+            this.triggerFinishHand();
         }
         // check for victory condition:
         // either everyone folded but one person,
@@ -311,9 +395,18 @@ export class GamePlayService {
         // if someone wins, add the hand result to the gameState (UI shows victory)
     }
 
+    triggerFinishBettingRound() {
+        this.timerManager.setTimer(this, this.finishBettingRound, 3000);
+    }
+
     finishBettingRound() {
         this.placeBetsInPot();
         this.checkForVictoryCondition();
         this.gsm.clearCurrentPlayerToAct();
+
+        if (!this.gsm.currentHandHasResult()) {
+            this.gsm.nextBettingRound();
+            this.initializeBettingRound();
+        }
     }
 }

@@ -76,15 +76,26 @@ function Controller(props) {
   } = props.controller;
 
   const [betAmt, setBetAmt] = useState(0);
+  const [chipAmt, setChipAmt] = useState(0);
 
   const changeBetAmount = (newAmt) => {
     setBetAmt(Math.min(Math.floor(newAmt), max));
   };
 
+  function onClickSetChipButton(){
+    server.send({
+      actionType: "SETCHIPSDEBUG",
+      debugMessage: {chipAmt: chipAmt}
+    })
+  }
+
   function onClickActionButton(action) {
     server.send({
       actionType: action,
-      bettingRoundAction: { type: action, amount: Number(betAmt) },
+      bettingRoundAction: { 
+        type: action, 
+        amount: action === "BET" ? Number(betAmt) : 0
+      },
     });
   }
 
@@ -122,6 +133,20 @@ function Controller(props) {
               </Button>
             ))}
           </div>
+        </div>
+        <div>
+        <TextField
+            onChange={(event) => setChipAmt(event.target.value)}
+            value={chipAmt}
+            type="number"
+            variant="outlined"
+          />
+          <Button
+            onClick={() => onClickSetChipButton()}
+            variant="outlined"
+            >
+              Set Chips (DEBUG)
+            </Button> 
         </div>
       </div>
     </div>
