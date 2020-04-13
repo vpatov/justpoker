@@ -10,14 +10,12 @@ import request from 'request';
 import cookie from 'cookie';
 
 import { AddressInfo } from 'net';
-import { ActionType } from '../../../shared/models/wsaction';
 import { MessageService } from '../service/messageService';
-import { NewGameForm } from '../../../shared/models/table';
 import { GameState } from '../../../shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
-import { DeckService } from '../service/deckService';
 import { generateUUID, printObj } from '../../../shared/util/util';
+import { TimerManager } from '../service/timerManager';
 
 function logGameState(gameState: GameState) {
     console.log('\n\nServer game state:\n');
@@ -54,7 +52,7 @@ class Server {
         private messageService: MessageService,
         private gameStateManager: GameStateManager,
         private stateTransformService: StateTransformService,
-        private deckService: DeckService,
+        private timerManager: TimerManager,
     ) {}
 
     private initRoutes(): void {
@@ -65,11 +63,6 @@ class Server {
         });
 
         router.post('/createGame', (req, res) => {
-            // if (this.tableInitialized && false) {
-            //     res.send("Table already initialized. Can only make one " +
-            //         "table per server instance (restriction is temporary," +
-            //         " put in place just for MVP/dev)");
-            // }
             const newGameForm = {
                 smallBlind: req.body.smallBlind,
                 bigBlind: req.body.bigBlind,
@@ -98,10 +91,11 @@ class Server {
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
+            continue;
             /* Debug Logging */
             const playerName = client.playerUUID
                 ? this.gameStateManager.getPlayer(client.playerUUID).name
-                : 'err_unnamed';
+                : 'Anonymous Client';
             console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);
             console.log(util.inspect(res, false, null, true));
             /* -------------- */
@@ -115,7 +109,7 @@ class Server {
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ server: this.server });
 
-        this.gameStateManager.observeUpdates().subscribe(() => {
+        this.timerManager.observeUpdates().subscribe(() => {
             console.log('from observeUpdates');
             this.sendUpdatesToClients();
         });
@@ -141,6 +135,8 @@ class Server {
             }
             console.log('clientID: ', clientID);
 
+            // TODO server shouldnt be communicating with the gameStateManager, but with some
+            // other intermediary that will handle WS robustness
             this.gameStateManager.initConnectedClient(clientID, ws);
 
             ws.send(

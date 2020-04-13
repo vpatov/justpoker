@@ -27,17 +27,4 @@ export class DeckService {
     drawCard(deck: Deck) {
         return deck.cards.pop();
     }
-
-    computeBestHandFromCards(cards: Card[]) {
-        const strCards = cards.map((card) => `${card.rank}${SUIT_ABBREVIATIONS[card.suit]}`);
-        return this.computeBestHandFromStrCards(strCards);
-    }
-
-    computeBestHandFromStrCards(cards: string[]) {
-        return HandSolver.solve(cards);
-    }
-
-    getWinningHands(hands: any[]) {
-        return HandSolver.winners(hands);
-    }
 }

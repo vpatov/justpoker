@@ -200,18 +200,27 @@ export class ValidationService {
             );
         }
 
-        // TODO implement this after you implement basic betting, so that you
-        // know how betting affects the state
+        // TODO
+        // if (!playerIsFacingRaise && !playerHasntActedYet){
+        //     cant bet
+        // }
     }
 
     // Preconditions
     /*
         Player can call if they are not already all-in.
         Player can call if they havent folded
+        Player can call if they are facing a bet.
     */
     validateCallAction(clientUUID: string) {
         // this should be all we need, because if a player has folded, it will never be their turn to act,
         // and if they are all in, it shouldn't be their turn to act either.
         this.ensureCorrectPlayerToAct(clientUUID);
+        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const errorPrefix = `Cannot Call\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
+
+        if (!this.gameStateManager.isPlayerFacingBet(player.uuid)) {
+            throw Error(`${errorPrefix} Player is not facing a bet.`);
+        }
     }
 }
