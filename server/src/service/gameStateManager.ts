@@ -17,6 +17,7 @@ import { Player } from '../../../shared/models/player';
 import { PlayerService } from './playerService';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../shared/util/util';
+import { ActionType } from '../../../shared/models/wsaction';
 
 @Service()
 export class GameStateManager {
@@ -139,6 +140,10 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerInHand(playerUUID));
     }
 
+    getPlayersEligibleToActNext() {
+        return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
+    }
+
     isPlayerInGame(playerUUID: string) {
         return Object.entries(this.gameState.players).some(([uuid, player]) => player.uuid === playerUUID);
     }
@@ -149,6 +154,26 @@ export class GameStateManager {
 
     isPlayerInHand(playerUUID: string) {
         return !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID);
+    }
+
+    isPlayerFacingBet(playerUUID: string) {
+        return this.getPreviousRaise() + this.getPartialAllInLeftOver() > this.getPlayerBetAmount(playerUUID);
+    }
+
+    // TODO
+    isPlayerFacingRaise(playerUUID: string) {
+        return false;
+    }
+
+    isPlayerEligibleToActNext(playerUUID: string) {
+        return (
+            !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID) && !this.isPlayerAllIn(playerUUID)
+        );
+    }
+
+    // incorrectly returning true if someone goes all in preflop and big blind doesnt have chance to fold/call
+    isBettingRoundOver() {
+        return this.haveAllPlayersActed();
     }
 
     hasPlayerFolded(playerUUID: string) {
@@ -176,7 +201,7 @@ export class GameStateManager {
         // find the next player that is in the hand
         let nextIndex = (currentIndex + 1) % seats.length;
         let [_, nextPlayerUUID] = seats[nextIndex];
-        while (!this.isPlayerInHand(nextPlayerUUID)) {
+        while (!this.isPlayerEligibleToActNext(nextPlayerUUID)) {
             nextIndex = (nextIndex + 1) % seats.length;
             [_, nextPlayerUUID] = seats[nextIndex];
         }
@@ -317,8 +342,17 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { lastActionType });
     }
 
+    getChips(playerUUID: string) {
+        return this.getPlayer(playerUUID).chips;
+    }
+
+    getPlayerBetAmount(playerUUID: string) {
+        return this.getPlayer(playerUUID).betAmount;
+    }
+
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
-        this.updatePlayer(playerUUID, { betAmount });
+        const chips = this.getPlayer(playerUUID).chips;
+        this.updatePlayer(playerUUID, { betAmount: betAmount > chips ? chips : betAmount });
     }
 
     clearStateOfRoundInfo() {
@@ -368,9 +402,13 @@ export class GameStateManager {
         }, 0);
     }
 
-    // TODO implement
-    isPlayerAllIn(playerUUID: string) {
+    isPlayerAllIn(playerUUID: string): boolean {
         const player = this.getPlayer(playerUUID);
+        return player.lastActionType === BettingRoundActionType.ALL_IN;
+    }
+
+    hasPlayerPutAllChipsInThePot(playerUUID: string): boolean {
+        return this.getChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
     }
 
     haveAllPlayersActed() {
