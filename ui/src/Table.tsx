@@ -3,11 +3,8 @@ import Player from "./Player";
 import OpenSeat from "./OpenSeat";
 import Bet from "./Bet";
 import CommunityCards from "./CommunityCards";
-import { debounce } from "./utils";
 
 import { makeStyles } from "@material-ui/core/styles";
-import green from "@material-ui/core/colors/green";
-import blue from "@material-ui/core/colors/blue";
 import Typography from "@material-ui/core/Typography";
 
 const tableHeightPercent = 65;
@@ -36,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    ...theme.TABLE,
+    ...theme.custom.TABLE,
     // transition: "transform 2s linear 0s",
     // "&:hover": {
     //   transform: "rotateX(720deg)",
@@ -65,17 +62,18 @@ function Table(props) {
     height: window.innerHeight,
     width: window.innerWidth,
   });
+
   useEffect(() => {
-    const debouncedHandleResize = debounce(function handleResize() {
+    const debouncedHandleResize = function handleResize() {
       setDimensions({
         height: window.innerHeight,
         width: window.innerWidth,
       });
-    }, 350);
+    };
 
     window.addEventListener("resize", debouncedHandleResize);
 
-    return (_) => {
+    return () => {
       window.removeEventListener("resize", debouncedHandleResize);
     };
   });
@@ -84,7 +82,7 @@ function Table(props) {
   const betPosScale = 0.26;
 
   function createSpotsAtTable() {
-    const ans = [];
+    const ans = [] as any;
 
     for (let index = 0; index < spots; index++) {
       const vmin = Math.min(dimensions.width, dimensions.height);

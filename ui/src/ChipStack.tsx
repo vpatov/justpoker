@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import get from "lodash/get";
 import classnames from "classnames";
 import Chip from "./Chip";
@@ -10,26 +10,28 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // flexDirection: "column",
+    width: "11vmin",
+    flexWrap: "wrap",
+    flexDirection: "row-reverse",
   },
   svgCont: {
     position: "relative",
-    // height: "4vmin",
-    // width: "3vmin",
+    marginTop: "-3vmin",
   },
 }));
 
 function ChipStack(props) {
   const classes = useStyles();
-  const { className, amount } = props;
+  const { amount } = props;
 
-  function generateAStackOfChips(chipSize, numChips) {
-    const chips = [];
-    const chipOffest = 4.5;
+  function generateAStackOfChips(chipSize, numChips): JSX.Element {
+    const chips = [] as any;
+    const chipOffest = 4;
     let yPos = 80;
     for (let i = 0; i < numChips; i++) {
       yPos -= chipOffest;
-      chips.push(<Chip amount={chipSize} yPos={`${yPos}%`} />);
+      const chipComp = <Chip amount={chipSize} yPos={`${yPos}%`} />;
+      chips.push(chipComp);
     }
     return (
       <svg
@@ -37,15 +39,14 @@ function ChipStack(props) {
         viewBox="0 0 100 200"
         width="3vmin"
         height="6vmin"
-        preserveAspectRatio="none"
       >
-        {chips}
+        <Fragment> {chips}</Fragment>
       </svg>
     );
   }
 
   function generatesChipsStacksFromAmount(amount) {
-    const chipsStacks = [];
+    const chipsStacks = [] as any;
     let remaining = amount;
 
     for (let j = 0; remaining > 0; j++) {

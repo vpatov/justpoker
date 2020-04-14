@@ -36,9 +36,9 @@ function MakeGame(props) {
   const { history } = props;
 
   const [name, setName] = useState("DefaultPlayer");
-  const [bigBlind, setBigBlind] = useState(2);
-  const [smallBlind, setSmallBlind] = useState(1);
-  const [buyin, setBuyin] = useState(200);
+  const [bigBlind, setBigBlind] = useState("2");
+  const [smallBlind, setSmallBlind] = useState("1");
+  const [buyin, setBuyin] = useState("200");
   const [password, setPassword] = useState("");
   const [gameType, setGameType] = useState("NLHOLDEM");
 
@@ -88,7 +88,7 @@ function MakeGame(props) {
         variant="outlined"
         className={classes.field}
         value={gameType}
-        onChange={(event) => setGameType(event.target.value)}
+        onChange={(event) => setGameType(event.target.value as string)}
       >
         <MenuItem value={"NLHOLDEM"}>No Limit Hold'em</MenuItem>
       </Select>

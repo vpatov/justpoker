@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   amount: {
     color: "white",
     fontWeight: "bold",
-    fontSize: "1.6vmin",
+    fontSize: "2vmin",
   },
 }));
 
