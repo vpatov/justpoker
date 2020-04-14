@@ -2,27 +2,29 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "./Table";
 import Controller from "./Controller";
-// import DarkMode from "./DarkMode";
-
+import { UiGameState } from "../../shared/models/uiState";
 const useStyles = makeStyles((theme) => ({
-    root: {
-        height: "100vh",
-        width: "100vw",
-        ...theme.custom.BACKGROUND,
-    },
+  root: {
+    height: "100vh",
+    width: "100vw",
+    ...theme.custom.BACKGROUND,
+  },
 }));
 
-function Game(props) {
-    const classes = useStyles();
-    const { table, controller, heroInGame } = props.game;
+export interface GameProps {
+  game: UiGameState;
+}
 
-    console.log(props);
-    return (
-        <div className={classes.root}>
-            <Table table={table} heroInGame={heroInGame} />
-            <Controller controller={controller} />
-        </div>
-    );
+function Game(props: GameProps) {
+  const classes = useStyles();
+  const { table, controller } = props.game;
+
+  return (
+    <div className={classes.root}>
+      <Table table={table} />
+      <Controller controller={controller} />
+    </div>
+  );
 }
 
 export default Game;
