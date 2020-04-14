@@ -6,6 +6,7 @@ server/dist
 shared/node_modules
 
 ui/node_modules
+ui/src/shared/node_modules
 ui/.pnp
 ui/.pnp.js
 
