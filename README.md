@@ -1,12 +1,11 @@
-JustPoker
+# JustPoker
 
-ui and server are separate apps with separate npm builds/configs
+##### Source code for the famous JustPoker website, where you can play private poker games with your friends
 
-ui - react frontend 
 
-server - node + TS + express server 
+### Stacks:
 
-models - TS interfaces shared by ui + server
+- **UI** React + TS 
 
-util - helper functions
+- **Server** Node + TS + Express + Typedi
 
