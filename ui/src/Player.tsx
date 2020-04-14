@@ -36,8 +36,8 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
       height: "100%",
       borderRadius: "50%",
-      boxShadow: `0px 0px 10px 20px rgba(5,255,5,1)`,
-      backgroundColor: `rgba(5,255,5,1)`,
+      boxShadow: `0px 0px 10px 20px rgba(200,200,235,0.8)`,
+      backgroundColor: `rgba(200,200,235,0.8)`,
       "-webkit-animation": "$scale 1s infinite ease-in-out",
       animation: "$scale 1s infinite ease-in-out",
     },
@@ -93,6 +93,8 @@ function Player(props) {
     hero,
     winner,
     button,
+    hidden,
+    folded,
     handLabel,
   } = props.player;
 
@@ -104,7 +106,7 @@ function Player(props) {
       })}
       style={style}
     >
-      <Hand hand={hand} hidden={!hero} />
+      <Hand hand={hand} hidden={hidden} folded={folded} />
       <PlayerStack name={name} stack={stack} button={button} />
 
       {handLabel ? (

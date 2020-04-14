@@ -23,14 +23,12 @@ function logGameState(gameState: GameState) {
         ...gameState,
         table: {
             uuid: gameState.table.uuid,
-            activeConnections: [
-                ...Object.entries(gameState.table.activeConnections).map(([uuid, client]) => [
-                    {
-                        ...client,
-                        ws: 'ommittedWebSocket',
-                    },
-                ]),
-            ],
+            activeConnections: [...gameState.table.activeConnections.entries()].map(([uuid, client]) => [
+                {
+                    ...client,
+                    ws: 'ommittedWebSocket',
+                },
+            ]),
         },
         // gameParameters: undefined as string,
         // board: undefined as string,
@@ -50,7 +48,7 @@ class Server {
 
     constructor(
         private messageService: MessageService,
-        private gameStateManager: GameStateManager,
+        private gsm: GameStateManager,
         private stateTransformService: StateTransformService,
         private timerManager: TimerManager,
     ) {}
@@ -69,7 +67,7 @@ class Server {
                 gameType: req.body.gameType,
                 password: req.body.password,
             };
-            const tableId = this.gameStateManager.initGame(newGameForm);
+            const tableId = this.gsm.initGame(newGameForm);
             this.tableInitialized = true;
             console.log(tableId);
             res.send(JSON.stringify({ tableId: tableId }));
@@ -85,17 +83,18 @@ class Server {
         this.app.use('/', router);
     }
 
-    sendUpdatesToClients() {
-        for (const client of this.gameStateManager.getConnectedClients()) {
+    sendUpdatesToClients(gameState: GameState) {
+        if (!gameState.isStateReady) {
+            return;
+        }
+        for (const client of this.gsm.getConnectedClients()) {
             const res = this.stateTransformService.getUIState(client.uuid);
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
             continue;
             /* Debug Logging */
-            const playerName = client.playerUUID
-                ? this.gameStateManager.getPlayer(client.playerUUID).name
-                : 'Anonymous Client';
+            const playerName = client.playerUUID ? this.gsm.getPlayer(client.playerUUID).name : 'Anonymous Client';
             console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);
             console.log(util.inspect(res, false, null, true));
             /* -------------- */
@@ -109,9 +108,13 @@ class Server {
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ server: this.server });
 
-        this.timerManager.observeUpdates().subscribe(() => {
-            console.log('from observeUpdates');
-            this.sendUpdatesToClients();
+        this.timerManager.observeUpdates().subscribe((gameState) => {
+            debugger;
+            this.sendUpdatesToClients(gameState);
+            /* Debug Logging */
+            logGameState(gameState);
+            // logGameState(this.gameStateManager.getGameState());
+            /* -------------- */
         });
 
         this.wss.on('connection', (ws: WebSocket, req) => {
@@ -137,7 +140,7 @@ class Server {
 
             // TODO server shouldnt be communicating with the gameStateManager, but with some
             // other intermediary that will handle WS robustness
-            this.gameStateManager.initConnectedClient(clientID, ws);
+            this.gsm.initConnectedClient(clientID, ws);
 
             ws.send(
                 JSON.stringify({
@@ -155,15 +158,15 @@ class Server {
                         const action = JSON.parse(data);
                         this.messageService.processMessage(action, clientID);
 
-                        this.sendUpdatesToClients();
+                        this.sendUpdatesToClients(this.gsm.getGameState());
 
                         /* Debug Logging */
-                        logGameState(this.gameStateManager.getGameState());
+                        logGameState(this.gsm.getGameState());
                         /* -------------- */
                     } catch (e) {
                         /* Debug Logging */
                         console.log(e);
-                        logGameState(this.gameStateManager.getGameState());
+                        logGameState(this.gsm.getGameState());
                         /* -------------- */
                     }
                 } else {

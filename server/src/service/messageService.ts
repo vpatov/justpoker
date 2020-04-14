@@ -71,7 +71,7 @@ export class MessageService {
             // TODO turn off debug messages in prod obv
             case ActionType.SETCHIPSDEBUG: {
                 this.gameStateManager.updatePlayer(this.gameStateManager.getPlayerByClientUUID(clientUUID).uuid, {
-                    chips: message.debugMessage.chipAmt,
+                    chips: Number(message.debugMessage.chipAmt),
                 });
             }
 

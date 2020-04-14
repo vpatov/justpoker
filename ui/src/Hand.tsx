@@ -13,13 +13,13 @@ const useStyles = makeStyles((theme) => ({
 
 function Hand(props) {
   const classes = useStyles();
-  const { hidden } = props;
+  const { hidden, folded } = props;
   const { cards } = props.hand;
 
   return (
     <div className={classes.root}>
       {cards.map((c) => (
-        <Card suit={c.suit} rank={c.rank} hidden={hidden} size="small" />
+        <Card suit={c.suit} rank={c.rank} hidden={hidden} folded={folded}size="small" />
       ))}
     </div>
   );
