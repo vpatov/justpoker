@@ -38,9 +38,9 @@ export const CUSTOM_THEME = {
         " radial-gradient(circle, rgba(50,112,173,1) 0%, rgba(14,47,83,1) 100%)",
     },
     TABLE: {
-      border: `14px solid rgba(255,255,255,0.7)`,
-      boxShadow: `0 0 0 4px black, 0 4px 4px 4px black`,
-      backgroundColor: "rgba(0,0,0,0.3)",
+      border: `8px solid rgba(255,255,255,0.7)`,
+      boxShadow: `0 0 0 4px black, 0 10px 20px 4px black`,
+      backgroundColor: "rgba(0,0,0,0.35)",
       // background: `radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);`,
       // backgroundSize: "100%",
       // backgroundPosition: "50% 50%",
