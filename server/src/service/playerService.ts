@@ -21,6 +21,7 @@ export class PlayerService {
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
             betAmount: 0,
             winner: false,
+            cardsAreHidden: true,
         };
     }
 

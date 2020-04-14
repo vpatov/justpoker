@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
     hidden: {
         ...theme.custom.HIDDEN,
     },
+    folded: {
+        ...theme.custom.FOLDED,
+    },
     side: {
         position: "relative",
         overflowWrap: "break-word",
@@ -67,14 +70,14 @@ const useStyles = makeStyles((theme) => ({
 
 function Card(props) {
     const classes = useStyles();
-    const { suit, rank, size, style, hidden, className } = props;
+    const { suit, rank, size, style, hidden, folded, className } = props;
 
     if (hidden) {
         return (
             <div
                 className={classnames(
                     classes.root,
-                    classes.hidden,
+                    folded ? classes.folded : classes.hidden,
                     classes[size],
                     className
                 )}

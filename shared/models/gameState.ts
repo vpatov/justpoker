@@ -11,6 +11,9 @@ import { Table } from "./table";
 import { Card, Deck } from "./cards";
 
 export declare interface GameState {
+  /** Server queries this field to determine if it should send the state or not. */
+  isStateReady: boolean;
+
   /** Sensitive field. */
   players: Readonly<{ [key: string]: Player }>;
 
@@ -56,6 +59,7 @@ export declare interface Pot {
 }
 
 export const cleanGameState: GameState = {
+  isStateReady: true,
   players: {},
   board: [],
   gameParameters: {
