@@ -1,5 +1,6 @@
 import { Card, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
+import { genRandomInt } from "../util/util";
 
 export declare interface UiGameState {
   controller: Controller;
@@ -107,7 +108,7 @@ export const TestGame: UiGameState = {
         position: 0,
         stack: 5500,
         toAct: true,
-        bet: 100,
+        bet: genRandomInt(0, 10),
         hand: {
           cards: [genRandomCard(), genRandomCard()],
         },
@@ -116,7 +117,7 @@ export const TestGame: UiGameState = {
         name: "Marty Shakus",
         position: 1,
         stack: 425323,
-        bet: 999900,
+        bet: genRandomInt(0, 100),
         handLabel: "Four of a Kind",
         hand: {
           cards: [genRandomCard(), genRandomCard()],
@@ -126,7 +127,7 @@ export const TestGame: UiGameState = {
         name: "Dean Markus",
         position: 2,
         stack: 323,
-        bet: 239,
+        bet: genRandomInt(0, 1000),
         handLabel: "Straight Flush",
         hand: {
           cards: [genRandomCard(), genRandomCard()],
@@ -136,7 +137,7 @@ export const TestGame: UiGameState = {
         name: "Tommy Bones",
         position: 3,
         stack: 323,
-        bet: 1,
+        bet: genRandomInt(0, 10000),
         hand: {
           cards: [genRandomCard(), genRandomCard()],
         },
@@ -146,7 +147,7 @@ export const TestGame: UiGameState = {
         name: "Langus Yanger",
         position: 4,
         stack: 323,
-        bet: 4500,
+        bet: genRandomInt(0, 100000),
         handLabel: "Top Two",
         hand: {
           cards: [genRandomCard(), genRandomCard()],
@@ -158,7 +159,7 @@ export const TestGame: UiGameState = {
         name: "Jimmy Dean",
         position: 6,
         stack: 43020,
-        bet: 12345,
+        bet: genRandomInt(0, 1000000),
         handLabel: "Three Queens",
         hand: {
           cards: [genRandomCard(), genRandomCard()],
@@ -168,7 +169,7 @@ export const TestGame: UiGameState = {
         name: "Nicki Lam",
         stack: 20499,
         position: 7,
-        bet: 450,
+        bet: genRandomInt(0, 1000000000000),
         hand: {
           cards: [genRandomCard(), genRandomCard()],
         },

@@ -14,10 +14,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    transition: "transform 1s linear 0s",
-    "&:hover": {
-      transform: "scale(1.5)",
-    },
+    transition: "transform 0.3s linear 0s",
   },
   handLabel: {
     backgroundColor: deepOrange[400],
