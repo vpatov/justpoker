@@ -1,11 +1,11 @@
 import { Service } from 'typedi';
 import { GameStateManager } from './gameStateManager';
-import { BettingRoundAction, BettingRoundActionType, BettingRoundStage } from '../../../shared/models/game';
+import { BettingRoundAction, BettingRoundActionType, BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { strict as assert } from 'assert';
 import { HandSolverService, Hand } from './handSolverService';
 import { TimerManager } from './timerManager';
-import { Pot, GameState } from '../../../shared/models/gameState';
-import { printObj } from '../../../shared/util/util';
+import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
+import { printObj } from '../../../ui/src/shared/util/util';
 
 @Service()
 export class GamePlayService {

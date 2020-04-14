@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Game from "./Game";
-import { CleanGame } from "../../shared/models/uiState";
+import { CleanGame } from "./shared/models/uiState";
 import { OpenWs, Subscribe } from "./api/ws";
 
 function GameContainer(): any {

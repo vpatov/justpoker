@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
-import { Card } from '../../../shared/models/cards';
-import { Player } from '../../../shared/models/player';
-import { GameState } from '../../../shared/models/gameState';
-import { BettingRoundStage } from '../../../shared/models/game';
+import { Card } from '../../../ui/src/shared/models/cards';
+import { Player } from '../../../ui/src/shared/models/player';
+import { GameState } from '../../../ui/src/shared/models/gameState';
+import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
 import {
     Controller,
@@ -11,7 +11,7 @@ import {
     SizingButton,
     COMMON_BB_SIZINGS,
     COMMON_POT_SIZINGS,
-} from '../../../shared/models/controller';
+} from '../../../ui/src/shared/models/controller';
 
 @Service()
 export class StateTransformService {

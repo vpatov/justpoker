@@ -11,10 +11,10 @@ import cookie from 'cookie';
 
 import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
-import { GameState } from '../../../shared/models/gameState';
+import { GameState } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
-import { generateUUID, printObj } from '../../../shared/util/util';
+import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { TimerManager } from '../service/timerManager';
 
 function logGameState(gameState: GameState) {

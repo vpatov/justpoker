@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "./Table";
 import Controller from "./Controller";
-import { UiGameState } from "../../shared/models/uiState";
+import { UiGameState } from "./shared/models/uiState";
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100vh",

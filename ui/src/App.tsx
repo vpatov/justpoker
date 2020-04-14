@@ -5,7 +5,7 @@ import { Theme } from "./Theme";
 import { ThemeProvider } from "@material-ui/core/styles";
 import GameContainer from "./GameContainer";
 import Game from "./Game";
-import { TestGame } from "../../shared/models/uiState";
+import { TestGame } from "./shared/models/uiState";
 
 import Home from "./Home";
 

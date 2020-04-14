@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Card, Deck, BASE_DECK, SUIT_ABBREVIATIONS } from '../../../shared/models/cards';
+import { Card, Deck, BASE_DECK, SUIT_ABBREVIATIONS } from '../../../ui/src/shared/models/cards';
 import { Hand as HandSolver } from 'pokersolver';
 
 @Service()
