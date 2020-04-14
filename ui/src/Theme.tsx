@@ -33,6 +33,12 @@ export const CUSTOM_THEME = {
             backgroundSize: "30% 20%",
             backgroundPosition: "50% 50%",
         },
+        FOLDED: {
+            backgroundColor: `${grey[400]}`,
+            backgroundImage: `url("https://www.transparenttextures.com/patterns/black-thread-light.png")`,
+            backgroundSize: "30% 20%",
+            backgroundPosition: "50% 50%",
+        },
         BACKGROUND: {
             background:
                 " radial-gradient(circle, rgba(50,112,173,1) 0%, rgba(14,47,83,1) 100%)",

@@ -34,6 +34,8 @@ export declare interface Player {
 
   /** The amount of chips the player is about to put into the pot. */
   readonly betAmount: number;
+
+  cardsAreHidden: boolean;
 }
 
 /*

@@ -325,7 +325,6 @@ export class GamePlayService {
     }
 
     showDown() {
-        debugger;
         const board = this.gsm.getBoard();
         const playersHands: [string, any][] = this.gsm
             .getPlayersInHand()
@@ -372,7 +371,10 @@ export class GamePlayService {
                     return [playerUUID, amount];
                 }),
             );
-            debugger;
+
+            // Show everyones hand at showdown if they havent folded yet.
+            // TODO show only those hands youre supposed to show.
+            this.gsm.updatePlayers((player) => (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}));
 
             this.gsm.updatePlayers((player) =>
                 winningPlayers.includes(player.uuid)
@@ -385,12 +387,11 @@ export class GamePlayService {
             snapShots.push(this.gsm.snapShotGameState());
         });
         assert(snapShots.length > 0, 'snapShots length was 0.');
-        debugger;
 
         this.gsm.updateGameState({ isStateReady: false });
 
         // TODO make external const
-        const interval = 1000;
+        const interval = 2000;
         for (const index in snapShots) {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
@@ -413,7 +414,6 @@ export class GamePlayService {
     }
 
     finishHand() {
-        console.log('finishHand');
         this.gsm.clearBettingRoundStage();
         this.ejectStackedPlayers();
         this.gsm.clearStateOfRoundInfo();
@@ -497,8 +497,14 @@ export class GamePlayService {
     victoryByFolding() {
         const winnerUUID = this.gsm.getPlayersInHand()[0];
         this.gsm.updatePlayer(winnerUUID, { winner: true });
+        this.gsm.updateGameState({ currentPlayerToAct: '' });
         this.placeBetsInPot();
-        this.triggerFinishHand(1000);
+        this.giveWinnerThePot(winnerUUID);
+        this.triggerFinishHand(2000);
+    }
+
+    giveWinnerThePot(winnerUUID: string) {
+        this.gsm.addPlayerChips(winnerUUID, this.gsm.getTotalPot());
     }
 
     triggerFinishBettingRound() {
