@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
 import { Theme } from "./Theme";
 import { ThemeProvider } from "@material-ui/core/styles";
 import GameContainer from "./GameContainer";
 import Game from "./Game";
-import { TestGame } from "./TestGame";
+import { TestGame } from "../../shared/models/uiState";
 
 import Home from "./Home";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 function App() {
   return (

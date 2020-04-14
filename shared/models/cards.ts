@@ -1,3 +1,5 @@
+import { getRandomInt } from "../util/util";
+
 export declare interface Deck {
   cards: Card[];
 }
@@ -75,3 +77,7 @@ export const BASE_DECK: Card[] = [
   { suit: Suit.SPADES, rank: "K" },
   { suit: Suit.SPADES, rank: "A" },
 ];
+
+export function genRandomCard(): Card {
+  return BASE_DECK[getRandomInt(0, 51)];
+}

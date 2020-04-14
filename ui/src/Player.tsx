@@ -4,6 +4,8 @@ import Hand from "./Hand";
 import PlayerStack from "./PlayerStack";
 
 import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import deepOrange from "@material-ui/core/colors/deepOrange";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -12,6 +14,18 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    transition: "transform 1s linear 0s",
+    "&:hover": {
+      transform: "scale(1.5)",
+    },
+  },
+  handLabel: {
+    backgroundColor: deepOrange[400],
+    fontSize: "1.2vmin",
+    padding: "1% 8%",
+    borderTop: `none`,
+    borderBottomLeftRadius: "0.6vmin",
+    borderBottomRightRadius: "0.5vmin",
   },
   winner: {
     "&:before": {
@@ -71,7 +85,16 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
   const classes = useStyles();
   const { className, style } = props;
-  const { stack, hand, name, toAct, hero, winner, button } = props.player;
+  const {
+    stack,
+    hand,
+    name,
+    toAct,
+    hero,
+    winner,
+    button,
+    handLabel,
+  } = props.player;
 
   return (
     <div
@@ -83,6 +106,10 @@ function Player(props) {
     >
       <Hand hand={hand} hidden={!hero} />
       <PlayerStack name={name} stack={stack} button={button} />
+
+      {handLabel ? (
+        <Typography className={classes.handLabel}>{handLabel}</Typography>
+      ) : null}
     </div>
   );
 }
