@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(0,0,0,0.4)",
     color: "white",
     borderRadius: 40,
-    padding: "12px 36px",
+    padding: "1vmin 3vmin",
   },
 }));
 

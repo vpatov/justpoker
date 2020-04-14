@@ -1,4 +1,4 @@
-import { getRandomInt } from "../util/util";
+import { genRandomInt } from "../util/util";
 
 export declare interface Deck {
   cards: Card[];
@@ -79,5 +79,5 @@ export const BASE_DECK: Card[] = [
 ];
 
 export function genRandomCard(): Card {
-  return BASE_DECK[getRandomInt(0, 51)];
+  return BASE_DECK[genRandomInt(0, 51)];
 }

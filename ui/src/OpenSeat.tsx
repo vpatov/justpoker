@@ -26,9 +26,8 @@ const useStyles = makeStyles((theme) => ({
       borderColor: "black",
     },
   },
-  text: {
+  icon: {
     fontSize: "3.4vmin",
-    textTransform: "none",
   },
 }));
 
@@ -55,7 +54,7 @@ function OpenSeat(props) {
       style={style}
       onClick={() => onSitDown()}
     >
-      <EventSeatIcon fontSize="large" />
+      <EventSeatIcon className={classes.icon} />
     </IconButton>
   );
 }

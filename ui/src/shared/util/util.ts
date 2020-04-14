@@ -12,7 +12,7 @@ export function printObj(obj: any) {
 }
 
 // Returns a random integer between min (inclusive) and max (inclusive)
-export function getRandomInt(min: number, max: number) {
+export function genRandomInt(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;

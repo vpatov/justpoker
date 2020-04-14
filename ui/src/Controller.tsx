@@ -9,7 +9,8 @@ import Button from "@material-ui/core/Button";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: "20%",
+      padding: 6,
+      width: "18%",
       height: "100%",
       position: "absolute",
       right: 0,
@@ -54,7 +55,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     button: {
       width: "80%",
-      height: "40px",
+      maxHeight: "72px",
+      height: "20%",
+      minHeight: "36px",
       backgroundColor: "white",
     },
     sizeButton: {
@@ -116,7 +119,7 @@ function Controller(props) {
           <div className={classes.amounts}>
             {sizingButtons.map((button) => (
               <Button
-                variant="outlined"
+                variant="contained"
                 className={classes.sizeButton}
                 onClick={(e) => changeBetAmount(button.value)}
               >
