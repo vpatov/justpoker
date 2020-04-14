@@ -325,8 +325,8 @@ export class GameStateManager {
             ...cleanGameState,
             table: this.initTable(newGameForm),
             gameParameters: {
-                smallBlind: newGameForm.smallBlind,
-                bigBlind: newGameForm.bigBlind,
+                smallBlind: Number(newGameForm.smallBlind),
+                bigBlind: Number(newGameForm.bigBlind),
                 gameType: newGameForm.gameType,
                 timeToAct: 30,
                 maxPlayers: 9,
@@ -435,6 +435,7 @@ export class GameStateManager {
             holeCards: [],
             winner: false,
             betAmount: 0,
+            cardsAreHidden: true,
         }));
 
         this.updateGameState({

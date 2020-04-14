@@ -17,7 +17,7 @@ import {
 export class StateTransformService {
     constructor(private readonly gameStateManager: GameStateManager) {}
 
-    transformGameStateToUIState(clientUUID: string, secureGameState: GameState) {
+    transformGameStateToUIState(clientUUID: string) {
         // need to define translation
         // need to define interfaces for UIState
         // needs to be refactored after types and state are better understood
@@ -33,10 +33,10 @@ export class StateTransformService {
                 heroInGame: this.gameStateManager.isPlayerInGame(heroPlayerUUID),
                 controller: clientPlayerIsInGame ? this.getUIController(heroPlayer) : cleanController,
                 table: {
-                    spots: 9,
-                    pot: this.gameStateManager.getTotalPot(),
+                    spots: 9, // TODO configure
+                    pot: this.gameStateManager.getTotalPot(), // TODO display multiple pots
                     communityCards: board,
-                    players: Object.entries(secureGameState.players).map(([uuid, player]) =>
+                    players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
                         this.transformPlayer(player, heroPlayerUUID),
                     ),
                 },
@@ -93,26 +93,27 @@ export class StateTransformService {
     }
 
     transformPlayer(player: Player, heroPlayerUUID: string) {
+        const isHero = heroPlayerUUID === player.uuid;
         const newPlayer = {
             stack: player.chips - player.betAmount,
             hand: {
-                cards:
-                    heroPlayerUUID !== player.uuid ? player.holeCards.map(() => ({ hidden: true })) : player.holeCards,
+                cards: isHero || !player.cardsAreHidden ? player.holeCards : player.holeCards.map(() => 'hiddenCard'),
             },
             name: player.name,
+            hidden: isHero ? false : player.cardsAreHidden,
             toAct: this.gameStateManager.getCurrentPlayerToAct() === player.uuid,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
             bet: player.betAmount,
             button: this.gameStateManager.getDealerUUID() === player.uuid,
             winner: player.winner,
+            folded: this.gameStateManager.hasPlayerFolded(player.uuid),
         };
         return newPlayer;
     }
 
     getUIState(clientUUID: string) {
-        const strippedState = this.stripSensitiveFields(clientUUID);
-        const uiState = this.transformGameStateToUIState(clientUUID, strippedState);
+        const uiState = this.transformGameStateToUIState(clientUUID);
         return uiState;
     }
 

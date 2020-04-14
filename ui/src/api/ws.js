@@ -5,7 +5,7 @@ export const server = {};
 const wsSubscriptions = {};
 
 export function OpenWs() {
-  let wsURI = "ws://localhost:8080";
+  let wsURI = process.env.NODE_ENV === 'production' ? 'ws://35.192.65.13:8080' : 'ws://localhost:8080';
 
   const clientID = docCookies.getItem("clientID");
   if (clientID) {
