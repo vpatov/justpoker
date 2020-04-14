@@ -43,8 +43,6 @@ export class StateTransformService {
             },
         };
 
-        console.log(JSON.stringify(UIState));
-
         return UIState;
     }
 
@@ -52,7 +50,6 @@ export class StateTransformService {
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
         const potSize = this.gameStateManager.getTotalPot();
-        console.log('bbvalue, potsize', bbValue, potSize);
         const controller: Controller = {
             toAct: this.gameStateManager.getCurrentPlayerToAct() === heroPlayer.uuid,
             unsetCheckCall: false,

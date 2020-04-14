@@ -31,10 +31,20 @@ export class GameStateManager {
         return this.gameState;
     }
 
+    isStateReady(): boolean {
+        return this.gameState.isStateReady;
+    }
+
     updateGameState(updates: Partial<GameState>) {
         this.gameState = {
             ...this.gameState,
             ...updates,
+        };
+    }
+
+    snapShotGameState() {
+        return {
+            ...this.gameState,
         };
     }
 
@@ -98,6 +108,14 @@ export class GameStateManager {
         return this.gameState.board;
     }
 
+    addPlayerChips(playerUUID: string, addChips: number) {
+        this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
+    }
+
+    getPots() {
+        return this.gameState.pots;
+    }
+
     getTotalPot() {
         return this.gameState.pots.reduce((sum, pot) => pot.value + sum, 0);
     }
@@ -130,6 +148,30 @@ export class GameStateManager {
             .map((player) => [player.seatNumber, player.uuid]);
         seats.sort();
         return seats;
+    }
+
+    getPositionRelativeToDealer(playerUUID: string) {
+        const numPlayers = this.getPlayersDealtIn().length;
+        return (
+            this.getPlayer(playerUUID).seatNumber +
+            ((numPlayers - this.getPlayer(this.getDealerUUID()).seatNumber) % numPlayers)
+        );
+    }
+
+    comparePositions(playerA: string, playerB: string) {
+        const posA = this.getPositionRelativeToDealer(playerA);
+        const posB = this.getPositionRelativeToDealer(playerB);
+
+        assert(
+            playerA !== playerB,
+            'gameStateManager.comparePositions was invoked with the same player. This is most likely a bug.',
+        );
+        assert(
+            posA !== posB,
+            'gameStateManager.getPositionRelativeToDealer returned the same position for two different players',
+        );
+        // they cannot be equal
+        return posA < posB ? -1 : 1;
     }
 
     getDeck() {
@@ -180,30 +222,56 @@ export class GameStateManager {
         return this.getPlayer(playerUUID).lastActionType === BettingRoundActionType.FOLD;
     }
 
+    hasEveryoneButOnePlayerFolded() {
+        return this.getPlayersInHand().length === 1;
+    }
+
     getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
+        //TODO is this method ever called while nobody is sitting?
+        // in a single-threaded env, probably
+
         const seats = this.getSeats();
         const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
 
         // find the next player that is in the hand
         let nextIndex = (currentIndex + 1) % seats.length;
         let [_, nextPlayerUUID] = seats[nextIndex];
-        while (!this.isPlayerReadyToPlay(nextPlayerUUID)) {
+        let counted = 0;
+
+        while (!this.isPlayerReadyToPlay(nextPlayerUUID) && counted < seats.length) {
             nextIndex = (nextIndex + 1) % seats.length;
             [_, nextPlayerUUID] = seats[nextIndex];
+            counted += 1;
+        }
+        if (counted == seats.length) {
+            // TODO remove safeguard - only here to identify bugs
+            throw Error(`Went through all players and didnt find the next player ready to play.`);
         }
         return nextPlayerUUID;
     }
 
     getNextPlayerInHandUUID(currentPlayerUUID: string) {
+        //TODO duplicate safeguard.
+        if (this.haveAllPlayersActed()) {
+            return '';
+        }
         const seats = this.getSeats();
         const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
 
         // find the next player that is in the hand
         let nextIndex = (currentIndex + 1) % seats.length;
         let [_, nextPlayerUUID] = seats[nextIndex];
-        while (!this.isPlayerEligibleToActNext(nextPlayerUUID)) {
+        let counted = 0;
+
+        while (!this.isPlayerEligibleToActNext(nextPlayerUUID) && counted < seats.length) {
             nextIndex = (nextIndex + 1) % seats.length;
             [_, nextPlayerUUID] = seats[nextIndex];
+            counted += 1;
+        }
+
+        if (counted == seats.length) {
+            // TODO remove safeguard - only here to identify bugs
+            throw Error(`Went through all players and didnt find the next player ready in hand.`);
         }
         return nextPlayerUUID;
     }
@@ -327,7 +395,12 @@ export class GameStateManager {
     }
 
     setCurrentPlayerToAct(playerUUID: string) {
-        this.updateGameState({ currentPlayerToAct: playerUUID });
+        // TODO create wrapper method in gamePlayService, to keep this a pure service, and to kepe game logic out.
+        // if everyone has acted, there is no current player to act (all in run out)
+
+        // if everyone has gone already, there are no further actors this round, and nobody should be
+        // illuminated
+        this.updateGameState({ currentPlayerToAct: this.haveAllPlayersActed() ? '' : playerUUID });
     }
 
     setBettingRoundStage(bettingRoundStage: BettingRoundStage) {
@@ -352,6 +425,7 @@ export class GameStateManager {
 
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
         const chips = this.getPlayer(playerUUID).chips;
+        // TODO remove this logic from the setter.
         this.updatePlayer(playerUUID, { betAmount: betAmount > chips ? chips : betAmount });
     }
 
@@ -360,9 +434,11 @@ export class GameStateManager {
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
             holeCards: [],
             winner: false,
+            betAmount: 0,
         }));
 
         this.updateGameState({
+            isStateReady: true,
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
             currentPlayerToAct: '',
@@ -411,6 +487,10 @@ export class GameStateManager {
         return this.getChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
     }
 
+    // TODO this should go in gamePlay service
+    // TODO redesign this
+    // TODO it would probably be correct to create a PLACE_BLIND action such that
+    // you dont have to bake extra logic around WAITING_TO_ACT
     haveAllPlayersActed() {
         return this.getPlayersDealtIn().every(
             (player) =>

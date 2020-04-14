@@ -9,6 +9,10 @@ export declare interface BettingRoundAction {
   // be equal to their stack if this is the case
 }
 
+// TODO re-evaluate semantics of WSAction vs BettingRoundAction vs lastActionType of Player
+// and see if you can find a better design
+// TODO re-evaluate semantics of WSAction vs BettingRoundAction vs lastActionType of Player
+// and see if you can find a better design
 export const enum BettingRoundActionType {
   // distinction between bet and call may be unnecessary
   CALL = "CALL",
@@ -20,6 +24,7 @@ export const enum BettingRoundActionType {
   WAITING_TO_ACT = "WAITING_TO_ACT",
   NOT_IN_HAND = "NOT_IN_HAND",
   ALL_IN = "ALL_IN",
+  PLACE_BLIND = "PLACE_BLIND",
 }
 
 export declare interface GameParameters {
