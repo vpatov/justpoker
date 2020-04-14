@@ -18,14 +18,10 @@ import Typography from "@material-ui/core/Typography";
 const useStyles = makeStyles((theme) => ({
   svgCircle: {
     strokeWidth: "5%",
-    cx: "50%",
-    cy: "50%",
     r: "28%",
   },
   svgInnerCircle: {
     strokeWidth: "2.5%",
-    cx: "50%",
-    cy: "50%",
     r: "10%",
   },
 }));
@@ -34,7 +30,7 @@ export const MAX_CHIP_SIZE = Math.pow(10, 7);
 
 function Chip(props) {
   const classes = useStyles();
-  const { yPos, xPos, amount } = props;
+  const { yPos = "50%", xPos = "50%", amount } = props;
 
   function getChipHueFromAmount(amount) {
     if (MAX_CHIP_SIZE < amount) {
@@ -47,33 +43,41 @@ function Chip(props) {
 
   const hue = getChipHueFromAmount(amount);
 
-  return [
-    <circle
-      className={classes.svgCircle}
-      stroke={hue[100]}
-      fill={hue.A400}
-      style={{ cy: yPos, cx: xPos }}
-    />,
-    <circle
-      className={classes.svgCircle}
-      fill={"none"}
-      stroke={hue[700]}
-      strokeDasharray="5%, 5%"
-      style={{ cy: yPos, cx: xPos }}
-    />,
-    <circle
-      className={classes.svgInnerCircle}
-      stroke={"white"}
-      style={{ cy: yPos, cx: xPos }}
-    />,
-    <circle
-      className={classes.svgInnerCircle}
-      stroke={"black"}
-      fill={"white"}
-      strokeDasharray="6%"
-      style={{ cy: yPos, cx: xPos }}
-    />,
-  ];
+  return (
+    <>
+      {[
+        <circle
+          className={classes.svgCircle}
+          stroke={hue[100]}
+          fill={hue.A400}
+          cy={yPos}
+          cx={xPos}
+        />,
+        <circle
+          className={classes.svgCircle}
+          fill={"none"}
+          stroke={hue[700]}
+          strokeDasharray="15%, 15%"
+          cy={yPos}
+          cx={xPos}
+        />,
+        <circle
+          className={classes.svgInnerCircle}
+          stroke={"white"}
+          cy={yPos}
+          cx={xPos}
+        />,
+        <circle
+          className={classes.svgInnerCircle}
+          stroke={"black"}
+          fill={"white"}
+          strokeDasharray="6%"
+          cy={yPos}
+          cx={xPos}
+        />,
+      ]}
+    </>
+  );
 }
 
 export default Chip;
