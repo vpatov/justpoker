@@ -390,7 +390,7 @@ export class GamePlayService {
         this.gsm.updateGameState({ isStateReady: false });
 
         // TODO make external const
-        const interval = 2000;
+        const interval = 1000;
         for (const index in snapShots) {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
@@ -401,7 +401,7 @@ export class GamePlayService {
                 interval * Number(index),
             );
         }
-
+        // TODO make this better. It seems they are not all being displayed.
         this.triggerFinishHand(interval * snapShots.length);
 
         // Inititate timer sequence that shows each pot winner for two seconds (or something)
@@ -498,11 +498,11 @@ export class GamePlayService {
         const winnerUUID = this.gsm.getPlayersInHand()[0];
         this.gsm.updatePlayer(winnerUUID, { winner: true });
         this.placeBetsInPot();
-        this.triggerFinishHand(1500);
+        this.triggerFinishHand(1000);
     }
 
     triggerFinishBettingRound() {
-        this.timerManager.setTimer(this, this.finishBettingRound, this.gsm, this.gsm.getGameState, 1000);
+        this.timerManager.setTimer(this, this.finishBettingRound, this.gsm, this.gsm.getGameState, 300);
     }
 
     finishBettingRound() {
