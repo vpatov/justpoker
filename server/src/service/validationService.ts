@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
 import { GameStateManager } from './gameStateManager';
-import { BettingRoundActionType, BettingRoundAction } from '../../../shared/models/game';
-import { SitDownRequest, JoinTableRequest } from '../../../shared/models/wsaction';
-import { printObj } from '../../../shared/util/util';
+import { BettingRoundActionType, BettingRoundAction } from '../../../ui/src/shared/models/game';
+import { SitDownRequest, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
+import { printObj } from '../../../ui/src/shared/util/util';
 
 const MAX_NAME_LENGTH = 32;
 

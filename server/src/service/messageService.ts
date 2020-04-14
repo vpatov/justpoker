@@ -1,11 +1,16 @@
-import { IncomingClientWsMessage, ActionType, SitDownRequest, JoinTableRequest } from '../../../shared/models/wsaction';
-import { CHECK_ACTION, FOLD_ACTION, BettingRoundAction, CALL_ACTION } from '../../../shared/models/game';
+import {
+    IncomingClientWsMessage,
+    ActionType,
+    SitDownRequest,
+    JoinTableRequest,
+} from '../../../ui/src/shared/models/wsaction';
+import { CHECK_ACTION, FOLD_ACTION, BettingRoundAction, CALL_ACTION } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
 import { PlayerService } from './playerService';
 import { ValidationService } from './validationService';
 import { StateTransformService } from './stateTransformService';
 import { Service } from 'typedi';
-import { GameState } from '../../../shared/models/gameState';
+import { GameState } from '../../../ui/src/shared/models/gameState';
 import { GamePlayService } from './gamePlayService';
 import { Action } from 'rxjs/internal/scheduler/Action';
 

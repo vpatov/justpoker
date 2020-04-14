@@ -1,9 +1,9 @@
 import { Service } from 'typedi';
 import WebSocket from 'ws';
-import { Player } from '../../../shared/models/player';
-import { ConnectedClient } from '../../../shared/models/table';
-import { generateUUID } from '../../../shared/util/util';
-import { BettingRoundActionType } from '../../../shared/models/game';
+import { Player } from '../../../ui/src/shared/models/player';
+import { ConnectedClient } from '../../../ui/src/shared/models/table';
+import { generateUUID } from '../../../ui/src/shared/util/util';
+import { BettingRoundActionType } from '../../../ui/src/shared/models/game';
 
 // TODO design functions here such that they receive as input
 // the players object, and return as output the players object

@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Card, SUIT_ABBREVIATIONS } from '../../../shared/models/cards';
+import { Card, SUIT_ABBREVIATIONS } from '../../../ui/src/shared/models/cards';
 import { Hand as HandSolver } from 'pokersolver';
 
 // TODO declare types for this module and make an npm package

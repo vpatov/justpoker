@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import WebSocket from 'ws';
 
 import { strict as assert } from 'assert';
-import { GameState, cleanGameState } from '../../../shared/models/gameState';
+import { GameState, cleanGameState } from '../../../ui/src/shared/models/gameState';
 import {
     StraddleType,
     GameType,
@@ -11,13 +11,13 @@ import {
     BettingRoundStage,
     BettingRoundAction,
     BettingRoundActionType,
-} from '../../../shared/models/game';
-import { NewGameForm, ConnectedClient } from '../../../shared/models/table';
-import { Player } from '../../../shared/models/player';
+} from '../../../ui/src/shared/models/game';
+import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
+import { Player } from '../../../ui/src/shared/models/player';
 import { PlayerService } from './playerService';
 import { DeckService } from './deckService';
-import { generateUUID, printObj } from '../../../shared/util/util';
-import { ActionType } from '../../../shared/models/wsaction';
+import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
+import { ActionType } from '../../../ui/src/shared/models/wsaction';
 
 @Service()
 export class GameStateManager {

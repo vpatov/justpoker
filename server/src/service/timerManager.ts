@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { Subject } from 'rxjs';
-import { GameState } from '../../../shared/models/gameState';
+import { GameState } from '../../../ui/src/shared/models/gameState';
 
 @Service()
 export class TimerManager {
