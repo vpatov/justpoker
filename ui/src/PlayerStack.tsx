@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import CountUp from "react-countup";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -100,9 +100,19 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+}
+
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, button, timeLimit } = props;
+    const { stack, name, button, timeLimit, winner } = props;
+
+    const prevStack = usePrevious(stack);
 
     useEffect(() => {
         console.log("stack changed");
@@ -114,8 +124,11 @@ function PlayerStack(props) {
                 <img src={ButtonSvg} className={classes.buttonR} />
             ) : null}
             <Typography variant="h4" className={classes.stack}>
-                {stack.toLocaleString()}
-                {/* <CountUp start={0} end={stack} separator="," /> */}
+                {winner ? (
+                    <CountUp start={prevStack} end={stack} separator="," />
+                ) : (
+                    stack.toLocaleString()
+                )}
             </Typography>
             <Typography variant="body1" className={classes.name}>
                 {name}

@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
         transition: "transform 0.3s linear 0s",
     },
     handLabel: {
-
         backgroundColor: deepOrange[400],
         fontSize: "1.2vmin",
         padding: "1% 8%",
@@ -28,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     },
     playerTimer: {
         zIndex: 2,
-        width: '100%',
+        width: "100%",
     },
     winner: {
         "&:before": {
@@ -110,10 +109,18 @@ function Player(props) {
             style={style}
         >
             <Hand hand={hand} hidden={hidden} folded={folded} />
-            <PlayerStack name={name} stack={stack} button={button} timeLimit={timeLimit} />
+            <PlayerStack
+                name={name}
+                stack={stack}
+                button={button}
+                timeLimit={timeLimit}
+                winner={winner}
+            />
             {/* {timeLimit ? <PlayerTimer className={classes.playerTimer}  /> : null} */}
             {handLabel ? (
-                <Typography className={classes.handLabel}>{handLabel}</Typography>
+                <Typography className={classes.handLabel}>
+                    {handLabel}
+                </Typography>
             ) : null}
         </div>
     );
