@@ -17,7 +17,11 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         transition: "transform 0.3s linear 0s",
     },
+    folded: {
+        ...theme.custom.FOLDED,
+    },
     handLabel: {
+        zIndex: 1,
         backgroundColor: deepOrange[400],
         fontSize: "1.2vmin",
         padding: "1% 8%",
@@ -26,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
         borderBottomRightRadius: "0.5vmin",
     },
     playerTimer: {
-        zIndex: 2,
         width: "100%",
     },
     winner: {
@@ -105,10 +108,11 @@ function Player(props) {
             className={classnames(classes.root, className, {
                 [classes.toAct]: toAct,
                 [classes.winner]: winner,
+                [classes.folded]: folded,
             })}
             style={style}
         >
-            <Hand hand={hand} hidden={hidden} folded={folded} />
+            <Hand hand={hand} hidden={hidden} />
             <PlayerStack
                 name={name}
                 stack={stack}

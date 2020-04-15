@@ -74,7 +74,6 @@ function Controller(props) {
         unsetCheckCall,
         min,
         max,
-        pot,
         sizingButtons,
         actionButtons,
     } = props.controller;

@@ -33,6 +33,10 @@ export const CUSTOM_THEME = {
             backgroundSize: "30% 20%",
             backgroundPosition: "50% 50%",
         },
+        FOLDED: {
+            opacity: 0.65,
+            filter: "grayscale(50%) brightness(0.5)",
+        },
         BACKGROUND: {
             background:
                 " radial-gradient(circle, rgba(50,112,173,1) 0%, rgba(14,47,83,1) 100%)",
@@ -49,7 +53,6 @@ export const CUSTOM_THEME = {
         },
         STACK: {
             backgroundColor: "white",
-            boxShadow: "0 5px 10px rgba(59, 43, 91, 0.7)",
         },
         CONTROLLER: {
             backgroundColor: "rgba(255,255,255,0.24)",
