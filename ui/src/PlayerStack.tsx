@@ -9,7 +9,7 @@ import PlayerTimer from "./PlayerTimer";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        zIndex: 2,
+
     },
     stackCont: {
         marginTop: -12,
@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: "0.6vmin",
         fontSize: "18px",
         position: "relative",
+        boxShadow: "0 5px 10px rgba(10,10,10,0.5)",
         ...theme.custom.STACK,
     },
     playerTimer: {
@@ -127,8 +128,8 @@ function PlayerStack(props) {
                 {winner ? (
                     <CountUp start={prevStack} end={stack} separator="," />
                 ) : (
-                    stack.toLocaleString()
-                )}
+                        stack.toLocaleString()
+                    )}
             </Typography>
             <Typography variant="body1" className={classes.name}>
                 {name}

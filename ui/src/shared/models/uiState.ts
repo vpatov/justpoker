@@ -11,7 +11,6 @@ export declare interface UiGameState {
 export declare interface Controller {
     min: number;
     max: number;
-    pot: number;
     sizingButtons: SizingButton[];
     actionButtons: ActionButton[];
 
@@ -31,7 +30,8 @@ export declare interface ActionButton {
 
 export declare interface Table {
     spots: number;
-    pot: number;
+    mainPot: number;
+    totalPot: number;
     communityCards: Card[];
     players: Player[];
 }
@@ -42,6 +42,7 @@ export declare interface Player {
     stack: number;
 
     hero?: boolean;
+    folded?: boolean;
     toAct?: boolean;
     button?: boolean;
     winner?: boolean;
@@ -61,7 +62,6 @@ export const TestGame: UiGameState = {
         unsetCheckCall: true,
         min: 25,
         max: 43000,
-        pot: 12000,
         sizingButtons: [
             {
                 label: "1/2",
@@ -97,7 +97,8 @@ export const TestGame: UiGameState = {
     },
     table: {
         spots: 9,
-        pot: 12000,
+        mainPot: 12000,
+        totalPot: 66500,
         communityCards: [
             genRandomCard(),
             genRandomCard(),
@@ -142,7 +143,7 @@ export const TestGame: UiGameState = {
                 name: "Tommy Bones",
                 position: 3,
                 stack: 323,
-                bet: genRandomInt(0, 10000),
+                folded: true,
                 hand: {
                     cards: [genRandomCard(), genRandomCard()],
                 },
@@ -190,13 +191,14 @@ export const CleanGame = {
         unsetCheckCall: true,
         min: 0,
         max: 0,
-        pot: 0,
+
         sizingButtons: [],
         actionButtons: [],
     },
     table: {
         spots: 9,
-        pot: 0,
+        mainPot: 0,
+        totalPot: 0,
         communityCards: [],
         players: [],
     },
