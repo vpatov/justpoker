@@ -5,6 +5,7 @@ import { server } from "./api/ws";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import { Controller } from "./shared/models/uiState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -32,6 +33,15 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: "center",
             flexDirection: "column",
         },
+        adminButtonCont: {
+            height: "10%",
+            marginTop: "auto",
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            flexDirection: "column",
+        },
         betSizeCont: {
             width: "100%",
         },
@@ -49,8 +59,11 @@ const useStyles = makeStyles((theme: Theme) =>
             flexWrap: "wrap",
             justifyContent: "space-evenly",
         },
-        slider: {
+        betTextField: {
             width: "80%",
+        },
+        betTextFieldInput: {
+            fontSize: "2.3vmin",
         },
         button: {
             width: "80%",
@@ -58,6 +71,11 @@ const useStyles = makeStyles((theme: Theme) =>
             height: "20%",
             minHeight: "36px",
             backgroundColor: "white",
+        },
+        adminButton: {
+            width: "80%",
+            maxHeight: "72px",
+            height: "100%",
         },
         sizeButton: {
             margin: 6,
@@ -67,7 +85,11 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-function Controller(props) {
+export interface ControllerProps {
+    controller: Controller;
+}
+
+function ControllerComp(props: ControllerProps) {
     const classes = useStyles();
     const {
         toAct,
@@ -76,6 +98,7 @@ function Controller(props) {
         max,
         sizingButtons,
         actionButtons,
+        adminButtons,
     } = props.controller;
 
     const [betAmt, setBetAmt] = useState(0);
@@ -91,6 +114,13 @@ function Controller(props) {
         });
     }
 
+    function onClickAdminButton(action) {
+        server.send({
+            actionType: action,
+            bettingRoundAction: { type: action },
+        });
+    }
+
     return (
         <div className={classes.root}>
             <div className={classes.sizeAndBetActionsCont}>
@@ -98,20 +128,33 @@ function Controller(props) {
                     {actionButtons.map((button) => (
                         <Button
                             variant="contained"
-                            className={classnames(classes.button, classes[button.action])}
+                            className={classnames(
+                                classes.button,
+                                classes[button.action]
+                            )}
                             onClick={() => onClickActionButton(button.action)}
                             disabled={!toAct}
                         >
                             {button.label}
                         </Button>
                     ))}
-                    <TextField
-                        className={classes.slider}
-                        onChange={(event) => setBetAmt(parseInt(event.target.value))}
-                        value={betAmt}
-                        type="number"
-                        variant="outlined"
-                    />
+                    {sizingButtons.length > 0 ? (
+                        <TextField
+                            className={classes.betTextField}
+                            InputProps={{
+                                classes: {
+                                    input: classes.betTextFieldInput,
+                                },
+                            }}
+                            onChange={(event) =>
+                                setBetAmt(parseInt(event.target.value))
+                            }
+                            value={betAmt === 0 ? "" : betAmt}
+                            type="number"
+                            variant="outlined"
+                            autoFocus={true}
+                        />
+                    ) : null}
                 </div>
                 <div className={classes.betSizeCont}>
                     <div className={classes.amounts}>
@@ -126,9 +169,23 @@ function Controller(props) {
                         ))}
                     </div>
                 </div>
+                <div className={classes.adminButtonCont}>
+                    {(adminButtons || []).map((button) => (
+                        <Button
+                            variant="contained"
+                            className={classnames(
+                                classes.adminButton,
+                                classes[button.action]
+                            )}
+                            onClick={(e) => onClickAdminButton(button.action)}
+                        >
+                            {button.label}
+                        </Button>
+                    ))}
+                </div>
             </div>
         </div>
     );
 }
 
-export default Controller;
+export default ControllerComp;
