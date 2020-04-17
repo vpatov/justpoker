@@ -320,7 +320,9 @@ export class GameStateManager {
     // TODO validation around this method. Shouldn't be executed when table is not intialized.
     initConnectedClient(clientUUID: string, ws: WebSocket) {
         const client = this.gameState.table.activeConnections.get(clientUUID);
-        if (!client) {
+        if (client) {
+            this.resetClientWebsocket(clientUUID, ws)
+        } else {
             const newClient = this.playerService.createConnectedClient(clientUUID, ws);
             this.gameState = {
                 ...this.gameState,
@@ -330,6 +332,10 @@ export class GameStateManager {
                 },
             };
         }
+    }
+
+    resetClientWebsocket(clientUUID: string, ws: WebSocket) {
+        this.gameState.table.activeConnections.get(clientUUID).ws = ws;
     }
 
     initGame(newGameForm: NewGameForm) {
