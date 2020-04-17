@@ -7,10 +7,11 @@ import blue from "@material-ui/core/colors/blue";
 import red from "@material-ui/core/colors/red";
 import grey from "@material-ui/core/colors/grey";
 import teal from "@material-ui/core/colors/teal";
+import orange from "@material-ui/core/colors/orange";
 
 declare module "@material-ui/core/styles/createMuiTheme" {
     interface Theme {
-        custom?: any; // optional
+        custom?: any;
     }
 }
 
@@ -30,8 +31,8 @@ export const CUSTOM_THEME = {
         },
         HIDDEN: {
             backgroundColor: `${grey[900]}`,
-            backgroundImage: `url("https://www.transparenttextures.com/patterns/black-thread-light.png")`,
-            backgroundSize: "30% 20%",
+            backgroundImage: `url("https://www.transparenttextures.com/patterns/climpek.png")`,
+            backgroundSize: "80% 80%",
             backgroundPosition: "50% 50%",
         },
         FOLDED: {
@@ -82,6 +83,16 @@ export const CUSTOM_THEME = {
     },
     typography: {
         fontFamily: "Roboto, Avenir, Helvetica, Arial, sans-serif",
+    },
+    palette: {
+        primary: {
+            main: teal["A400"],
+            light: teal["100"],
+        },
+        secondary: {
+            main: orange["A400"],
+            light: orange["100"],
+        },
     },
 };
 
