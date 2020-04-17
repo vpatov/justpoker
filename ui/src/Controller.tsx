@@ -97,6 +97,7 @@ const KEY_ACTION_MAP = {
     [ActionType.CHECK]: "K",
     [ActionType.CALL]: "A",
     [ActionType.FOLD]: "F",
+    [ActionType.STARTGAME]: "S",
 };
 
 function ControllerComp(props: ControllerProps) {
@@ -146,7 +147,9 @@ function ControllerComp(props: ControllerProps) {
                             onClick={() => onClickActionButton(button.action)}
                             disabled={!toAct}
                         >
-                            {button.label}
+                            {`${button.label} (${
+                                KEY_ACTION_MAP[button.action]
+                            })`}
                         </ButtonWithKeyPress>
                     ))}
                     {sizingButtons.length > 0 ? (
@@ -182,7 +185,7 @@ function ControllerComp(props: ControllerProps) {
                 </div>
                 <div className={classes.adminButtonCont}>
                     {(adminButtons || []).map((button) => (
-                        <Button
+                        <ButtonWithKeyPress
                             variant="contained"
                             className={classnames(
                                 classes.adminButton,
@@ -190,8 +193,10 @@ function ControllerComp(props: ControllerProps) {
                             )}
                             onClick={(e) => onClickAdminButton(button.action)}
                         >
-                            {button.label}
-                        </Button>
+                            {`${button.label} (${
+                                KEY_ACTION_MAP[button.action]
+                            })`}
+                        </ButtonWithKeyPress>
                     ))}
                 </div>
             </div>
