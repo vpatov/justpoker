@@ -2,7 +2,6 @@ import { Card, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
 
-
 export declare interface UiState {
     game: UiGameState;
 }
@@ -19,6 +18,7 @@ export declare interface Controller {
     max: number;
     sizingButtons: SizingButton[];
     actionButtons: ActionButton[];
+    adminButtons?: ActionButton[];
 
     toAct?: boolean;
     unsetCheckCall?: boolean;
@@ -41,11 +41,9 @@ export declare interface Table {
     players: Player[];
 }
 
-
 export declare interface PlayerTimer {
     timeElapsed: number;
     timeLimit: number;
-
 }
 
 export declare interface Player {
@@ -104,6 +102,12 @@ export const TestGame: UiGameState = {
             {
                 action: ActionType.BET,
                 label: "Bet",
+            },
+        ],
+        adminButtons: [
+            {
+                action: ActionType.STARTGAME,
+                label: "Start Game",
             },
         ],
     },

@@ -1,6 +1,7 @@
 import { createMuiTheme } from "@material-ui/core/styles";
 
 import lightBlue from "@material-ui/core/colors/lightBlue";
+import lightGreen from "@material-ui/core/colors/lightGreen";
 import green from "@material-ui/core/colors/green";
 import blue from "@material-ui/core/colors/blue";
 import red from "@material-ui/core/colors/red";
@@ -73,6 +74,9 @@ export const CUSTOM_THEME = {
             },
             CALL: {
                 color: blue[800],
+            },
+            STARTGAME: {
+                color: lightGreen[800],
             },
         },
     },
