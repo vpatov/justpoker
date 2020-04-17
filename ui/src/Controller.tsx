@@ -6,6 +6,9 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { Controller } from "./shared/models/uiState";
+import { ActionType } from "./shared/models/wsaction";
+
+import ButtonWithKeyPress from "./ButtonWithKeyPress";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -89,6 +92,13 @@ export interface ControllerProps {
     controller: Controller;
 }
 
+const KEY_ACTION_MAP = {
+    [ActionType.BET]: "B",
+    [ActionType.CHECK]: "K",
+    [ActionType.CALL]: "A",
+    [ActionType.FOLD]: "F",
+};
+
 function ControllerComp(props: ControllerProps) {
     const classes = useStyles();
     const {
@@ -126,7 +136,8 @@ function ControllerComp(props: ControllerProps) {
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => (
-                        <Button
+                        <ButtonWithKeyPress
+                            keyPress={KEY_ACTION_MAP[button.action]}
                             variant="contained"
                             className={classnames(
                                 classes.button,
@@ -136,7 +147,7 @@ function ControllerComp(props: ControllerProps) {
                             disabled={!toAct}
                         >
                             {button.label}
-                        </Button>
+                        </ButtonWithKeyPress>
                     ))}
                     {sizingButtons.length > 0 ? (
                         <TextField
