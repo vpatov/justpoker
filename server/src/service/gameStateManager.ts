@@ -23,7 +23,7 @@ import { ActionType } from '../../../ui/src/shared/models/wsaction';
 export class GameStateManager {
     private gameState: Readonly<GameState> = cleanGameState;
 
-    constructor(private readonly deckService: DeckService, private readonly playerService: PlayerService) {}
+    constructor(private readonly deckService: DeckService, private readonly playerService: PlayerService) { }
 
     /* Getters */
 
@@ -110,6 +110,18 @@ export class GameStateManager {
 
     addPlayerChips(playerUUID: string, addChips: number) {
         this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
+    }
+
+    getTimeTurnStartedMs() {
+        return this.gameState.timeTurnStarted
+    }
+
+    getTimeTurnElapsedSeconds() {
+        return (Date.now() - this.getTimeTurnStartedMs()) / 1000
+    }
+
+    getTimeToAct() {
+        return this.gameState.gameParameters.timeToAct
     }
 
     getPots() {
@@ -400,7 +412,7 @@ export class GameStateManager {
 
         // if everyone has gone already, there are no further actors this round, and nobody should be
         // illuminated
-        this.updateGameState({ currentPlayerToAct: this.haveAllPlayersActed() ? '' : playerUUID });
+        this.updateGameState({ currentPlayerToAct: this.haveAllPlayersActed() ? '' : playerUUID, timeTurnStarted: Date.now() });
     }
 
     setBettingRoundStage(bettingRoundStage: BettingRoundStage) {

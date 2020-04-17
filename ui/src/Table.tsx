@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 function Table(props) {
     const classes = useStyles();
     const { heroInGame } = props;
-    const { players, communityCards, spots, mainPot, totalPot } = props.table;
+    const { players, communityCards, spots, pot } = props.table;
 
     const [dimensions, setDimensions] = useState({
         height: window.innerHeight,
@@ -140,11 +140,9 @@ function Table(props) {
         <div className={classes.root}>
             <div className={classes.tableCont}>
                 <div className={classes.table}>
-                    <Tooltip classes={{ tooltip: classes.totalPot }} placement='top' title={`Total Pot: ${totalPot.toLocaleString()}`}>
-                        <Typography
-                            className={classes.mainPot}
-                        >{`${mainPot.toLocaleString()}`}</Typography>
-                    </Tooltip>
+                    <Typography
+                        className={classes.mainPot}
+                    >{`${pot.toLocaleString()}`}</Typography>
                     <CommunityCards communityCards={communityCards} />
                 </div>
             </div>

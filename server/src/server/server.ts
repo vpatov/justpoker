@@ -51,7 +51,7 @@ class Server {
         private gsm: GameStateManager,
         private stateTransformService: StateTransformService,
         private timerManager: TimerManager,
-    ) {}
+    ) { }
 
     private initRoutes(): void {
         const router = express.Router();
@@ -92,7 +92,7 @@ class Server {
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
-            continue;
+            // continue;
             /* Debug Logging */
             const playerName = client.playerUUID ? this.gsm.getPlayer(client.playerUUID).name : 'Anonymous Client';
             console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);
