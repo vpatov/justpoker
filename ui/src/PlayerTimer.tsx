@@ -18,15 +18,25 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
+
+function getPercetTimeRemaining(timeElapsed: number, timeLimit: number): number {
+
+    const timeElapsedPercentage = timeElapsed * 100.0 / timeLimit
+    return 100.0 - timeElapsedPercentage
+
+}
+
 function PlayerTimer(props) {
     const classes = useStyles();
-    const { timeLimit, className } = props;
+    const { playerTimer, className } = props;
+    const { timeLimit, timeElapsed } = playerTimer
 
-    const [completed, setCompleted] = useState(100);
+    const [completed, setCompleted] = useState(100.0);
     const [timer, setTimer] = useState();
 
 
     useEffect(() => {
+        setCompleted(getPercetTimeRemaining(timeElapsed, timeLimit))
         const updateIntervalMs = 250
         const reduceBy = (100.0 / timeLimit) * (updateIntervalMs / 1000)
         function progress() {

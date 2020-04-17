@@ -95,7 +95,7 @@ function Player(props) {
         hand,
         name,
         toAct,
-        timeLimit,
+        playerTimer,
         winner,
         button,
         hidden,
@@ -117,7 +117,7 @@ function Player(props) {
                 name={name}
                 stack={stack}
                 button={button}
-                timeLimit={timeLimit}
+                playerTimer={playerTimer}
                 winner={winner}
             />
             {/* {timeLimit ? <PlayerTimer className={classes.playerTimer}  /> : null} */}

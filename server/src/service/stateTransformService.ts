@@ -4,6 +4,8 @@ import { Player } from '../../../ui/src/shared/models/player';
 import { GameState } from '../../../ui/src/shared/models/gameState';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
+import { printObj } from '../../../ui/src/shared/util/util';
+
 import {
     Controller,
     cleanController,
@@ -12,10 +14,12 @@ import {
     COMMON_BB_SIZINGS,
     COMMON_POT_SIZINGS,
 } from '../../../ui/src/shared/models/controller';
+import { HandSolverService, Hand } from './handSolverService'
 
 @Service()
 export class StateTransformService {
-    constructor(private readonly gameStateManager: GameStateManager) {}
+    constructor(private readonly gameStateManager: GameStateManager,
+        private readonly handSolverService: HandSolverService, ) { }
 
     transformGameStateToUIState(clientUUID: string) {
         // need to define translation
@@ -42,7 +46,7 @@ export class StateTransformService {
                 },
             },
         };
-
+        printObj(UIState)
         return UIState;
     }
 
@@ -60,8 +64,8 @@ export class StateTransformService {
                 bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
                     ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
                     : COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
-                          this.createPotSizeButton(numerator, denominator, potSize),
-                      ),
+                        this.createPotSizeButton(numerator, denominator, potSize),
+                    ),
             actionButtons: ALL_ACTION_BUTTONS,
         };
 
@@ -93,15 +97,22 @@ export class StateTransformService {
     }
 
     transformPlayer(player: Player, heroPlayerUUID: string) {
+        const board = this.gameStateManager.getBoard();
+
+
         const isHero = heroPlayerUUID === player.uuid;
+        const shouldCardsBeVisible = isHero || !player.cardsAreHidden
+        const toAct = this.gameStateManager.getCurrentPlayerToAct() === player.uuid
         const newPlayer = {
             stack: player.chips - player.betAmount,
             hand: {
-                cards: isHero || !player.cardsAreHidden ? player.holeCards : player.holeCards.map(() => 'hiddenCard'),
+                cards: shouldCardsBeVisible ? player.holeCards : player.holeCards.map(() => 'hiddenCard'),
             },
+            playerTimer: toAct ? { timeElapsed: this.gameStateManager.getTimeTurnElapsedSeconds(), timeLimit: this.gameStateManager.getTimeToAct() } : undefined,
+            handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? this.handSolverService.computeBestHandFromCards([...board, ...player.holeCards]).name : undefined,
             name: player.name,
             hidden: isHero ? false : player.cardsAreHidden,
-            toAct: this.gameStateManager.getCurrentPlayerToAct() === player.uuid,
+            toAct: toAct,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
             bet: player.betAmount,
