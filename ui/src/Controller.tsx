@@ -87,7 +87,7 @@ function Controller(props) {
     function onClickActionButton(action) {
         server.send({
             actionType: action,
-            bettingRoundAction: { type: action, amount: Number(betAmt) },
+            request: { type: action, amount: Number(betAmt) },
         });
     }
 

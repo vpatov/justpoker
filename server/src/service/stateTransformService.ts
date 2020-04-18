@@ -34,7 +34,8 @@ export class StateTransformService {
                 controller: clientPlayerIsInGame ? this.getUIController(heroPlayer) : cleanController,
                 table: {
                     spots: 9, // TODO configure
-                    pot: this.gameStateManager.getTotalPot(), // TODO display multiple pots
+                    mainPot: 0,
+                    totalPot: this.gameStateManager.getTotalPot(), // TODO display multiple pots
                     communityCards: board,
                     players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
                         this.transformPlayer(player, heroPlayerUUID),
