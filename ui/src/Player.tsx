@@ -98,7 +98,6 @@ function Player(props) {
         playerTimer,
         winner,
         button,
-        hidden,
         folded,
         handLabel,
     } = props.player;
@@ -112,7 +111,7 @@ function Player(props) {
             })}
             style={style}
         >
-            <Hand hand={hand} hidden={hidden} />
+            <Hand hand={hand} />
             <PlayerStack
                 name={name}
                 stack={stack}
