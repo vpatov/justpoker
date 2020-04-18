@@ -50,7 +50,6 @@ export class StateTransformService {
                 },
             },
         };
-        printObj(UIState);
         return UIState;
     }
 
