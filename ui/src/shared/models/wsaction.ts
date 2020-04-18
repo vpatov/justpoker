@@ -10,7 +10,6 @@ export enum ActionType {
   PINGSTATE = "PINGSTATE",
   CHECK = "CHECK",
   BET = "BET",
-  RAISE = "RAISE",
   FOLD = "FOLD",
   CALL = "CALL",
   CHAT = "CHAT",
@@ -30,34 +29,18 @@ export declare interface JoinTableRequest {
   // password?: string;
 }
 
-export declare interface IncomingClientWsMessage {
-  actionType: ActionType;
-  sitDownRequest: SitDownRequest;
-  joinTableRequest: JoinTableRequest;
-  joinTableAndSitDownRequest: SitDownRequest & JoinTableRequest;
-  bettingRoundAction: BettingRoundAction;
-  debugMessage: any;
+export declare interface AddChipsRequest {
+  chipAmount: number;
 }
 
-/*
-gameplay actions:
-Check
-Bet XX
-Raise XX
-Fold
-Show hole card
+export type ClientWsMessageRequest = 
+  SitDownRequest & 
+  JoinTableRequest & 
+  (SitDownRequest & JoinTableRequest) 
+  & BettingRoundAction & 
+  AddChipsRequest; 
 
-
-Host actions
-Start game
-edit game
-Edit chips
-
-
-user actions:
-sit down
-stand up
-buy-in
-top-off
-
-*/
+export declare interface IncomingClientWsMessage {
+  actionType: ActionType;
+  request: ClientWsMessageRequest;
+}

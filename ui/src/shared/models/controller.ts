@@ -43,7 +43,7 @@ export const BET_BUTTON: ActionButton = {
 };
 
 export const RAISE_BUTTON: ActionButton = {
-  action: ActionType.RAISE,
+  action: ActionType.BET,
   label: "Raise",
 };
 

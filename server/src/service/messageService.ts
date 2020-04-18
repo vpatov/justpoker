@@ -1,18 +1,16 @@
-import {
-    IncomingClientWsMessage,
-    ActionType,
-    SitDownRequest,
-    JoinTableRequest,
-} from '../../../ui/src/shared/models/wsaction';
-import { CHECK_ACTION, FOLD_ACTION, BettingRoundAction, CALL_ACTION } from '../../../ui/src/shared/models/game';
+import { IncomingClientWsMessage, ActionType, ClientWsMessageRequest } from '../../../ui/src/shared/models/wsaction';
 import { GameStateManager } from './gameStateManager';
-import { PlayerService } from './playerService';
-import { ValidationService } from './validationService';
-import { StateTransformService } from './stateTransformService';
+import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
-import { GameState } from '../../../ui/src/shared/models/gameState';
 import { GamePlayService } from './gamePlayService';
-import { Action } from 'rxjs/internal/scheduler/Action';
+import { ValidationResponse, NO_ERROR } from '../../../ui/src/shared/models/validation';
+
+declare interface ActionProcessor {
+    validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
+    perform: (clientUUID: string, messagePayload: ClientWsMessageRequest) => void;
+}
+
+declare type MessageProcessor = { [key in ActionType]: ActionProcessor };
 
 @Service()
 export class MessageService {
@@ -22,134 +20,101 @@ export class MessageService {
         private readonly gamePlayService: GamePlayService,
     ) {}
 
+    messageProcessor: MessageProcessor = {
+        [ActionType.STARTGAME]: {
+            validation: (uuid, req) => this.validationService.validateStartGameRequest(uuid),
+            perform: (uuid, req) => this.gamePlayService.startGame(),
+        },
+        [ActionType.STOPGAME]: {
+            validation: (uuid, req) => this.validationService.validateStopGameRequest(uuid),
+            perform: (uuid, req) => this.gamePlayService.stopGame(),
+        },
+        [ActionType.SITDOWN]: {
+            validation: (uuid, req) => this.validationService.validateSitDownRequest(uuid, req),
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
+            },
+        },
+        [ActionType.STANDUP]: {
+            validation: (uuid, req) => this.validationService.validateStandUpRequest(uuid),
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.standUpPlayer(player.uuid);
+            },
+        },
+        [ActionType.JOINTABLE]: {
+            validation: (uuid, req) => this.validationService.validateJoinTableRequest(uuid, req),
+            perform: (uuid, req) => this.gameStateManager.addNewPlayerToGame(uuid, req),
+        },
+        [ActionType.JOINTABLEANDSITDOWN]: {
+            validation: (uuid, req) => {
+                const response = this.validationService.validateJoinTableRequest(uuid, req);
+                if (hasError(response)) {
+                    return response;
+                }
+                return this.validationService.validateSitDownRequest(uuid, req);
+            },
+            perform: (uuid, req) => {
+                this.gameStateManager.addNewPlayerToGame(uuid, req);
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
+            },
+        },
+        [ActionType.PINGSTATE]: {
+            validation: (uuid, req) => NO_ERROR,
+            perform: (uuid, req) => {},
+        },
+        [ActionType.CHECK]: {
+            validation: (uuid, req) => this.validationService.validateCheckAction(uuid),
+            perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
+        },
+        [ActionType.BET]: {
+            validation: (uuid, req) => this.validationService.validateBetAction(uuid, req),
+            perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
+        },
+        [ActionType.FOLD]: {
+            validation: (uuid, req) => this.validationService.validateFoldAction(uuid),
+            perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
+        },
+        [ActionType.CALL]: {
+            validation: (uuid, req) => this.validationService.validateCallAction(uuid),
+            perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
+        },
+        [ActionType.CHAT]: {
+            validation: (uuid, req) => {
+                throw Error('CHAT ws action not implemented yet.');
+            },
+            perform: (uuid, req) => {},
+        },
+        [ActionType.SETCHIPSDEBUG]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, request) => {
+                this.validationService.ensureClientIsInGame(uuid);
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.addPlayerChips(player.uuid, Number(request.chipAmount));
+            },
+        },
+    };
+
     processMessage(message: IncomingClientWsMessage, clientUUID: string) {
         this.validationService.ensureClientExists(clientUUID);
-
-        switch (message.actionType) {
-            case ActionType.STARTGAME: {
-                this.processStartGameMessage(clientUUID);
-                break;
-            }
-            case ActionType.STOPGAME: {
-                this.processStopGameMessage(clientUUID);
-                break;
-            }
-            case ActionType.SITDOWN: {
-                this.processSitDownMessage(clientUUID, message.sitDownRequest);
-                break;
-            }
-            case ActionType.STANDUP: {
-                this.processStandUpMessage(clientUUID);
-                break;
-            }
-            case ActionType.JOINTABLE: {
-                this.processJoinTableMessage(clientUUID, message.joinTableRequest);
-                break;
-            }
-
-            case ActionType.JOINTABLEANDSITDOWN: {
-                this.processJoinTableAndSitDownMessage(clientUUID, message.joinTableAndSitDownRequest);
-                break;
-            }
-
-            case ActionType.CHECK: {
-                this.processCheckMessage(clientUUID);
-                break;
-            }
-
-            case ActionType.BET: {
-                this.processBetMessage(clientUUID, message.bettingRoundAction);
-                break;
-            }
-
-            case ActionType.FOLD: {
-                this.processFoldMessage(clientUUID);
-                break;
-            }
-
-            case ActionType.CALL: {
-                this.processCallMessage(clientUUID);
-                break;
-            }
-
-            // TODO formalize debug messages system
-            // TODO turn off debug messages in prod obv
-            case ActionType.SETCHIPSDEBUG: {
-                this.gameStateManager.updatePlayer(this.gameStateManager.getPlayerByClientUUID(clientUUID).uuid, {
-                    chips: Number(message.debugMessage.chipAmt),
-                });
-            }
-
-            case ActionType.PINGSTATE: {
-                break;
-            }
-
-            default: {
-                throw Error(`Unrecognized action type: ${message.actionType}`);
-            }
+        const actionProcessor = this.messageProcessor[message.actionType];
+        const response = actionProcessor.validation(clientUUID, message.request);
+        if (!hasError(response)) {
+            // TODO process error and send error to client
+            console.log(response);
+        } else {
+            console.log(
+                `clientUUID: ${clientUUID}, messagePayload: ${message.request}, actionType: ${message.actionType}`,
+            );
+            actionProcessor.perform(clientUUID, message.request);
         }
-
         this.gamePlayService.startHandIfReady();
-    }
-
-    // Preconditions: at least two players are sitting down.
-    processStartGameMessage(clientUUID: string): void {
-        this.validationService.validateStartGameRequest(clientUUID);
-        this.gamePlayService.startGame();
-    }
-
-    // Preconditions: the game is in progress.
-    processStopGameMessage(clientUUID: string): void {
-        this.validationService.validateStopGameRequest(clientUUID);
-        this.gamePlayService.stopGame();
     }
 
     // TODO should sitdown, standup, jointable, chat, add chips, be put into their own service?
     // something like room service? or administrative service? how to name the aspects of gameplay
-    // that are not directly related to gameplay (sitting down, buying chips, talking)
-    processSitDownMessage(clientUUID: string, request: SitDownRequest): void {
-        this.validationService.validateSitDownRequest(clientUUID, request);
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        this.gameStateManager.sitDownPlayer(player.uuid, request.seatNumber);
-    }
-
-    processStandUpMessage(clientUUID: string): void {
-        this.validationService.validateStandUpRequest(clientUUID);
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        this.gameStateManager.standUpPlayer(player.uuid);
-    }
-
-    processJoinTableMessage(clientUUID: string, request: JoinTableRequest): void {
-        this.validationService.validateJoinTableRequest(clientUUID, request);
-        this.gameStateManager.addNewPlayerToGame(clientUUID, request.name, request.buyin);
-    }
-
-    // TODO you wont be able to stand up and sit back down while this is the case
-    processJoinTableAndSitDownMessage(clientUUID: string, request: JoinTableRequest & SitDownRequest): void {
-        this.processJoinTableMessage(clientUUID, request);
-        this.processSitDownMessage(clientUUID, request);
-    }
-
-    // TODO perhaps create one actionType for a gamePlayAction, and then validate to make sure
-    // that only messages from the current player to act are processed.
-
-    processCheckMessage(clientUUID: string): void {
-        this.validationService.validateCheckAction(clientUUID);
-        this.gamePlayService.performBettingRoundAction(CHECK_ACTION);
-    }
-
-    processCallMessage(clientUUID: string): void {
-        this.validationService.validateCallAction(clientUUID);
-        this.gamePlayService.performBettingRoundAction(CALL_ACTION);
-    }
-
-    processBetMessage(clientUUID: string, action: BettingRoundAction): void {
-        this.validationService.validateBetAction(clientUUID, action);
-        this.gamePlayService.performBettingRoundAction(action);
-    }
-
-    processFoldMessage(clientUUID: string): void {
-        this.validationService.validateFoldAction(clientUUID);
-        this.gamePlayService.performBettingRoundAction(FOLD_ACTION);
-    }
+    // that are not directly related to gameplay, and that can be done out of turn
+    // i.e. (sitting down, buying chips, talking)
 }

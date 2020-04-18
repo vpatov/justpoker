@@ -40,7 +40,7 @@ function OpenSeat(props) {
   function onSitDown() {
     server.send({
       actionType: "JOINTABLEANDSITDOWN",
-      joinTableAndSitDownRequest: {
+      request: {
         name: `Player${seatNumber}`,
         buyin: 200,
         seatNumber: seatNumber,

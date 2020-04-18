@@ -3,6 +3,7 @@ import { GameStateManager } from './gameStateManager';
 import { BettingRoundActionType, BettingRoundAction } from '../../../ui/src/shared/models/game';
 import { SitDownRequest, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
 import { printObj } from '../../../ui/src/shared/util/util';
+import { ValidationResponse, ErrorType, NO_ERROR } from '../../../ui/src/shared/models/validation';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -18,113 +19,187 @@ const MAX_NAME_LENGTH = 32;
  * performed, which allows the gaurantee of atomic operations (either they
  * completely succeed, or completely fail).
  */
+
+export function hasError(response: ValidationResponse): boolean {
+    return response.errorType === ErrorType.NO_ERROR;
+}
+
 @Service()
 export class ValidationService {
     constructor(private readonly gameStateManager: GameStateManager) {}
 
-    ensureClientExists(clientUUID: string) {
+    ensureClientExists(clientUUID: string): ValidationResponse {
         const client = this.gameStateManager.getConnectedClient(clientUUID);
         if (!client) {
-            throw Error(`Client ${clientUUID} does not exist.`);
+            return {
+                errorType: ErrorType.CLIENT_DOES_NOT_EXIST,
+                errorString: `Client ${clientUUID} does not exist.`,
+            };
         }
+        return NO_ERROR;
     }
 
-    ensureClientIsInGame(clientUUID: string) {
+    ensureClientIsInGame(clientUUID: string): ValidationResponse {
         const client = this.gameStateManager.getConnectedClient(clientUUID);
 
         if (!client.playerUUID) {
-            throw Error(`Client ${clientUUID} has not joined the game.`);
+            return {
+                errorType: ErrorType.CLIENT_HAS_NOT_JOINED_GAME,
+                errorString: `Client ${clientUUID} has not joined the game.`,
+            };
         }
 
         const player = this.gameStateManager.getPlayer(client.playerUUID);
         if (!player) {
-            throw Error(`Player ${client.playerUUID} does not exist.`);
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${client.playerUUID} does not exist.`,
+            };
         }
+        return NO_ERROR;
     }
 
-    ensureClientIsNotInGame(clientUUID: string) {
+    ensureClientIsNotInGame(clientUUID: string): ValidationResponse {
         const client = this.gameStateManager.getConnectedClient(clientUUID);
         if (client.playerUUID) {
-            throw Error(`Client ${clientUUID} already has player association: ${client.playerUUID}`);
+            return {
+                errorType: ErrorType.CLIENT_ALREADY_HAS_PLAYER,
+                errorString: `Client ${clientUUID} already has player association: ${client.playerUUID}`,
+            };
         }
+        return NO_ERROR;
     }
 
-    ensurePlayerIsSitting(playerUUID: string) {
+    ensurePlayerIsSitting(playerUUID: string): ValidationResponse {
         const player = this.gameStateManager.getPlayer(playerUUID);
         if (!player.sitting) {
-            throw Error(`Player is not sitting:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`);
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is not sitting:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
+            };
         }
+        return NO_ERROR;
     }
 
-    ensurePlayerIsStanding(playerUUID: string) {
+    ensurePlayerIsStanding(playerUUID: string): ValidationResponse {
         const player = this.gameStateManager.getPlayer(playerUUID);
         if (player.sitting) {
-            throw Error(`Player is not standing:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`);
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is not standing:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
+            };
         }
+        return NO_ERROR;
     }
 
-    // TODO can probably use string templates in a more elegant way to handle errorPrefix
-    ensureCorrectPlayerToAct(clientUUID: string) {
-        this.ensureClientIsInGame(clientUUID);
+    ensureCorrectPlayerToAct(clientUUID: string): ValidationResponse {
+        let response = this.ensureClientIsInGame(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        this.ensurePlayerIsSitting(player.uuid);
+        response = this.ensurePlayerIsSitting(player.uuid);
+        if (hasError(response)) {
+            return response;
+        }
         const currentPlayerToAct = this.gameStateManager.getCurrentPlayerToAct();
         if (player.uuid !== currentPlayerToAct) {
-            throw Error(`Not your turn!\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`);
+            return {
+                errorType: ErrorType.OUT_OF_TURN,
+                errorString: `Not your turn!\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
+            };
         }
+        return NO_ERROR;
     }
 
-    validateJoinTableRequest(clientUUID: string, request: JoinTableRequest) {
-        this.ensureClientIsNotInGame(clientUUID);
+    validateJoinTableRequest(clientUUID: string, request: JoinTableRequest): ValidationResponse {
+        const response = this.ensureClientIsNotInGame(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
         if (request.name.length > MAX_NAME_LENGTH) {
-            throw Error(`Name ${request.name} is too long - exceeds limit of 32 characters.`);
+            return {
+                errorString: `Name ${request.name} is too long - exceeds limit of 32 characters.`,
+                errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
+            };
         }
+        return NO_ERROR;
     }
 
-    validateSitDownRequest(clientUUID: string, request: SitDownRequest) {
-        this.ensureClientIsInGame(clientUUID);
+    validateSitDownRequest(clientUUID: string, request: SitDownRequest): ValidationResponse {
+        let response = this.ensureClientIsInGame(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
 
         const seatNumber = request.seatNumber;
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot SitDown\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
-        this.ensurePlayerIsStanding(player.uuid);
+        response = this.ensurePlayerIsStanding(player.uuid);
+        if (hasError(response)) {
+            return response;
+        }
 
         if (player.chips <= 0) {
-            throw Error(`${errorPrefix} Player needs chips to sit down.`);
+            return {
+                errorType: ErrorType.NOT_ENOUGH_CHIPS,
+                errorString: `${errorPrefix} Player needs chips to sit down.`,
+            };
         }
 
         if (!this.gameStateManager.isValidSeat(seatNumber)) {
-            throw Error(`${errorPrefix} Seat ${seatNumber} is not a valid seat.`);
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `${errorPrefix} Seat ${seatNumber} is not a valid seat.`,
+            };
         }
 
         if (this.gameStateManager.isSeatTaken(seatNumber)) {
-            throw Error(`${errorPrefix} Seat ${seatNumber} is taken. Please pick another`);
+            return {
+                errorType: ErrorType.SEAT_IS_TAKEN,
+                errorString: `${errorPrefix} Seat ${seatNumber} is taken. Please pick another`,
+            };
         }
+        return NO_ERROR;
     }
 
-    validateStandUpRequest(clientUUID: string) {
-        this.ensureClientIsInGame(clientUUID);
+    validateStandUpRequest(clientUUID: string): ValidationResponse {
+        const response = this.ensureClientIsInGame(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        this.ensurePlayerIsSitting(player.uuid);
+        return this.ensurePlayerIsSitting(player.uuid);
     }
 
-    validateStartGameRequest(clientUUID: string) {
+    validateStartGameRequest(clientUUID: string): ValidationResponse {
         // TODO validate that client is admin
         if (this.gameStateManager.isGameInProgress()) {
-            throw Error(`Cannot StartGame: Game is already in progress.`);
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Cannot StartGame: Game is already in progress.`,
+            };
         }
+        return NO_ERROR;
     }
 
-    validateStopGameRequest(clientUUID: string) {
+    validateStopGameRequest(clientUUID: string): ValidationResponse {
         // TODO validate that client is admin
         if (!this.gameStateManager.isGameInProgress()) {
-            throw Error(`Cannot StopGame: Game is not in progress.`);
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Cannot StopGame: Game is not in progress.`,
+            };
         }
+        return NO_ERROR;
     }
 
-    validateCheckAction(clientUUID: string) {
-        this.ensureCorrectPlayerToAct(clientUUID);
+    validateCheckAction(clientUUID: string): ValidationResponse {
+        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
 
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const bettingRoundActions = this.gameStateManager.getBettingRoundActionTypes();
@@ -133,7 +208,10 @@ export class ValidationService {
         // Check to see if anyone has bet before us
         for (const actionType of bettingRoundActions) {
             if (actionType === BettingRoundActionType.BET) {
-                throw Error(`You cannot check when someone before you has bet.`);
+                return {
+                    errorType: ErrorType.ILLEGAL_BETTING_ACTION,
+                    errorString: `You cannot check when someone before you has bet.`,
+                };
             }
         }
 
@@ -141,15 +219,26 @@ export class ValidationService {
         // the highest bet if we are checking. This way, only the big blind and
         // those who post a blind can check.
         if (playerBetAmt != this.gameStateManager.getHighestBet()) {
-            throw Error(`You cannot check without calling the blinds.`);
+            return {
+                errorType: ErrorType.ILLEGAL_BETTING_ACTION,
+                errorString: `You cannot check without calling the blinds.`,
+            };
         }
+        return NO_ERROR;
     }
 
     // You can fold anytime. In the future, would be nice to implement
     // "Are you sure you want to fold?" prompt if user tries to fold
     // without facing a bet
-    validateFoldAction(clientUUID: string) {
-        this.ensureCorrectPlayerToAct(clientUUID);
+    validateFoldAction(clientUUID: string): ValidationResponse {
+        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
+
+        // TODO ensure that player has cards. If they do not have cards, they should never be able to
+        // perform this action unless theres a bug.
+        return NO_ERROR;
     }
 
     // Preconditions:
@@ -165,24 +254,30 @@ export class ValidationService {
 
     */
     //TODO complete
-    validateBetAction(clientUUID: string, action: BettingRoundAction) {
-        this.ensureCorrectPlayerToAct(clientUUID);
+    validateBetAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
+        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
 
+        // TODO remove this from here and put this extra checking in a type validation layer.
         const betAmount = typeof action.amount === 'number' ? action.amount : Number(action.amount);
-
-        // if (typeof betAmount !== 'number') {
-        //     throw Error(`Bet amount should be a number. Received ${typeof betAmount}`);
-        // }
 
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot Bet\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
         if (player.chips < betAmount) {
-            throw Error(`${errorPrefix} Player cannot bet ${betAmount}, they only have ${player.chips} chips.`);
+            return {
+                errorType: ErrorType.NOT_ENOUGH_CHIPS,
+                errorString: `${errorPrefix} Player cannot bet ${betAmount}, they only have ${player.chips} chips.`,
+            };
         }
 
         if (!this.gameStateManager.isPlayerInHand(player.uuid)) {
-            throw Error(`${errorPrefix} FATAL ERROR: Player is not in the hand, they should not be able to bet.`);
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `${errorPrefix} FATAL ERROR: Player is not in the hand, they should not be able to bet.`,
+            };
         }
 
         const minRaiseDiff = this.gameStateManager.getMinRaiseDiff();
@@ -193,12 +288,16 @@ export class ValidationService {
         const isPlayerAllIn = player.chips === betAmount;
 
         if (!isPlayerAllIn && betAmount < minimumBet) {
-            throw Error(
-                `${errorPrefix} Player cannot bet ${betAmount}\nminimum bet is ${minimumBet},` +
+            return {
+                errorType: ErrorType.ILLEGAL_BETTING_ACTION,
+                errorString:
+                    `${errorPrefix} Player cannot bet ${betAmount}\nminimum bet is ${minimumBet},` +
                     ` previousRaise is ${previousRaise}, minRaiseDiff is ${minRaiseDiff}, ` +
                     `partialAllInLeftOver is ${partialAllInLeftOver}`,
-            );
+            };
         }
+
+        return NO_ERROR;
 
         // TODO
         // if (!playerIsFacingRaise && !playerHasntActedYet){
@@ -212,15 +311,25 @@ export class ValidationService {
         Player can call if they havent folded
         Player can call if they are facing a bet.
     */
-    validateCallAction(clientUUID: string) {
+    validateCallAction(clientUUID: string): ValidationResponse {
+        debugger;
         // this should be all we need, because if a player has folded, it will never be their turn to act,
         // and if they are all in, it shouldn't be their turn to act either.
-        this.ensureCorrectPlayerToAct(clientUUID);
+        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot Call\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
+        //TODO is a noop right now
         if (!this.gameStateManager.isPlayerFacingBet(player.uuid)) {
-            throw Error(`${errorPrefix} Player is not facing a bet.`);
+            return {
+                errorType: ErrorType.ILLEGAL_BETTING_ACTION,
+                errorString: `${errorPrefix} Player is not facing a bet.`,
+            };
         }
+
+        return NO_ERROR;
     }
 }

@@ -17,7 +17,7 @@ import { Player } from '../../../ui/src/shared/models/player';
 import { PlayerService } from './playerService';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
-import { ActionType } from '../../../ui/src/shared/models/wsaction';
+import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
 
 @Service()
 export class GameStateManager {
@@ -370,7 +370,9 @@ export class GameStateManager {
         };
     }
 
-    addNewPlayerToGame(clientUUID: string, name: string, buyin: number) {
+    addNewPlayerToGame(clientUUID: string, request: JoinTableRequest) {
+        const name = request.name;
+        const buyin = request.buyin;
         const player = this.playerService.createNewPlayer(name, buyin);
         const associatedClient = this.associateClientAndPlayer(clientUUID, player);
         this.gameState = {
