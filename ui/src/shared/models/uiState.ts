@@ -1,4 +1,4 @@
-import { Card, genRandomCard } from "./cards";
+import { Suit, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
 
@@ -34,10 +34,16 @@ export declare interface ActionButton {
     action: ActionType;
 }
 
+export declare interface UiCard {
+    suit?: Suit;
+    rank?: string;
+    hidden?: boolean;
+}
+
 export declare interface Table {
     spots: number;
     pot: number;
-    readonly communityCards: Card[];
+    readonly communityCards: UiCard[];
     players: Player[];
 }
 
@@ -60,7 +66,7 @@ export declare interface Player {
     handLabel?: string;
     playerTimer?: PlayerTimer;
     hand: {
-        cards: Card[];
+        cards: UiCard[];
     };
 }
 
@@ -68,61 +74,61 @@ export declare interface Player {
 export const FOLD_BUTTON: ActionButton = {
     action: ActionType.FOLD,
     label: "Fold",
-  };
-  
-  export const CHECK_BUTTON: ActionButton = {
+};
+
+export const CHECK_BUTTON: ActionButton = {
     action: ActionType.CHECK,
     label: "Check",
-  };
-  
-  export const CALL_BUTTON: ActionButton = {
+};
+
+export const CALL_BUTTON: ActionButton = {
     action: ActionType.CALL,
     label: "Call",
-  };
-  
-  export const BET_BUTTON: ActionButton = {
+};
+
+export const BET_BUTTON: ActionButton = {
     action: ActionType.BET,
     label: "Bet",
-  };
-  
-  export const RAISE_BUTTON: ActionButton = {
+};
+
+export const RAISE_BUTTON: ActionButton = {
     action: ActionType.BET,
     label: "Raise",
-  };
-  
-  export const NOT_FACING_BET_ACTION_BUTTONS = [
+};
+
+export const NOT_FACING_BET_ACTION_BUTTONS = [
     FOLD_BUTTON,
     CHECK_BUTTON,
     BET_BUTTON,
-  ];
-  
-  export const FACING_BET_ACTION_BUTTONS = [
+];
+
+export const FACING_BET_ACTION_BUTTONS = [
     FOLD_BUTTON,
     CALL_BUTTON,
     RAISE_BUTTON,
-  ];
-  
-  export const ALL_ACTION_BUTTONS = [
+];
+
+export const ALL_ACTION_BUTTONS = [
     FOLD_BUTTON,
     CHECK_BUTTON,
     CALL_BUTTON,
     BET_BUTTON,
     // RAISE_BUTTON,
-  ];
-  
-  /* Common bet sizes */
-  export const COMMON_BB_SIZINGS: Array<number> = [2, 3, 4, 5];
-  
-  export const COMMON_POT_SIZINGS: Array<[number, number]> = [
+];
+
+/* Common bet sizes */
+export const COMMON_BB_SIZINGS: Array<number> = [2, 3, 4, 5];
+
+export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [1, 3],
     [1, 2],
     [2, 3],
     [1, 1],
     [5, 4],
-  ];
-  
-  /* Clean Controller for init. */
-  export const cleanController: Controller = {
+];
+
+/* Clean Controller for init. */
+export const cleanController: Controller = {
     toAct: false,
     unsetCheckCall: false,
     min: 0,
@@ -130,9 +136,8 @@ export const FOLD_BUTTON: ActionButton = {
     sizingButtons: [],
     actionButtons: [],
     adminButtons: [],
-  };
+};
 
-  
 export const TestGame: UiGameState = {
     heroInGame: true,
     gameStarted: true,

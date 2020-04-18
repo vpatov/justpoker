@@ -127,7 +127,7 @@ export class StateTransformService {
         const newPlayer = {
             stack: player.chips - player.betAmount,
             hand: {
-                cards: shouldCardsBeVisible ? player.holeCards : [],
+                cards: shouldCardsBeVisible ? player.holeCards : player.holeCards.map(() => ({ hidden: true })),
             },
             playerTimer: toAct
                 ? {
