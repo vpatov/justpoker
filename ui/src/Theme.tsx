@@ -1,15 +1,17 @@
 import { createMuiTheme } from "@material-ui/core/styles";
 
 import lightBlue from "@material-ui/core/colors/lightBlue";
+import lightGreen from "@material-ui/core/colors/lightGreen";
 import green from "@material-ui/core/colors/green";
 import blue from "@material-ui/core/colors/blue";
 import red from "@material-ui/core/colors/red";
 import grey from "@material-ui/core/colors/grey";
 import teal from "@material-ui/core/colors/teal";
+import orange from "@material-ui/core/colors/orange";
 
 declare module "@material-ui/core/styles/createMuiTheme" {
     interface Theme {
-        custom?: any; // optional
+        custom?: any;
     }
 }
 
@@ -29,8 +31,8 @@ export const CUSTOM_THEME = {
         },
         HIDDEN: {
             backgroundColor: `${grey[900]}`,
-            backgroundImage: `url("https://www.transparenttextures.com/patterns/black-thread-light.png")`,
-            backgroundSize: "30% 20%",
+            backgroundImage: `url("https://www.transparenttextures.com/patterns/climpek.png")`,
+            backgroundSize: "80% 80%",
             backgroundPosition: "50% 50%",
         },
         FOLDED: {
@@ -74,10 +76,23 @@ export const CUSTOM_THEME = {
             CALL: {
                 color: blue[800],
             },
+            STARTGAME: {
+                color: lightGreen[800],
+            },
         },
     },
     typography: {
         fontFamily: "Roboto, Avenir, Helvetica, Arial, sans-serif",
+    },
+    palette: {
+        primary: {
+            main: teal["A400"],
+            light: teal["100"],
+        },
+        secondary: {
+            main: orange["A400"],
+            light: orange["100"],
+        },
     },
 };
 

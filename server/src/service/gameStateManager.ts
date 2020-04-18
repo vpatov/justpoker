@@ -112,6 +112,18 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
     }
 
+    getTimeTurnStartedMs() {
+        return this.gameState.timeTurnStarted;
+    }
+
+    getTimeTurnElapsedSeconds() {
+        return (Date.now() - this.getTimeTurnStartedMs()) / 1000;
+    }
+
+    getTimeToAct() {
+        return this.gameState.gameParameters.timeToAct;
+    }
+
     getPots() {
         return this.gameState.pots;
     }
@@ -308,7 +320,9 @@ export class GameStateManager {
     // TODO validation around this method. Shouldn't be executed when table is not intialized.
     initConnectedClient(clientUUID: string, ws: WebSocket) {
         const client = this.gameState.table.activeConnections.get(clientUUID);
-        if (!client) {
+        if (client) {
+            this.resetClientWebsocket(clientUUID, ws);
+        } else {
             const newClient = this.playerService.createConnectedClient(clientUUID, ws);
             this.gameState = {
                 ...this.gameState,
@@ -318,6 +332,10 @@ export class GameStateManager {
                 },
             };
         }
+    }
+
+    resetClientWebsocket(clientUUID: string, ws: WebSocket) {
+        this.gameState.table.activeConnections.get(clientUUID).ws = ws;
     }
 
     initGame(newGameForm: NewGameForm) {
@@ -402,7 +420,10 @@ export class GameStateManager {
 
         // if everyone has gone already, there are no further actors this round, and nobody should be
         // illuminated
-        this.updateGameState({ currentPlayerToAct: this.haveAllPlayersActed() ? '' : playerUUID });
+        this.updateGameState({
+            currentPlayerToAct: this.haveAllPlayersActed() ? '' : playerUUID,
+            timeTurnStarted: Date.now(),
+        });
     }
 
     setBettingRoundStage(bettingRoundStage: BettingRoundStage) {

@@ -92,7 +92,7 @@ class Server {
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
-            continue;
+            // continue;
             /* Debug Logging */
             const playerName = client.playerUUID ? this.gsm.getPlayer(client.playerUUID).name : 'Anonymous Client';
             console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);
@@ -122,20 +122,22 @@ class Server {
             console.log('connected to ip:', ip);
 
             let clientID = '';
-            try {
-                // try to get clientID from cookie (local script testing)
-                clientID = cookie.parse(req.headers.cookie).clientID;
-                // try to get clientID from url (frontend)
-                if (!clientID) {
-                    const regEx = /clientID\=(\w+)/g;
-                    clientID = Array.from(req.url.matchAll(regEx), (m) => m[1])[0];
-                }
-                if (!clientID) {
-                    clientID = generateUUID();
-                }
-            } catch (e) {
+            // try to get clientID from cookie (local script testing)
+            // try {
+            //     clientID = cookie.parse(req.headers.cookie).clientID;
+            // } catch (e) {
+            //     console.log(e, 'generating new uuid');
+            // }
+
+            // try to get clientID from url (frontend)
+            if (!clientID) {
+                const regEx = /clientID\=(\w+)/g;
+                clientID = Array.from(req.url.matchAll(regEx), (m) => m[1])[0];
+            }
+            if (!clientID) {
                 clientID = generateUUID();
             }
+
             console.log('clientID: ', clientID);
 
             // TODO server shouldnt be communicating with the gameStateManager, but with some
@@ -144,7 +146,6 @@ class Server {
 
             ws.send(
                 JSON.stringify({
-                    status: 200,
                     clientID,
                 }),
             );

@@ -111,13 +111,8 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, button, timeLimit, winner } = props;
-
+    const { stack, name, button, winner, playerTimer } = props;
     const prevStack = usePrevious(stack);
-
-    useEffect(() => {
-        console.log("stack changed");
-    }, [stack]);
 
     return (
         <div className={classes.stackCont}>
@@ -134,10 +129,10 @@ function PlayerStack(props) {
             <Typography variant="body1" className={classes.name}>
                 {name}
             </Typography>
-            {timeLimit ? (
+            {playerTimer ? (
                 <PlayerTimer
                     className={classes.playerTimer}
-                    timeLimit={timeLimit}
+                    playerTimer={playerTimer}
                 />
             ) : null}
         </div>
