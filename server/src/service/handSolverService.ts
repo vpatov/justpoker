@@ -9,8 +9,6 @@ export declare interface Hand {
 
 @Service()
 export class HandSolverService {
-
-
     computeBestHandFromCards(cards: Card[]): Hand {
         const strCards = cards.map((card) => `${card.rank}${SUIT_ABBREVIATIONS[card.suit]}`);
         return this.computeBestHandFromStrCards(strCards);

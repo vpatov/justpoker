@@ -13,7 +13,7 @@ export class GamePlayService {
         private readonly gsm: GameStateManager,
         private readonly handSolverService: HandSolverService,
         private readonly timerManager: TimerManager,
-    ) { }
+    ) {}
 
     /* Gameplay functionality */
 
@@ -175,8 +175,8 @@ export class GamePlayService {
             isPlayerAllIn
                 ? BettingRoundActionType.ALL_IN
                 : playerPlacingBlindBetUUID
-                    ? BettingRoundActionType.WAITING_TO_ACT
-                    : BettingRoundActionType.BET,
+                ? BettingRoundActionType.WAITING_TO_ACT
+                : BettingRoundActionType.BET,
         );
 
         /* TODO
@@ -295,7 +295,7 @@ export class GamePlayService {
 
         this.gsm.updateGameState({
             currentPlayerToAct: firstToActPreflop,
-            timeTurnStarted: Date.now()
+            timeTurnStarted: Date.now(),
         });
     }
 
@@ -380,7 +380,7 @@ export class GamePlayService {
             this.gsm.updatePlayers((player) =>
                 winningPlayers.includes(player.uuid)
                     ? // TODO the players winning hand would go here too.
-                    { chips: player.chips + amountsWon[player.uuid], winner: true }
+                      { chips: player.chips + amountsWon[player.uuid], winner: true }
                     : { winner: false },
             );
 
@@ -397,7 +397,7 @@ export class GamePlayService {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
                 this,
-                () => { },
+                () => {},
                 null,
                 () => snapShot,
                 interval * Number(index),

@@ -9,6 +9,7 @@ export declare interface Controller {
   pot: number;
   sizingButtons: Array<SizingButton>;
   actionButtons: Array<ActionButton>;
+  adminButtons: Array<ActionButton>;
 }
 
 export declare interface SizingButton {
@@ -87,4 +88,5 @@ export const cleanController: Controller = {
   pot: 0,
   sizingButtons: [],
   actionButtons: [],
+  adminButtons: [],
 };
