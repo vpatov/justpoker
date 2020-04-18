@@ -415,7 +415,7 @@ export class GameStateManager {
     }
 
     setCurrentPlayerToAct(playerUUID: string) {
-        // TODO create wrapper method in gamePlayService, to keep this a pure service, and to kepe game logic out.
+        // TODO create wrapper method in gamePlayService, to keep this a pure service, and to keep game logic out.
         // if everyone has acted, there is no current player to act (all in run out)
 
         // if everyone has gone already, there are no further actors this round, and nobody should be

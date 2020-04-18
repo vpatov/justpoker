@@ -2,7 +2,14 @@ import { Service } from 'typedi';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
 import { GameState } from '../../../ui/src/shared/models/gameState';
-import { UiState, Player as UIPlayer } from '../../../ui/src/shared/models/uiState';
+import {
+    UiState,
+    Player as UIPlayer,
+    FOLD_BUTTON,
+    CHECK_BUTTON,
+    CALL_BUTTON,
+    BET_BUTTON,
+} from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
 import { printObj } from '../../../ui/src/shared/util/util';
@@ -10,33 +17,37 @@ import { printObj } from '../../../ui/src/shared/util/util';
 import {
     Controller,
     cleanController,
+    ActionButton,
     ALL_ACTION_BUTTONS,
     SizingButton,
     COMMON_BB_SIZINGS,
     COMMON_POT_SIZINGS,
-} from '../../../ui/src/shared/models/controller';
+} from '../../../ui/src/shared/models/uiState';
 import { HandSolverService, Hand } from './handSolverService';
+import { ValidationService, hasError } from './validationService';
 
 @Service()
 export class StateTransformService {
     constructor(
         private readonly gameStateManager: GameStateManager,
         private readonly handSolverService: HandSolverService,
+        private readonly validationService: ValidationService,
     ) {}
 
+    // Hero refers to the player who is receiving this particular UiState.
     transformGameStateToUIState(clientUUID: string): UiState {
         // TODO needs to be cleaned up, along with model files
 
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsInGame = !!heroPlayer;
-        const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : null;
+        const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : '';
         const board = this.gameStateManager.getBoard();
 
         const uiState: UiState = {
             game: {
                 gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
                 heroInGame: this.gameStateManager.isPlayerInGame(heroPlayerUUID),
-                controller: clientPlayerIsInGame ? this.getUIController(heroPlayer) : cleanController,
+                controller: clientPlayerIsInGame ? this.getUIController(clientUUID, heroPlayerUUID) : cleanController,
                 table: {
                     spots: 9, // TODO configure
                     pot: this.gameStateManager.getTotalPot(),
@@ -50,27 +61,52 @@ export class StateTransformService {
         return uiState;
     }
 
-    getUIController(heroPlayer: Player): Controller {
+    getUIController(clientUUID: string, heroPlayerUUID: string): Controller {
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
         const potSize = this.gameStateManager.getTotalPot();
         const controller: Controller = {
-            toAct: this.gameStateManager.getCurrentPlayerToAct() === heroPlayer.uuid,
+            toAct: this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID,
             unsetCheckCall: false,
             min: 0,
-            max: heroPlayer.chips,
-            pot: potSize,
+            max: this.gameStateManager.getPlayer(heroPlayerUUID).chips,
             sizingButtons:
                 bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
                     ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
                     : COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
                           this.createPotSizeButton(numerator, denominator, potSize),
                       ),
-            actionButtons: ALL_ACTION_BUTTONS,
+            actionButtons: this.getValidBetActions(clientUUID, heroPlayerUUID),
             adminButtons: [],
         };
 
         return controller;
+    }
+
+    // TODO
+    getValidBetActions(clientUUID: string, heroPlayerUUID: string): ActionButton[] {
+        const currentPlayerToAct = this.gameStateManager.getCurrentPlayerToAct();
+        if (currentPlayerToAct !== heroPlayerUUID) {
+            return [];
+        }
+        const actionButtons = [];
+        if (!hasError(this.validationService.validateFoldAction(clientUUID))) {
+            actionButtons.push(FOLD_BUTTON);
+        }
+        if (!hasError(this.validationService.validateCheckAction(clientUUID))) {
+            actionButtons.push(CHECK_BUTTON);
+        }
+        if (!hasError(this.validationService.validateCallAction(clientUUID))) {
+            actionButtons.push(CALL_BUTTON);
+        }
+        /* TODO - create generic bet action that can be used here, or augment
+            validation code path to allow for checking whether a bet is possible
+        if (!hasError(this.validationService.validateBetAction(clientUUID,null))){
+            actionButtons.push(BET_BUTTON);
+        }
+        */
+
+        return ALL_ACTION_BUTTONS;
     }
 
     transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
