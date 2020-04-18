@@ -2,10 +2,15 @@ import { Card, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
 
+export declare interface UiState {
+    game: UiGameState;
+}
+
 export declare interface UiGameState {
     controller: Controller;
     table: Table;
     heroInGame: boolean;
+    gameStarted: boolean;
 }
 
 export declare interface Controller {
@@ -13,6 +18,7 @@ export declare interface Controller {
     max: number;
     sizingButtons: SizingButton[];
     actionButtons: ActionButton[];
+    adminButtons?: ActionButton[];
 
     toAct?: boolean;
     unsetCheckCall?: boolean;
@@ -30,10 +36,14 @@ export declare interface ActionButton {
 
 export declare interface Table {
     spots: number;
-    mainPot: number;
-    totalPot: number;
-    communityCards: Card[];
+    pot: number;
+    readonly communityCards: Card[];
     players: Player[];
+}
+
+export declare interface PlayerTimer {
+    timeElapsed: number;
+    timeLimit: number;
 }
 
 export declare interface Player {
@@ -48,8 +58,7 @@ export declare interface Player {
     winner?: boolean;
     bet?: number;
     handLabel?: string;
-    timeLimit?: number;
-
+    playerTimer?: PlayerTimer;
     hand: {
         cards: Card[];
     };
@@ -57,6 +66,7 @@ export declare interface Player {
 
 export const TestGame: UiGameState = {
     heroInGame: true,
+    gameStarted: true,
     controller: {
         toAct: true,
         unsetCheckCall: true,
@@ -94,11 +104,17 @@ export const TestGame: UiGameState = {
                 label: "Bet",
             },
         ],
+        adminButtons: [
+            {
+                action: ActionType.STARTGAME,
+                label: "Start Game",
+            },
+        ],
     },
     table: {
         spots: 9,
-        mainPot: 12000,
-        totalPot: 66500,
+        pot: 12000,
+
         communityCards: [
             genRandomCard(),
             genRandomCard(),
@@ -112,8 +128,11 @@ export const TestGame: UiGameState = {
                 position: 0,
                 stack: 5500,
                 toAct: true,
-                timeLimit: 30,
                 handLabel: "Set of Kings",
+                playerTimer: {
+                    timeElapsed: 7.6,
+                    timeLimit: 30,
+                },
                 bet: genRandomInt(0, 10),
                 hand: {
                     cards: [genRandomCard(), genRandomCard()],
@@ -186,6 +205,7 @@ export const TestGame: UiGameState = {
 
 export const CleanGame = {
     heroInGame: false,
+    gameStarted: false,
     controller: {
         toAct: false,
         unsetCheckCall: true,
@@ -197,8 +217,7 @@ export const CleanGame = {
     },
     table: {
         spots: 9,
-        mainPot: 0,
-        totalPot: 0,
+        pot: 0,
         communityCards: [],
         players: [],
     },

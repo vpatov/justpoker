@@ -8,11 +8,12 @@ import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        border: "2px solid white",
         borderRadius: 6,
         display: "inline-block",
         textAlign: "center",
         position: "relative",
+        backgroundColor: "white",
+        boxShadow: "0 0 0.3vmin 0.1vmin rgba(255,255,255,0.5)",
     },
     large: {
         height: "8vmin",
@@ -26,6 +27,10 @@ const useStyles = makeStyles((theme) => ({
         width: "5vmin",
         fontSize: "2.8vmin",
         margin: 2,
+    },
+    valueText: {
+        fontWeight: "bold",
+        fontFamily: "Futura, Roboto, Avenir, Helvetica, Arial, sans-serif",
     },
     rankText: {
         fontSize: "inherit",
