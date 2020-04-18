@@ -21,7 +21,7 @@ const MAX_NAME_LENGTH = 32;
  */
 
 export function hasError(response: ValidationResponse): boolean {
-    return response.errorType === ErrorType.NO_ERROR;
+    return response.errorType !== ErrorType.NO_ERROR;
 }
 
 @Service()

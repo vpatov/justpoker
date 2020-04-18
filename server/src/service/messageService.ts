@@ -53,7 +53,11 @@ export class MessageService {
                 if (hasError(response)) {
                     return response;
                 }
-                return this.validationService.validateSitDownRequest(uuid, req);
+                // TODO either remove jointableandsitdown or change code path to allow for
+                // jointable validation, jointable, and then sitdown validation (because sitdown
+                // validation depends on jointable being completed)
+                return response;
+                // return this.validationService.validateSitDownRequest(uuid, req);
             },
             perform: (uuid, req) => {
                 this.gameStateManager.addNewPlayerToGame(uuid, req);
@@ -101,7 +105,7 @@ export class MessageService {
         this.validationService.ensureClientExists(clientUUID);
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);
-        if (!hasError(response)) {
+        if (hasError(response)) {
             // TODO process error and send error to client
             console.log(response);
         } else {

@@ -90,13 +90,21 @@ export class StateTransformService {
             return [];
         }
         const actionButtons = [];
-        if (!hasError(this.validationService.validateFoldAction(clientUUID))) {
+        let response = this.validationService.validateFoldAction(clientUUID);
+        console.log(response);
+        if (!hasError(response)) {
             actionButtons.push(FOLD_BUTTON);
         }
-        if (!hasError(this.validationService.validateCheckAction(clientUUID))) {
+        response = this.validationService.validateCheckAction(clientUUID);
+        console.log(response);
+
+        if (!hasError(response)) {
             actionButtons.push(CHECK_BUTTON);
         }
-        if (!hasError(this.validationService.validateCallAction(clientUUID))) {
+        response = this.validationService.validateCallAction(clientUUID);
+        console.log(response);
+
+        if (!hasError(response)) {
             actionButtons.push(CALL_BUTTON);
         }
         /* TODO - create generic bet action that can be used here, or augment
@@ -106,7 +114,8 @@ export class StateTransformService {
         }
         */
 
-        return ALL_ACTION_BUTTONS;
+        actionButtons.push(BET_BUTTON);
+        return actionButtons;
     }
 
     transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
