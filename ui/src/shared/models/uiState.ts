@@ -203,7 +203,7 @@ export const TestGame: UiGameState = {
     },
 };
 
-export const CleanGame = {
+export const CleanGame: UiGameState = {
     heroInGame: false,
     gameStarted: false,
     controller: {
