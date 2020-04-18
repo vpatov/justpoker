@@ -16,6 +16,7 @@ import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { TimerManager } from '../service/timerManager';
+import { GameExpService } from '../service/gameExpService';
 
 function logGameState(gameState: GameState) {
     console.log('\n\nServer game state:\n');
@@ -51,6 +52,7 @@ class Server {
         private gsm: GameStateManager,
         private stateTransformService: StateTransformService,
         private timerManager: TimerManager,
+        private readonly gameExpService: GameExpService,
     ) {}
 
     private initRoutes(): void {
@@ -87,6 +89,7 @@ class Server {
         if (!gameState.isStateReady) {
             return;
         }
+
         for (const client of this.gsm.getConnectedClients()) {
             const res = this.stateTransformService.getUIState(client.uuid);
             const jsonRes = JSON.stringify(res);
@@ -99,6 +102,7 @@ class Server {
             console.log(util.inspect(res, false, null, true));
             /* -------------- */
         }
+        this.gameExpService.resetGameExp();
     }
 
     //refactor this mess of a function
