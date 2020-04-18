@@ -45,6 +45,8 @@ server.send = function (data) {
 // for correctly constructing messages.
 
 export function Subscribe(key, onMessage) {
+    console.log(key, onMessage);
+
     if (wsSubscriptions[key]) {
         wsSubscriptions[key].push(onMessage);
     } else {

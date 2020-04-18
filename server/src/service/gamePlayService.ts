@@ -5,6 +5,9 @@ import { strict as assert } from 'assert';
 import { HandSolverService, Hand } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
+
+import { GameExpService } from './gameExpService';
+
 import { printObj } from '../../../ui/src/shared/util/util';
 
 @Service()
@@ -13,6 +16,7 @@ export class GamePlayService {
         private readonly gsm: GameStateManager,
         private readonly handSolverService: HandSolverService,
         private readonly timerManager: TimerManager,
+        private readonly gameExpService: GameExpService,
     ) {}
 
     /* Gameplay functionality */
@@ -146,16 +150,20 @@ export class GamePlayService {
     // then its possible to get rid of these methods, and of
     // the CHECK_ACTION / FOLD_ACTION constants
     check() {
+        this.gameExpService.playCheckSFX();
         this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.CHECK);
     }
 
     fold() {
+        this.gameExpService.playFoldSFX();
         this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.FOLD);
 
         // TODO only if player is facing bet
     }
 
     bet(betAmount: number, playerPlacingBlindBetUUID?: string) {
+        this.gameExpService.playBetSFX();
+
         // TODO is playerPlacingBlindBet correct design?
         // after all, a blind is a special case of a normal bet,
         // so in theory it belongs in this method as a code path.
@@ -219,6 +227,7 @@ export class GamePlayService {
     }
 
     callBet() {
+        this.gameExpService.playCallSFX();
         const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
