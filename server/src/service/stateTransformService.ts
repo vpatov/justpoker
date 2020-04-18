@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
 import { GameState } from '../../../ui/src/shared/models/gameState';
+import { UiState, Player as UIPlayer } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
 import { printObj } from '../../../ui/src/shared/util/util';
@@ -23,34 +24,30 @@ export class StateTransformService {
         private readonly handSolverService: HandSolverService,
     ) {}
 
-    transformGameStateToUIState(clientUUID: string) {
-        // need to define translation
-        // need to define interfaces for UIState
-        // needs to be refactored after types and state are better understood
+    transformGameStateToUIState(clientUUID: string): UiState {
+        // TODO needs to be cleaned up, along with model files
 
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsInGame = !!heroPlayer;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : null;
         const board = this.gameStateManager.getBoard();
 
-        const UIState = {
+        const uiState: UiState = {
             game: {
                 gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
                 heroInGame: this.gameStateManager.isPlayerInGame(heroPlayerUUID),
                 controller: clientPlayerIsInGame ? this.getUIController(heroPlayer) : cleanController,
                 table: {
                     spots: 9, // TODO configure
-                    mainPot: 0,
                     pot: this.gameStateManager.getTotalPot(),
-                    totalPot: this.gameStateManager.getTotalPot(), // TODO display multiple pots
-                    communityCards: board,
+                    communityCards: [...board],
                     players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
                         this.transformPlayer(player, heroPlayerUUID),
                     ),
                 },
             },
         };
-        return UIState;
+        return uiState;
     }
 
     getUIController(heroPlayer: Player): Controller {
@@ -76,31 +73,7 @@ export class StateTransformService {
         return controller;
     }
 
-    // TODO (players might want to show their hand)
-    // TODO should table be in state?
-    stripSensitiveFields(clientUUID: string): GameState {
-        const connectedClient = this.gameStateManager.getConnectedClient(clientUUID);
-        const clientPlayerUUID = connectedClient.playerUUID;
-
-        // const players = Object.fromEntries(
-        //     Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) => [
-        //         uuid,
-        //         uuid === clientPlayerUUID ? player : { ...player, holeCards: [] },
-        //     ]),
-        // );
-
-        const strippedGameState = {
-            ...this.gameStateManager.getGameState(),
-            clientPlayerUUID,
-        };
-
-        delete strippedGameState.deck;
-        delete strippedGameState.table;
-
-        return strippedGameState;
-    }
-
-    transformPlayer(player: Player, heroPlayerUUID: string) {
+    transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
         const board = this.gameStateManager.getBoard();
 
         const isHero = heroPlayerUUID === player.uuid;
@@ -109,7 +82,7 @@ export class StateTransformService {
         const newPlayer = {
             stack: player.chips - player.betAmount,
             hand: {
-                cards: shouldCardsBeVisible ? player.holeCards : player.holeCards.map(() => 'hiddenCard'),
+                cards: shouldCardsBeVisible ? player.holeCards : [],
             },
             playerTimer: toAct
                 ? {
@@ -136,7 +109,7 @@ export class StateTransformService {
         return newPlayer;
     }
 
-    getUIState(clientUUID: string) {
+    getUIState(clientUUID: string): UiState {
         const uiState = this.transformGameStateToUIState(clientUUID);
         return uiState;
     }
@@ -149,7 +122,7 @@ export class StateTransformService {
         };
     }
 
-    createBBSizeButton(numBlinds: number, bbValue: number) {
+    createBBSizeButton(numBlinds: number, bbValue: number): SizingButton {
         return {
             label: `${numBlinds} BB`,
             value: numBlinds * bbValue,
