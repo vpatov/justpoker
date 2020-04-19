@@ -42,7 +42,7 @@ const docCookies = {
       ) || null
     );
   },
-  setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+  setItem: function (sKey, sValue, vEnd?, sPath?, sDomain?, bSecure?) {
     if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
       return false;
     }

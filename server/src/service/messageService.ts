@@ -1,4 +1,4 @@
-import { IncomingClientWsMessage, ActionType, ClientWsMessageRequest } from '../../../ui/src/shared/models/wsaction';
+import { ClientWsMessage, ActionType, ClientWsMessageRequest } from '../../../ui/src/shared/models/wsaction';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
@@ -101,7 +101,7 @@ export class MessageService {
         },
     };
 
-    processMessage(message: IncomingClientWsMessage, clientUUID: string) {
+    processMessage(message: ClientWsMessage, clientUUID: string) {
         this.validationService.ensureClientExists(clientUUID);
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);

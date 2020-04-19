@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import classnames from "classnames";
 import Hand from "./Hand";
-import { server } from "./api/ws";
+import { WsServer } from "./api/ws";
 
 import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
@@ -38,7 +38,7 @@ function OpenSeat(props) {
   // TODO change this to onRequestSitDown, because the player has to request to sit down,
   // declare their name, chips, waitForBigBlind?, etc...
   function onSitDown() {
-    server.send({
+    WsServer.send({
       actionType: "JOINTABLEANDSITDOWN",
       request: {
         name: `Player${seatNumber}`,

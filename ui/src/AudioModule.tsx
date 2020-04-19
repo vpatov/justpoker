@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Howl } from "howler";
 import { SoundByte, AudioQueue } from "./shared/models/audioQueue";
-import { Subscribe } from "./api/ws";
+import { WsServer } from "./api/ws";
 
 // TODO if user can pick themes, it would essentially just change the src_path. audio init
 // should be put in function to allow for reload in this case.
@@ -21,7 +21,7 @@ for (const [action, path] of AUDIO_PATHS) {
 
 function AudioModule(props) {
     useEffect(() => {
-        Subscribe("audio", onReceiveNewAudioState);
+        WsServer.subscribe("audio", onReceiveNewAudioState);
     }, []);
 
     const onReceiveNewAudioState = (audioState: AudioQueue) => {
