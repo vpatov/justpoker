@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
 import { Howl } from "howler";
-
 import { SoundByte, AudioQueue } from "./shared/models/audioQueue";
 import { Subscribe } from "./api/ws";
 
+// TODO if user can pick themes, it would essentially just change the src_path. audio init
+// should be put in function to allow for reload in this case.
 const SRC_PATH = `${process.env.PUBLIC_URL}/sounds/guitar_theme`;
-const ACTION_TO_PATH = {
-    [SoundByte.CHECK]: `${SRC_PATH}/check.mp3`,
-    [SoundByte.BET]: `${SRC_PATH}/bet.mp3`,
-    [SoundByte.FOLD]: `${SRC_PATH}/fold.mp3`,
-    [SoundByte.CALL]: `${SRC_PATH}/call.mp3`,
-};
+const EXT = 'mp3';
 
-const ACTION_TO_AUDIO = {};
+const AUDIO_PATHS = Object.entries(SoundByte).map(
+    ([soundByte, filename], _) => [
+        soundByte,
+        `${SRC_PATH}/${filename.toLocaleLowerCase()}.${EXT}`
+    ]);
 
-// init ACTION_TO_AUDIO
-for (const [action, path] of Object.entries(ACTION_TO_PATH)) {
-    ACTION_TO_AUDIO[action] = new Howl({ src: [path] });
+const AUDIO_MAP = {}
+for (const [action, path] of AUDIO_PATHS) {
+    AUDIO_MAP[action] = new Howl({ src: [path] });
 }
 
 function AudioModule(props) {
@@ -25,11 +25,13 @@ function AudioModule(props) {
     }, []);
 
     const onReceiveNewAudioState = (audioState: AudioQueue) => {
-        const audio = ACTION_TO_AUDIO[audioState.global];
+        const audio = AUDIO_MAP[audioState.global];
         if (audio) {
             console.log("playing", audioState.global);
-
             audio.play();
+        }
+        else {
+            console.log(`No audio file provided for ${audioState.global}`);
         }
     };
 

@@ -29,4 +29,15 @@ export class AudioService {
     playCallSFX() {
         this.setGlobalSound(SoundByte.CALL);
     }
+    playVictoryByFoldingSFX() {
+        this.setGlobalSound(SoundByte.VICTORY_BY_FOLDING);
+    }
+    playStartOfHandSFX() {
+        this.setGlobalSound(SoundByte.START_OF_HAND);
+    }
+    playStartOfBettingRoundSFX() {
+        this.setGlobalSound(SoundByte.START_OF_BETTING_ROUND);
+    }
+    // TODO
+    playPersonalWinSFX() {}
 }
