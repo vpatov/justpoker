@@ -6,7 +6,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { Controller } from "./shared/models/uiState";
-import { ActionType } from "./shared/models/wsaction";
+import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
 
 import ButtonWithKeyPress from "./ButtonWithKeyPress";
 
@@ -118,17 +118,19 @@ function ControllerComp(props: ControllerProps) {
         setBetAmt(Math.min(Math.floor(newAmt), max));
     };
 
+    // TODO Redesign ClientWsMessageRequest type to better use typescripts features to better
+    // represent the "one-of" idea
     function onClickActionButton(action) {
         WsServer.send({
             actionType: action,
-            request: { type: action, amount: Number(betAmt) },
+            request: { type: action, amount: Number(betAmt) } as ClientWsMessageRequest,
         });
     }
 
     function onClickAdminButton(action) {
         WsServer.send({
             actionType: action,
-            request: { },
+            request: { } as ClientWsMessageRequest,
         });
     }
 

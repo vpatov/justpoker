@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import classnames from "classnames";
 import Hand from "./Hand";
 import { WsServer } from "./api/ws";
+import {ActionType} from './shared/models/wsaction';
 
 import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
 import EventSeatIcon from "@material-ui/icons/EventSeat";
 import grey from "@material-ui/core/colors/grey";
 import Typography from "@material-ui/core/Typography";
+import { ClientWsMessageRequest } from "./shared/models/wsaction";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,12 +41,12 @@ function OpenSeat(props) {
   // declare their name, chips, waitForBigBlind?, etc...
   function onSitDown() {
     WsServer.send({
-      actionType: "JOINTABLEANDSITDOWN",
+      actionType: ActionType.JOINTABLEANDSITDOWN,
       request: {
         name: `Player${seatNumber}`,
         buyin: 200,
         seatNumber: seatNumber,
-      },
+      } as ClientWsMessageRequest,
     });
   }
 
