@@ -16,7 +16,7 @@ import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { TimerManager } from '../service/timerManager';
-import { GameExpService } from '../service/gameExpService';
+import { AudioService } from '../service/audioService';
 
 function logGameState(gameState: GameState) {
     console.log('\n\nServer game state:\n');
@@ -52,7 +52,7 @@ class Server {
         private gsm: GameStateManager,
         private stateTransformService: StateTransformService,
         private timerManager: TimerManager,
-        private readonly gameExpService: GameExpService,
+        private readonly audioService: AudioService,
     ) {}
 
     private initRoutes(): void {
@@ -102,7 +102,8 @@ class Server {
             console.log(util.inspect(res, false, null, true));
             /* -------------- */
         }
-        this.gameExpService.resetGameExp();
+        // TODO remove this from server and place into stateTransformService
+        this.audioService.reset();
     }
 
     //refactor this mess of a function

@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "./Table";
 import Controller from "./Controller";
-import GameExpModule from "./GameExpModule";
+import GameExpModule from "./AudioModule";
 
 import { UiGameState } from "./shared/models/uiState";
 const useStyles = makeStyles((theme) => ({

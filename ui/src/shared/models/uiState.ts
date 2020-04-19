@@ -1,10 +1,11 @@
 import { Suit, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
-import { GameExp } from "./gameExp";
+import { AudioQueue } from "./audioQueue";
+
 export declare interface UiState {
     game: UiGameState;
-    exp: GameExp;
+    audio: AudioQueue;
 }
 
 export declare interface UiGameState {

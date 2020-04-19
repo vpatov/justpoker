@@ -12,7 +12,7 @@ import {
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
-import { GameExpService } from './gameExpService';
+import { AudioService } from './audioService';
 
 import { printObj } from '../../../ui/src/shared/util/util';
 
@@ -34,7 +34,7 @@ export class StateTransformService {
         private readonly gameStateManager: GameStateManager,
         private readonly handSolverService: HandSolverService,
         private readonly validationService: ValidationService,
-        private readonly gameExpService: GameExpService,
+        private readonly audioService: AudioService,
     ) {}
 
     // Hero refers to the player who is receiving this particular UiState.
@@ -60,7 +60,7 @@ export class StateTransformService {
                     ),
                 },
             },
-            exp: this.gameExpService.getGameExp(),
+            audio: this.audioService.getAudioQueue(),
         };
         return uiState;
     }

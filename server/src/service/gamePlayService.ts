@@ -6,7 +6,7 @@ import { HandSolverService, Hand } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
 
-import { GameExpService } from './gameExpService';
+import { AudioService } from './audioService';
 
 import { printObj } from '../../../ui/src/shared/util/util';
 
@@ -16,7 +16,7 @@ export class GamePlayService {
         private readonly gsm: GameStateManager,
         private readonly handSolverService: HandSolverService,
         private readonly timerManager: TimerManager,
-        private readonly gameExpService: GameExpService,
+        private readonly gameExpService: AudioService,
     ) {}
 
     /* Gameplay functionality */
