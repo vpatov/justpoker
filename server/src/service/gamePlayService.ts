@@ -16,7 +16,7 @@ export class GamePlayService {
         private readonly gsm: GameStateManager,
         private readonly handSolverService: HandSolverService,
         private readonly timerManager: TimerManager,
-        private readonly gameExpService: AudioService,
+        private readonly audioService: AudioService,
     ) {}
 
     /* Gameplay functionality */
@@ -82,18 +82,22 @@ export class GamePlayService {
             }
             case BettingRoundStage.PREFLOP: {
                 this.initializePreflop();
+                this.audioService.playStartOfHandSFX();
                 break;
             }
             case BettingRoundStage.FLOP: {
                 this.initializeFlop();
+                this.audioService.playStartOfBettingRoundSFX();
                 break;
             }
             case BettingRoundStage.TURN: {
                 this.initializeTurn();
+                this.audioService.playStartOfBettingRoundSFX();
                 break;
             }
             case BettingRoundStage.RIVER: {
                 this.initializeRiver();
+                this.audioService.playStartOfBettingRoundSFX();
                 break;
             }
             case BettingRoundStage.SHOWDOWN: {
@@ -150,19 +154,19 @@ export class GamePlayService {
     // then its possible to get rid of these methods, and of
     // the CHECK_ACTION / FOLD_ACTION constants
     check() {
-        this.gameExpService.playCheckSFX();
+        this.audioService.playCheckSFX();
         this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.CHECK);
     }
 
     fold() {
-        this.gameExpService.playFoldSFX();
+        this.audioService.playFoldSFX();
         this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.FOLD);
 
         // TODO only if player is facing bet
     }
 
     bet(betAmount: number, playerPlacingBlindBetUUID?: string) {
-        this.gameExpService.playBetSFX();
+        this.audioService.playBetSFX();
 
         // TODO is playerPlacingBlindBet correct design?
         // after all, a blind is a special case of a normal bet,
@@ -227,7 +231,7 @@ export class GamePlayService {
     }
 
     callBet() {
-        this.gameExpService.playCallSFX();
+        this.audioService.playCallSFX();
         const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
@@ -510,6 +514,7 @@ export class GamePlayService {
         this.gsm.updateGameState({ currentPlayerToAct: '' });
         this.placeBetsInPot();
         this.giveWinnerThePot(winnerUUID);
+        this.audioService.playVictoryByFoldingSFX();
         this.triggerFinishHand(2000);
     }
 
@@ -518,7 +523,7 @@ export class GamePlayService {
     }
 
     triggerFinishBettingRound() {
-        this.timerManager.setTimer(this, this.finishBettingRound, this.gsm, this.gsm.getGameState, 300);
+        this.timerManager.setTimer(this, this.finishBettingRound, this.gsm, this.gsm.getGameState, 600);
     }
 
     finishBettingRound() {
