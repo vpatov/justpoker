@@ -40,7 +40,7 @@ export type ClientWsMessageRequest =
   & BettingRoundAction & 
   AddChipsRequest; 
 
-export declare interface IncomingClientWsMessage {
+export declare interface ClientWsMessage {
   actionType: ActionType;
   request: ClientWsMessageRequest;
 }

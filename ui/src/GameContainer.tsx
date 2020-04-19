@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Game from "./Game";
 import { CleanGame } from "./shared/models/uiState";
-import { OpenWs, Subscribe } from "./api/ws";
+import { WsServer } from "./api/ws";
 
 function GameContainer(): any {
   const [game, setGame] = useState(CleanGame);
 
   useEffect(() => {
-    const succ = OpenWs();
+    const succ = WsServer.openWs();
     if (succ) {
-      Subscribe("game", onReceiveNewGame);
+      WsServer.subscribe("game", onReceiveNewGame);
     }
   }, []);
 

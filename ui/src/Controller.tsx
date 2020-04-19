@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import classnames from "classnames";
-import { server } from "./api/ws";
+import { WsServer } from "./api/ws";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -119,16 +119,16 @@ function ControllerComp(props: ControllerProps) {
     };
 
     function onClickActionButton(action) {
-        server.send({
+        WsServer.send({
             actionType: action,
             request: { type: action, amount: Number(betAmt) },
         });
     }
 
     function onClickAdminButton(action) {
-        server.send({
+        WsServer.send({
             actionType: action,
-            bettingRoundAction: { type: action },
+            request: { },
         });
     }
 
