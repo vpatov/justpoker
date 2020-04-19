@@ -14,9 +14,10 @@ export class TimerManager {
         getUpdateScope: any,
         getUpdate: () => GameState,
     ) {
-        debugger;
         fn.bind(bindScope)();
-        updateEmitter.next(getUpdate.bind(getUpdateScope)());
+        const state = getUpdate.bind(getUpdateScope)();
+        console.log('timerManager globalTimerFn');
+        updateEmitter.next(state);
     }
 
     observeUpdates() {
