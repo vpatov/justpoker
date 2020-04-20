@@ -14,6 +14,9 @@ export declare interface Player {
     /** Player's hole cards. */
     readonly holeCards: Card[];
 
+    /** Label describing the best hand the player current holds. */
+    readonly handDescription: string;
+
     /**
      * If a player is sitting they are either playing/have played
      * in the current hand, or are waiting to be dealt in the next hand.
@@ -50,6 +53,7 @@ export const cleanPlayer: Player = {
     name: '',
     chips: 0,
     holeCards: [],
+    handDescription: '',
     sitting: false,
     seatNumber: -1,
     lastActionType: BettingRoundActionType.NOT_IN_HAND,

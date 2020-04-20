@@ -80,6 +80,10 @@ export class GamePlayService {
         this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getCurrentPlayerToAct()));
     }
 
+    updateHandDescriptions() {
+        this.gsm.updatePlayers((player) => ({ handDescription: this.gsm.getPlayerHandDescription(player.uuid) }));
+    }
+
     initializeBettingRound() {
         // TODO timer - this seems like it would a good place to handle the timer
 
@@ -354,18 +358,21 @@ export class GamePlayService {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.FLOP);
         this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(3);
+        this.updateHandDescriptions();
     }
 
     initializeTurn() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.TURN);
         this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(1);
+        this.updateHandDescriptions();
     }
 
     initializeRiver() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.RIVER);
         this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(1);
+        this.updateHandDescriptions();
     }
 
     showDown() {
