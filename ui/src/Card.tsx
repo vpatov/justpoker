@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 
 import { generateStringFromSuit, SUITS } from "./utils";
 import classnames from "classnames";
@@ -16,35 +16,42 @@ const useStyles = makeStyles((theme) => ({
         boxShadow: "0 0 0.3vmin 0.1vmin rgba(255,255,255,0.5)",
     },
     large: {
-        height: "8vmin",
-        width: "6vmin",
-        fontSize: "4vmin",
-        margin: 4,
+        height: "10vmin",
+        width: "8vmin",
+        fontSize: "5vmin",
+        margin: "0.5vmin",
     },
     small: {
-        zIndex: -1,
         height: "6vmin",
         width: "5vmin",
-        fontSize: "2.8vmin",
-        margin: 2,
+        margin: "0.4vmin",
+        display: "flex",
+        justifyContent: "space-evenly",
     },
-    valueText: {
+    valueTextsmall: {
+        letterSpacing: "-0.3vmin",
+        fontSize: "2.5vmin",
+        color: "white",
         fontWeight: "bold",
         fontFamily: "Futura, Roboto, Avenir, Helvetica, Arial, sans-serif",
     },
-    rankText: {
+    valueTextlarge: {
+        fontWeight: "bold",
+        fontFamily: "Futura, Roboto, Avenir, Helvetica, Arial, sans-serif",
+    },
+    rankTextlarge: {
         fontSize: "inherit",
         position: "absolute",
-        top: "-0.6vmin",
-        left: "0.6vmin",
+        top: "-1vmin",
+        left: "0.8vmin",
         color: "white",
         display: "inline-block",
     },
-    suitText: {
+    suitTextlarge: {
         fontSize: "inherit",
         position: "absolute",
         bottom: "-0.6vmin",
-        right: "0.6vmin",
+        right: "0.8vmin",
         color: "white",
         display: "inline-block",
     },
@@ -74,6 +81,36 @@ function Card(props) {
     const classes = useStyles();
     const { suit, rank, size, style, hidden, className } = props;
 
+    function generateSmallText() {
+        return (
+            <Typography className={classnames(classes[`valueText${size}`])}>
+                {`${rank} ${generateStringFromSuit(suit)}`}
+            </Typography>
+        );
+    }
+
+    function generateLargeText() {
+        return (
+            <Fragment>
+                <Typography
+                    className={classnames(
+                        classes[`valueText${size}`],
+                        classes[`rankText${size}`]
+                    )}
+                >
+                    {rank}
+                </Typography>
+                <Typography
+                    className={classnames(
+                        classes[`valueText${size}`],
+                        classes[`suitText${size}`]
+                    )}
+                >
+                    {generateStringFromSuit(suit)}
+                </Typography>
+            </Fragment>
+        );
+    }
     if (hidden) {
         return (
             <div
@@ -97,18 +134,7 @@ function Card(props) {
             )}
             style={style}
         >
-            <Typography
-                className={classnames(classes.valueText, classes.rankText)}
-                style={size === "small" ? { top: -2 } : {}}
-            >
-                {rank}
-            </Typography>
-            <Typography
-                className={classnames(classes.valueText, classes.suitText)}
-                style={size === "small" ? { top: -2 } : {}}
-            >
-                {generateStringFromSuit(suit)}
-            </Typography>
+            {size === "small" ? generateSmallText() : generateLargeText()}
         </div>
     );
 }
