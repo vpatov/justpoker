@@ -8,9 +8,32 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 
-const tableHeightPercent = 65;
-const tableWidthPercent = 65;
+const TABLE_HEIGHT = 50;
+const TABLE_WIDTH = 80;
 
+const PLAYER_HEIGHT = 61;
+const PLAYER_WIDTH = 90;
+
+const BET_HEIGHT = 35;
+const BET_WIDTH = 62;
+
+function positionToPlacement(width, height, index) {
+    const xInc = width / 8;
+    const yInc = height / 6;
+    const dict = {
+        0: { x: xInc * 2, y: 0 },
+        1: { x: xInc * 6, y: 0 },
+        2: { x: width, y: yInc * 2 },
+        3: { x: width, y: yInc * 4 },
+        4: { x: xInc * 6.5, y: yInc * 5.5 },
+        5: { x: xInc * 4, y: height },
+        6: { x: xInc * 1.5, y: yInc * 5.5 },
+        7: { x: 0, y: yInc * 4 },
+        8: { x: 0, y: yInc * 2 },
+    };
+
+    return dict[index];
+}
 const useStyles = makeStyles((theme) => ({
     root: {
         height: "80%",
@@ -19,16 +42,21 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         alignItems: "center",
     },
-    tableCont: {
-        // transition: "transform 2s linear 0s",
-        // "&:hover": {
-        //   transform: "translate(0vw, -100vh)",
-        // },
+    playersCont: {
+        position: "absolute",
+        height: `${PLAYER_HEIGHT}vmin`,
+        width: `${PLAYER_WIDTH}vmin`,
+    },
+    betCont: {
+        position: "absolute",
+        height: `${BET_HEIGHT}vmin`,
+        width: `${BET_WIDTH}vmin`,
     },
     table: {
-        height: tableHeightPercent + "vmin",
-        width: tableWidthPercent + "vmin",
-        borderRadius: "50%",
+        position: "absolute",
+        height: `${TABLE_HEIGHT}vmin`,
+        width: `${TABLE_WIDTH}vmin`,
+        borderRadius: "30vmin",
         margin: "auto",
         display: "flex",
         justifyContent: "center",
@@ -42,6 +70,9 @@ const useStyles = makeStyles((theme) => ({
     },
     spot: {
         position: "absolute",
+        top: 0,
+        left: 0,
+        transform: "translateY(-50%) translateX(-50%)",
     },
     mainPot: {
         fontSize: "3vmin",
@@ -82,16 +113,15 @@ function Table(props) {
         };
     });
 
-    const playerPosScale = 0.4;
-    const betPosScale = 0.26;
-
     function createSpotsAtTable() {
         const ans = [] as any;
 
         for (let index = 0; index < spots; index++) {
-            const vmin = Math.min(dimensions.width, dimensions.height);
-            const xPos = Math.cos((2 * 3.14 * index) / spots) * vmin;
-            const yPos = Math.sin((2 * 3.14 * index) / spots) * vmin;
+            const pPos = positionToPlacement(
+                PLAYER_WIDTH,
+                PLAYER_HEIGHT,
+                index
+            );
 
             const player = players.find((p) => p.position === index);
             if (player) {
@@ -101,21 +131,10 @@ function Table(props) {
                             player={player}
                             className={classes.spot}
                             style={{
-                                transform: `translate(${
-                                    xPos * playerPosScale
-                                }px,${yPos * playerPosScale}px)`,
+                                top: `${pPos.y}vmin`,
+                                left: `${pPos.x}vmin`,
                             }}
                         />
-                        {player.bet ? (
-                            <Bet
-                                style={{
-                                    transform: `translate(${
-                                        xPos * betPosScale
-                                    }px,${yPos * betPosScale}px)`,
-                                }}
-                                amount={player.bet}
-                            />
-                        ) : null}
                     </Fragment>
                 );
             } else if (!heroInGame) {
@@ -124,10 +143,34 @@ function Table(props) {
                         seatNumber={index}
                         className={classes.spot}
                         style={{
-                            transform: `translate(${xPos * playerPosScale}px,${
-                                yPos * playerPosScale
-                            }px)`,
+                            top: `${pPos.y}vmin`,
+                            left: `${pPos.x}vmin`,
                         }}
+                    />
+                );
+            } else {
+                ans.push(null);
+            }
+        }
+        return ans;
+    }
+
+    function createBetsAtTable() {
+        const ans = [] as any;
+
+        for (let index = 0; index < spots; index++) {
+            const bPos = positionToPlacement(BET_WIDTH, BET_HEIGHT, index);
+
+            const player = players.find((p) => p.position === index);
+            if (player.bet) {
+                ans.push(
+                    <Bet
+                        style={{
+                            top: `${bPos.y}vmin`,
+                            left: `${bPos.x}vmin`,
+                            transform: "translateY(-50%) translateX(-50%)",
+                        }}
+                        amount={player.bet}
                     />
                 );
             } else {
@@ -138,15 +181,15 @@ function Table(props) {
     }
     return (
         <div className={classes.root}>
-            <div className={classes.tableCont}>
-                <div className={classes.table}>
-                    <Typography
-                        className={classes.mainPot}
-                    >{`${pot.toLocaleString()}`}</Typography>
-                    <CommunityCards communityCards={communityCards} />
-                </div>
+            <div className={classes.table}>
+                <Typography
+                    className={classes.mainPot}
+                >{`${pot.toLocaleString()}`}</Typography>
+                <CommunityCards communityCards={communityCards} />
             </div>
-            {createSpotsAtTable()}
+
+            <div className={classes.playersCont}>{createSpotsAtTable()}</div>
+            <div className={classes.betCont}>{createBetsAtTable()}</div>
         </div>
     );
 }

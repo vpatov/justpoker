@@ -36,7 +36,7 @@ export declare interface ActionButton {
     action: ActionType;
 }
 
-export declare interface UiCard{
+export declare interface UiCard {
     suit?: Suit;
     rank?: string;
     hidden?: boolean;
@@ -98,20 +98,20 @@ export const RAISE_BUTTON: ActionButton = {
     label: "Raise",
 };
 
-export const  START_GAME_BUTTON = {
+export const START_GAME_BUTTON = {
     action: ActionType.STARTGAME,
     label: "Start Game",
 };
 
-export const  STOP_GAME_BUTTON = {
+export const STOP_GAME_BUTTON = {
     action: ActionType.STOPGAME,
     label: "Stop Game",
 };
 
 export const ADD_CHIPS_BUTTON = {
     action: ActionType.ADDCHIPS,
-    label: "Add Chips"
-}
+    label: "Add Chips",
+};
 
 export const NOT_FACING_BET_ACTION_BUTTONS = [
     FOLD_BUTTON,
@@ -182,9 +182,7 @@ export const TestGame: UiGameState = {
             },
         ],
         actionButtons: ALL_ACTION_BUTTONS,
-        adminButtons: [
-            START_GAME_BUTTON,
-        ],
+        adminButtons: [START_GAME_BUTTON],
     },
     table: {
         spots: 9,
@@ -234,14 +232,14 @@ export const TestGame: UiGameState = {
                 },
             },
             {
-                name: "Tommy Bones",
+                name: "Johnny Bones",
                 position: 3,
                 stack: 323,
-                folded: true,
                 hand: {
                     cards: [genRandomCard(), genRandomCard()],
                 },
             },
+
             {
                 button: true,
                 name: "Langus Yanger",
@@ -253,7 +251,15 @@ export const TestGame: UiGameState = {
                     cards: [genRandomCard(), genRandomCard()],
                 },
             },
+            {
+                name: "Tommy Bones",
+                position: 5,
+                stack: 323,
 
+                hand: {
+                    cards: [genRandomCard(), genRandomCard()],
+                },
+            },
             {
                 hero: true,
                 name: "Jimmy Dean",
@@ -269,7 +275,16 @@ export const TestGame: UiGameState = {
                 name: "Nicki Lam",
                 stack: 20499,
                 position: 7,
-                bet: genRandomInt(0, 1000000000000),
+                bet: genRandomInt(0, 100000000),
+                hand: {
+                    cards: [genRandomCard(), genRandomCard()],
+                },
+            },
+            {
+                name: "Tommy Bones",
+                position: 8,
+                stack: 323,
+                folded: true,
                 hand: {
                     cards: [genRandomCard(), genRandomCard()],
                 },

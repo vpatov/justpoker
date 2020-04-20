@@ -41,12 +41,12 @@ export const CUSTOM_THEME = {
         },
         BACKGROUND: {
             background:
-                " radial-gradient(circle, rgba(50,112,173,1) 0%, rgba(14,47,83,1) 100%)",
+                "linear-gradient(rgba(65,112,173,1) 0%, rgba(34,67,103,1) 100%)",
         },
         TABLE: {
-            border: `14px solid rgba(255,255,255,0.7)`,
+            border: `0.7vmin solid rgba(255,255,255,0.4)`,
             boxShadow: `0 0 0 4px black, 0 4px 4px 4px black`,
-            backgroundColor: "rgba(0,0,0,0.3)",
+            backgroundColor: "rgba(0,0,0,0.1)",
             // background: `radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);`,
             // backgroundSize: "100%",
             // backgroundPosition: "50% 50%",
