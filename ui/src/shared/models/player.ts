@@ -35,7 +35,14 @@ export declare interface Player {
     /** The amount of chips the player is about to put into the pot. */
     readonly betAmount: number;
 
-    cardsAreHidden: boolean;
+    /** Whether or not the player's cards are publicly visible at the table. */
+    readonly cardsAreHidden: boolean;
+
+    /** The total amount of chips the player has won or lost during this hand. */
+    readonly chipDelta: number;
+
+    /** Used to calculate chipDelta. */
+    readonly chipsAtStartOfHand: number;
 }
 
 export const cleanPlayer: Player = {
@@ -49,4 +56,6 @@ export const cleanPlayer: Player = {
     winner: false,
     betAmount: 0,
     cardsAreHidden: true,
+    chipsAtStartOfHand: 0,
+    chipDelta: 0
 }

@@ -1,16 +1,8 @@
-import { Card } from "./cards";
-
 export declare interface BettingRoundAction {
   type: BettingRoundActionType;
   amount?: number;
-  // allin: boolean;
-  // Is there a reason to set all in in this object?
-  // the amount of chips the player bets will always
-  // be equal to their stack if this is the case
 }
 
-// TODO re-evaluate semantics of WSAction vs BettingRoundAction vs lastActionType of Player
-// and see if you can find a better design
 // TODO re-evaluate semantics of WSAction vs BettingRoundAction vs lastActionType of Player
 // and see if you can find a better design
 export const enum BettingRoundActionType {
@@ -33,9 +25,6 @@ export declare interface GameParameters {
   gameType: GameType;
   timeToAct: number;
   maxPlayers: number;
-  // add these later
-  // straddleType: StraddleType;
-  // ante: number;
 }
 
 export const enum StraddleType {
@@ -43,11 +32,6 @@ export const enum StraddleType {
   MississipiStraddle = "MississipiStraddle",
   NormalStraddle = "NormalStraddle",
 }
-
-// These are the community cards
-// export declare interface Board {
-//   cards: Card[];
-// }
 
 export const enum GameType {
   LHOLDEM = "LHOLDEM",

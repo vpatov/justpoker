@@ -29,6 +29,7 @@ import {
 } from '../../../ui/src/shared/models/uiState';
 import { HandSolverService, Hand } from './handSolverService';
 import { ValidationService, hasError } from './validationService';
+import { AudioQueue } from '../../../ui/src/shared/models/audioQueue';
 
 @Service()
 export class StateTransformService {
@@ -41,8 +42,8 @@ export class StateTransformService {
 
     // Hero refers to the player who is receiving this particular UiState.
     transformGameStateToUIState(clientUUID: string): UiState {
-        // TODO needs to be cleaned up, along with model files
-
+        // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
+        // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsInGame = !!heroPlayer;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : '';
@@ -51,7 +52,7 @@ export class StateTransformService {
         const uiState: UiState = {
             game: {
                 gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
-                heroInGame: this.gameStateManager.isPlayerInGame(heroPlayerUUID),
+                heroInGame: clientPlayerIsInGame,
                 controller: clientPlayerIsInGame ? this.getUIController(clientUUID, heroPlayerUUID) : cleanController,
                 table: {
                     spots: 9, // TODO configure
@@ -62,13 +63,13 @@ export class StateTransformService {
                     ),
                 },
             },
-            audio: this.audioService.getAudioQueue(),
+            audio: clientPlayerIsInGame
+                ? this.transformAudioForClient(heroPlayerUUID)
+                : this.audioService.getAudioQueue(),
         };
         return uiState;
     }
 
-    // TODO remove heroPlayerUUID from parameters here and elsewhere where clientUUID is provided
-    // because its a little bit redundant
     getUIController(clientUUID: string, heroPlayerUUID: string): Controller {
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
@@ -134,6 +135,35 @@ export class StateTransformService {
         return adminButtons;
     }
 
+    transformAudioForClient(playerUUID: string): AudioQueue {
+        const winners = this.gameStateManager.getWinners();
+        if (winners.length > 0) {
+            if (winners.includes(playerUUID)) {
+                // TODO check chip delta for big player win
+                return this.audioService.getHeroWinSFX();
+            } else {
+                return this.audioService.getVillainWinSFX();
+            }
+        }
+        /* TODO this approach isn't working exactly as intended because right now
+         there is no delay between a player action, and the resultant state.
+         for example, a player bets. Their bet, and the next
+         player to act, are part of the same state update. It would be probably be 
+         better for timing/sounds/animations if there was a slight delay in between
+         player actions and the next person to act. i.e.
+         player bets - updated state with their bet gets sent
+         next player to act - the state that immediately follows
+         this way the sound for when someone bets and when its someones turn 
+         are part of different states and are easier to handle.
+        */
+        // if (this.gameStateManager.getCurrentPlayerToAct() === playerUUID) {
+        //     return this.audioService.getHeroTurnToActSFX();
+        // } else {
+        //     return this.audioService.getAudioQueue();
+        // }
+        return this.audioService.getAudioQueue();
+    }
+
     transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
         const board = this.gameStateManager.getBoard();
 
@@ -147,7 +177,7 @@ export class StateTransformService {
             },
             playerTimer: toAct
                 ? {
-                      timeElapsed: this.gameStateManager.getTimeTurnElapsedSeconds(),
+                      timeElapsed: this.gameStateManager.getCurrentPlayerTurnElapsedTime() / 1000,
                       timeLimit: this.gameStateManager.getTimeToAct(),
                   }
                 : undefined,

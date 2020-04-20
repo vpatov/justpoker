@@ -130,12 +130,14 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
     }
 
-    getTimeTurnStartedMs() {
-        return this.gameState.timeTurnStarted;
+    // returns time in milliseconds
+    getTimeCurrentPlayerTurnStarted() {
+        return this.gameState.timeCurrentPlayerTurnStarted;
     }
 
-    getTimeTurnElapsedSeconds() {
-        return (Date.now() - this.getTimeTurnStartedMs()) / 1000;
+    // returns time in milliseconds
+    getCurrentPlayerTurnElapsedTime() {
+        return Date.now() - this.getTimeCurrentPlayerTurnStarted();
     }
 
     getTimeToAct() {
@@ -208,51 +210,51 @@ export class GameStateManager {
         return this.gameState.deck;
     }
 
-    getPlayersInHand() {
+    getPlayersInHand(): string[] {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerInHand(playerUUID));
     }
 
-    getPlayersEligibleToActNext() {
+    getPlayersEligibleToActNext(): string[] {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
-    isPlayerInGame(playerUUID: string) {
-        return Object.entries(this.gameState.players).some(([uuid, player]) => player.uuid === playerUUID);
+    isPlayerInGame(playerUUID: string): boolean {
+        return !!this.getPlayer(playerUUID);
     }
 
-    isPlayerReadyToPlay(playerUUID: string) {
+    isPlayerReadyToPlay(playerUUID: string): boolean {
         return this.getPlayer(playerUUID).sitting;
     }
 
-    isPlayerInHand(playerUUID: string) {
+    isPlayerInHand(playerUUID: string): boolean {
         return !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID);
     }
 
-    isPlayerFacingBet(playerUUID: string) {
+    isPlayerFacingBet(playerUUID: string): boolean {
         return this.getPreviousRaise() + this.getPartialAllInLeftOver() > this.getPlayerBetAmount(playerUUID);
     }
 
     // TODO
-    isPlayerFacingRaise(playerUUID: string) {
+    isPlayerFacingRaise(playerUUID: string): boolean {
         return false;
     }
 
-    isPlayerEligibleToActNext(playerUUID: string) {
+    isPlayerEligibleToActNext(playerUUID: string): boolean {
         return (
             !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID) && !this.isPlayerAllIn(playerUUID)
         );
     }
 
     // incorrectly returning true if someone goes all in preflop and big blind doesnt have chance to fold/call
-    isBettingRoundOver() {
+    isBettingRoundOver(): boolean {
         return this.haveAllPlayersActed();
     }
 
-    hasPlayerFolded(playerUUID: string) {
+    hasPlayerFolded(playerUUID: string): boolean {
         return this.getPlayer(playerUUID).lastActionType === BettingRoundActionType.FOLD;
     }
 
-    hasEveryoneButOnePlayerFolded() {
+    hasEveryoneButOnePlayerFolded(): boolean {
         return this.getPlayersInHand().length === 1;
     }
 
@@ -433,15 +435,7 @@ export class GameStateManager {
     }
 
     setCurrentPlayerToAct(playerUUID: string) {
-        // TODO create wrapper method in gamePlayService, to keep this a pure service, and to keep game logic out.
-        // if everyone has acted, there is no current player to act (all in run out)
-
-        // if everyone has gone already, there are no further actors this round, and nobody should be
-        // illuminated
-        this.updateGameState({
-            currentPlayerToAct: this.haveAllPlayersActed() ? '' : playerUUID,
-            timeTurnStarted: Date.now(),
-        });
+        this.updateGameState({ currentPlayerToAct: playerUUID });
     }
 
     setBettingRoundStage(bettingRoundStage: BettingRoundStage) {
