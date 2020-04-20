@@ -38,11 +38,15 @@ export declare interface Player {
     cardsAreHidden: boolean;
 }
 
-/*
-export declare interface PlayerGameData {
-    // holeCards: Card[];
-    // gameData: PlayerGameData;
-    // potsWon: number;
-    // vpip: number;
+export const cleanPlayer: Player = {
+    uuid: '',
+    name: '',
+    chips: 0,
+    holeCards: [],
+    sitting: false,
+    seatNumber: -1,
+    lastActionType: BettingRoundActionType.NOT_IN_HAND,
+    winner: false,
+    betAmount: 0,
+    cardsAreHidden: true,
 }
-*/

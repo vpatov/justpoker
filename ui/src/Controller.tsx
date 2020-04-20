@@ -97,7 +97,6 @@ const KEY_ACTION_MAP = {
     [ActionType.CHECK]: "K",
     [ActionType.CALL]: "A",
     [ActionType.FOLD]: "F",
-    [ActionType.STARTGAME]: "S",
 };
 
 function ControllerComp(props: ControllerProps) {
@@ -195,9 +194,7 @@ function ControllerComp(props: ControllerProps) {
                             )}
                             onClick={(e) => onClickAdminButton(button.action)}
                         >
-                            {`${button.label} (${
-                                KEY_ACTION_MAP[button.action]
-                            })`}
+                            {`${button.label}`}
                         </ButtonWithKeyPress>
                     ))}
                 </div>
