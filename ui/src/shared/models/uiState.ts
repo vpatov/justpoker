@@ -108,6 +108,11 @@ export const  STOP_GAME_BUTTON = {
     label: "Stop Game",
 };
 
+export const ADD_CHIPS_BUTTON = {
+    action: ActionType.ADDCHIPS,
+    label: "Add Chips"
+}
+
 export const NOT_FACING_BET_ACTION_BUTTONS = [
     FOLD_BUTTON,
     CHECK_BUTTON,

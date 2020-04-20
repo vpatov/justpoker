@@ -92,7 +92,13 @@ export class GameStateManager {
                 clients.push(client);
             }
         }
-        assert(clients.length === 1);
+
+        if (clients.length !== 1) {
+            console.log(
+                `clients.length was ${clients.length} and not 1. ` +
+                    `clients: ${clients}, playerUUID: ${playerUUID}, allClients: ${this.getConnectedClients()}`,
+            );
+        }
         return clients[0].uuid;
     }
 
@@ -496,7 +502,6 @@ export class GameStateManager {
             bettingRoundStage: BettingRoundStage.WAITING,
             currentPlayerToAct: '',
             pots: [],
-            shouldDealNextHand: true,
             deck: {
                 cards: [],
             },

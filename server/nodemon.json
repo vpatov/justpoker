@@ -1,5 +1,5 @@
 {
-  "watch": ["src","../shared", "./package.json", "./tsconfig.json"],
+  "watch": ["src","../ui/src/shared", "./package.json", "./tsconfig.json"],
   "ext": "ts",
   "exec": "npm run start"
 }

@@ -11,6 +11,7 @@ import {
     BET_BUTTON,
     START_GAME_BUTTON,
     STOP_GAME_BUTTON,
+    ADD_CHIPS_BUTTON,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -74,17 +75,19 @@ export class StateTransformService {
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
         const potSize = this.gameStateManager.getTotalPot();
+        const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID;
         const controller: Controller = {
-            toAct: this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID,
+            toAct,
             unsetCheckCall: false,
             min: 0,
             max: this.gameStateManager.getPlayer(heroPlayerUUID).chips,
-            sizingButtons:
-                bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
-                    ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
-                    : COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
-                          this.createPotSizeButton(numerator, denominator, potSize),
-                      ),
+            sizingButtons: !toAct
+                ? []
+                : bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
+                ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
+                : COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
+                      this.createPotSizeButton(numerator, denominator, potSize),
+                  ),
             actionButtons: this.getValidBetActions(clientUUID, heroPlayerUUID),
             adminButtons: this.getValidAdminButtons(clientUUID),
         };
@@ -131,7 +134,7 @@ export class StateTransformService {
 
         const adminButtons = [];
         adminButtons.push(this.gameStateManager.shouldDealNextHand() ? STOP_GAME_BUTTON : START_GAME_BUTTON);
-
+        adminButtons.push(ADD_CHIPS_BUTTON);
         return adminButtons;
     }
 
