@@ -13,45 +13,45 @@ import ButtonWithKeyPress from "./ButtonWithKeyPress";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            width: "18%",
-            height: "100%",
+            width: "100%",
+            height: "15%",
             position: "absolute",
             right: 0,
-            top: 0,
+            bottom: 0,
             zIndex: 2,
+            display: "flex",
+            justifyContent: "space-evenly",
+            alignItems: "center",
             ...theme.custom.CONTROLLER,
         },
         sizeAndBetActionsCont: {
             marginLeft: "auto",
-            width: "100%",
+            width: "40%",
             height: "100%",
             display: "flex",
             flexDirection: "column",
+            justifyContent: "space-evenly",
+            alignItems: "center",
         },
         betActionsCont: {
-            height: "50%",
+            height: "100%",
             width: "100%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
-            flexDirection: "column",
+            flexWrap: "wrap",
         },
         adminButtonCont: {
-            height: "35%",
-            marginTop: "auto",
-            width: "100%",
+            height: "100%",
+            width: "20%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
-            flexDirection: "column",
         },
         betSizeCont: {
             width: "100%",
         },
-        sliderCont: {
-            paddingTop: 10,
-            width: "100%",
-        },
+
         betInput: {
             paddingRight: 50,
             paddingTop: 25,
@@ -63,20 +63,20 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: "space-evenly",
         },
         betTextField: {
-            width: "80%",
+            width: "100%",
         },
         betTextFieldInput: {
-            fontSize: "2.3vmin",
+            fontSize: "1.5vmin",
         },
         button: {
-            width: "80%",
+            width: "40%",
             maxHeight: "72px",
-            height: "20%",
             minHeight: "36px",
             backgroundColor: "white",
+            fontSize: "1.4vmin",
         },
         adminButton: {
-            width: "80%",
+            width: "30%",
             maxHeight: "72px",
             height: "100%",
         },
@@ -118,21 +118,24 @@ function ControllerComp(props: ControllerProps) {
         setBetAmt(Math.min(Math.floor(newAmt), max));
     };
 
-
-
     // TODO Redesign ClientWsMessageRequest type to better use typescripts features to better
     // represent the "one-of" idea
     function onClickActionButton(action) {
         WsServer.send({
             actionType: action,
-            request: { type: action, amount: Number(betAmt) } as ClientWsMessageRequest,
+            request: {
+                type: action,
+                amount: Number(betAmt),
+            } as ClientWsMessageRequest,
         });
     }
 
     function onClickAdminButton(action) {
         WsServer.send({
             actionType: action,
-            request: (action === ActionType.ADDCHIPS ? {chipAmount: chipAmt} : { }) as ClientWsMessageRequest,
+            request: (action === ActionType.ADDCHIPS
+                ? { chipAmount: chipAmt }
+                : {}) as ClientWsMessageRequest,
         });
     }
 
@@ -156,26 +159,26 @@ function ControllerComp(props: ControllerProps) {
                             })`}
                         </ButtonWithKeyPress>
                     ))}
-                    {sizingButtons.length > 0 ? (
-                        <TextField
-                            className={classes.betTextField}
-                            InputProps={{
-                                classes: {
-                                    input: classes.betTextFieldInput,
-                                },
-                            }}
-                            onChange={(event) =>
-                                setBetAmt(parseInt(event.target.value))
-                            }
-                            value={betAmt === 0 ? "" : betAmt}
-                            type="number"
-                            variant="outlined"
-                            autoFocus={true}
-                        />
-                    ) : null}
                 </div>
                 <div className={classes.betSizeCont}>
                     <div className={classes.amounts}>
+                        {sizingButtons.length > 0 ? (
+                            <TextField
+                                className={classes.betTextField}
+                                InputProps={{
+                                    classes: {
+                                        input: classes.betTextFieldInput,
+                                    },
+                                }}
+                                onChange={(event) =>
+                                    setBetAmt(parseInt(event.target.value))
+                                }
+                                value={betAmt === 0 ? "" : betAmt}
+                                type="number"
+                                variant="outlined"
+                                autoFocus={true}
+                            />
+                        ) : null}
                         {sizingButtons.map((button) => (
                             <Button
                                 variant="contained"
@@ -187,37 +190,39 @@ function ControllerComp(props: ControllerProps) {
                         ))}
                     </div>
                 </div>
-                <div className={classes.adminButtonCont}>
-                    {(adminButtons || []).map((button) => (
-                        <ButtonWithKeyPress
-                            variant="contained"
-                            className={classnames(
-                                classes.adminButton,
-                                classes[button.action]
-                            )}
-                            onClick={(e) => onClickAdminButton(button.action)}
-                        >
-                            {`${button.label}`}
-                        </ButtonWithKeyPress>
-                    ))}
-                    {(adminButtons || []).filter(button => button.action === ActionType.ADDCHIPS).length > 0 ? (
-                       <TextField
-                            className={classes.betTextField}
-                            InputProps={{
-                                classes: {
-                                    input: classes.betTextFieldInput,
-                                },
-                            }}
-                            onChange={(event) =>
-                                setChipAmt(parseInt(event.target.value))
-                            }
-                            value={chipAmt === 0 ? "" : chipAmt}
-                            type="number"
-                            variant="outlined"
-                            autoFocus={true}
-                        />
-                    ) : null}
-                </div>
+            </div>
+            <div className={classes.adminButtonCont}>
+                {(adminButtons || []).map((button) => (
+                    <ButtonWithKeyPress
+                        variant="contained"
+                        className={classnames(
+                            classes.adminButton,
+                            classes[button.action]
+                        )}
+                        onClick={(e) => onClickAdminButton(button.action)}
+                    >
+                        {`${button.label}`}
+                    </ButtonWithKeyPress>
+                ))}
+
+                {(adminButtons || []).filter(
+                    (button) => button.action === ActionType.ADDCHIPS
+                ).length > 0 ? (
+                    <TextField
+                        className={classes.betTextField}
+                        InputProps={{
+                            classes: {
+                                input: classes.betTextFieldInput,
+                            },
+                        }}
+                        onChange={(event) =>
+                            setChipAmt(parseInt(event.target.value))
+                        }
+                        value={chipAmt === 0 ? "" : chipAmt}
+                        type="number"
+                        variant="outlined"
+                    />
+                ) : null}
             </div>
         </div>
     );

@@ -13,8 +13,8 @@ const tableWidthPercent = 65;
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: "100%",
-        width: "80%",
+        height: "80%",
+        width: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -101,17 +101,17 @@ function Table(props) {
                             player={player}
                             className={classes.spot}
                             style={{
-                                transform: `translate(${xPos * playerPosScale}px,${
-                                    yPos * playerPosScale
-                                    }px)`,
+                                transform: `translate(${
+                                    xPos * playerPosScale
+                                }px,${yPos * playerPosScale}px)`,
                             }}
                         />
                         {player.bet ? (
                             <Bet
                                 style={{
-                                    transform: `translate(${xPos * betPosScale}px,${
-                                        yPos * betPosScale
-                                        }px)`,
+                                    transform: `translate(${
+                                        xPos * betPosScale
+                                    }px,${yPos * betPosScale}px)`,
                                 }}
                                 amount={player.bet}
                             />
@@ -126,7 +126,7 @@ function Table(props) {
                         style={{
                             transform: `translate(${xPos * playerPosScale}px,${
                                 yPos * playerPosScale
-                                }px)`,
+                            }px)`,
                         }}
                     />
                 );
