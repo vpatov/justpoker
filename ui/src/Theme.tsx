@@ -46,7 +46,7 @@ export const CUSTOM_THEME = {
         TABLE: {
             border: `0.7vmin solid rgba(255,255,255,0.4)`,
             boxShadow: `0 0 0 4px black, 0 4px 4px 4px black`,
-            backgroundColor: "rgba(0,0,0,0.1)",
+            backgroundColor: "rgba(255,255,255,0.01)",
             // background: `radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);`,
             // backgroundSize: "100%",
             // backgroundPosition: "50% 50%",

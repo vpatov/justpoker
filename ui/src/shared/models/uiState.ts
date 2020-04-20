@@ -127,9 +127,8 @@ export const FACING_BET_ACTION_BUTTONS = [
 
 export const ALL_ACTION_BUTTONS = [
     FOLD_BUTTON,
-    CHECK_BUTTON,
+
     CALL_BUTTON,
-    BET_BUTTON,
     // RAISE_BUTTON,
 ];
 

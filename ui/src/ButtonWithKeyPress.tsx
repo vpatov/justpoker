@@ -5,7 +5,6 @@ import classnames from "classnames";
 
 const useStyles = makeStyles((theme: Theme) => {
     const activeStyles = {
-        sizing: "borderBox",
         border: `3px solid ${theme.palette.primary.main}`,
         transition: "",
         "&:before": {
@@ -13,6 +12,7 @@ const useStyles = makeStyles((theme: Theme) => {
             content: '""',
             width: "100%",
             height: "100%",
+            zIndex: -1,
             backgroundColor: theme.palette.primary.light,
             "-webkit-animation": "$scale 0.1s 1 ease-in-out",
             animation: "$scale 0.1s 1 ease-in-out",
@@ -21,6 +21,9 @@ const useStyles = makeStyles((theme: Theme) => {
     };
     return createStyles({
         button: {
+            overflow: "hidden",
+            border: `3px solid transparent`,
+
             "&:hover": {
                 ...activeStyles,
             },

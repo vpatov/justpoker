@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import classnames from "classnames";
 import { WsServer } from "./api/ws";
 
@@ -25,31 +25,42 @@ const useStyles = makeStyles((theme: Theme) =>
             ...theme.custom.CONTROLLER,
         },
         sizeAndBetActionsCont: {
-            marginLeft: "auto",
-            width: "40%",
+            width: "60%",
             height: "100%",
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             justifyContent: "space-evenly",
             alignItems: "center",
         },
         betActionsCont: {
             height: "100%",
-            width: "100%",
+            width: "50%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
             flexWrap: "wrap",
         },
-        adminButtonCont: {
+        bettingCont: {
             height: "100%",
-            width: "20%",
+            width: "60%",
+            display: "flex",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            flexWrap: "wrap",
+        },
+        sizingButtonsCont: {
+            width: "100%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
         },
-        betSizeCont: {
-            width: "100%",
+        adminButtonCont: {
+            float: "right",
+            height: "100%",
+            width: "30%",
+            display: "flex",
+            justifyContent: "space-evenly",
+            alignItems: "center",
         },
 
         betInput: {
@@ -63,10 +74,12 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: "space-evenly",
         },
         betTextField: {
-            width: "100%",
+            width: "80%",
+            margin: "auto",
         },
         betTextFieldInput: {
             fontSize: "1.5vmin",
+            padding: "1vmin",
         },
         button: {
             width: "40%",
@@ -76,9 +89,10 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: "1.4vmin",
         },
         adminButton: {
-            width: "30%",
+            fontSize: "1.4vmin",
+
             maxHeight: "72px",
-            height: "100%",
+            minHeight: "36px",
         },
         sizeButton: {
             margin: 6,
@@ -160,9 +174,21 @@ function ControllerComp(props: ControllerProps) {
                         </ButtonWithKeyPress>
                     ))}
                 </div>
-                <div className={classes.betSizeCont}>
-                    <div className={classes.amounts}>
-                        {sizingButtons.length > 0 ? (
+                <div className={classes.bettingCont}>
+                    {sizingButtons.length > 0 ? (
+                        <Fragment>
+                            <ButtonWithKeyPress
+                                keyPress={KEY_ACTION_MAP["BET"]}
+                                variant="contained"
+                                className={classnames(
+                                    classes.button,
+                                    classes["BET"]
+                                )}
+                                onClick={() => onClickActionButton("BET")}
+                                disabled={!toAct}
+                            >
+                                {`${"BET"} (${KEY_ACTION_MAP["BET"]})`}
+                            </ButtonWithKeyPress>
                             <TextField
                                 className={classes.betTextField}
                                 InputProps={{
@@ -178,17 +204,21 @@ function ControllerComp(props: ControllerProps) {
                                 variant="outlined"
                                 autoFocus={true}
                             />
-                        ) : null}
-                        {sizingButtons.map((button) => (
-                            <Button
-                                variant="contained"
-                                className={classes.sizeButton}
-                                onClick={(e) => changeBetAmount(button.value)}
-                            >
-                                {button.label}
-                            </Button>
-                        ))}
-                    </div>
+                            <div className={classes.sizingButtonsCont}>
+                                {sizingButtons.map((button) => (
+                                    <Button
+                                        variant="contained"
+                                        className={classes.sizeButton}
+                                        onClick={(e) =>
+                                            changeBetAmount(button.value)
+                                        }
+                                    >
+                                        {button.label}
+                                    </Button>
+                                ))}
+                            </div>
+                        </Fragment>
+                    ) : null}
                 </div>
             </div>
             <div className={classes.adminButtonCont}>
@@ -209,12 +239,6 @@ function ControllerComp(props: ControllerProps) {
                     (button) => button.action === ActionType.ADDCHIPS
                 ).length > 0 ? (
                     <TextField
-                        className={classes.betTextField}
-                        InputProps={{
-                            classes: {
-                                input: classes.betTextFieldInput,
-                            },
-                        }}
                         onChange={(event) =>
                             setChipAmt(parseInt(event.target.value))
                         }
