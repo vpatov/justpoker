@@ -27,7 +27,7 @@ export declare interface GameState {
 
     currentPlayerToAct: Readonly<string>;
 
-    timeTurnStarted?: number;
+    timeCurrentPlayerTurnStarted: number;
 
     pots: ReadonlyArray<Pot>;
 
@@ -87,6 +87,7 @@ export const cleanGameState: GameState = {
         activeConnections: new Map(),
         password: "",
     },
+    timeCurrentPlayerTurnStarted: 0,
     serverTime: 0,
     minRaiseDiff: 0,
     previousRaise: 0,

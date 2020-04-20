@@ -49,6 +49,19 @@ export class GamePlayService {
         }
     }
 
+    setCurrentPlayerToAct(playerUUID: string) {
+        // if everyone has gone already, there are no further actors this round, and nobody should be
+        // illuminated
+        this.gsm.setCurrentPlayerToAct(this.gsm.haveAllPlayersActed() ? '' : playerUUID);
+        this.gsm.updateGameState({
+            timeCurrentPlayerTurnStarted: Date.now(),
+        });
+    }
+
+    setNextPlayerToAct() {
+        // this.setCurrentPlayerToAct(this.getNextPlayerInHandUUID(this.getCurrentPlayerToAct()));
+    }
+
     initializeBettingRound() {
         // TODO timer - this seems like it would a good place to handle the timer
 
@@ -175,6 +188,7 @@ export class GamePlayService {
         // bets take place an arbitrary number of times. Perhaps then it
         // is better to separate them.
 
+        // place the bet (or the blind)
         const currentPlayerToAct = playerPlacingBlindBetUUID
             ? playerPlacingBlindBetUUID
             : this.gsm.getCurrentPlayerToAct();
@@ -284,19 +298,8 @@ export class GamePlayService {
         // the players have to be waiting to act because they can still raise even
         // if everyone before them calls
 
-        // this.bet({actionType: BettingRoundActionType.BET, })
         this.bet(SB, smallBlindUUID);
         this.bet(BB, bigBlindUUID);
-
-        // this.gsm.updatePlayer(smallBlindUUID, {
-        //     lastActionType: BettingRoundActionType.WAITING_TO_ACT,
-        //     betAmount: SB,
-        // });
-
-        // this.gsm.updatePlayer(bigBlindUUID, {
-        //     lastActionType: BettingRoundActionType.WAITING_TO_ACT,
-        //     betAmount: BB,
-        // });
 
         // If heads up, dealer is first to act
         const firstToActPreflop =
@@ -306,10 +309,7 @@ export class GamePlayService {
 
         assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
 
-        this.gsm.updateGameState({
-            currentPlayerToAct: firstToActPreflop,
-            timeTurnStarted: Date.now(),
-        });
+        this.gsm.setCurrentPlayerToAct(firstToActPreflop);
     }
 
     distributeHoleCards() {
@@ -514,7 +514,6 @@ export class GamePlayService {
         this.gsm.updateGameState({ currentPlayerToAct: '' });
         this.placeBetsInPot();
         this.giveWinnerThePot(winnerUUID);
-        this.audioService.playHeroWinSFX();
         this.triggerFinishHand(2000);
     }
 

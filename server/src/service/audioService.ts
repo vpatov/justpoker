@@ -31,18 +31,25 @@ export class AudioService {
     playCallSFX() {
         this.setSound(SoundByte.CALL);
     }
-    playHeroWinSFX() {
-        this.setSound(SoundByte.HERO_WIN);
-    }
-    playVillianWinSFX() {
-        this.setSound(SoundByte.VILLAIN_WIN);
-    }
     playStartOfHandSFX() {
         this.setSound(SoundByte.START_OF_HAND);
     }
     playStartOfBettingRoundSFX() {
         this.setSound(SoundByte.START_OF_BETTING_ROUND);
     }
-    // TODO
-    playPersonalWinSFX() {}
+
+    // TODO refactor personal/global and design the best way to do this
+
+    getHeroWinSFX(): AudioQueue {
+        return { global: SoundByte.HERO_WIN };
+    }
+    getVillainWinSFX(): AudioQueue {
+        return { global: SoundByte.VILLAIN_WIN };
+    }
+    getBigHeroWinSFX(): AudioQueue {
+        return { global: SoundByte.BIG_HERO_WIN };
+    }
+    getHeroTurnToActSFX(): AudioQueue {
+        return { global: SoundByte.HERO_TURN_TO_ACT };
+    }
 }
