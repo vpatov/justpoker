@@ -442,10 +442,6 @@ export class GameStateManager {
         this.updateGameState({ bettingRoundStage });
     }
 
-    setNextPlayerToAct() {
-        this.setCurrentPlayerToAct(this.getNextPlayerInHandUUID(this.getCurrentPlayerToAct()));
-    }
-
     setPlayerLastActionType(playerUUID: string, lastActionType: BettingRoundActionType) {
         this.updatePlayer(playerUUID, { lastActionType });
     }
@@ -531,6 +527,7 @@ export class GameStateManager {
         return this.getPlayersDealtIn().every(
             (player) =>
                 player.lastActionType !== BettingRoundActionType.WAITING_TO_ACT &&
+                player.lastActionType !== BettingRoundActionType.PLACE_BLIND &&
                 (this.hasPlayerFolded(player.uuid) ||
                     player.betAmount === this.getHighestBet() ||
                     this.isPlayerAllIn(player.uuid)),
