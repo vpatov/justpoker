@@ -22,15 +22,17 @@ function logGameState(gameState: GameState) {
     console.log('\n\nServer game state:\n');
     const minimizedGameState = {
         ...gameState,
-        table: {
-            uuid: gameState.table.uuid,
-            activeConnections: [...gameState.table.activeConnections.entries()].map(([uuid, client]) => [
-                {
-                    ...client,
-                    ws: 'ommittedWebSocket',
-                },
-            ]),
-        },
+        // table: {
+        //     uuid: gameState.table.uuid,
+        //     activeConnections: [...gameState.table.activeConnections.entries()].map(([uuid, client]) => [
+        //         {
+        //             ...client,
+        //             ws: 'ommittedWebSocket',
+        //         },
+        //     ]),
+        // },
+        table: undefined as any,
+        board: undefined as any,
         // gameParameters: undefined as string,
         // board: undefined as string,
 
@@ -96,7 +98,7 @@ class Server {
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
-            // continue;
+            continue;
             /* Debug Logging */
             const playerName = client.playerUUID ? this.gsm.getPlayer(client.playerUUID).name : 'Anonymous Client';
             console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);

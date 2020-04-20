@@ -19,6 +19,10 @@ export class AudioService {
         this.audioQueue = getCleanAudioQueue();
     }
 
+    hasSFX() {
+        return this.audioQueue.global !== SoundByte.NONE;
+    }
+
     playCheckSFX() {
         this.setSound(SoundByte.CHECK);
     }

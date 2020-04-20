@@ -102,19 +102,14 @@ export class StateTransformService {
         }
         const actionButtons = [];
         let response = this.validationService.validateFoldAction(clientUUID);
-        console.log(response);
         if (!hasError(response)) {
             actionButtons.push(FOLD_BUTTON);
         }
         response = this.validationService.validateCheckAction(clientUUID);
-        console.log(response);
-
         if (!hasError(response)) {
             actionButtons.push(CHECK_BUTTON);
         }
         response = this.validationService.validateCallAction(clientUUID);
-        console.log(response);
-
         if (!hasError(response)) {
             actionButtons.push(CALL_BUTTON);
         }
@@ -139,6 +134,9 @@ export class StateTransformService {
     }
 
     transformAudioForClient(playerUUID: string): AudioQueue {
+        if (this.audioService.hasSFX()) {
+            return this.audioService.getAudioQueue();
+        }
         const winners = this.gameStateManager.getWinners();
         if (winners.length > 0) {
             if (winners.includes(playerUUID)) {
@@ -159,12 +157,17 @@ export class StateTransformService {
          this way the sound for when someone bets and when its someones turn 
          are part of different states and are easier to handle.
         */
-        // if (this.gameStateManager.getCurrentPlayerToAct() === playerUUID) {
-        //     return this.audioService.getHeroTurnToActSFX();
-        // } else {
-        //     return this.audioService.getAudioQueue();
-        // }
-        return this.audioService.getAudioQueue();
+        if (this.gameStateManager.getCurrentPlayerToAct() === playerUUID) {
+            console.log('currentPlayerToAct is hero, setting heroturn sound FX');
+            return this.audioService.getHeroTurnToActSFX();
+        } else {
+            return this.audioService.getAudioQueue();
+        }
+        // TODO create pause between cards being dealt and the first to act of that street
+        // simplest way to do that, is in this method, have the start of hand sound take
+        // precedence over the turn to act sound.
+
+        // return this.audioService.getAudioQueue();
     }
 
     transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
