@@ -36,9 +36,10 @@ function MakeGame(props) {
   const { history } = props;
 
   const [name, setName] = useState("DefaultPlayer");
-  const [bigBlind, setBigBlind] = useState("2");
-  const [smallBlind, setSmallBlind] = useState("1");
-  const [buyin, setBuyin] = useState("200");
+  const [bigBlind, setBigBlind] = useState(2);
+  const [smallBlind, setSmallBlind] = useState(1);
+  const [buyin, setBuyin] = useState(200);
+  const [timeToAct, setTimeToAct] = useState(30);
   const [password, setPassword] = useState("");
   const [gameType, setGameType] = useState("NLHOLDEM");
 
@@ -64,6 +65,7 @@ function MakeGame(props) {
       bigBlind,
       smallBlind,
       buyin,
+      timeToAct,
       password,
       gameType,
     };
@@ -77,26 +79,26 @@ function MakeGame(props) {
 
   return (
     <div className={classes.root}>
-      <TextField
+      {/* <TextField
         className={classes.field}
         label="Name"
         variant="outlined"
         onChange={(event) => setName(event.target.value)}
         value={name}
-      />
-      <Select
+      /> */}
+      {/* <Select
         variant="outlined"
         className={classes.field}
         value={gameType}
         onChange={(event) => setGameType(event.target.value as string)}
       >
         <MenuItem value={"NLHOLDEM"}>No Limit Hold'em</MenuItem>
-      </Select>
+      </Select> */}
       <TextField
         className={classes.field}
         label="Small Blind"
         variant="outlined"
-        onChange={(event) => setSmallBlind(event.target.value)}
+        onChange={(event) => setSmallBlind(Number(event.target.value))}
         value={smallBlind}
         type="number"
       />
@@ -104,7 +106,7 @@ function MakeGame(props) {
         className={classes.field}
         label="Big Blind"
         variant="outlined"
-        onChange={(event) => setBigBlind(event.target.value)}
+        onChange={(event) => setBigBlind(Number(event.target.value))}
         value={bigBlind}
         type="number"
       />
@@ -112,17 +114,25 @@ function MakeGame(props) {
         className={classes.field}
         label="Buyin"
         variant="outlined"
-        onChange={(event) => setBuyin(event.target.value)}
+        onChange={(event) => setBuyin(Number(event.target.value))}
         value={buyin}
         type="number"
       />
       <TextField
         className={classes.field}
+        label="Time To Act"
+        variant="outlined"
+        onChange={(event) => setTimeToAct(Number(event.target.value))}
+        value={timeToAct}
+        type="number"
+      />
+      {/* <TextField
+        className={classes.field}
         label="Password"
         variant="outlined"
         onChange={(event) => setPassword(event.target.value)}
         value={password}
-      />
+      /> */}
       <Button
         className={classes.button}
         variant="contained"

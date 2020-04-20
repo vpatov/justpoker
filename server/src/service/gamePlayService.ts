@@ -9,6 +9,7 @@ import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
 import { AudioService } from './audioService';
 
 import { printObj } from '../../../ui/src/shared/util/util';
+import { hasError, ValidationService } from './validationService';
 
 @Service()
 export class GamePlayService {
@@ -17,6 +18,7 @@ export class GamePlayService {
         private readonly handSolverService: HandSolverService,
         private readonly timerManager: TimerManager,
         private readonly audioService: AudioService,
+        private readonly validationService: ValidationService,
     ) {}
 
     /* Gameplay functionality */
@@ -52,12 +54,26 @@ export class GamePlayService {
     setCurrentPlayerToAct(playerUUID: string) {
         // if everyone has gone already, there are no further actors this round, and nobody should be
         // illuminated
-        this.gsm.setCurrentPlayerToAct(this.gsm.haveAllPlayersActed() ? 'foo' : playerUUID);
+        this.gsm.setCurrentPlayerToAct(this.gsm.haveAllPlayersActed() ? '' : playerUUID);
         this.gsm.updateGameState({
             timeCurrentPlayerTurnStarted: Date.now(),
         });
         //start timer
-        // this.timerManager.setTimer(this);
+        this.timerManager.setPlayerTimer(
+            () => this.timeOutPlayer(),
+            () => this.gsm.getGameState(),
+            this.gsm.getTimeToAct(),
+        );
+    }
+
+    timeOutPlayer() {
+        const playerUUID = this.gsm.getCurrentPlayerToAct();
+        if (!hasError(this.validationService.validateCheckAction(this.gsm.getClientByPlayerUUID(playerUUID)))) {
+            this.check();
+        } else {
+            this.fold();
+        }
+        this.postBettingRoundAction();
     }
 
     setNextPlayerToAct() {
@@ -155,7 +171,10 @@ export class GamePlayService {
                 this.callBet();
             }
         }
+        this.postBettingRoundAction();
+    }
 
+    postBettingRoundAction() {
         if (this.gsm.hasEveryoneButOnePlayerFolded()) {
             this.victoryByFolding();
         } else if (this.gsm.isBettingRoundOver()) {
@@ -416,7 +435,7 @@ export class GamePlayService {
         this.gsm.updateGameState({ isStateReady: false });
 
         // TODO make external const
-        const interval = 2000;
+        const interval = 3000;
         for (const index in snapShots) {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
