@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment } from "react";
 import Player from "./Player";
 import OpenSeat from "./OpenSeat";
 import Bet from "./Bet";
@@ -92,26 +92,6 @@ function Table(props) {
     const classes = useStyles();
     const { heroInGame } = props;
     const { players, communityCards, spots, pot } = props.table;
-
-    const [dimensions, setDimensions] = useState({
-        height: window.innerHeight,
-        width: window.innerWidth,
-    });
-
-    useEffect(() => {
-        const debouncedHandleResize = function handleResize() {
-            setDimensions({
-                height: window.innerHeight,
-                width: window.innerWidth,
-            });
-        };
-
-        window.addEventListener("resize", debouncedHandleResize);
-
-        return () => {
-            window.removeEventListener("resize", debouncedHandleResize);
-        };
-    });
 
     function createSpotsAtTable() {
         const ans = [] as any;

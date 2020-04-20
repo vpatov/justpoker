@@ -8,13 +8,11 @@ import ButtonSvg from "./imgs/button.svg";
 import PlayerTimer from "./PlayerTimer";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-
-    },
+    root: {},
     stackCont: {
         marginTop: -12,
         padding: "0.8vmin",
-        width: "100%",
+        width: "13vmin",
         borderRadius: "0.6vmin",
         fontSize: "18px",
         position: "relative",
@@ -123,8 +121,8 @@ function PlayerStack(props) {
                 {winner ? (
                     <CountUp start={prevStack} end={stack} separator="," />
                 ) : (
-                        stack.toLocaleString()
-                    )}
+                    stack.toLocaleString()
+                )}
             </Typography>
             <Typography variant="body1" className={classes.name}>
                 {name}
