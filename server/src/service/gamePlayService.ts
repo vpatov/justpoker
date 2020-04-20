@@ -52,14 +52,16 @@ export class GamePlayService {
     setCurrentPlayerToAct(playerUUID: string) {
         // if everyone has gone already, there are no further actors this round, and nobody should be
         // illuminated
-        this.gsm.setCurrentPlayerToAct(this.gsm.haveAllPlayersActed() ? '' : playerUUID);
+        this.gsm.setCurrentPlayerToAct(this.gsm.haveAllPlayersActed() ? 'foo' : playerUUID);
         this.gsm.updateGameState({
             timeCurrentPlayerTurnStarted: Date.now(),
         });
+        //start timer
+        // this.timerManager.setTimer(this);
     }
 
     setNextPlayerToAct() {
-        // this.setCurrentPlayerToAct(this.getNextPlayerInHandUUID(this.getCurrentPlayerToAct()));
+        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getCurrentPlayerToAct()));
     }
 
     initializeBettingRound() {
@@ -159,7 +161,7 @@ export class GamePlayService {
         } else if (this.gsm.isBettingRoundOver()) {
             this.triggerFinishBettingRound();
         } else {
-            this.gsm.setNextPlayerToAct();
+            this.setNextPlayerToAct();
         }
     }
 
@@ -201,7 +203,7 @@ export class GamePlayService {
             isPlayerAllIn
                 ? BettingRoundActionType.ALL_IN
                 : playerPlacingBlindBetUUID
-                ? BettingRoundActionType.WAITING_TO_ACT
+                ? BettingRoundActionType.PLACE_BLIND
                 : BettingRoundActionType.BET,
         );
 
@@ -260,14 +262,21 @@ export class GamePlayService {
     }
 
     initializePreflop() {
-        // TODO this is where you would start the timer
         this.initializeDealerButton();
+        this.gsm.initializeNewDeck();
+        this.distributeHoleCards();
+
+        // important that the cards are distributed before the blinds are placed,
+        // because the setCurrentPlayerToAct method checks to see if everyone has acted,
+        // and if so, it nulls the currentPlayerToAct instead of setting it.
+        // Whether or not everyone has acted or not is calculated by looking at those
+        // who were dealt in. If the cards havent been distributed yet, nobody has been dealt in,
+        // and therefore hasEveryoneActed is vacuously true. It might be worthwhile to refactor
+        // the setCurrentPlayerToAct method, and remove that logic from it to avoid bugs.
         this.placeBlinds();
 
-        this.gsm.initializeNewDeck();
+        // TODO bettingRoundStage is already preflop here. Remove
         this.gsm.setBettingRoundStage(BettingRoundStage.PREFLOP);
-
-        this.distributeHoleCards();
     }
 
     initializeDealerButton() {
@@ -309,11 +318,13 @@ export class GamePlayService {
 
         assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
 
-        this.gsm.setCurrentPlayerToAct(firstToActPreflop);
+        this.setCurrentPlayerToAct(firstToActPreflop);
     }
 
     distributeHoleCards() {
         const deck = this.gsm.getDeck();
+        // TODO remove assertion
+        assert(deck.cards.length === 52);
         Object.values(this.gsm.getPlayers())
             .filter((player) => player.sitting)
             .forEach((player) => this.gsm.dealCardsToPlayer(2, player.uuid));
@@ -322,19 +333,19 @@ export class GamePlayService {
     /* STREETS */
     initializeFlop() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.FLOP);
-        this.gsm.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
+        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(3);
     }
 
     initializeTurn() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.TURN);
-        this.gsm.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
+        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(1);
     }
 
     initializeRiver() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.RIVER);
-        this.gsm.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
+        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(1);
     }
 
@@ -409,9 +420,7 @@ export class GamePlayService {
         for (const index in snapShots) {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
-                this,
                 () => {},
-                null,
                 () => snapShot,
                 interval * Number(index),
             );
@@ -424,7 +433,11 @@ export class GamePlayService {
 
     // TODO make all references to this use a constant not a literal
     triggerFinishHand(timeout: number) {
-        this.timerManager.setTimer(this, this.finishHand, this.gsm, this.gsm.getGameState, timeout);
+        this.timerManager.setTimer(
+            () => this.finishHand(),
+            () => this.gsm.getGameState(),
+            timeout,
+        );
     }
 
     finishHand() {
@@ -522,7 +535,11 @@ export class GamePlayService {
     }
 
     triggerFinishBettingRound() {
-        this.timerManager.setTimer(this, this.finishBettingRound, this.gsm, this.gsm.getGameState, 600);
+        this.timerManager.setTimer(
+            () => this.finishBettingRound(),
+            () => this.gsm.getGameState(),
+            600,
+        );
     }
 
     finishBettingRound() {
