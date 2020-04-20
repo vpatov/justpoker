@@ -178,7 +178,11 @@ export class StateTransformService {
             playerTimer: toAct
                 ? {
                       timeElapsed: this.gameStateManager.getCurrentPlayerTurnElapsedTime() / 1000,
-                      timeLimit: this.gameStateManager.getTimeToAct(),
+
+                      // subtract one second such that the server timer ends just a little bit after
+                      // the visual component of the UI indicates that the turn is over, to compensate
+                      // and prevent from the vice-versa scenario (which would be way worse)
+                      timeLimit: this.gameStateManager.getTimeToAct() / 1000 - 1,
                   }
                 : undefined,
             handLabel:

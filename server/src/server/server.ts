@@ -68,6 +68,7 @@ class Server {
                 bigBlind: req.body.bigBlind,
                 gameType: req.body.gameType,
                 password: req.body.password,
+                timeToAct: req.body.timeToAct,
             };
             const tableId = this.gsm.initGame(newGameForm);
             this.tableInitialized = true;

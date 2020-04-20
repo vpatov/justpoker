@@ -84,6 +84,17 @@ export class GameStateManager {
         return this.gameState.table.activeConnections.get(clientUUID);
     }
 
+    getClientByPlayerUUID(playerUUID: string): string {
+        const clients = [];
+        for (const client of this.getConnectedClients()) {
+            if (client.playerUUID === playerUUID) {
+                clients.push(client);
+            }
+        }
+        assert(clients.length === 1);
+        return clients[0].uuid;
+    }
+
     getConnectedClients() {
         return this.gameState.table.activeConnections.values();
     }
@@ -366,7 +377,7 @@ export class GameStateManager {
                 smallBlind: Number(newGameForm.smallBlind),
                 bigBlind: Number(newGameForm.bigBlind),
                 gameType: newGameForm.gameType,
-                timeToAct: 30,
+                timeToAct: Number(newGameForm.timeToAct) * 1000,
                 maxPlayers: 9,
                 // consider adding timeToAct and maxPlayers to form
             },
