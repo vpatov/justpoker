@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
             flexDirection: "column",
         },
         adminButtonCont: {
-            height: "10%",
+            height: "35%",
             marginTop: "auto",
             width: "100%",
             display: "flex",
@@ -111,11 +111,14 @@ function ControllerComp(props: ControllerProps) {
         adminButtons,
     } = props.controller;
 
+    const [chipAmt, setChipAmt] = useState(0);
     const [betAmt, setBetAmt] = useState(0);
 
     const changeBetAmount = (newAmt) => {
         setBetAmt(Math.min(Math.floor(newAmt), max));
     };
+
+
 
     // TODO Redesign ClientWsMessageRequest type to better use typescripts features to better
     // represent the "one-of" idea
@@ -129,7 +132,7 @@ function ControllerComp(props: ControllerProps) {
     function onClickAdminButton(action) {
         WsServer.send({
             actionType: action,
-            request: { } as ClientWsMessageRequest,
+            request: (action === ActionType.ADDCHIPS ? {chipAmount: chipAmt} : { }) as ClientWsMessageRequest,
         });
     }
 
@@ -197,6 +200,23 @@ function ControllerComp(props: ControllerProps) {
                             {`${button.label}`}
                         </ButtonWithKeyPress>
                     ))}
+                    {(adminButtons || []).filter(button => button.action === ActionType.ADDCHIPS).length > 0 ? (
+                       <TextField
+                            className={classes.betTextField}
+                            InputProps={{
+                                classes: {
+                                    input: classes.betTextFieldInput,
+                                },
+                            }}
+                            onChange={(event) =>
+                                setChipAmt(parseInt(event.target.value))
+                            }
+                            value={chipAmt === 0 ? "" : chipAmt}
+                            type="number"
+                            variant="outlined"
+                            autoFocus={true}
+                        />
+                    ) : null}
                 </div>
             </div>
         </div>

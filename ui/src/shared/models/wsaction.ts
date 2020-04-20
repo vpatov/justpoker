@@ -1,19 +1,19 @@
 import { BettingRoundAction } from "../models/game";
 
 export enum ActionType {
-  STARTGAME = "STARTGAME",
-  STOPGAME = "STOPGAME",
-  SITDOWN = "SITDOWN",
-  STANDUP = "STANDUP",
-  JOINTABLE = "JOINTABLE",
-  JOINTABLEANDSITDOWN = "JOINTABLEANDSITDOWN",
-  PINGSTATE = "PINGSTATE",
-  CHECK = "CHECK",
-  BET = "BET",
-  FOLD = "FOLD",
-  CALL = "CALL",
-  CHAT = "CHAT",
-  SETCHIPSDEBUG = "SETCHIPSDEBUG",
+    STARTGAME = "STARTGAME",
+    STOPGAME = "STOPGAME",
+    SITDOWN = "SITDOWN",
+    STANDUP = "STANDUP",
+    JOINTABLE = "JOINTABLE",
+    JOINTABLEANDSITDOWN = "JOINTABLEANDSITDOWN",
+    PINGSTATE = "PINGSTATE",
+    CHECK = "CHECK",
+    BET = "BET",
+    FOLD = "FOLD",
+    CALL = "CALL",
+    CHAT = "CHAT",
+    ADDCHIPS = "ADDCHIPS"
 }
 
 export declare interface SitDownRequest {

@@ -91,7 +91,7 @@ export class MessageService {
             },
             perform: (uuid, req) => {},
         },
-        [ActionType.SETCHIPSDEBUG]: {
+        [ActionType.ADDCHIPS]: {
             validation: (_, __) => NO_ERROR,
             perform: (uuid, request) => {
                 this.validationService.ensureClientIsInGame(uuid);
