@@ -25,6 +25,8 @@ export declare interface GameState {
 
     bettingRoundStage: Readonly<BettingRoundStage>;
 
+    firstToAct: Readonly<string>;
+
     currentPlayerToAct: Readonly<string>;
 
     timeCurrentPlayerTurnStarted: number;
@@ -76,6 +78,7 @@ export const cleanGameState: GameState = {
     // bigBlindUUID: '',
     bettingRoundStage: BettingRoundStage.WAITING,
     // bettingRoundActions: [],
+    firstToAct: "",
     currentPlayerToAct: "",
     shouldDealNextHand: false,
     deck: {

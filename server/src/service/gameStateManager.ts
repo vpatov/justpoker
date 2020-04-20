@@ -86,6 +86,9 @@ export class GameStateManager {
     }
 
     getClientByPlayerUUID(playerUUID: string): string {
+        if (!playerUUID) {
+            throw Error(`getClientByPlayerUUID called with null playerUUID`);
+        }
         const clients = [];
         for (const client of this.getConnectedClients()) {
             if (client.playerUUID === playerUUID) {
@@ -96,7 +99,9 @@ export class GameStateManager {
         if (clients.length !== 1) {
             console.log(
                 `clients.length was ${clients.length} and not 1. ` +
-                    `clients: ${clients}, playerUUID: ${playerUUID}, allClients: ${this.getConnectedClients()}`,
+                    `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
+                        this.getConnectedClients(),
+                    )}`,
             );
         }
         return clients[0].uuid;
@@ -305,6 +310,9 @@ export class GameStateManager {
         if (this.haveAllPlayersActed()) {
             return '';
         }
+        if (!currentPlayerUUID) {
+            return '';
+        }
         const seats = this.getSeats();
         const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
 
@@ -452,6 +460,14 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { sitting: false, seatNumber: -1 });
     }
 
+    getFirstToAct() {
+        return this.gameState.firstToAct;
+    }
+
+    setFirstToAct(playerUUID: string) {
+        this.updateGameState({ firstToAct: playerUUID });
+    }
+
     setCurrentPlayerToAct(playerUUID: string) {
         this.updateGameState({ currentPlayerToAct: playerUUID });
     }
@@ -500,6 +516,7 @@ export class GameStateManager {
             isStateReady: true,
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
+            firstToAct: '',
             currentPlayerToAct: '',
             pots: [],
             deck: {

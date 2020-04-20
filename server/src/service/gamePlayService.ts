@@ -54,26 +54,39 @@ export class GamePlayService {
     setCurrentPlayerToAct(playerUUID: string) {
         // if everyone has gone already, there are no further actors this round, and nobody should be
         // illuminated
-        this.gsm.setCurrentPlayerToAct(this.gsm.haveAllPlayersActed() ? '' : playerUUID);
-        this.gsm.updateGameState({
-            timeCurrentPlayerTurnStarted: Date.now(),
-        });
-        //start timer
-        this.timerManager.setPlayerTimer(
-            () => this.timeOutPlayer(),
-            () => this.gsm.getGameState(),
-            this.gsm.getTimeToAct(),
-        );
+        const currentPlayerToAct = this.gsm.haveAllPlayersActed() ? '' : playerUUID;
+        this.gsm.setCurrentPlayerToAct(currentPlayerToAct);
+
+        // start the timer if currentPlayerToAct has been set
+        if (currentPlayerToAct) {
+            this.gsm.updateGameState({
+                timeCurrentPlayerTurnStarted: Date.now(),
+            });
+            this.timerManager.setPlayerTimer(
+                () => this.timeOutPlayer(),
+                () => this.gsm.getGameState(),
+                this.gsm.getTimeToAct(),
+            );
+        }
+    }
+
+    clearCurrentPlayerToAct() {
+        this.setCurrentPlayerToAct('');
     }
 
     timeOutPlayer() {
         const playerUUID = this.gsm.getCurrentPlayerToAct();
+        if (!playerUUID) {
+            console.log('timeOutPlayer was called and there is no currentPlayerToAct. state:');
+            printObj(this.gsm.getGameState());
+            return;
+        }
         if (!hasError(this.validationService.validateCheckAction(this.gsm.getClientByPlayerUUID(playerUUID)))) {
             this.check();
         } else {
             this.fold();
         }
-        this.postBettingRoundAction();
+        this.triggerPostBettingRoundAction();
     }
 
     setNextPlayerToAct() {
@@ -118,21 +131,25 @@ export class GamePlayService {
             case BettingRoundStage.PREFLOP: {
                 this.initializePreflop();
                 this.audioService.playStartOfHandSFX();
+                this.triggerSetFirstToAct();
                 break;
             }
             case BettingRoundStage.FLOP: {
                 this.initializeFlop();
                 this.audioService.playStartOfBettingRoundSFX();
+                this.triggerSetFirstToAct();
                 break;
             }
             case BettingRoundStage.TURN: {
                 this.initializeTurn();
                 this.audioService.playStartOfBettingRoundSFX();
+                this.triggerSetFirstToAct();
                 break;
             }
             case BettingRoundStage.RIVER: {
                 this.initializeRiver();
                 this.audioService.playStartOfBettingRoundSFX();
+                this.triggerSetFirstToAct();
                 break;
             }
             case BettingRoundStage.SHOWDOWN: {
@@ -146,10 +163,20 @@ export class GamePlayService {
             }
         }
 
-        // TODO timer if everyone is all in
+        // This code is executed during in all-in run out.
+        // That should be the only case when the betting round is over
+        // right as it is initialized.
         if (this.gsm.isBettingRoundOver()) {
             this.triggerFinishBettingRound();
         }
+    }
+
+    triggerSetFirstToAct() {
+        this.timerManager.setTimer(
+            () => this.setCurrentPlayerToAct(this.gsm.getFirstToAct()),
+            () => this.gsm.getGameState(),
+            1000,
+        );
     }
 
     /* Betting Round Actions */
@@ -175,12 +202,20 @@ export class GamePlayService {
                 this.callBet();
             }
         }
-        this.postBettingRoundAction();
+        this.triggerPostBettingRoundAction();
+    }
+
+    triggerPostBettingRoundAction() {
+        this.timerManager.setTimer(
+            () => this.postBettingRoundAction(),
+            () => this.gsm.getGameState(),
+            800,
+        );
     }
 
     postBettingRoundAction() {
         if (this.gsm.hasEveryoneButOnePlayerFolded()) {
-            this.victoryByFolding();
+            this.triggerVictoryByFolding();
         } else if (this.gsm.isBettingRoundOver()) {
             this.triggerFinishBettingRound();
         } else {
@@ -339,9 +374,9 @@ export class GamePlayService {
                 ? dealerUUID
                 : this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
 
-        assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
+        this.gsm.setFirstToAct(firstToActPreflop);
 
-        this.setCurrentPlayerToAct(firstToActPreflop);
+        assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
     }
 
     distributeHoleCards() {
@@ -356,21 +391,21 @@ export class GamePlayService {
     /* STREETS */
     initializeFlop() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.FLOP);
-        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
+        this.gsm.setFirstToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(3);
         this.updateHandDescriptions();
     }
 
     initializeTurn() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.TURN);
-        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
+        this.gsm.setFirstToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(1);
         this.updateHandDescriptions();
     }
 
     initializeRiver() {
         assert(this.gsm.getBettingRoundStage() === BettingRoundStage.RIVER);
-        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
+        this.gsm.setFirstToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
         this.gsm.dealCardsToBoard(1);
         this.updateHandDescriptions();
     }
@@ -547,6 +582,14 @@ export class GamePlayService {
         this.gsm.updatePlayers((player) => ({ chips: player.chips - player.betAmount, betAmount: 0 }));
     }
 
+    triggerVictoryByFolding() {
+        this.timerManager.setTimer(
+            () => this.victoryByFolding(),
+            () => this.gsm.getGameState(),
+            900,
+        );
+    }
+
     victoryByFolding() {
         const winnerUUID = this.gsm.getPlayersInHand()[0];
         this.gsm.updatePlayer(winnerUUID, { winner: true });
@@ -561,10 +604,11 @@ export class GamePlayService {
     }
 
     triggerFinishBettingRound() {
+        this.clearCurrentPlayerToAct();
         this.timerManager.setTimer(
             () => this.finishBettingRound(),
             () => this.gsm.getGameState(),
-            600,
+            900,
         );
     }
 
