@@ -185,12 +185,7 @@ export class StateTransformService {
                       timeLimit: this.gameStateManager.getTimeToAct() / 1000 - 1,
                   }
                 : undefined,
-            handLabel:
-                shouldCardsBeVisible && player.holeCards.length > 0
-                    ? // TODO calculate at the beginning of each street and save to player obj rather
-                      // than recalculating every single time someone does anything
-                      this.handSolverService.computeBestHandFromCards([...board, ...player.holeCards]).name
-                    : undefined,
+            handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? player.handDescription : undefined,
             name: player.name,
             hidden: isHero ? false : player.cardsAreHidden,
             toAct: toAct,

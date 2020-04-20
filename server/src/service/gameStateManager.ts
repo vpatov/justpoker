@@ -17,6 +17,7 @@ import { Player, cleanPlayer } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
+import { HandSolverService } from './handSolverService';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -24,7 +25,7 @@ import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsac
 export class GameStateManager {
     private gameState: Readonly<GameState> = cleanGameState;
 
-    constructor(private readonly deckService: DeckService) {}
+    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) {}
 
     /* Getters */
 
@@ -457,6 +458,14 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { lastActionType });
     }
 
+    getPlayerHandDescription(playerUUID: string) {
+        const bestHand = this.handSolverService.computeBestHandFromCards([
+            ...this.getBoard(),
+            ...this.getPlayer(playerUUID).holeCards,
+        ]);
+        return bestHand.descr;
+    }
+
     getChips(playerUUID: string) {
         return this.getPlayer(playerUUID).chips;
     }
@@ -475,6 +484,7 @@ export class GameStateManager {
         this.updatePlayers((player) => ({
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
             holeCards: [],
+            handDescription: '',
             winner: false,
             betAmount: 0,
             cardsAreHidden: true,

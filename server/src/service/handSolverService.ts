@@ -5,6 +5,7 @@ import { Hand as HandSolver } from 'pokersolver';
 // TODO declare types for this module and make an npm package
 export declare interface Hand {
     name: string;
+    descr: string;
 }
 
 @Service()
