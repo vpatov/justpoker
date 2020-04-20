@@ -36,7 +36,7 @@ function positionToPlacement(width, height, index) {
 }
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: "80%",
+        height: "85%",
         width: "100%",
         display: "flex",
         justifyContent: "center",
@@ -162,7 +162,7 @@ function Table(props) {
             const bPos = positionToPlacement(BET_WIDTH, BET_HEIGHT, index);
 
             const player = players.find((p) => p.position === index);
-            if (player.bet) {
+            if (player && player.bet) {
                 ans.push(
                     <Bet
                         style={{
