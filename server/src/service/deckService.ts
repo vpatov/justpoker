@@ -3,6 +3,7 @@ import { Card, Deck, BASE_DECK, SUIT_ABBREVIATIONS } from '../../../ui/src/share
 import { Hand as HandSolver } from 'pokersolver';
 
 @Service()
+// TODO Clearly define what does "Service", "Manager", "Helper" mean.
 export class DeckService {
     newDeck() {
         const deck = { cards: [...BASE_DECK] };

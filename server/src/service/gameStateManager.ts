@@ -13,17 +13,18 @@ import {
     BettingRoundActionType,
 } from '../../../ui/src/shared/models/game';
 import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
-import { Player } from '../../../ui/src/shared/models/player';
-import { PlayerService } from './playerService';
+import { Player, cleanPlayer } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
+
+// TODO Re-organize methods in some meaningful way
 
 @Service()
 export class GameStateManager {
     private gameState: Readonly<GameState> = cleanGameState;
 
-    constructor(private readonly deckService: DeckService, private readonly playerService: PlayerService) {}
+    constructor(private readonly deckService: DeckService) {}
 
     /* Getters */
 
@@ -45,6 +46,23 @@ export class GameStateManager {
     snapShotGameState() {
         return {
             ...this.gameState,
+        };
+    }
+
+    createNewPlayer(name: string, chips: number): Player {
+        return {
+            ...cleanPlayer,
+            uuid: generateUUID(),
+            name,
+            chips,
+        };
+    }
+
+    createConnectedClient(clientUUID: string, ws: WebSocket): ConnectedClient {
+        return {
+            uuid: clientUUID,
+            playerUUID: '',
+            ws,
         };
     }
 
@@ -296,8 +314,8 @@ export class GameStateManager {
         return seatNumber >= 0 && seatNumber < this.gameState.gameParameters.maxPlayers;
     }
 
-    isGameInProgress() {
-        return this.gameState.gameInProgress;
+    shouldDealNextHand() {
+        return this.gameState.shouldDealNextHand;
     }
 
     // TODO deck breaks immutability
@@ -323,7 +341,7 @@ export class GameStateManager {
         if (client) {
             this.resetClientWebsocket(clientUUID, ws);
         } else {
-            const newClient = this.playerService.createConnectedClient(clientUUID, ws);
+            const newClient = this.createConnectedClient(clientUUID, ws);
             this.gameState = {
                 ...this.gameState,
                 table: {
@@ -391,7 +409,7 @@ export class GameStateManager {
     addNewPlayerToGame(clientUUID: string, request: JoinTableRequest) {
         const name = request.name;
         const buyin = request.buyin;
-        const player = this.playerService.createNewPlayer(name, buyin);
+        const player = this.createNewPlayer(name, buyin);
         const associatedClient = this.associateClientAndPlayer(clientUUID, player);
         this.gameState = {
             ...this.gameState,
@@ -467,7 +485,7 @@ export class GameStateManager {
             bettingRoundStage: BettingRoundStage.WAITING,
             currentPlayerToAct: '',
             pots: [],
-            gameInProgress: true,
+            shouldDealNextHand: true,
             deck: {
                 cards: [],
             },

@@ -31,7 +31,7 @@ export declare interface GameState {
 
     pots: ReadonlyArray<Pot>;
 
-    gameInProgress: Readonly<boolean>;
+    shouldDealNextHand: Readonly<boolean>;
 
     /** Sensitive field. */
     deck: Readonly<Deck>;
@@ -77,7 +77,7 @@ export const cleanGameState: GameState = {
     bettingRoundStage: BettingRoundStage.WAITING,
     // bettingRoundActions: [],
     currentPlayerToAct: "",
-    gameInProgress: false,
+    shouldDealNextHand: false,
     deck: {
         cards: [],
     },

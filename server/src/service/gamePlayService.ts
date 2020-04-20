@@ -25,12 +25,12 @@ export class GamePlayService {
     // perform this check after every incoming message
     // this way, you don't have to check explicit events
     startGame() {
-        this.gsm.updateGameState({ gameInProgress: true });
+        this.gsm.updateGameState({ shouldDealNextHand: true });
     }
 
     // TODO wipe gameplay game state.
     stopGame() {
-        this.gsm.updateGameState({ gameInProgress: false });
+        this.gsm.updateGameState({ shouldDealNextHand: false });
     }
 
     // are there only two actions after which a round can start?
@@ -40,7 +40,7 @@ export class GamePlayService {
     startHandIfReady() {
         if (
             // TODO uncomment this once startGame button is added
-            // this.gsm.isGameInProgress() &&
+            this.gsm.shouldDealNextHand() &&
             this.gsm.getBettingRoundStage() === BettingRoundStage.WAITING &&
             this.gsm.getNumberPlayersSitting() >= 2
         ) {
@@ -514,7 +514,7 @@ export class GamePlayService {
         this.gsm.updateGameState({ currentPlayerToAct: '' });
         this.placeBetsInPot();
         this.giveWinnerThePot(winnerUUID);
-        this.audioService.playVictoryByFoldingSFX();
+        this.audioService.playHeroWinSFX();
         this.triggerFinishHand(2000);
     }
 

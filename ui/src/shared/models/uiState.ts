@@ -36,7 +36,7 @@ export declare interface ActionButton {
     action: ActionType;
 }
 
-export declare interface UiCard {
+export declare interface UiCard{
     suit?: Suit;
     rank?: string;
     hidden?: boolean;
@@ -96,6 +96,16 @@ export const BET_BUTTON: ActionButton = {
 export const RAISE_BUTTON: ActionButton = {
     action: ActionType.BET,
     label: "Raise",
+};
+
+export const  START_GAME_BUTTON = {
+    action: ActionType.STARTGAME,
+    label: "Start Game",
+};
+
+export const  STOP_GAME_BUTTON = {
+    action: ActionType.STOPGAME,
+    label: "Stop Game",
 };
 
 export const NOT_FACING_BET_ACTION_BUTTONS = [
@@ -168,10 +178,7 @@ export const TestGame: UiGameState = {
         ],
         actionButtons: ALL_ACTION_BUTTONS,
         adminButtons: [
-            {
-                action: ActionType.STARTGAME,
-                label: "Start Game",
-            },
+            START_GAME_BUTTON,
         ],
     },
     table: {

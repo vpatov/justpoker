@@ -5,7 +5,9 @@ import { AudioQueue, getCleanAudioQueue, SoundByte } from '../../../ui/src/share
 export class AudioService {
     private audioQueue: AudioQueue = getCleanAudioQueue();
 
-    private setGlobalSound(soundByte: SoundByte) {
+    // TODO we most likely dont need "global" and "personal",
+    // because it seems like there will only be one sound per client per wsmessage
+    private setSound(soundByte: SoundByte) {
         return (this.audioQueue.global = soundByte);
     }
 
@@ -18,25 +20,28 @@ export class AudioService {
     }
 
     playCheckSFX() {
-        this.setGlobalSound(SoundByte.CHECK);
+        this.setSound(SoundByte.CHECK);
     }
     playFoldSFX() {
-        this.setGlobalSound(SoundByte.FOLD);
+        this.setSound(SoundByte.FOLD);
     }
     playBetSFX() {
-        this.setGlobalSound(SoundByte.BET);
+        this.setSound(SoundByte.BET);
     }
     playCallSFX() {
-        this.setGlobalSound(SoundByte.CALL);
+        this.setSound(SoundByte.CALL);
     }
-    playVictoryByFoldingSFX() {
-        this.setGlobalSound(SoundByte.VICTORY_BY_FOLDING);
+    playHeroWinSFX() {
+        this.setSound(SoundByte.HERO_WIN);
+    }
+    playVillianWinSFX() {
+        this.setSound(SoundByte.VILLAIN_WIN);
     }
     playStartOfHandSFX() {
-        this.setGlobalSound(SoundByte.START_OF_HAND);
+        this.setSound(SoundByte.START_OF_HAND);
     }
     playStartOfBettingRoundSFX() {
-        this.setGlobalSound(SoundByte.START_OF_BETTING_ROUND);
+        this.setSound(SoundByte.START_OF_BETTING_ROUND);
     }
     // TODO
     playPersonalWinSFX() {}

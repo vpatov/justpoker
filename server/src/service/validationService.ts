@@ -175,7 +175,7 @@ export class ValidationService {
 
     validateStartGameRequest(clientUUID: string): ValidationResponse {
         // TODO validate that client is admin
-        if (this.gameStateManager.isGameInProgress()) {
+        if (this.gameStateManager.shouldDealNextHand()) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `Cannot StartGame: Game is already in progress.`,
@@ -186,7 +186,7 @@ export class ValidationService {
 
     validateStopGameRequest(clientUUID: string): ValidationResponse {
         // TODO validate that client is admin
-        if (!this.gameStateManager.isGameInProgress()) {
+        if (!this.gameStateManager.shouldDealNextHand()) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `Cannot StopGame: Game is not in progress.`,
