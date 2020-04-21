@@ -227,7 +227,7 @@ export const TestGame: UiGameState = {
                 bet: genRandomInt(0, 1000),
                 handLabel: "Straight Flush",
                 hand: {
-                    cards: [genRandomCard(), genRandomCard()],
+                    cards: [{ hidden: true }, { hidden: true }],
                 },
             },
             {

@@ -4,8 +4,11 @@ import Card from "./Card";
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        margin: "0 auto",
+        width: "80%",
         display: "flex",
-        height: "50%",
+        justifyContent: "space-evenly",
+
     },
 }));
 
