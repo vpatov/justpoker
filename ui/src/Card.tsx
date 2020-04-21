@@ -13,7 +13,6 @@ const useStyles = makeStyles((theme) => ({
         textAlign: "center",
         position: "relative",
         backgroundColor: "white",
-        boxShadow: "0 0 0.3vmin 0.1vmin rgba(255,255,255,0.5)",
     },
     large: {
         height: "10vmin",
@@ -24,9 +23,9 @@ const useStyles = makeStyles((theme) => ({
     small: {
         height: "6vmin",
         width: "5vmin",
-        margin: "0.4vmin",
         display: "flex",
         justifyContent: "space-evenly",
+
     },
     valueTextsmall: {
         letterSpacing: "-0.3vmin",
@@ -56,6 +55,11 @@ const useStyles = makeStyles((theme) => ({
         display: "inline-block",
     },
     hidden: {
+        display: "flex",
+        justifyContent: "center",
+        fontSize: "2.8vmin",
+        fontWeight: "bold",
+        fontFamily: "Futura, Roboto, Avenir, Helvetica, Arial, sans-serif",
         ...theme.custom.HIDDEN,
     },
     side: {
@@ -121,7 +125,7 @@ function Card(props) {
                     className
                 )}
                 style={style}
-            />
+            >JP</div>
         );
     }
     return (
