@@ -2,10 +2,12 @@ import { Suit, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
 import { AudioQueue } from "./audioQueue";
+import { ChatMessage } from "./chat";
 
 export declare interface UiState {
     game: UiGameState;
     audio: AudioQueue;
+    chat: UiChatMessage;
 }
 
 export declare interface UiGameState {
@@ -70,6 +72,12 @@ export declare interface Player {
     hand: {
         cards: UiCard[];
     };
+}
+
+export declare interface UiChatMessage {
+    timestamp: number;
+    content: string;
+    senderName: string;
 }
 
 /* Action Buttons */

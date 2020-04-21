@@ -1,7 +1,12 @@
 import { Service } from 'typedi';
 import { GameStateManager } from './gameStateManager';
 import { BettingRoundActionType, BettingRoundAction } from '../../../ui/src/shared/models/game';
-import { SitDownRequest, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
+import {
+    SitDownRequest,
+    JoinTableRequest,
+    ClientWsMessageRequest,
+    ClientChatMessage,
+} from '../../../ui/src/shared/models/wsaction';
 import { printObj } from '../../../ui/src/shared/util/util';
 import { ValidationResponse, ErrorType, NO_ERROR } from '../../../ui/src/shared/models/validation';
 
@@ -330,6 +335,20 @@ export class ValidationService {
             };
         }
 
+        return NO_ERROR;
+    }
+
+    validateChatMessage(uuid: string, message: ClientChatMessage) {
+        const messageLength = message.message.length;
+        if (messageLength > 1000) {
+            return {
+                errorType: ErrorType.MAX_CHAT_MESSAGE_LENGTH_EXCEEDED,
+                errorString: `Message: ${message.message.substr(
+                    0,
+                    50,
+                )}... is ${messageLength} characters, over the allowed limit of 1000.`,
+            };
+        }
         return NO_ERROR;
     }
 }
