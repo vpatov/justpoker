@@ -106,6 +106,9 @@ export interface ControllerProps {
     controller: Controller;
 }
 
+// conflicting with chat
+// TODO either get rid of hotkeys and ensure 
+// chat isnt in focus..
 const KEY_ACTION_MAP = {
     [ActionType.BET]: "B",
     [ActionType.CHECK]: "K",
@@ -159,7 +162,7 @@ function ControllerComp(props: ControllerProps) {
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => (
                         <ButtonWithKeyPress
-                            keyPress={KEY_ACTION_MAP[button.action]}
+                            // keyPress={KEY_ACTION_MAP[button.action]}
                             variant="contained"
                             className={classnames(
                                 classes.button,
@@ -168,9 +171,7 @@ function ControllerComp(props: ControllerProps) {
                             onClick={() => onClickActionButton(button.action)}
                             disabled={!toAct}
                         >
-                            {`${button.label} (${
-                                KEY_ACTION_MAP[button.action]
-                            })`}
+                            {`${button.label}`}
                         </ButtonWithKeyPress>
                     ))}
                 </div>
@@ -178,7 +179,7 @@ function ControllerComp(props: ControllerProps) {
                     {sizingButtons.length > 0 ? (
                         <Fragment>
                             <ButtonWithKeyPress
-                                keyPress={KEY_ACTION_MAP["BET"]}
+                                // keyPress={KEY_ACTION_MAP["BET"]}
                                 variant="contained"
                                 className={classnames(
                                     classes.button,
@@ -187,7 +188,7 @@ function ControllerComp(props: ControllerProps) {
                                 onClick={() => onClickActionButton("BET")}
                                 disabled={!toAct}
                             >
-                                {`${"BET"} (${KEY_ACTION_MAP["BET"]})`}
+                                {`${"BET"}`}
                             </ButtonWithKeyPress>
                             <TextField
                                 className={classes.betTextField}

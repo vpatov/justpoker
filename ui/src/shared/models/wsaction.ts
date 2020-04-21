@@ -34,7 +34,7 @@ export declare interface AddChipsRequest {
 }
 
 export declare interface ClientChatMessage {
-  message: string;
+  content: string;
 }
 
 export type ClientWsMessageRequest = 

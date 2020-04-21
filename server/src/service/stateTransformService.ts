@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
-import { GameState } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
 import { strict as assert } from 'assert';
 
 import {
@@ -46,8 +46,20 @@ export class StateTransformService {
         private readonly chatService: ChatService,
     ) {}
 
+    gameUpdated(updatedKeys: Set<ServerStateKeys>): boolean {
+        return updatedKeys.has(ServerStateKeys.GAMESTATE);
+    }
+
+    audioUpdated(updatedKeys: Set<ServerStateKeys>): boolean {
+        return updatedKeys.has(ServerStateKeys.AUDIO);
+    }
+
+    chatUpdated(updatedKeys: Set<ServerStateKeys>): boolean {
+        return updatedKeys.has(ServerStateKeys.CHAT);
+    }
+
     // Hero refers to the player who is receiving this particular UiState.
-    transformGameStateToUIState(clientUUID: string): UiState {
+    transformGameStateToUIState(clientUUID: string, updatedKeys: Set<ServerStateKeys>): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
@@ -57,7 +69,7 @@ export class StateTransformService {
 
         // TODO put each key into its own function
         const uiState: UiState = {
-            game: this.messageService.gameUpdated()
+            game: this.gameUpdated(updatedKeys)
                 ? {
                       gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
                       heroInGame: clientPlayerIsInGame,
@@ -74,14 +86,12 @@ export class StateTransformService {
                       },
                   }
                 : undefined,
-            audio: this.messageService.audioUpdated()
+            audio: this.audioUpdated(updatedKeys)
                 ? clientPlayerIsInGame
                     ? this.transformAudioForClient(heroPlayerUUID)
                     : this.audioService.getAudioQueue()
                 : undefined,
-            chat: this.messageService.chatUpdated()
-                ? this.transformChatMessage(this.chatService.getMessage())
-                : undefined,
+            chat: this.chatUpdated(updatedKeys) ? this.transformChatMessage(this.chatService.getMessage()) : undefined,
         };
         return uiState;
     }
@@ -149,11 +159,11 @@ export class StateTransformService {
     }
 
     transformChatMessage(chatMessage: ChatMessage): UiChatMessage {
-        // TODO does the spread operator here not include the clientUUID?
         const uiChatMessage = {
-            ...chatMessage,
+            content: chatMessage.content,
+            senderName: chatMessage.senderName,
+            timestamp: Date.now(),
         };
-        assert(!uiChatMessage.clientUUID);
         return uiChatMessage;
     }
 
@@ -229,8 +239,12 @@ export class StateTransformService {
         return newPlayer;
     }
 
-    getUIState(clientUUID: string): UiState {
-        const uiState = this.transformGameStateToUIState(clientUUID);
+    getUIState(clientUUID: string, updatedKeys?: Set<ServerStateKeys>): UiState {
+        // TODO document the usage of updatedKeys and consider a refactor/redesign if too complex
+        const uiState = this.transformGameStateToUIState(
+            clientUUID,
+            updatedKeys || this.messageService.getUpdatedKeys(),
+        );
         return uiState;
     }
 

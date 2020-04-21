@@ -338,12 +338,12 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateChatMessage(uuid: string, message: ClientChatMessage) {
-        const messageLength = message.message.length;
+    validateChatMessage(uuid: string, message: ClientChatMessage): ValidationResponse {
+        const messageLength = message.content.length;
         if (messageLength > 1000) {
             return {
                 errorType: ErrorType.MAX_CHAT_MESSAGE_LENGTH_EXCEEDED,
-                errorString: `Message: ${message.message.substr(
+                errorString: `Message: ${message.content.substr(
                     0,
                     50,
                 )}... is ${messageLength} characters, over the allowed limit of 1000.`,

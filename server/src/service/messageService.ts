@@ -103,10 +103,7 @@ export class MessageService {
             updates: [ServerStateKeys.GAMESTATE, ServerStateKeys.AUDIO],
         },
         [ActionType.CHAT]: {
-            validation: (uuid, req) => {
-                this.validationService.validateChatMessage(uuid, req);
-                throw Error('CHAT ws action not implemented yet.');
-            },
+            validation: (uuid, req) => this.validationService.validateChatMessage(uuid, req),
             perform: (uuid, req) => {
                 this.chatService.processChatMessage(uuid, req);
             },
@@ -127,22 +124,15 @@ export class MessageService {
         return this.updatedKeys;
     }
 
-    gameUpdated(): boolean {
-        return this.updatedKeys.has(ServerStateKeys.GAMESTATE);
-    }
-
-    audioUpdated(): boolean {
-        return this.updatedKeys.has(ServerStateKeys.AUDIO);
-    }
-
-    chatUpdated(): boolean {
-        return this.updatedKeys.has(ServerStateKeys.CHAT);
+    setUpdatedKeys(updatedKeys: ServerStateKeys[]) {
+        this.updatedKeys = new Set(updatedKeys);
     }
 
     processMessage(message: ClientWsMessage, clientUUID: string) {
         this.validationService.ensureClientExists(clientUUID);
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);
+        this.updatedKeys.clear();
         if (!hasError(response)) {
             console.log(
                 `clientUUID: ${clientUUID}, messagePayload: ${message.request}, actionType: ${message.actionType}`,
