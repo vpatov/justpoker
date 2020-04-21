@@ -1,6 +1,6 @@
 import get from "lodash/get";
 import docCookies from "../Cookies";
-import { ClientWsMessage } from "../shared/models/wsaction";
+import { ClientWsMessage, ClientChatMessage } from "../shared/models/wsaction";
 
 
 // TODO create stricter api for sending messages to server. DOM node source shouldnt be responsible
@@ -43,6 +43,10 @@ export class WsServer {
     static send(message: ClientWsMessage){
         WsServer.ws.send(JSON.stringify(message));
     };
+
+    static sendChatMessage(message: ClientChatMessage){
+        WsServer.ws.send(JSON.stringify(message));
+    }
 
     static subscribe(key: string, onMessage) {
         console.log(key, onMessage);

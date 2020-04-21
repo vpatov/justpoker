@@ -2,6 +2,8 @@ import { Service } from 'typedi';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
 import { GameState } from '../../../ui/src/shared/models/gameState';
+import { strict as assert } from 'assert';
+
 import {
     UiState,
     Player as UIPlayer,
@@ -12,6 +14,7 @@ import {
     START_GAME_BUTTON,
     STOP_GAME_BUTTON,
     ADD_CHIPS_BUTTON,
+    UiChatMessage,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -23,22 +26,24 @@ import {
     Controller,
     cleanController,
     ActionButton,
-    ALL_ACTION_BUTTONS,
     SizingButton,
     COMMON_BB_SIZINGS,
     COMMON_POT_SIZINGS,
 } from '../../../ui/src/shared/models/uiState';
-import { HandSolverService, Hand } from './handSolverService';
 import { ValidationService, hasError } from './validationService';
 import { AudioQueue } from '../../../ui/src/shared/models/audioQueue';
+import { MessageService } from './messageService';
+import { ChatService } from './chatService';
+import { ChatMessage } from '../../../ui/src/shared/models/chat';
 
 @Service()
 export class StateTransformService {
     constructor(
         private readonly gameStateManager: GameStateManager,
-        private readonly handSolverService: HandSolverService,
         private readonly validationService: ValidationService,
         private readonly audioService: AudioService,
+        private readonly messageService: MessageService,
+        private readonly chatService: ChatService,
     ) {}
 
     // Hero refers to the player who is receiving this particular UiState.
@@ -50,23 +55,33 @@ export class StateTransformService {
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : '';
         const board = this.gameStateManager.getBoard();
 
+        // TODO put each key into its own function
         const uiState: UiState = {
-            game: {
-                gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
-                heroInGame: clientPlayerIsInGame,
-                controller: clientPlayerIsInGame ? this.getUIController(clientUUID, heroPlayerUUID) : cleanController,
-                table: {
-                    spots: 9, // TODO configure
-                    pot: this.gameStateManager.getTotalPot(),
-                    communityCards: [...board],
-                    players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
-                        this.transformPlayer(player, heroPlayerUUID),
-                    ),
-                },
-            },
-            audio: clientPlayerIsInGame
-                ? this.transformAudioForClient(heroPlayerUUID)
-                : this.audioService.getAudioQueue(),
+            game: this.messageService.gameUpdated()
+                ? {
+                      gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
+                      heroInGame: clientPlayerIsInGame,
+                      controller: clientPlayerIsInGame
+                          ? this.getUIController(clientUUID, heroPlayerUUID)
+                          : cleanController,
+                      table: {
+                          spots: 9, // TODO configure
+                          pot: this.gameStateManager.getTotalPot(),
+                          communityCards: [...board],
+                          players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
+                              this.transformPlayer(player, heroPlayerUUID),
+                          ),
+                      },
+                  }
+                : undefined,
+            audio: this.messageService.audioUpdated()
+                ? clientPlayerIsInGame
+                    ? this.transformAudioForClient(heroPlayerUUID)
+                    : this.audioService.getAudioQueue()
+                : undefined,
+            chat: this.messageService.chatUpdated()
+                ? this.transformChatMessage(this.chatService.getMessage())
+                : undefined,
         };
         return uiState;
     }
@@ -131,6 +146,15 @@ export class StateTransformService {
         adminButtons.push(this.gameStateManager.shouldDealNextHand() ? STOP_GAME_BUTTON : START_GAME_BUTTON);
         adminButtons.push(ADD_CHIPS_BUTTON);
         return adminButtons;
+    }
+
+    transformChatMessage(chatMessage: ChatMessage): UiChatMessage {
+        // TODO does the spread operator here not include the clientUUID?
+        const uiChatMessage = {
+            ...chatMessage,
+        };
+        assert(!uiChatMessage.clientUUID);
+        return uiChatMessage;
     }
 
     transformAudioForClient(playerUUID: string): AudioQueue {
