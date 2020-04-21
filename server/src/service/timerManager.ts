@@ -12,7 +12,7 @@ export class TimerManager {
 
     globalTimerFn(fn: Function, getUpdate: () => GameState) {
         fn();
-        this.updateEmitter.next([getUpdate(), new Set([ServerStateKeys.GAMESTATE])]);
+        this.updateEmitter.next([getUpdate(), new Set([ServerStateKeys.GAMESTATE, ServerStateKeys.AUDIO])]);
     }
 
     observeUpdates() {
