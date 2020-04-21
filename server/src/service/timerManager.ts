@@ -1,15 +1,18 @@
 import { Service } from 'typedi';
 import { Subject } from 'rxjs';
-import { GameState } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
+import { MessageService } from './messageService';
 
 @Service()
 export class TimerManager {
     private gameTimer: NodeJS.Timer;
-    private updateEmitter: Subject<GameState> = new Subject<GameState>();
+    private updateEmitter: Subject<[GameState, Set<ServerStateKeys>]> = new Subject<
+        [GameState, Set<ServerStateKeys>]
+    >();
 
-    globalTimerFn(fn: Function, updateEmitter: Subject<GameState>, getUpdate: () => GameState) {
+    globalTimerFn(fn: Function, getUpdate: () => GameState) {
         fn();
-        updateEmitter.next(getUpdate());
+        this.updateEmitter.next([getUpdate(), new Set([ServerStateKeys.GAMESTATE])]);
     }
 
     observeUpdates() {
@@ -20,11 +23,8 @@ export class TimerManager {
     setTimer(fn: Function, getUpdateFn: () => GameState, timeout: number) {
         console.log('setTimer', fn, getUpdateFn, timeout);
         global.setTimeout(
-            this.globalTimerFn /* Timer manager function that executes fn */,
+            () => this.globalTimerFn(fn, getUpdateFn) /* Timer manager function that executes fn */,
             timeout /* Timeout value in ms */,
-            fn /* Function passed in by caller of setTimer, contains game logic */,
-            this.updateEmitter /* Subject to emit after function execution is complete */,
-            getUpdateFn /* Function that returns value that should be emitted */,
         );
     }
 
@@ -33,11 +33,8 @@ export class TimerManager {
     setPlayerTimer(fn: Function, getUpdateFn: () => GameState, timeout: number) {
         global.clearTimeout(this.gameTimer);
         this.gameTimer = global.setTimeout(
-            this.globalTimerFn /* Timer manager function that executes fn */,
+            () => this.globalTimerFn(fn, getUpdateFn) /* Timer manager function that executes fn */,
             timeout /* Timeout value in ms */,
-            fn /* Function passed in by caller of setTimer, contains game logic */,
-            this.updateEmitter /* Subject to emit after function execution is complete */,
-            getUpdateFn /* Function that returns value that should be emitted */,
         );
     }
 }

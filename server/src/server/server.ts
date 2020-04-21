@@ -11,7 +11,7 @@ import cookie from 'cookie';
 
 import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
-import { GameState } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
@@ -88,13 +88,13 @@ class Server {
         this.app.use('/', router);
     }
 
-    sendUpdatesToClients(gameState: GameState) {
+    sendUpdatesToClients(gameState: GameState, updatedKeys?: Set<ServerStateKeys>) {
         if (!gameState.isStateReady) {
             return;
         }
 
         for (const client of this.gsm.getConnectedClients()) {
-            const res = this.stateTransformService.getUIState(client.uuid);
+            const res = this.stateTransformService.getUIState(client.uuid, updatedKeys);
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
@@ -116,9 +116,9 @@ class Server {
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ server: this.server });
 
-        this.timerManager.observeUpdates().subscribe((gameState) => {
+        this.timerManager.observeUpdates().subscribe(([gameState, updatedKeys]) => {
             debugger;
-            this.sendUpdatesToClients(gameState);
+            this.sendUpdatesToClients(gameState, updatedKeys);
             /* Debug Logging */
             logGameState(gameState);
             // logGameState(this.gameStateManager.getGameState());

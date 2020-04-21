@@ -23,7 +23,7 @@ export class ChatService {
 
         this.lastMessage = {
             timestamp: Date.now(),
-            content: message.message,
+            content: message.content,
             senderName: player ? player.name : 'Anonymous',
             clientUUID,
         };
