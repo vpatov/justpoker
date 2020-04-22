@@ -8,7 +8,7 @@ import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
 
 import { AudioService } from './audioService';
 
-import { printObj } from '../../../ui/src/shared/util/util';
+import { printObj, logGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';
 
 @Service()
@@ -59,6 +59,7 @@ export class GamePlayService {
 
         // start the timer if currentPlayerToAct has been set
         if (currentPlayerToAct) {
+            console.log(`Setting player timer for playerUUID: ${currentPlayerToAct}`);
             this.gsm.updateGameState({
                 timeCurrentPlayerTurnStarted: Date.now(),
             });
@@ -67,6 +68,8 @@ export class GamePlayService {
                 () => this.gsm.getGameState(),
                 this.gsm.getTimeToAct(),
             );
+        } else {
+            this.timerManager.clearTimer();
         }
     }
 
@@ -78,7 +81,7 @@ export class GamePlayService {
         const playerUUID = this.gsm.getCurrentPlayerToAct();
         if (!playerUUID) {
             console.log('timeOutPlayer was called and there is no currentPlayerToAct. state:');
-            printObj(this.gsm.getGameState());
+            logGameState(this.gsm.getGameState());
             return;
         }
         if (!hasError(this.validationService.validateCheckAction(this.gsm.getClientByPlayerUUID(playerUUID)))) {
@@ -593,7 +596,7 @@ export class GamePlayService {
     victoryByFolding() {
         const winnerUUID = this.gsm.getPlayersInHand()[0];
         this.gsm.updatePlayer(winnerUUID, { winner: true });
-        this.gsm.updateGameState({ currentPlayerToAct: '' });
+        this.clearCurrentPlayerToAct();
         this.placeBetsInPot();
         this.giveWinnerThePot(winnerUUID);
         this.triggerFinishHand(2000);
@@ -614,9 +617,15 @@ export class GamePlayService {
 
     finishBettingRound() {
         this.placeBetsInPot();
-        this.gsm.clearCurrentPlayerToAct();
 
         // TODO this code will never not execute  here I believe. refactor
+        // placeBetsInPot and clearCurrentPlayerToAct seem to be common logic
+        // between victory by folding and finish betting round. See if you can
+        // put them in their own function, or incorporate victoryByFolding into finish
+        // betting round?
+        // What is the most logical time to check for a hand result? Immediately after an action
+        // or at "the end" of a betting round? The only "end of betting round" in which this applies
+        // is showdown.
         if (!this.gsm.currentHandHasResult()) {
             this.gsm.nextBettingRound();
             this.initializeBettingRound();

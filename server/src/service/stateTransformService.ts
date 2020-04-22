@@ -192,7 +192,6 @@ export class StateTransformService {
          are part of different states and are easier to handle.
         */
         if (this.gameStateManager.getCurrentPlayerToAct() === playerUUID) {
-            console.log('currentPlayerToAct is hero, setting heroturn sound FX');
             return this.audioService.getHeroTurnToActSFX();
         } else {
             return this.audioService.getAudioQueue();

@@ -1,7 +1,6 @@
 import { Service } from 'typedi';
 import { Subject } from 'rxjs';
 import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
-import { MessageService } from './messageService';
 
 @Service()
 export class TimerManager {
@@ -21,7 +20,6 @@ export class TimerManager {
 
     // TODO clear existing timers
     setTimer(fn: Function, getUpdateFn: () => GameState, timeout: number) {
-        console.log('setTimer', fn, getUpdateFn, timeout);
         global.setTimeout(
             () => this.globalTimerFn(fn, getUpdateFn) /* Timer manager function that executes fn */,
             timeout /* Timeout value in ms */,
@@ -36,5 +34,9 @@ export class TimerManager {
             () => this.globalTimerFn(fn, getUpdateFn) /* Timer manager function that executes fn */,
             timeout /* Timeout value in ms */,
         );
+    }
+
+    clearTimer() {
+        global.clearTimeout(this.gameTimer);
     }
 }
