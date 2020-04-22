@@ -139,19 +139,19 @@ export class GamePlayService {
             }
             case BettingRoundStage.FLOP: {
                 this.initializeFlop();
-                this.audioService.playStartOfBettingRoundSFX();
+                // this.audioService.playStartOfBettingRoundSFX();
                 this.triggerSetFirstToAct();
                 break;
             }
             case BettingRoundStage.TURN: {
                 this.initializeTurn();
-                this.audioService.playStartOfBettingRoundSFX();
+                // this.audioService.playStartOfBettingRoundSFX();
                 this.triggerSetFirstToAct();
                 break;
             }
             case BettingRoundStage.RIVER: {
                 this.initializeRiver();
-                this.audioService.playStartOfBettingRoundSFX();
+                // this.audioService.playStartOfBettingRoundSFX();
                 this.triggerSetFirstToAct();
                 break;
             }
