@@ -1,35 +1,28 @@
-import React from "react";
-import {
-    createStyles,
-    withStyles,
-    WithStyles,
-    Theme,
-} from "@material-ui/core/styles";
-import { scroll, scroller } from "react-scroll";
-import TextareaAutosize from "react-textarea-autosize";
+import React, { useState, useEffect, useRef } from "react";
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+
+import classnames from 'classnames'
+import get from 'lodash/get'
+
+import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Slide from "@material-ui/core/Slide";
+import Button from "@material-ui/core/Button";
 
 import { WsServer } from "./api/ws";
 import {
     UiChatMessage,
-    cleanUiChatLog,
-    testUiChatLog,
-    UiChatLog,
 } from "./shared/models/uiState";
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            position: "absolute",
-            top: "0",
-            right: "0",
-            height: "85%",
-            width: "20vmin",
+            height: "100%",
+            width: "20%",
+            maxWidth: "360px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            gridArea: "chatLog",
             flexDirection: "column",
             ...theme.custom.CHAT,
         },
@@ -37,57 +30,37 @@ const styles = (theme: Theme) =>
             display: "flex",
             flexDirection: "column",
             height: "100%",
-            margin: "8px",
+            width: "100%",
             overflowY: "auto",
+            // "&:hover": {
+            //     overflowY: "auto",
+            // },
             overflowWrap: "break-word",
-            width: "95%",
+
         },
         chatInputSection: {
-            alignContent: "center",
-            alignItems: "center",
+
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-between",
-            margin: "8px",
-            width: "95%",
-        },
-        chatInputContainer: {
-            marginRight: "20px",
-            width: "85%",
-        },
-        chatInput: {
-            backgroundColor: "rgba(201,148,226,0.1)",
-            border: "1.5px solid rgba(255,210,210,0.3)",
-            borderRadius: "5px",
-            color: "blanchedalmond",
-            height: "16px",
-            fontFamily: "Ubuntu",
-            fontSize: "12px",
-            marginBottom: "0px",
-            marginTop: "0px",
-            padding: "8px",
-            resize: "none",
-            width: "calc(100% - 7px)",
-        },
-        buttonContainer: {
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            width: "100%",
+            paddingTop: "2vmin"
         },
         sendButton: {
-            backgroundColor: "black",
-            borderBottomStyle: "hidden",
-            borderLeftStyle: "hidden",
-            borderRightStyle: "hidden",
-            borderTopStyle: "hidden",
-            borderRadius: "10px",
-            color: "rgb(200,150,240)",
-            fontFamily: "Ubuntu",
-            height: "32.66px",
-            marginTop: "auto",
-            padding: "6px",
-            textTransform: "uppercase",
-            width: "100%",
+            fontSize: "1vmin",
+            marginRight: "1vmin",
+
+        },
+        messageTextField: {
+            flexGrow: 1,
+            marginRight: "1vmin",
+            marginBottom: 0,
+            marginTop: 0
+        },
+        messageTextFieldInput: {
+            fontSize: "1vmin",
+
         },
         chatMessage: {
             margin: "5px",
@@ -100,148 +73,118 @@ const styles = (theme: Theme) =>
         },
         messageContent: {
             color: "rgb(220,210,230)",
-        },
-    });
+        }
+    }),
+);
 
-declare interface ChatLogState {
-    chatLog: UiChatLog;
-    draftChatMessage: string;
-    isScrolledToBottom: boolean;
+
+interface ChatLogProps {
+    className?: string
+    hideChat: boolean
 }
 
-interface ChatLogProps extends WithStyles<typeof styles> {}
 
-class ChatLog extends React.Component<ChatLogProps, ChatLogState> {
-    bottomOfChatLog: HTMLDivElement | null = null;
-    chatLogComponent: HTMLDivElement | null = null;
+function ChatLog(props: ChatLogProps) {
+    const classes = useStyles();
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            chatLog: { messages: [] },
-            draftChatMessage: "",
-            isScrolledToBottom: true,
-        };
+    const { className, hideChat } = props;
+
+    const [messages, setMessages] = useState([] as any);
+    const [draftMessage, setDraftMessage] = useState("");
+
+    const messagesRef = useRef(null)
+
+    const scrollToBottom = () => {
+        (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: "smooth" })
     }
 
-    setDraftChatMessage(newDraftChatMessage: string) {
-        this.setState((state, props) => ({
-            draftChatMessage: newDraftChatMessage,
-        }));
-    }
+    useEffect(scrollToBottom, [messages, hideChat]);
 
-    sendMessage() {
-        WsServer.sendChatMessage(this.state.draftChatMessage);
-        this.setDraftChatMessage("");
-    }
-
-    onTextAreaPressEnter(event: KeyboardEvent) {
-        if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            this.sendMessage();
+    useEffect(() => {
+        const succ = WsServer.openWs();
+        if (succ) {
+            WsServer.subscribe("chat", onReceiveNewChatMessage);
         }
+
+    }, []);
+
+    function sendMessage() {
+        WsServer.sendChatMessage(draftMessage);
+        setDraftMessage("");
     }
 
-    onReceiveNewChatMessage(chatMessage: UiChatMessage) {
-        this.setState((state, props) => ({
-            chatLog: { messages: [...state.chatLog.messages, chatMessage] },
-            draftChatMessage: state.draftChatMessage,
-        }));
+    // onTextAreaPressEnter(event: KeyboardEvent) {
+    //     if (event.key === "Enter" && !event.shiftKey) {
+    //         event.preventDefault();
+    //         this.sendMessage();
+    //     }
+    // }
+
+    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
+        setMessages(oldMessages => [...oldMessages, chatMessage])
     }
 
-    componentDidUpdate() {
-        if (this.state.isScrolledToBottom) {
-            this.scrollToBottom();
-        }
-    }
 
-    componentDidMount() {
-        WsServer.subscribe("chat", (newChatMessage) =>
-            this.onReceiveNewChatMessage(newChatMessage)
-        );
-        this.chatLogComponent!.addEventListener("scroll", this.listenToScroll);
-    }
 
-    componentWillUnmount() {
-        this.chatLogComponent!.removeEventListener(
-            "scroll",
-            this.listenToScroll
-        );
-    }
-
-    // if the user is currently scrolled close to the bottom, consider them scroll to the bottom and autoscroll them down when
-    // new messages come in
-    listenToScroll = () => {
-        const clientHeight = this.chatLogComponent!.clientHeight;
-        const scrollTop = this.chatLogComponent!.scrollTop;
-        const scrollHeight = this.chatLogComponent!.scrollHeight;
-        this.setState((state, props) => ({
-            isScrolledToBottom:
-                Math.abs(scrollHeight - (scrollTop + clientHeight)) < 25,
-        }));
-    };
-
-    scrollToBottom = () => {
-        this.bottomOfChatLog!.scrollIntoView({ behavior: "smooth" });
-    };
-
-    render() {
-        const { classes } = this.props;
+    function renderChat() {
         return (
-            <div className={classes.root}>
-                <div
-                    className={classes.chatLog}
-                    ref={(element) => {
-                        this.chatLogComponent = element;
-                    }}
-                >
-                    {this.state.chatLog.messages.map((message) => (
-                        <Typography
-                            key={message.timestamp}
-                            className={classes.chatMessage}
-                        >
-                            <span className={classes.senderName}>
-                                {message.senderName}:
+            <Slide in mountOnEnter unmountOnExit direction="left">
+                <div className={classnames(classes.root, className)}>
+                    <div className={classes.chatLog}  >
+                        {messages.map((message) => (
+                            <Typography
+                                key={message.timestamp}
+                                className={classes.chatMessage}
+                            >
+                                <span className={classes.senderName}>
+                                    {message.senderName}:
                             </span>
-                            <span className={classes.messageContent}>
-                                {message.content}
-                            </span>
-                        </Typography>
-                    ))}
-                    <div
-                        style={{ float: "left", clear: "both" }}
-                        ref={(element) => {
-                            this.bottomOfChatLog = element;
-                        }}
-                    ></div>
-                </div>
-
-                <div className={classes.chatInputSection}>
-                    <div className={classes.chatInputContainer}>
-                        <TextareaAutosize
-                            className={classes.chatInput}
-                            maxRows={3}
-                            value={this.state.draftChatMessage}
-                            onKeyDown={(event) =>
-                                this.onTextAreaPressEnter(event)
-                            }
-                            onChange={(event) =>
-                                this.setDraftChatMessage(event.target.value)
-                            }
-                        ></TextareaAutosize>
+                                <span className={classes.messageContent}>
+                                    {message.content}
+                                </span>
+                            </Typography>
+                        ))}
+                        <div ref={messagesRef} />
                     </div>
-                    <div className={classes.buttonContainer}>
-                        <button
+                    <div className={classes.chatInputSection}>
+                        <TextField
+                            variant="outlined"
+                            value={draftMessage}
+                            className={classes.messageTextField}
+                            margin="dense"
+                            onChange={(event) =>
+                                setDraftMessage(event.target.value)
+                            }
+                            InputProps={{
+                                classes: {
+                                    input: classes.messageTextFieldInput,
+                                },
+                            }}
+                            multiline
+                            rowsMax={4}
+                        />
+                        <Button
                             className={classes.sendButton}
-                            onClick={(event) => this.sendMessage()}
+                            onClick={(e) =>
+                                sendMessage()
+                            }
                         >
                             Send
-                        </button>
+                        </Button>
                     </div>
+
                 </div>
-            </div>
+            </Slide>
+
         );
+    }
+
+
+    if (!hideChat) {
+        return renderChat()
+    } else {
+        return null
     }
 }
 
-export default withStyles(styles)(ChatLog);
+export default ChatLog

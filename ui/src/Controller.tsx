@@ -108,6 +108,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export interface ControllerProps {
     controller: Controller;
+    className?: string;
 }
 
 // conflicting with chat
@@ -122,6 +123,7 @@ const KEY_ACTION_MAP = {
 
 function ControllerComp(props: ControllerProps) {
     const classes = useStyles();
+    const { className } = props
     const {
         toAct,
         unsetCheckCall,
@@ -130,6 +132,7 @@ function ControllerComp(props: ControllerProps) {
         sizingButtons,
         actionButtons,
         adminButtons,
+
     } = props.controller;
 
     const [chipAmt, setChipAmt] = useState(0);
@@ -161,7 +164,7 @@ function ControllerComp(props: ControllerProps) {
     }
 
     return (
-        <div className={classes.root}>
+        <div className={classnames(classes.root, className)}>
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => {
@@ -180,7 +183,7 @@ function ControllerComp(props: ControllerProps) {
                                 >
                                     {`${button.label} (${
                                         KEY_ACTION_MAP[button.action]
-                                    })`}
+                                        })`}
                                 </ButtonWithKeyPress>
                             );
                         }
@@ -250,15 +253,15 @@ function ControllerComp(props: ControllerProps) {
                 {(adminButtons || []).filter(
                     (button) => button.action === ActionType.ADDCHIPS
                 ).length > 0 ? (
-                    <TextField
-                        onChange={(event) =>
-                            setChipAmt(parseInt(event.target.value))
-                        }
-                        value={chipAmt === 0 ? "" : chipAmt}
-                        type="number"
-                        variant="outlined"
-                    />
-                ) : null}
+                        <TextField
+                            onChange={(event) =>
+                                setChipAmt(parseInt(event.target.value))
+                            }
+                            value={chipAmt === 0 ? "" : chipAmt}
+                            type="number"
+                            variant="outlined"
+                        />
+                    ) : null}
             </div>
         </div>
     );
