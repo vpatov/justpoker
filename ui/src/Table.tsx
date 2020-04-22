@@ -3,6 +3,7 @@ import Player from "./Player";
 import OpenSeat from "./OpenSeat";
 import Bet from "./Bet";
 import CommunityCards from "./CommunityCards";
+import classnames from 'classnames'
 
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -36,12 +37,11 @@ function positionToPlacement(width, height, index) {
 }
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: "80%",
-        width: "100%",
+        height: "100%",
+
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        gridArea: "table",
     },
     playersCont: {
         position: "absolute",
@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Table(props) {
     const classes = useStyles();
-    const { heroInGame } = props;
+    const { heroInGame, className } = props;
     const { players, communityCards, spots, pot } = props.table;
 
     function createSpotsAtTable() {
@@ -162,7 +162,7 @@ function Table(props) {
         return ans;
     }
     return (
-        <div className={classes.root}>
+        <div className={classnames(classes.root, className)}>
             <div className={classes.table}>
                 <Typography
                     className={classes.mainPot}

@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
         border: "1px solid black",
         borderRadius: 12,
         width: "40%",

@@ -98,12 +98,23 @@ export const CUSTOM_THEME = {
         },
     },
     overrides: {
+        MuiFormLabel: {
+            root: {
+                color: 'white'
+            }
+        },
         MuiOutlinedInput: {
             notchedOutline: {
                 borderColor: `white`,
+
             },
             input: {
                 color: "white",
+            },
+            root: {
+                "&:hover:not($disabled):not($focused):not($error) $notchedOutline": {
+                    borderColor: teal["A200"]
+                }
             },
         },
         MuiButton: {
