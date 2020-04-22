@@ -14,31 +14,19 @@ import { MessageService } from '../service/messageService';
 import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
-import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
+import { generateUUID, logGameState } from '../../../ui/src/shared/util/util';
 import { TimerManager } from '../service/timerManager';
 import { AudioService } from '../service/audioService';
 
-function logGameState(gameState: GameState) {
-    console.log('\n\nServer game state:\n');
-    const minimizedGameState = {
-        ...gameState,
-        // table: {
-        //     uuid: gameState.table.uuid,
-        //     activeConnections: [...gameState.table.activeConnections.entries()].map(([uuid, client]) => [
-        //         {
-        //             ...client,
-        //             ws: 'ommittedWebSocket',
-        //         },
-        //     ]),
-        // },
-        table: undefined as any,
-        board: undefined as any,
-        // gameParameters: undefined as string,
-        // board: undefined as string,
+declare interface PerformanceMetrics {
+    // sum, count (used for average)
+    snippets: { [key in ExecutionSnippet]: [number, number] };
+}
 
-        deck: [] as any,
-    };
-    console.log(util.inspect(minimizedGameState, false, null, true));
+const enum ExecutionSnippet {
+    PROCESS_MSG = 'MESSAGE_SERVICE_PROCESS_MESSAGE',
+    SEND_UPDATES = 'SEND_UPDATES_WITH_TRANSFORM_FOR_ALL',
+    TOTAL_WS_MESSAGE_PROCESS = 'TOTAL_WS_MESSAGE_PROCESS',
 }
 
 @Service()
@@ -48,6 +36,13 @@ class Server {
     defaultPort = 8080;
     wss: WebSocket.Server;
     tableInitialized = false;
+    performanceMetrics: PerformanceMetrics = {
+        snippets: {
+            MESSAGE_SERVICE_PROCESS_MESSAGE: [0, 0],
+            SEND_UPDATES_WITH_TRANSFORM_FOR_ALL: [0, 0],
+            TOTAL_WS_MESSAGE_PROCESS: [0, 0],
+        },
+    };
 
     constructor(
         private messageService: MessageService,
@@ -56,6 +51,20 @@ class Server {
         private timerManager: TimerManager,
         private readonly audioService: AudioService,
     ) {}
+
+    updateSnippet(snippet: ExecutionSnippet, ms: number) {
+        this.performanceMetrics.snippets[snippet][0] += ms;
+        this.performanceMetrics.snippets[snippet][1] += 1;
+    }
+
+    logAverages() {
+        Object.entries(this.performanceMetrics.snippets).forEach(([snippet, [sum, count]]) => {
+            // dont flood the console
+            if (count % 10 === 0) {
+                console.log(`${snippet}: Average over ${count} samples: ${sum / count}`);
+            }
+        });
+    }
 
     private initRoutes(): void {
         const router = express.Router();
@@ -120,7 +129,7 @@ class Server {
             debugger;
             this.sendUpdatesToClients(gameState, updatedKeys);
             /* Debug Logging */
-            logGameState(gameState);
+            // logGameState(gameState);
             // logGameState(this.gameStateManager.getGameState());
             /* -------------- */
         });
@@ -130,13 +139,6 @@ class Server {
             console.log('connected to ip:', ip);
 
             let clientID = '';
-            // try to get clientID from cookie (local script testing)
-            // try {
-            //     clientID = cookie.parse(req.headers.cookie).clientID;
-            // } catch (e) {
-            //     console.log(e, 'generating new uuid');
-            // }
-
             // try to get clientID from url (frontend)
             if (!clientID) {
                 const regEx = /clientID\=(\w+)/g;
@@ -164,13 +166,23 @@ class Server {
                 console.log('Incoming data:', util.inspect(data, false, null, true));
                 if (typeof data === 'string') {
                     try {
+                        const receivedMessageTime = Date.now();
                         const action = JSON.parse(data);
                         this.messageService.processMessage(action, clientID);
+                        const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
+                        this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
 
+                        const startSendUpdatesTime = Date.now();
                         this.sendUpdatesToClients(this.gsm.getGameState());
+                        const sendUpdatesTime = Date.now() - startSendUpdatesTime;
+                        this.updateSnippet(ExecutionSnippet.SEND_UPDATES, sendUpdatesTime);
+                        const totalMessageProcessTime = Date.now() - receivedMessageTime;
+                        this.updateSnippet(ExecutionSnippet.TOTAL_WS_MESSAGE_PROCESS, totalMessageProcessTime);
+
+                        this.logAverages();
 
                         /* Debug Logging */
-                        logGameState(this.gsm.getGameState());
+                        // logGameState(this.gsm.getGameState());
                         /* -------------- */
                     } catch (e) {
                         /* Debug Logging */
