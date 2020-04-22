@@ -33,14 +33,20 @@ export declare interface AddChipsRequest {
   chipAmount: number;
 }
 
+export declare interface ClientChatMessage {
+  content: string;
+}
+
 export type ClientWsMessageRequest = 
   SitDownRequest & 
   JoinTableRequest & 
   (SitDownRequest & JoinTableRequest) 
   & BettingRoundAction & 
-  AddChipsRequest; 
+  AddChipsRequest &
+  ClientChatMessage; 
 
 export declare interface ClientWsMessage {
   actionType: ActionType;
   request: ClientWsMessageRequest;
 }
+

@@ -16,7 +16,8 @@ export declare interface ValidationResponse {
     NOT_ENOUGH_CHIPS = 'NOT_ENOUGH_CHIPS',
     SEAT_IS_TAKEN = 'SEAT_IS_TAKEN',
     ILLEGAL_BETTING_ACTION = 'ILLEGAL_BETTING_ACTION',
-  }
+    MAX_CHAT_MESSAGE_LENGTH_EXCEEDED = "MAX_CHAT_MESSAGE_LENGTH_EXCEEDED"
+}
   
   export const NO_ERROR: ValidationResponse = {
     errorType: ErrorType.NO_ERROR,

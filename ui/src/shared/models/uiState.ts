@@ -2,10 +2,12 @@ import { Suit, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
 import { AudioQueue } from "./audioQueue";
+import { ChatMessage } from "./chat";
 
 export declare interface UiState {
     game: UiGameState;
     audio: AudioQueue;
+    chat: UiChatMessage;
 }
 
 export declare interface UiGameState {
@@ -70,6 +72,16 @@ export declare interface Player {
     hand: {
         cards: UiCard[];
     };
+}
+
+export declare interface UiChatMessage {
+    timestamp: number;
+    content: string;
+    senderName: string;
+}
+
+export declare interface UiChatLog {
+    messages: UiChatMessage[];
 }
 
 /* Action Buttons */
@@ -143,6 +155,10 @@ export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [5, 4],
 ];
 
+export const cleanUiChatLog: UiChatLog = {
+    messages: []
+};
+
 /* Clean Controller for init. */
 export const cleanController: Controller = {
     toAct: false,
@@ -153,6 +169,26 @@ export const cleanController: Controller = {
     actionButtons: [],
     adminButtons: [],
 };
+
+export const testUiChatLog: UiChatLog = {
+    messages: [
+        {
+            senderName: "Vasia",
+            content: "Message in the chat log.",
+            timestamp: 0
+        },
+        {
+            senderName: "Jules",
+            content: "witty response to something clever.",
+            timestamp: 0
+        },
+        {
+            senderName: "ShaemusGoatmaster",
+            content: "Message in the chataaaasssssssssss sadasdasd asdasd lots of words lorem ipsum lorel sdfsdf log.",
+            timestamp: 0
+        }
+    ]
+}
 
 export const TestGame: UiGameState = {
     heroInGame: true,

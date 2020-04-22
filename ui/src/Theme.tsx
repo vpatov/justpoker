@@ -42,30 +42,29 @@ export const CUSTOM_THEME = {
         BACKGROUND: {
             background:
                 "radial-gradient(circle , rgba(60,60,75,1) 0%, rgba(22,22,40,1) 80%);",
-
         },
         TABLE: {
-
             border: `0.7vmin solid rgba(0,0,0,0.4)`,
             boxShadow: ` 0 4px 4px 4px rgba(255,255,255,0.7)`,
             backgroundColor: "black",
-            background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`
+            background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
         },
         STACK: {
             color: "white",
             backgroundColor: " rgba(28,28,42,1)",
             borderRadius: "0.6vmin",
             boxShadow: "0 5px 15px rgba(10,10,10,0.9)",
-
         },
         CONTROLLER: {
             backgroundColor: "rgba(0,0,0,0.3)",
-            background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`
-
+            background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
         },
         BET: {
             border: "1px solid white",
             backgroundColor: teal[200],
+        },
+        CHAT: {
+            background: `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50, 30, 57, 0.3)80%);`,
         },
         // ACTION_BUTTONS: {
         //     FOLD: {
@@ -104,8 +103,8 @@ export const CUSTOM_THEME = {
                 borderColor: `white`,
             },
             input: {
-                color: "white"
-            }
+                color: "white",
+            },
         },
         MuiButton: {
             root: {
