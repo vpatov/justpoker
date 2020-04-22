@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        gridArea: "table",
     },
     playersCont: {
         position: "absolute",
@@ -120,6 +121,7 @@ function Table(props) {
             } else if (!heroInGame) {
                 ans.push(
                     <OpenSeat
+                        key={index}
                         seatNumber={index}
                         className={classes.spot}
                         style={{

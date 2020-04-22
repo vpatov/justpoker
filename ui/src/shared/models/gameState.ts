@@ -62,6 +62,12 @@ export declare interface Pot {
     contestors: ReadonlyArray<string>;
 }
 
+export const enum ServerStateKeys {
+    GAMESTATE = "GAMESTATE",
+    AUDIO = "AUDIO",
+    CHAT = "CHAT",
+}
+
 export const cleanGameState: GameState = {
     isStateReady: true,
     players: {},

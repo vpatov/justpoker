@@ -49,7 +49,6 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: "center",
             flexWrap: "wrap",
             flexDirection: "column",
-
         },
         sizingButtonsCont: {
             display: "flex",
@@ -90,7 +89,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         betButton: {
             height: "100%",
-            marginRight: "1.4vmin"
+            marginRight: "1.4vmin",
         },
         button: {
             width: "9vmin",
@@ -111,6 +110,9 @@ export interface ControllerProps {
     controller: Controller;
 }
 
+// conflicting with chat
+// TODO either get rid of hotkeys and ensure
+// chat isnt in focus..
 const KEY_ACTION_MAP = {
     [ActionType.BET]: "B",
     [ActionType.CHECK]: "K",
@@ -164,19 +166,23 @@ function ControllerComp(props: ControllerProps) {
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => {
                         if (button.action !== ActionType.BET) {
-                            return <ButtonWithKeyPress
-                                keyPress={KEY_ACTION_MAP[button.action]}
-                                className={classnames(
-                                    classes.button,
-                                    classes[button.action]
-                                )}
-                                onClick={() => onClickActionButton(button.action)}
-                                disabled={!toAct}
-                            >
-                                {`${button.label} (${
-                                    KEY_ACTION_MAP[button.action]
+                            return (
+                                <ButtonWithKeyPress
+                                    keyPress={KEY_ACTION_MAP[button.action]}
+                                    className={classnames(
+                                        classes.button,
+                                        classes[button.action]
+                                    )}
+                                    onClick={() =>
+                                        onClickActionButton(button.action)
+                                    }
+                                    disabled={!toAct}
+                                >
+                                    {`${button.label} (${
+                                        KEY_ACTION_MAP[button.action]
                                     })`}
-                            </ButtonWithKeyPress>
+                                </ButtonWithKeyPress>
+                            );
                         }
                     })}
                 </div>
@@ -211,7 +217,6 @@ function ControllerComp(props: ControllerProps) {
                                     variant="outlined"
                                     autoFocus={true}
                                 />
-
                             </div>
                             <div className={classes.sizingButtonsCont}>
                                 {sizingButtons.map((button) => (
@@ -245,17 +250,15 @@ function ControllerComp(props: ControllerProps) {
                 {(adminButtons || []).filter(
                     (button) => button.action === ActionType.ADDCHIPS
                 ).length > 0 ? (
-                        <TextField
-
-
-                            onChange={(event) =>
-                                setChipAmt(parseInt(event.target.value))
-                            }
-                            value={chipAmt === 0 ? "" : chipAmt}
-                            type="number"
-                            variant="outlined"
-                        />
-                    ) : null}
+                    <TextField
+                        onChange={(event) =>
+                            setChipAmt(parseInt(event.target.value))
+                        }
+                        value={chipAmt === 0 ? "" : chipAmt}
+                        type="number"
+                        variant="outlined"
+                    />
+                ) : null}
             </div>
         </div>
     );
