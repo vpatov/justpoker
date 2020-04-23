@@ -25,18 +25,16 @@ const useStyles = makeStyles((theme) => ({
         width: "5vmin",
         display: "flex",
         justifyContent: "space-evenly",
-
     },
     valueTextsmall: {
-        letterSpacing: "-0.3vmin",
-        fontSize: "2.5vmin",
+        letterSpacing: "-0.05vmin",
+        fontSize: "2.1vmin",
         color: "white",
         fontWeight: "bold",
-        fontFamily: "Futura, Roboto, Avenir, Helvetica, Arial, sans-serif",
+        marginTop: '0.5vmin',
     },
     valueTextlarge: {
         fontWeight: "bold",
-        fontFamily: "Futura, Roboto, Avenir, Helvetica, Arial, sans-serif",
     },
     rankTextlarge: {
         fontSize: "inherit",
@@ -47,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
         display: "inline-block",
     },
     suitTextlarge: {
-        fontSize: "inherit",
+        fontSize: "4vmin",
         position: "absolute",
         bottom: "-0.6vmin",
         right: "0.8vmin",
@@ -59,7 +57,6 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center",
         fontSize: "2.8vmin",
         fontWeight: "bold",
-        fontFamily: "Futura, Roboto, Avenir, Helvetica, Arial, sans-serif",
         ...theme.custom.HIDDEN,
     },
     side: {
@@ -117,7 +114,7 @@ function Card(props) {
     }
     if (hidden) {
         return (
-            <div
+            <Typography
                 className={classnames(
                     classes.root,
                     classes.hidden,
@@ -125,7 +122,8 @@ function Card(props) {
                     className
                 )}
                 style={style}
-            >JP</div>
+            >JP
+            </Typography>
         );
     }
     return (
