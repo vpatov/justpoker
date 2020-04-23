@@ -34,7 +34,6 @@ export const CUSTOM_THEME = {
         HIDDEN: {
             color: `${blueGrey[500]}`,
             backgroundColor: `${blueGrey[700]}`,
-
         },
         FOLDED: {
             opacity: 0.8,
@@ -89,7 +88,7 @@ export const CUSTOM_THEME = {
         // },
     },
     typography: {
-        fontFamily: "Questrial, Helvetica, sans-serif",
+        fontFamily: "Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif",
     },
     palette: {
         primary: {
@@ -104,27 +103,25 @@ export const CUSTOM_THEME = {
     overrides: {
         MuiFormLabel: {
             root: {
-                color: 'white'
-            }
+                color: "white",
+            },
         },
         MuiOutlinedInput: {
             notchedOutline: {
                 borderColor: `white`,
-
             },
             input: {
                 color: "white",
             },
             root: {
                 "&:hover:not($disabled):not($focused):not($error) $notchedOutline": {
-                    borderColor: teal["A200"]
-                }
+                    borderColor: teal["A200"],
+                },
             },
         },
         MuiButton: {
             text: {
                 padding: "0.4vmin 0.8vmin",
-
             },
             root: {
                 border: `1px solid white`,
