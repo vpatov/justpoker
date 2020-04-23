@@ -25,6 +25,7 @@ export class ChatService {
             timestamp: Date.now(),
             content: message.content,
             senderName: player ? player.name : 'Anonymous',
+            playerUUID: player ? player.uuid : undefined,
             clientUUID,
         };
 

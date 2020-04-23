@@ -78,6 +78,7 @@ export declare interface UiChatMessage {
     timestamp: number;
     content: string;
     senderName: string;
+    playerUUID?: string;
 }
 
 export declare interface UiChatLog {
