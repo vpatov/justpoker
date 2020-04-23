@@ -114,7 +114,7 @@ function Card(props) {
     }
     if (hidden) {
         return (
-            <div
+            <Typography
                 className={classnames(
                     classes.root,
                     classes.hidden,
@@ -122,7 +122,8 @@ function Card(props) {
                     className
                 )}
                 style={style}
-            >JP</div>
+            >JP
+            </Typography>
         );
     }
     return (
