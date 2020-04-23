@@ -6,17 +6,19 @@ import get from 'lodash/get'
 
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import Slide from "@material-ui/core/Slide";
+import Fade from "@material-ui/core/Fade";
 import Button from "@material-ui/core/Button";
 
 import { WsServer } from "./api/ws";
 import {
     UiChatMessage,
 } from "./shared/models/uiState";
+import ButtonWithKeyPress from "./ButtonWithKeyPress";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
+            zIndex: 5,
             height: "100%",
             width: "20%",
             maxWidth: "360px",
@@ -24,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: "space-between",
             alignItems: "center",
             flexDirection: "column",
+            paddingLeft: "1.2vmin",
             ...theme.custom.CHAT,
         },
         chatLog: {
@@ -48,7 +51,6 @@ const useStyles = makeStyles((theme: Theme) =>
         sendButton: {
             fontSize: "1vmin",
             marginRight: "1vmin",
-
         },
         messageTextField: {
             flexGrow: 1,
@@ -124,7 +126,7 @@ function ChatLog(props: ChatLogProps) {
 
     function renderChat() {
         return (
-            <Slide in mountOnEnter unmountOnExit direction="left">
+            <Fade in mountOnEnter unmountOnExit >
                 <div className={classnames(classes.root, className)}>
                     <div className={classes.chatLog}  >
                         {messages.map((message) => (
@@ -159,19 +161,25 @@ function ChatLog(props: ChatLogProps) {
                             onKeyPress={(event) => onTextAreaPressEnter(event)}
                             multiline
                             rowsMax={4}
+                            onKeyPress={(ev) => {
+                                if (ev.key === 'Enter') {
+                                    ev.preventDefault();
+                                }
+                            }}
                         />
-                        <Button
+                        <ButtonWithKeyPress
                             className={classes.sendButton}
                             onClick={(e) =>
                                 sendMessage()
                             }
+                            keyPress={"Enter"}
                         >
                             Send
-                        </Button>
+                        </ButtonWithKeyPress>
                     </div>
 
                 </div>
-            </Slide>
+            </Fade>
 
         );
     }
