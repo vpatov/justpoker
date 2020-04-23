@@ -13,6 +13,7 @@ import { WsServer } from "./api/ws";
 import {
     UiChatMessage,
 } from "./shared/models/uiState";
+import ButtonWithKeyPress from "./ButtonWithKeyPress";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -161,15 +162,21 @@ function ChatLog(props: ChatLogProps) {
                             }}
                             multiline
                             rowsMax={4}
+                            onKeyPress={(ev) => {
+                                if (ev.key === 'Enter') {
+                                    ev.preventDefault();
+                                }
+                            }}
                         />
-                        <Button
+                        <ButtonWithKeyPress
                             className={classes.sendButton}
                             onClick={(e) =>
                                 sendMessage()
                             }
+                            keyPress={"Enter"}
                         >
                             Send
-                        </Button>
+                        </ButtonWithKeyPress>
                     </div>
 
                 </div>
