@@ -64,7 +64,7 @@ export const CUSTOM_THEME = {
             backgroundColor: teal[200],
         },
         CHAT: {
-            background: `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50, 30, 57, 0.3)80%);`,
+            background: `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50, 30, 57, 0.4)70%);`,
         },
         // ACTION_BUTTONS: {
         //     FOLD: {
@@ -98,12 +98,23 @@ export const CUSTOM_THEME = {
         },
     },
     overrides: {
+        MuiFormLabel: {
+            root: {
+                color: 'white'
+            }
+        },
         MuiOutlinedInput: {
             notchedOutline: {
                 borderColor: `white`,
+
             },
             input: {
                 color: "white",
+            },
+            root: {
+                "&:hover:not($disabled):not($focused):not($error) $notchedOutline": {
+                    borderColor: teal["A200"]
+                }
             },
         },
         MuiButton: {

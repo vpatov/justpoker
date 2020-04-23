@@ -5,6 +5,7 @@ import { WsServer } from "./api/ws";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+
 import { Controller } from "./shared/models/uiState";
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
 
@@ -43,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         bettingCont: {
             height: "100%",
-            width: "60%",
+            width: "80%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
@@ -59,7 +60,6 @@ const useStyles = makeStyles((theme: Theme) =>
             float: "right",
             height: "100%",
             width: "30%",
-
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
@@ -82,6 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
         betTextField: {
             flexGrow: 1,
             width: "5vmin",
+            marginRight: "1vmin",
         },
         betTextFieldInput: {
             fontSize: "1.4vmin",
@@ -94,6 +95,14 @@ const useStyles = makeStyles((theme: Theme) =>
         button: {
             width: "9vmin",
             fontSize: "1.4vmin",
+        },
+        incButton: {
+            padding: 0,
+            fontSize: "2vmin",
+            fontWeight: "bold"
+        },
+        incButtonLeft: {
+            marginRight: "1vmin",
         },
         adminButton: {
             fontSize: "1.4vmin",
@@ -108,6 +117,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export interface ControllerProps {
     controller: Controller;
+    className?: string;
 }
 
 // conflicting with chat
@@ -122,6 +132,7 @@ const KEY_ACTION_MAP = {
 
 function ControllerComp(props: ControllerProps) {
     const classes = useStyles();
+    const { className } = props
     const {
         toAct,
         unsetCheckCall,
@@ -130,13 +141,23 @@ function ControllerComp(props: ControllerProps) {
         sizingButtons,
         actionButtons,
         adminButtons,
+
     } = props.controller;
 
     const [chipAmt, setChipAmt] = useState(0);
     const [betAmt, setBetAmt] = useState(0);
 
     const changeBetAmount = (newAmt) => {
-        setBetAmt(Math.min(Math.floor(newAmt), max));
+        // parse string into int
+        let intValue = parseInt(newAmt, 10);
+
+        // if user tries to input non interger values set to current value
+        if (Number.isNaN(intValue) || newAmt <= 0) {
+            setBetAmt(0);
+        } else {
+            setBetAmt(Math.min(Math.floor(newAmt), max));
+        }
+        return
     };
 
     // TODO Redesign ClientWsMessageRequest type to better use typescripts features to better
@@ -161,14 +182,14 @@ function ControllerComp(props: ControllerProps) {
     }
 
     return (
-        <div className={classes.root}>
+        <div className={classnames(classes.root, className)}>
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => {
                         if (button.action !== ActionType.BET) {
                             return (
                                 <ButtonWithKeyPress
-                                    keyPress={KEY_ACTION_MAP[button.action]}
+                                    keyPress={`Key${KEY_ACTION_MAP[button.action]}`}
                                     className={classnames(
                                         classes.button,
                                         classes[button.action]
@@ -180,7 +201,7 @@ function ControllerComp(props: ControllerProps) {
                                 >
                                     {`${button.label} (${
                                         KEY_ACTION_MAP[button.action]
-                                    })`}
+                                        })`}
                                 </ButtonWithKeyPress>
                             );
                         }
@@ -191,7 +212,7 @@ function ControllerComp(props: ControllerProps) {
                         <Fragment>
                             <div className={classes.betFieldButtonCont}>
                                 <ButtonWithKeyPress
-                                    keyPress={KEY_ACTION_MAP["BET"]}
+                                    keyPress={`Key${KEY_ACTION_MAP["BET"]}`}
                                     className={classnames(
                                         classes.button,
                                         classes.betButton,
@@ -210,13 +231,35 @@ function ControllerComp(props: ControllerProps) {
                                         },
                                     }}
                                     onChange={(event) =>
-                                        setBetAmt(parseInt(event.target.value))
+                                        changeBetAmount(event.target.value)
                                     }
                                     value={betAmt === 0 ? "" : betAmt}
                                     type="number"
                                     variant="outlined"
                                     autoFocus={true}
                                 />
+                                <div className={classes.incrementCont}>
+                                    <ButtonWithKeyPress
+                                        keyPress={"Minus"}
+                                        onClick={() => changeBetAmount(betAmt - min)}
+                                        className={classnames(
+                                            classes.incButton,
+                                            classes.incButtonLeft,
+                                        )}
+
+                                    >
+                                        -
+                                </ButtonWithKeyPress>
+                                    <ButtonWithKeyPress
+                                        keyPress={"Equal"}
+                                        onClick={() => changeBetAmount(betAmt + min)}
+                                        className={classnames(
+                                            classes.incButton,
+                                        )}
+                                    >
+                                        +
+                                </ButtonWithKeyPress>
+                                </div>
                             </div>
                             <div className={classes.sizingButtonsCont}>
                                 {sizingButtons.map((button) => (
@@ -250,15 +293,15 @@ function ControllerComp(props: ControllerProps) {
                 {(adminButtons || []).filter(
                     (button) => button.action === ActionType.ADDCHIPS
                 ).length > 0 ? (
-                    <TextField
-                        onChange={(event) =>
-                            setChipAmt(parseInt(event.target.value))
-                        }
-                        value={chipAmt === 0 ? "" : chipAmt}
-                        type="number"
-                        variant="outlined"
-                    />
-                ) : null}
+                        <TextField
+                            onChange={(event) =>
+                                setChipAmt(parseInt(event.target.value))
+                            }
+                            value={chipAmt === 0 ? "" : chipAmt}
+                            type="number"
+                            variant="outlined"
+                        />
+                    ) : null}
             </div>
         </div>
     );
