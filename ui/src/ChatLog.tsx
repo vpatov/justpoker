@@ -12,7 +12,6 @@ import { WsServer } from "./api/ws";
 import {
     UiChatMessage,
 } from "./shared/models/uiState";
-import ButtonWithKeyPress from "./ButtonWithKeyPress";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -58,12 +57,11 @@ const useStyles = makeStyles((theme: Theme) =>
             marginTop: 0
         },
         messageTextFieldInput: {
-            fontSize: "1vmin",
-
+            fontSize: "1.5vmin",
         },
         chatMessage: {
             margin: "5px",
-            fontSize: "1.3vmin",
+            fontSize: "1.8vmin",
         },
         senderName: {
             fontWeight: "bold",
@@ -112,18 +110,16 @@ function ChatLog(props: ChatLogProps) {
         setDraftMessage("");
     }
 
-    // onTextAreaPressEnter(event: KeyboardEvent) {
-    //     if (event.key === "Enter" && !event.shiftKey) {
-    //         event.preventDefault();
-    //         this.sendMessage();
-    //     }
-    // }
+    function onTextAreaPressEnter(event: any) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
 
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
         setMessages(oldMessages => [...oldMessages, chatMessage])
     }
-
-
 
     function renderChat() {
         return (
@@ -159,23 +155,10 @@ function ChatLog(props: ChatLogProps) {
                                     input: classes.messageTextFieldInput,
                                 },
                             }}
+                            onKeyPress={(event) => onTextAreaPressEnter(event)}
                             multiline
                             rowsMax={4}
-                            onKeyPress={(ev) => {
-                                if (ev.key === 'Enter') {
-                                    ev.preventDefault();
-                                }
-                            }}
                         />
-                        <ButtonWithKeyPress
-                            className={classes.sendButton}
-                            onClick={(e) =>
-                                sendMessage()
-                            }
-                            keyPress={"Enter"}
-                        >
-                            Send
-                        </ButtonWithKeyPress>
                     </div>
 
                 </div>
