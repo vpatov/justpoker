@@ -90,7 +90,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         betButton: {
             height: "100%",
-            marginRight: "1.4vmin",
+            marginRight: "1vmin",
         },
         button: {
             width: "9vmin",

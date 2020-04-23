@@ -85,7 +85,7 @@ export const CUSTOM_THEME = {
         // },
     },
     typography: {
-        fontFamily: "Roboto, Avenir, Helvetica, Arial, sans-serif",
+        fontFamily: "Questrial, Helvetica, sans-serif",
     },
     palette: {
         primary: {
