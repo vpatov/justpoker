@@ -11,12 +11,13 @@ import cookie from 'cookie';
 
 import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
-import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
 import { generateUUID, logGameState } from '../../../ui/src/shared/util/util';
 import { TimerManager } from '../service/timerManager';
 import { AudioService } from '../service/audioService';
+import { ChatService } from '../service/chatService';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -49,6 +50,7 @@ class Server {
         private gsm: GameStateManager,
         private stateTransformService: StateTransformService,
         private timerManager: TimerManager,
+        private readonly chatService: ChatService,
         private readonly audioService: AudioService,
     ) {}
 
@@ -82,6 +84,7 @@ class Server {
                 timeToAct: req.body.timeToAct,
             };
             const tableId = this.gsm.initGame(newGameForm);
+            this.chatService.clearMessages();
             this.tableInitialized = true;
             console.log(tableId);
             res.send(JSON.stringify({ tableId: tableId }));
@@ -97,7 +100,7 @@ class Server {
         this.app.use('/', router);
     }
 
-    sendUpdatesToClients(gameState: GameState, updatedKeys?: Set<ServerStateKeys>) {
+    sendUpdatesToClients(gameState: GameState, updatedKeys?: Set<ServerStateKey>) {
         if (!gameState.isStateReady) {
             return;
         }

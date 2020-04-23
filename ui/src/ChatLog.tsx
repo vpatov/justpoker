@@ -111,18 +111,16 @@ function ChatLog(props: ChatLogProps) {
         setDraftMessage("");
     }
 
-    // onTextAreaPressEnter(event: KeyboardEvent) {
-    //     if (event.key === "Enter" && !event.shiftKey) {
-    //         event.preventDefault();
-    //         this.sendMessage();
-    //     }
-    // }
+    function onTextAreaPressEnter(event: any) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
 
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
         setMessages(oldMessages => [...oldMessages, chatMessage])
     }
-
-
 
     function renderChat() {
         return (
@@ -158,6 +156,7 @@ function ChatLog(props: ChatLogProps) {
                                     input: classes.messageTextFieldInput,
                                 },
                             }}
+                            onKeyPress={(event) => onTextAreaPressEnter(event)}
                             multiline
                             rowsMax={4}
                         />
