@@ -46,7 +46,7 @@ export const CUSTOM_THEME = {
         },
         TABLE: {
             border: `0.7vmin solid rgba(0,0,0,0.4)`,
-            boxShadow: ` 0 4px 4px 4px rgba(255,255,255,0.7)`,
+            boxShadow: ` 0 3px 3px 3px rgba(255,255,255,0.4)`,
             backgroundColor: "black",
             background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
         },
@@ -122,6 +122,10 @@ export const CUSTOM_THEME = {
             },
         },
         MuiButton: {
+            text: {
+                padding: "0.4vmin 0.8vmin",
+
+            },
             root: {
                 border: `1px solid white`,
                 backgroundColor: "rgba(0,0,0,0.9)",

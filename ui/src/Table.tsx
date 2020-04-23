@@ -12,8 +12,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 const TABLE_HEIGHT = 50;
 const TABLE_WIDTH = 80;
 
-const PLAYER_HEIGHT = 61;
-const PLAYER_WIDTH = 93;
+const PLAYER_HEIGHT = 64;
+const PLAYER_WIDTH = 90;
 
 const BET_HEIGHT = 35;
 const BET_WIDTH = 62;
@@ -26,9 +26,9 @@ function positionToPlacement(width, height, index) {
         1: { x: xInc * 6, y: 0 },
         2: { x: width, y: yInc * 2 },
         3: { x: width, y: yInc * 4 },
-        4: { x: xInc * 6.5, y: yInc * 6 },
+        4: { x: xInc * 6.5, y: yInc * 5.7 },
         5: { x: xInc * 4, y: height },
-        6: { x: xInc * 1.5, y: yInc * 6 },
+        6: { x: xInc * 1.5, y: yInc * 5.7 },
         7: { x: 0, y: yInc * 4 },
         8: { x: 0, y: yInc * 2 },
     };
@@ -38,7 +38,6 @@ function positionToPlacement(width, height, index) {
 const useStyles = makeStyles((theme) => ({
     root: {
         height: "100%",
-
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
