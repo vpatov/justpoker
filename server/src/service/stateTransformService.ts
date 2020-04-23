@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
-import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { strict as assert } from 'assert';
 
 import {
@@ -46,20 +46,20 @@ export class StateTransformService {
         private readonly chatService: ChatService,
     ) {}
 
-    gameUpdated(updatedKeys: Set<ServerStateKeys>): boolean {
-        return updatedKeys.has(ServerStateKeys.GAMESTATE);
+    gameUpdated(updatedKeys: Set<ServerStateKey>): boolean {
+        return updatedKeys.has(ServerStateKey.GAMESTATE);
     }
 
-    audioUpdated(updatedKeys: Set<ServerStateKeys>): boolean {
-        return updatedKeys.has(ServerStateKeys.AUDIO);
+    audioUpdated(updatedKeys: Set<ServerStateKey>): boolean {
+        return updatedKeys.has(ServerStateKey.AUDIO);
     }
 
-    chatUpdated(updatedKeys: Set<ServerStateKeys>): boolean {
-        return updatedKeys.has(ServerStateKeys.CHAT);
+    chatUpdated(updatedKeys: Set<ServerStateKey>): boolean {
+        return updatedKeys.has(ServerStateKey.CHAT);
     }
 
     // Hero refers to the player who is receiving this particular UiState.
-    transformGameStateToUIState(clientUUID: string, updatedKeys: Set<ServerStateKeys>): UiState {
+    transformGameStateToUIState(clientUUID: string, updatedKeys: Set<ServerStateKey>): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
@@ -239,11 +239,11 @@ export class StateTransformService {
         return newPlayer;
     }
 
-    getUIState(clientUUID: string, updatedKeys?: Set<ServerStateKeys>): UiState {
+    getUIState(clientUUID: string, updatedKeys?: Set<ServerStateKey>): UiState {
         // TODO document the usage of updatedKeys and consider a refactor/redesign if too complex
         const uiState = this.transformGameStateToUIState(
             clientUUID,
-            updatedKeys || this.messageService.getUpdatedKeys(),
+            updatedKeys || this.gameStateManager.getUpdatedKeys(),
         );
         return uiState;
     }

@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import WebSocket from 'ws';
 
 import { strict as assert } from 'assert';
-import { GameState, cleanGameState } from '../../../ui/src/shared/models/gameState';
+import { GameState, cleanGameState, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import {
     StraddleType,
     GameType,
@@ -24,6 +24,21 @@ import { HandSolverService } from './handSolverService';
 @Service()
 export class GameStateManager {
     private gameState: Readonly<GameState> = cleanGameState;
+
+    // TODO place updatedKey logic into a seperate ServerStateManager file.
+    updatedKeys: Set<ServerStateKey> = new Set();
+
+    getUpdatedKeys(): Set<ServerStateKey> {
+        return this.updatedKeys;
+    }
+
+    addUpdatedKeys(...updatedKeys: ServerStateKey[]) {
+        updatedKeys.forEach((updatedKey) => this.updatedKeys.add(updatedKey));
+    }
+
+    setUpdatedKeys(updatedKeys: ServerStateKey[]) {
+        this.updatedKeys = new Set(updatedKeys);
+    }
 
     constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) {}
 

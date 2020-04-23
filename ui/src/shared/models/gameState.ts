@@ -62,7 +62,7 @@ export declare interface Pot {
     contestors: ReadonlyArray<string>;
 }
 
-export const enum ServerStateKeys {
+export const enum ServerStateKey {
     GAMESTATE = "GAMESTATE",
     AUDIO = "AUDIO",
     CHAT = "CHAT",
