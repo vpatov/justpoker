@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     },
     gameChatCont: {
         display: "flex",
-        height: "85vmin",
+        height: "85vh",
         width: '100%',
         overflow: "hidden"
     },
@@ -33,11 +33,12 @@ const useStyles = makeStyles((theme) => ({
     },
     hideButton: {
         margin: "2vmin",
+        fontSize: "1vmin",
+
         zIndex: 5,
         position: "fixed",
         bottom: 0,
         right: 0,
-        height: "3vmin"
     },
 }));
 

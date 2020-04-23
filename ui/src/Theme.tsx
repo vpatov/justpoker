@@ -34,6 +34,7 @@ export const CUSTOM_THEME = {
         HIDDEN: {
             color: `${blueGrey[500]}`,
             backgroundColor: `${blueGrey[700]}`,
+
         },
         FOLDED: {
             opacity: 0.8,
@@ -41,7 +42,7 @@ export const CUSTOM_THEME = {
         },
         BACKGROUND: {
             background:
-                "radial-gradient(circle , rgba(60,60,75,1) 0%, rgba(22,22,40,1) 80%);",
+                "linear-gradient(360deg, rgba(50,50,55) 0%, rgb(22,22,30));",
         },
         TABLE: {
             border: `0.7vmin solid rgba(0,0,0,0.4)`,
@@ -64,7 +65,10 @@ export const CUSTOM_THEME = {
             backgroundColor: teal[200],
         },
         CHAT: {
-            background: `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50, 30, 57, 0.4)70%);`,
+            backgroundColor: "rgba(40, 30, 40, 0.3)",
+            boxShadow: ` 0 3px 3px 3px rgba(0,0,0,0.2)`,
+
+            // background: `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50, 30, 57, 0.4)70%);`,
         },
         // ACTION_BUTTONS: {
         //     FOLD: {
