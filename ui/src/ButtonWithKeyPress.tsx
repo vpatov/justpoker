@@ -28,12 +28,19 @@ function ButtonWithKeyPress(props) {
 
     useEffect(() => {
         function keyDown(e) {
-            if (e.code === `Key${keyPress}` && !isKeyDown) setIsKeyDown(true);
+
+            if (e.code === keyPress && !isKeyDown) {
+                setIsKeyDown(true);
+
+            }
+
         }
         function keyUp(e) {
-            if (e.code === `Key${keyPress}` && isKeyDown) {
+            console.log("up")
+            if (e.code === keyPress && isKeyDown) {
                 setIsKeyDown(false);
                 onClick();
+
             }
         }
         document.addEventListener("keydown", keyDown);
