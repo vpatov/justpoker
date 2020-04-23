@@ -1,17 +1,16 @@
 import { Service } from 'typedi';
 import { Subject } from 'rxjs';
-import { GameState, ServerStateKeys } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 
 @Service()
 export class TimerManager {
     private gameTimer: NodeJS.Timer;
-    private updateEmitter: Subject<[GameState, Set<ServerStateKeys>]> = new Subject<
-        [GameState, Set<ServerStateKeys>]
-    >();
+    private updateEmitter: Subject<[GameState, Set<ServerStateKey>]> = new Subject<[GameState, Set<ServerStateKey>]>();
 
     globalTimerFn(fn: Function, getUpdate: () => GameState) {
         fn();
-        this.updateEmitter.next([getUpdate(), new Set([ServerStateKeys.GAMESTATE, ServerStateKeys.AUDIO])]);
+        // TODO perhaps timerManager can simply send all keys?
+        this.updateEmitter.next([getUpdate(), new Set([ServerStateKey.GAMESTATE, ServerStateKey.AUDIO])]);
     }
 
     observeUpdates() {
