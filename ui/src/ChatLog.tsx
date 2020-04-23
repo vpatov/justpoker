@@ -32,11 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
             height: "100%",
             width: "100%",
             overflowY: "auto",
-            // "&:hover": {
-            //     overflowY: "auto",
-            // },
             overflowWrap: "break-word",
-
         },
         chatInputSection: {
 
@@ -45,7 +41,9 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: "space-evenly",
             alignItems: "center",
             width: "100%",
-            paddingTop: "2vmin"
+            paddingTop: "2vmin",
+            paddingBottom: "1vmin"
+
         },
         sendButton: {
             fontSize: "1vmin",

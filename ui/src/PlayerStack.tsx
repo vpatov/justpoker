@@ -18,8 +18,12 @@ const useStyles = makeStyles((theme) => ({
     },
     toAct: {
         ...theme.custom.STACK,
-        backgroundColor: " rgba(70,70,105,1)",
         boxShadow: "0 0px 14px rgba(255,255,255,0.8)",
+        background: "linear-gradient(90deg, rgba(100,100,115,1) 0%, rgba(80,80,135,1) 50%, rgba(100,100,115,1)  100%);",
+        backgroundSize: "200% 200%",
+        "-webkit-animation": "$grad 2s linear infinite",
+        animation: "$grad 2s linear infinite",
+        "-moz-animation": "$grad 2s linear infinite",
 
     },
     winner: {
@@ -37,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
         "0%": {
             backgroundPosition: "0% 0%",
         },
-
         "100%": {
             backgroundPosition: "200% -200%",
 
