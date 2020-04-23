@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "2.1vmin",
         color: "white",
         fontWeight: "bold",
-        marginTop: '0.5vmin',
+        marginTop: "0.5vmin",
     },
     valueTextlarge: {
         fontWeight: "bold",
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     rankTextlarge: {
         fontSize: "inherit",
         position: "absolute",
-        top: "-1vmin",
+        top: "-0.5vmin",
         left: "0.8vmin",
         color: "white",
         display: "inline-block",
@@ -47,8 +47,8 @@ const useStyles = makeStyles((theme) => ({
     suitTextlarge: {
         fontSize: "4vmin",
         position: "absolute",
-        bottom: "-0.6vmin",
-        right: "0.8vmin",
+        bottom: "-0.5vmin",
+        right: "0.5vmin",
         color: "white",
         display: "inline-block",
     },
@@ -122,7 +122,8 @@ function Card(props) {
                     className
                 )}
                 style={style}
-            >JP
+            >
+                JP
             </Typography>
         );
     }

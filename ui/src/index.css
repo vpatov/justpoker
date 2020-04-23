@@ -11,6 +11,11 @@ body {
     scrollbar-shadow-color: #646464;
 }
 
+@font-face {
+    font-family: "Avenir";
+    src: local("Avenir"), url(./fonts/Avenir.otf);
+}
+
 a {
     text-decoration: none;
     color: unset;

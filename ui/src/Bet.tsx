@@ -6,37 +6,38 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    position: "absolute",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "column",
-  },
-  amount: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: "2vmin",
-  },
+    root: {
+        position: "absolute",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+    },
+    amount: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: "2vmin",
+        marginTop: "0.3vmin",
+    },
 }));
 
 function Bet(props) {
-  const classes = useStyles();
-  const { className, style, amount } = props;
+    const classes = useStyles();
+    const { className, style, amount } = props;
 
-  return (
-    <div
-      className={classnames(classes.root, className)}
-      style={{
-        ...style,
-      }}
-    >
-      <ChipStack amount={amount} />
-      <Typography variant={"h6"} className={classnames(classes.amount)}>
-        {amount.toLocaleString()}
-      </Typography>
-    </div>
-  );
+    return (
+        <div
+            className={classnames(classes.root, className)}
+            style={{
+                ...style,
+            }}
+        >
+            <ChipStack amount={amount} />
+            <Typography variant={"h6"} className={classnames(classes.amount)}>
+                {amount.toLocaleString()}
+            </Typography>
+        </div>
+    );
 }
 
 export default Bet;
