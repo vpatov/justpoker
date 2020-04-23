@@ -162,6 +162,7 @@ export class StateTransformService {
         const uiChatMessage = {
             content: chatMessage.content,
             senderName: chatMessage.senderName,
+            playerUUID: chatMessage.playerUUID,
             timestamp: Date.now(),
         };
         return uiChatMessage;
