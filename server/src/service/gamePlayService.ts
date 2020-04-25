@@ -61,6 +61,7 @@ export class GamePlayService {
         if (currentPlayerToAct) {
             console.log(`Setting player timer for playerUUID: ${currentPlayerToAct}`);
             this.gsm.updateGameState({
+                canCurrentPlayerAct: true,
                 timeCurrentPlayerTurnStarted: Date.now(),
             });
             this.timerManager.setPlayerTimer(
@@ -69,8 +70,13 @@ export class GamePlayService {
                 this.gsm.getTimeToAct(),
             );
         } else {
+            this.gsm.updateGameState({ canCurrentPlayerAct: false });
             this.timerManager.clearTimer();
         }
+    }
+
+    endCurrentPlayerTurn() {
+        this.gsm.updateGameState({ canCurrentPlayerAct: false });
     }
 
     clearCurrentPlayerToAct() {
@@ -209,6 +215,7 @@ export class GamePlayService {
     }
 
     triggerPostBettingRoundAction() {
+        this.endCurrentPlayerTurn();
         this.timerManager.setTimer(
             () => this.postBettingRoundAction(),
             () => this.gsm.getGameState(),

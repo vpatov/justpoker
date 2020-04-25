@@ -29,6 +29,8 @@ export declare interface GameState {
 
     currentPlayerToAct: Readonly<string>;
 
+    canCurrentPlayerAct: Readonly<boolean>;
+
     timeCurrentPlayerTurnStarted: number;
 
     pots: ReadonlyArray<Pot>;
@@ -86,6 +88,7 @@ export const cleanGameState: GameState = {
     // bettingRoundActions: [],
     firstToAct: "",
     currentPlayerToAct: "",
+    canCurrentPlayerAct: false,
     shouldDealNextHand: false,
     deck: {
         cards: [],
