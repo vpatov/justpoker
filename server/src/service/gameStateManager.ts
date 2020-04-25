@@ -260,6 +260,17 @@ export class GameStateManager {
         return this.gameState.canCurrentPlayerAct;
     }
 
+    getMinimumBetSize() {
+        const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise() + this.getPartialAllInLeftOver();
+        return minimumBet;
+    }
+
+    getMinimumBetSizeForPlayer(playerUUID: string) {
+        const player = this.getPlayer(playerUUID);
+        const minimumBetSize = this.getMinimumBetSize();
+        return minimumBetSize > player.chips ? player.chips : minimumBetSize;
+    }
+
     isPlayerInGame(playerUUID: string): boolean {
         return !!this.getPlayer(playerUUID);
     }

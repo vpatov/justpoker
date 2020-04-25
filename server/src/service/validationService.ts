@@ -31,10 +31,10 @@ export function hasError(response: ValidationResponse): boolean {
 
 @Service()
 export class ValidationService {
-    constructor(private readonly gameStateManager: GameStateManager) {}
+    constructor(private readonly gsm: GameStateManager) {}
 
     ensureClientExists(clientUUID: string): ValidationResponse {
-        const client = this.gameStateManager.getConnectedClient(clientUUID);
+        const client = this.gsm.getConnectedClient(clientUUID);
         if (!client) {
             return {
                 errorType: ErrorType.CLIENT_DOES_NOT_EXIST,
@@ -45,7 +45,7 @@ export class ValidationService {
     }
 
     ensureClientIsInGame(clientUUID: string): ValidationResponse {
-        const client = this.gameStateManager.getConnectedClient(clientUUID);
+        const client = this.gsm.getConnectedClient(clientUUID);
 
         if (!client.playerUUID) {
             return {
@@ -54,7 +54,7 @@ export class ValidationService {
             };
         }
 
-        const player = this.gameStateManager.getPlayer(client.playerUUID);
+        const player = this.gsm.getPlayer(client.playerUUID);
         if (!player) {
             return {
                 errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
@@ -65,7 +65,7 @@ export class ValidationService {
     }
 
     ensureClientIsNotInGame(clientUUID: string): ValidationResponse {
-        const client = this.gameStateManager.getConnectedClient(clientUUID);
+        const client = this.gsm.getConnectedClient(clientUUID);
         if (client.playerUUID) {
             return {
                 errorType: ErrorType.CLIENT_ALREADY_HAS_PLAYER,
@@ -76,7 +76,7 @@ export class ValidationService {
     }
 
     ensurePlayerIsSitting(playerUUID: string): ValidationResponse {
-        const player = this.gameStateManager.getPlayer(playerUUID);
+        const player = this.gsm.getPlayer(playerUUID);
         if (!player.sitting) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
@@ -87,7 +87,7 @@ export class ValidationService {
     }
 
     ensurePlayerIsStanding(playerUUID: string): ValidationResponse {
-        const player = this.gameStateManager.getPlayer(playerUUID);
+        const player = this.gsm.getPlayer(playerUUID);
         if (player.sitting) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
@@ -102,13 +102,13 @@ export class ValidationService {
         if (hasError(response)) {
             return response;
         }
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
         response = this.ensurePlayerIsSitting(player.uuid);
         if (hasError(response)) {
             return response;
         }
-        const currentPlayerToAct = this.gameStateManager.getCurrentPlayerToAct();
-        const canCurrentPlayerAct = this.gameStateManager.getCanCurrentPlayerAct();
+        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const canCurrentPlayerAct = this.gsm.getCanCurrentPlayerAct();
         if (player.uuid !== currentPlayerToAct || !canCurrentPlayerAct) {
             return {
                 errorType: ErrorType.OUT_OF_TURN,
@@ -139,7 +139,7 @@ export class ValidationService {
         }
 
         const seatNumber = request.seatNumber;
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot SitDown\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
         response = this.ensurePlayerIsStanding(player.uuid);
@@ -154,14 +154,14 @@ export class ValidationService {
             };
         }
 
-        if (!this.gameStateManager.isValidSeat(seatNumber)) {
+        if (!this.gsm.isValidSeat(seatNumber)) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `${errorPrefix} Seat ${seatNumber} is not a valid seat.`,
             };
         }
 
-        if (this.gameStateManager.isSeatTaken(seatNumber)) {
+        if (this.gsm.isSeatTaken(seatNumber)) {
             return {
                 errorType: ErrorType.SEAT_IS_TAKEN,
                 errorString: `${errorPrefix} Seat ${seatNumber} is taken. Please pick another`,
@@ -175,13 +175,13 @@ export class ValidationService {
         if (hasError(response)) {
             return response;
         }
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
         return this.ensurePlayerIsSitting(player.uuid);
     }
 
     validateStartGameRequest(clientUUID: string): ValidationResponse {
         // TODO validate that client is admin
-        if (this.gameStateManager.shouldDealNextHand()) {
+        if (this.gsm.shouldDealNextHand()) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `Cannot StartGame: Game is already in progress.`,
@@ -192,7 +192,7 @@ export class ValidationService {
 
     validateStopGameRequest(clientUUID: string): ValidationResponse {
         // TODO validate that client is admin
-        if (!this.gameStateManager.shouldDealNextHand()) {
+        if (!this.gsm.shouldDealNextHand()) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `Cannot StopGame: Game is not in progress.`,
@@ -207,8 +207,8 @@ export class ValidationService {
             return response;
         }
 
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const bettingRoundActions = this.gameStateManager.getBettingRoundActionTypes();
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
+        const bettingRoundActions = this.gsm.getBettingRoundActionTypes();
         const playerBetAmt = player.betAmount;
 
         // Check to see if anyone has bet before us
@@ -224,7 +224,7 @@ export class ValidationService {
         // Blinds aren't considered a betAction, so make sure our bet matches
         // the highest bet if we are checking. This way, only the big blind and
         // those who post a blind can check.
-        if (playerBetAmt != this.gameStateManager.getHighestBet()) {
+        if (playerBetAmt != this.gsm.getHighestBet()) {
             return {
                 errorType: ErrorType.ILLEGAL_BETTING_ACTION,
                 errorString: `You cannot check without calling the blinds.`,
@@ -269,7 +269,7 @@ export class ValidationService {
         // TODO remove this from here and put this extra checking in a type validation layer.
         const betAmount = typeof action.amount === 'number' ? action.amount : Number(action.amount);
 
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot Bet\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
         if (player.chips < betAmount) {
@@ -279,27 +279,25 @@ export class ValidationService {
             };
         }
 
-        if (!this.gameStateManager.isPlayerInHand(player.uuid)) {
+        if (!this.gsm.isPlayerInHand(player.uuid)) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `${errorPrefix} FATAL ERROR: Player is not in the hand, they should not be able to bet.`,
             };
         }
 
-        const minRaiseDiff = this.gameStateManager.getMinRaiseDiff();
-        const previousRaise = this.gameStateManager.getPreviousRaise();
-        const partialAllInLeftOver = this.gameStateManager.getPartialAllInLeftOver();
-        const minimumBet = minRaiseDiff + previousRaise + partialAllInLeftOver;
+        const minimumBet = this.gsm.getMinimumBetSizeForPlayer(player.uuid);
 
-        const isPlayerAllIn = player.chips === betAmount;
-
-        if (!isPlayerAllIn && betAmount < minimumBet) {
+        if (betAmount < minimumBet) {
             return {
                 errorType: ErrorType.ILLEGAL_BETTING_ACTION,
                 errorString:
                     `${errorPrefix} Player cannot bet ${betAmount}\nminimum bet is ${minimumBet},` +
-                    ` previousRaise is ${previousRaise}, minRaiseDiff is ${minRaiseDiff}, ` +
-                    `partialAllInLeftOver is ${partialAllInLeftOver}`,
+                    ` previousRaise is ${this.gsm.getPreviousRaise()}, minRaiseDiff is ${this.gsm.getMinRaiseDiff()}, ` +
+                    `partialAllInLeftOver is ${this.gsm.getPartialAllInLeftOver()}. Player has ${
+                        player.chips
+                    } chips, ` +
+                    `so they are ${player.chips === betAmount ? '' : 'NOT'} all in.`,
             };
         }
 
@@ -325,11 +323,11 @@ export class ValidationService {
         if (hasError(response)) {
             return response;
         }
-        const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot Call\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
         //TODO is a noop right now
-        if (!this.gameStateManager.isPlayerFacingBet(player.uuid)) {
+        if (!this.gsm.isPlayerFacingBet(player.uuid)) {
             return {
                 errorType: ErrorType.ILLEGAL_BETTING_ACTION,
                 errorString: `${errorPrefix} Player is not facing a bet.`,
