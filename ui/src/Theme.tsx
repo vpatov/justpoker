@@ -101,6 +101,11 @@ export const CUSTOM_THEME = {
         },
     },
     overrides: {
+        MuiTypography: {
+            root: {
+                color: "white",
+            },
+        },
         MuiFormLabel: {
             root: {
                 color: "white",
