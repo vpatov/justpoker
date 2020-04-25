@@ -70,4 +70,8 @@ export class WsServer {
 
     // TODO
     static reopenWebsocket() {}
+
+    static lintTest() {
+        
+    }
 }
