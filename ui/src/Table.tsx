@@ -3,11 +3,16 @@ import Player from "./Player";
 import OpenSeat from "./OpenSeat";
 import Bet from "./Bet";
 import CommunityCards from "./CommunityCards";
-import classnames from 'classnames'
+import classnames from "classnames";
+import { useSelector } from "react-redux";
+import {
+    tableSelector,
+    heroInGameSelector,
+    playersSelector,
+} from "./store/selectors";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import Tooltip from "@material-ui/core/Tooltip";
 
 const TABLE_HEIGHT = 50;
 const TABLE_WIDTH = 80;
@@ -89,9 +94,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Table(props) {
+    console.log("render table");
     const classes = useStyles();
-    const { heroInGame, className } = props;
-    const { players, communityCards, spots, pot } = props.table;
+    const { className } = props;
+    const heroInGame = useSelector(heroInGameSelector);
+    const { communityCards, spots, pot } = useSelector(tableSelector);
+    const players = useSelector(playersSelector);
 
     function createSpotsAtTable() {
         const ans = [] as any;

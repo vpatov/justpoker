@@ -1,21 +1,25 @@
 import get from "lodash/get";
 import docCookies from "../Cookies";
-import { ClientWsMessage, ClientChatMessage, ActionType, ClientWsMessageRequest } from "../shared/models/wsaction";
-
+import {
+    ClientWsMessage,
+    ClientChatMessage,
+    ActionType,
+    ClientWsMessageRequest,
+} from "../shared/models/wsaction";
 
 // TODO create stricter api for sending messages to server. DOM node source shouldnt be responsible
 // for correctly constructing messages.
 
 export class WsServer {
-
     static ws: WebSocket;
-    static subscriptions: {[key: string]: any} = {};
+    static subscriptions: { [key: string]: any } = {};
 
-    static openWs(){
+    static openWs() {
+        console.log("opening ws...");
         let wsURI =
-        process.env.NODE_ENV === "production"
-            ? "ws://35.192.65.13:8080"
-            : "ws://localhost:8080";
+            process.env.NODE_ENV === "production"
+                ? "ws://35.192.65.13:8080"
+                : "ws://localhost:8080";
 
         const clientID = docCookies.getItem("clientID");
         if (clientID) {
@@ -27,7 +31,7 @@ export class WsServer {
         return true;
     }
 
-    private static onMessage(msg: MessageEvent){
+    private static onMessage(msg: MessageEvent) {
         const jsonData = JSON.parse(get(msg, "data", {}));
         console.log("Data from sever:\n", jsonData);
         if (jsonData.clientID) {
@@ -35,20 +39,22 @@ export class WsServer {
         }
         Object.keys(WsServer.subscriptions).forEach((key) => {
             if (jsonData[key]) {
-                WsServer.subscriptions[key].forEach((func) => func(jsonData[key]));
+                WsServer.subscriptions[key].forEach((func) =>
+                    func(jsonData[key])
+                );
             }
         });
     }
 
-    static send(message: ClientWsMessage){
+    static send(message: ClientWsMessage) {
         WsServer.ws.send(JSON.stringify(message));
-    };
+    }
 
-    static sendChatMessage(content: string){
-        const chatMessage: ClientChatMessage = {content};
+    static sendChatMessage(content: string) {
+        const chatMessage: ClientChatMessage = { content };
         const clientWsMessage: ClientWsMessage = {
             actionType: ActionType.CHAT,
-            request: chatMessage as ClientWsMessageRequest
+            request: chatMessage as ClientWsMessageRequest,
         };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
@@ -63,8 +69,5 @@ export class WsServer {
     }
 
     // TODO
-    static reopenWebsocket(){
-
-    }
+    static reopenWebsocket() {}
 }
-
