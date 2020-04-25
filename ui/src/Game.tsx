@@ -9,28 +9,22 @@ import ChatLog from "./ChatLog";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
-
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: "100vh",
-        width: "100vw",
-        ...theme.custom.BACKGROUND,
+        height: "100%",
+        width: "100%",
     },
     gameChatCont: {
         display: "flex",
         height: "85vh",
-        width: '100%',
-        overflow: "hidden"
+        width: "100%",
+        overflow: "hidden",
     },
     table: {
         flex: "1 1 100%",
     },
-    chatlog: {
-
-    },
-    controller: {
-
-    },
+    chatlog: {},
+    controller: {},
     hideButton: {
         margin: "2vmin",
         fontSize: "1vmin",
@@ -42,36 +36,29 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export interface GameProps {
-    game: UiGameState;
-}
-
-function Game(props: GameProps) {
+function Game(props) {
     const classes = useStyles();
-    const { table, controller, heroInGame } = props.game;
-
     const [hideChat, setHideChat] = useState(false);
 
-
     function renderHideChatButton() {
-        return (<Button
-            className={classes.hideButton}
-            onClick={(e) =>
-                setHideChat(!hideChat)
-            }
-        >
-            {`${hideChat ? "Show" : "Hide"} Chat`}
-        </Button>)
+        return (
+            <Button
+                className={classes.hideButton}
+                onClick={(e) => setHideChat(!hideChat)}
+            >
+                {`${hideChat ? "Show" : "Hide"} Chat`}
+            </Button>
+        );
     }
 
     return (
         <div className={classes.root}>
             <div className={classes.gameChatCont}>
-                <Table table={table} heroInGame={heroInGame} className={classes.table} />
+                <Table className={classes.table} />
                 <ChatLog className={classes.chatlog} hideChat={hideChat} />
                 {renderHideChatButton()}
             </div>
-            <Controller controller={controller} className={classes.controller} />
+            <Controller className={classes.controller} />
             <AudioModule />
         </div>
     );

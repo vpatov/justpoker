@@ -1,6 +1,8 @@
 import React, { useState, Fragment } from "react";
 import classnames from "classnames";
 import { WsServer } from "./api/ws";
+import { useSelector } from "react-redux";
+import { controllerSelector, heroHandLabelSelector } from "./store/selectors";
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -10,6 +12,7 @@ import { Controller } from "./shared/models/uiState";
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
 
 import ButtonWithKeyPress from "./ButtonWithKeyPress";
+import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -64,7 +67,6 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: "space-evenly",
             alignItems: "center",
         },
-
         betInput: {
             paddingRight: 50,
             paddingTop: 25,
@@ -99,7 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
         incButton: {
             padding: 0,
             fontSize: "2vmin",
-            fontWeight: "bold"
+            fontWeight: "bold",
         },
         incButtonLeft: {
             marginRight: "1vmin",
@@ -111,12 +113,17 @@ const useStyles = makeStyles((theme: Theme) =>
             margin: 6,
             fontSize: "1vmin",
         },
+        handLabel: {
+            margin: "1vmin",
+            float: "right",
+            fontSize: "2vmin",
+            fontWeight: "bold",
+        },
         ...theme.custom.ACTION_BUTTONS,
     })
 );
 
 export interface ControllerProps {
-    controller: Controller;
     className?: string;
 }
 
@@ -131,8 +138,10 @@ const KEY_ACTION_MAP = {
 };
 
 function ControllerComp(props: ControllerProps) {
+    console.log("render controller");
+
     const classes = useStyles();
-    const { className } = props
+    const { className } = props;
     const {
         toAct,
         unsetCheckCall,
@@ -141,8 +150,9 @@ function ControllerComp(props: ControllerProps) {
         sizingButtons,
         actionButtons,
         adminButtons,
+    } = useSelector(controllerSelector);
 
-    } = props.controller;
+    const heroHandLabel = useSelector(heroHandLabelSelector);
 
     const [chipAmt, setChipAmt] = useState(0);
     const [betAmt, setBetAmt] = useState(0);
@@ -157,7 +167,7 @@ function ControllerComp(props: ControllerProps) {
         } else {
             setBetAmt(Math.min(Math.floor(newAmt), max));
         }
-        return
+        return;
     };
 
     // TODO Redesign ClientWsMessageRequest type to better use typescripts features to better
@@ -183,13 +193,18 @@ function ControllerComp(props: ControllerProps) {
 
     return (
         <div className={classnames(classes.root, className)}>
+            <Typography className={classes.handLabel}>
+                {heroHandLabel}
+            </Typography>
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => {
                         if (button.action !== ActionType.BET) {
                             return (
                                 <ButtonWithKeyPress
-                                    keyPress={`Key${KEY_ACTION_MAP[button.action]}`}
+                                    keyPress={`Key${
+                                        KEY_ACTION_MAP[button.action]
+                                    }`}
                                     className={classnames(
                                         classes.button,
                                         classes[button.action]
@@ -201,7 +216,7 @@ function ControllerComp(props: ControllerProps) {
                                 >
                                     {`${button.label} (${
                                         KEY_ACTION_MAP[button.action]
-                                        })`}
+                                    })`}
                                 </ButtonWithKeyPress>
                             );
                         }
@@ -241,24 +256,27 @@ function ControllerComp(props: ControllerProps) {
                                 <div className={classes.incrementCont}>
                                     <ButtonWithKeyPress
                                         keyPress={"Minus"}
-                                        onClick={() => changeBetAmount(betAmt - min)}
+                                        onClick={() =>
+                                            changeBetAmount(betAmt - min)
+                                        }
                                         className={classnames(
                                             classes.incButton,
-                                            classes.incButtonLeft,
+                                            classes.incButtonLeft
                                         )}
-
                                     >
                                         -
-                                </ButtonWithKeyPress>
+                                    </ButtonWithKeyPress>
                                     <ButtonWithKeyPress
                                         keyPress={"Equal"}
-                                        onClick={() => changeBetAmount(betAmt + min)}
+                                        onClick={() =>
+                                            changeBetAmount(betAmt + min)
+                                        }
                                         className={classnames(
-                                            classes.incButton,
+                                            classes.incButton
                                         )}
                                     >
                                         +
-                                </ButtonWithKeyPress>
+                                    </ButtonWithKeyPress>
                                 </div>
                             </div>
                             <div className={classes.sizingButtonsCont}>
@@ -293,15 +311,15 @@ function ControllerComp(props: ControllerProps) {
                 {(adminButtons || []).filter(
                     (button) => button.action === ActionType.ADDCHIPS
                 ).length > 0 ? (
-                        <TextField
-                            onChange={(event) =>
-                                setChipAmt(parseInt(event.target.value))
-                            }
-                            value={chipAmt === 0 ? "" : chipAmt}
-                            type="number"
-                            variant="outlined"
-                        />
-                    ) : null}
+                    <TextField
+                        onChange={(event) =>
+                            setChipAmt(parseInt(event.target.value))
+                        }
+                        value={chipAmt === 0 ? "" : chipAmt}
+                        type="number"
+                        variant="outlined"
+                    />
+                ) : null}
             </div>
         </div>
     );
