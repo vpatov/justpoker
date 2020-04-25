@@ -11,7 +11,7 @@ import cookie from 'cookie';
 
 import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
-import { GameState, ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKey, ALL_STATE_KEYS } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateTransformService } from '../service/stateTransformService';
 import { generateUUID, logGameState } from '../../../ui/src/shared/util/util';
@@ -163,7 +163,7 @@ class Server {
                 }),
             );
 
-            ws.send(JSON.stringify(this.stateTransformService.getUIState(clientID)));
+            ws.send(JSON.stringify(this.stateTransformService.getUIState(clientID, ALL_STATE_KEYS)));
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log('Incoming data:', util.inspect(data, false, null, true));
