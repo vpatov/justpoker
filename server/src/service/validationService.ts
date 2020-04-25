@@ -97,7 +97,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensureCorrectPlayerToAct(clientUUID: string): ValidationResponse {
+    ensurePlayerCanActRightNow(clientUUID: string): ValidationResponse {
         let response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
             return response;
@@ -108,7 +108,8 @@ export class ValidationService {
             return response;
         }
         const currentPlayerToAct = this.gameStateManager.getCurrentPlayerToAct();
-        if (player.uuid !== currentPlayerToAct) {
+        const canCurrentPlayerAct = this.gameStateManager.getCanCurrentPlayerAct();
+        if (player.uuid !== currentPlayerToAct || !canCurrentPlayerAct) {
             return {
                 errorType: ErrorType.OUT_OF_TURN,
                 errorString: `Not your turn!\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
@@ -201,7 +202,7 @@ export class ValidationService {
     }
 
     validateCheckAction(clientUUID: string): ValidationResponse {
-        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        const response = this.ensurePlayerCanActRightNow(clientUUID);
         if (hasError(response)) {
             return response;
         }
@@ -236,7 +237,7 @@ export class ValidationService {
     // "Are you sure you want to fold?" prompt if user tries to fold
     // without facing a bet
     validateFoldAction(clientUUID: string): ValidationResponse {
-        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        const response = this.ensurePlayerCanActRightNow(clientUUID);
         if (hasError(response)) {
             return response;
         }
@@ -260,7 +261,7 @@ export class ValidationService {
     */
     //TODO complete
     validateBetAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
-        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        const response = this.ensurePlayerCanActRightNow(clientUUID);
         if (hasError(response)) {
             return response;
         }
@@ -320,7 +321,7 @@ export class ValidationService {
         debugger;
         // this should be all we need, because if a player has folded, it will never be their turn to act,
         // and if they are all in, it shouldn't be their turn to act either.
-        const response = this.ensureCorrectPlayerToAct(clientUUID);
+        const response = this.ensurePlayerCanActRightNow(clientUUID);
         if (hasError(response)) {
             return response;
         }

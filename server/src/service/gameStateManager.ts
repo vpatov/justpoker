@@ -256,6 +256,10 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
+    getCanCurrentPlayerAct() {
+        return this.gameState.canCurrentPlayerAct;
+    }
+
     isPlayerInGame(playerUUID: string): boolean {
         return !!this.getPlayer(playerUUID);
     }
