@@ -1,7 +1,7 @@
 import { Suit, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
-import { AudioQueue } from "./audioQueue";
+import { AudioQueue, getCleanAudioQueue } from "./audioQueue";
 import { ChatMessage } from "./chat";
 
 export declare interface UiState {
@@ -13,6 +13,7 @@ export declare interface UiState {
 export declare interface UiGameState {
     controller: Controller;
     table: Table;
+    players: Player[];
     heroInGame: boolean;
     gameStarted: boolean;
 }
@@ -48,7 +49,6 @@ export declare interface Table {
     spots: number;
     pot: number;
     readonly communityCards: UiCard[];
-    players: Player[];
 }
 
 export declare interface PlayerTimer {
@@ -157,7 +157,7 @@ export const COMMON_POT_SIZINGS: Array<[number, number]> = [
 ];
 
 export const cleanUiChatLog: UiChatLog = {
-    messages: []
+    messages: [],
 };
 
 /* Clean Controller for init. */
@@ -171,25 +171,55 @@ export const cleanController: Controller = {
     adminButtons: [],
 };
 
+export const CleanGame: UiGameState = {
+    heroInGame: false,
+    gameStarted: false,
+    controller: {
+        toAct: false,
+        unsetCheckCall: true,
+        min: 0,
+        max: 0,
+        sizingButtons: [],
+        actionButtons: [],
+    },
+    table: {
+        spots: 9,
+        pot: 0,
+        communityCards: [],
+    },
+    players: [],
+};
+
+export const CleanRootState: UiState = {
+    game: CleanGame,
+    audio: getCleanAudioQueue(),
+    chat: {
+        senderName: "Vasia",
+        content: "Message in the chat log.",
+        timestamp: 0,
+    },
+};
+
 export const testUiChatLog: UiChatLog = {
     messages: [
         {
             senderName: "Vasia",
             content: "Message in the chat log.",
-            timestamp: 0
+            timestamp: 0,
         },
         {
             senderName: "Jules",
             content: "witty response to something clever.",
-            timestamp: 0
+            timestamp: 0,
         },
         {
             senderName: "ShaemusGoatmaster",
-            content: "Message in the chataaaasssssssssss sadasdasd asdasd lots of words lorem ipsum lorel sdfsdf log.",
-            timestamp: 0
-        }
-    ]
-}
+            content:
+                "Message in the chataaaasssssssssss sadasdasd asdasd lots of words lorem ipsum lorel sdfsdf log.",
+            timestamp: 0,
+        },
+    ],
+};
 
 export const TestGame: UiGameState = {
     heroInGame: true,
@@ -231,120 +261,100 @@ export const TestGame: UiGameState = {
             genRandomCard(),
             genRandomCard(),
         ],
-        players: [
-            {
-                name: "Rick Dolo",
-                position: 0,
-                stack: 5500,
-                toAct: true,
-                handLabel: "Set of Kings",
-                playerTimer: {
-                    timeElapsed: 7.6,
-                    timeLimit: 30,
-                },
-                bet: genRandomInt(0, 10),
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-            {
-                name: "Marty Shakus",
-                position: 1,
-                stack: 425323,
-                bet: genRandomInt(0, 100),
-                handLabel: "Four of a Kind",
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-            {
-                name: "Dean Markus",
-                position: 2,
-                stack: 323,
-                bet: genRandomInt(0, 1000),
-                handLabel: "Straight Flush",
-                hand: {
-                    cards: [{ hidden: true }, { hidden: true }],
-                },
-            },
-            {
-                name: "Johnny Bones",
-                position: 3,
-                stack: 323,
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-
-            {
-                button: true,
-                name: "Langus Yanger",
-                position: 4,
-                stack: 323,
-                bet: genRandomInt(0, 100000),
-                handLabel: "Top Two",
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-            {
-                name: "Tommy Bones",
-                position: 5,
-                stack: 323,
-
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-            {
-                hero: true,
-                name: "Jimmy Dean",
-                position: 6,
-                stack: 43020,
-                bet: genRandomInt(0, 1000000),
-                handLabel: "Three Queens",
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-            {
-                name: "Nicki Lam",
-                stack: 20499,
-                position: 7,
-                bet: genRandomInt(0, 100000000),
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-            {
-                name: "Tommy Bones",
-                position: 8,
-                stack: 323,
-                folded: true,
-                hand: {
-                    cards: [genRandomCard(), genRandomCard()],
-                },
-            },
-        ],
     },
-};
+    players: [
+        {
+            name: "Rick Dolo",
+            position: 0,
+            stack: 5500,
+            toAct: true,
+            handLabel: "Set of Kings",
+            playerTimer: {
+                timeElapsed: 7.6,
+                timeLimit: 30,
+            },
+            bet: genRandomInt(0, 10),
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
+        {
+            name: "Marty Shakus",
+            position: 1,
+            stack: 425323,
+            bet: genRandomInt(0, 100),
+            handLabel: "Four of a Kind",
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
+        {
+            name: "Dean Markus",
+            position: 2,
+            stack: 323,
+            bet: genRandomInt(0, 1000),
+            handLabel: "Straight Flush",
+            hand: {
+                cards: [{ hidden: true }, { hidden: true }],
+            },
+        },
+        {
+            name: "Johnny Bones",
+            position: 3,
+            stack: 323,
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
 
-export const CleanGame: UiGameState = {
-    heroInGame: false,
-    gameStarted: false,
-    controller: {
-        toAct: false,
-        unsetCheckCall: true,
-        min: 0,
-        max: 0,
+        {
+            button: true,
+            name: "Langus Yanger",
+            position: 4,
+            stack: 323,
+            bet: genRandomInt(0, 100000),
+            handLabel: "Top Two",
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
+        {
+            name: "Tommy Bones",
+            position: 5,
+            stack: 323,
 
-        sizingButtons: [],
-        actionButtons: [],
-    },
-    table: {
-        spots: 9,
-        pot: 0,
-        communityCards: [],
-        players: [],
-    },
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
+        {
+            hero: true,
+            name: "Jimmy Dean",
+            position: 6,
+            stack: 43020,
+            bet: genRandomInt(0, 1000000),
+            handLabel: "Three Queens",
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
+        {
+            name: "Nicki Lam",
+            stack: 20499,
+            position: 7,
+            bet: genRandomInt(0, 100000000),
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
+        {
+            name: "Tommy Bones",
+            position: 8,
+            stack: 323,
+            folded: true,
+            hand: {
+                cards: [genRandomCard(), genRandomCard()],
+            },
+        },
+    ],
 };

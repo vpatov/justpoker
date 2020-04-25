@@ -80,10 +80,10 @@ export class StateTransformService {
                           spots: 9, // TODO configure
                           pot: this.gameStateManager.getTotalPot(),
                           communityCards: [...board],
-                          players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
-                              this.transformPlayer(player, heroPlayerUUID),
-                          ),
                       },
+                      players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
+                          this.transformPlayer(player, heroPlayerUUID),
+                      ),
                   }
                 : undefined,
             audio: this.audioUpdated(updatedKeys)
