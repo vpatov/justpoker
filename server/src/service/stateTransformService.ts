@@ -60,6 +60,7 @@ export class StateTransformService {
 
     // Hero refers to the player who is receiving this particular UiState.
     transformGameStateToUIState(clientUUID: string, updatedKeys: Set<ServerStateKey>): UiState {
+        debugger;
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
@@ -91,7 +92,12 @@ export class StateTransformService {
                     ? this.transformAudioForClient(heroPlayerUUID)
                     : this.audioService.getAudioQueue()
                 : undefined,
-            chat: this.chatUpdated(updatedKeys) ? this.transformChatMessage(this.chatService.getMessage()) : undefined,
+            // TODO refactor to send entire chatlog on init.
+            chat: this.chatUpdated(updatedKeys)
+                ? this.chatService.getMessage()
+                    ? this.transformChatMessage(this.chatService.getMessage())
+                    : undefined
+                : undefined,
         };
         return uiState;
     }

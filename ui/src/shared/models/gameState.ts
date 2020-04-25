@@ -70,6 +70,8 @@ export const enum ServerStateKey {
     CHAT = "CHAT",
 }
 
+export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
+
 export const cleanGameState: GameState = {
     isStateReady: true,
     players: {},
