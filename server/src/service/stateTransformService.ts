@@ -96,6 +96,10 @@ export class StateTransformService {
         return uiState;
     }
 
+    // TODO determine preconditions for when this is called. Is this function called for every player,
+    // and returns an unpopulated controller for when its not the players turn? Or is this function
+    // only called for the current player to act? Whatever the choice is, the usage/parameters have
+    // to be made consistent with the decision, because there is some redundancy right now.
     getUIController(clientUUID: string, heroPlayerUUID: string): Controller {
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
@@ -104,7 +108,7 @@ export class StateTransformService {
         const controller: Controller = {
             toAct,
             unsetCheckCall: false,
-            min: 0,
+            min: this.getMinimumBetSize(heroPlayerUUID),
             max: this.gameStateManager.getPlayer(heroPlayerUUID).chips,
             sizingButtons: !toAct
                 ? []
@@ -146,6 +150,10 @@ export class StateTransformService {
         // }
 
         return actionButtons;
+    }
+
+    getMinimumBetSize(heroPlayerUUID: string) {
+        return this.gameStateManager.getMinimumBetSizeForPlayer(heroPlayerUUID);
     }
 
     getValidAdminButtons(clientUUID: string): ActionButton[] {
