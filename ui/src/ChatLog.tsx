@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 
-import classnames from 'classnames'
-import get from 'lodash/get'
+import classnames from "classnames";
+import get from "lodash/get";
 
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Fade from "@material-ui/core/Fade";
 
 import { WsServer } from "./api/ws";
-import {
-    UiChatMessage,
-} from "./shared/models/uiState";
+import { UiChatMessage } from "./shared/models/uiState";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -36,15 +34,13 @@ const useStyles = makeStyles((theme: Theme) =>
             overflowWrap: "break-word",
         },
         chatInputSection: {
-
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-evenly",
             alignItems: "center",
             width: "100%",
             paddingTop: "2vmin",
-            paddingBottom: "1vmin"
-
+            paddingBottom: "1vmin",
         },
         sendButton: {
             fontSize: "1vmin",
@@ -54,7 +50,7 @@ const useStyles = makeStyles((theme: Theme) =>
             flexGrow: 1,
             marginRight: "1vmin",
             marginBottom: 0,
-            marginTop: 0
+            marginTop: 0,
         },
         messageTextFieldInput: {
             fontSize: "1.5vmin",
@@ -70,18 +66,17 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         messageContent: {
             color: "rgb(220,210,230)",
-        }
-    }),
+        },
+    })
 );
 
-
 interface ChatLogProps {
-    className?: string
-    hideChat: boolean
+    className?: string;
+    hideChat: boolean;
 }
 
-
 function ChatLog(props: ChatLogProps) {
+    console.log("chat render");
     const classes = useStyles();
 
     const { className, hideChat } = props;
@@ -89,11 +84,13 @@ function ChatLog(props: ChatLogProps) {
     const [messages, setMessages] = useState([] as any);
     const [draftMessage, setDraftMessage] = useState("");
 
-    const messagesRef = useRef(null)
+    const messagesRef = useRef(null);
 
     const scrollToBottom = () => {
-        (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: "smooth" })
-    }
+        (
+            get(messagesRef, "current") || { scrollIntoView: (_) => null }
+        ).scrollIntoView({ behavior: "smooth" });
+    };
 
     useEffect(scrollToBottom, [messages, hideChat]);
 
@@ -102,7 +99,6 @@ function ChatLog(props: ChatLogProps) {
         if (succ) {
             WsServer.subscribe("chat", onReceiveNewChatMessage);
         }
-
     }, []);
 
     function sendMessage() {
@@ -118,14 +114,14 @@ function ChatLog(props: ChatLogProps) {
     }
 
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
-        setMessages(oldMessages => [...oldMessages, chatMessage])
+        setMessages((oldMessages) => [...oldMessages, chatMessage]);
     }
 
     function renderChat() {
         return (
-            <Fade in mountOnEnter unmountOnExit >
+            <Fade in mountOnEnter unmountOnExit>
                 <div className={classnames(classes.root, className)}>
-                    <div className={classes.chatLog}  >
+                    <div className={classes.chatLog}>
                         {messages.map((message) => (
                             <Typography
                                 key={message.timestamp}
@@ -133,7 +129,7 @@ function ChatLog(props: ChatLogProps) {
                             >
                                 <span className={classes.senderName}>
                                     {message.senderName}:
-                            </span>
+                                </span>
                                 <span className={classes.messageContent}>
                                     {message.content}
                                 </span>
@@ -160,19 +156,16 @@ function ChatLog(props: ChatLogProps) {
                             rowsMax={4}
                         />
                     </div>
-
                 </div>
             </Fade>
-
         );
     }
 
-
     if (!hideChat) {
-        return renderChat()
+        return renderChat();
     } else {
-        return null
+        return null;
     }
 }
 
-export default ChatLog
+export default ChatLog;
