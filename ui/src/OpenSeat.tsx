@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import classnames from "classnames";
 import Hand from "./Hand";
 import { WsServer } from "./api/ws";
@@ -25,8 +25,17 @@ const useStyles = makeStyles((theme) => ({
             borderColor: "black",
         },
     },
+    field: {
+        width: "30%"
+    },
     icon: {
         fontSize: "3.4vmin",
+    },
+    dialogRoot: {
+
+    },
+    dialogContent: {
+        height: "20vmin"
     }
 }));
 
@@ -40,27 +49,31 @@ function OpenSeat(props) {
     const [buyin, setBuyin] = useState(100);
 
     const dialogClose = () => {
-      setDialogOpen(false);
+        setDialogOpen(false);
     };
-  
+
     function onClickSitDown() {
         setDialogOpen(true);
     }
 
-    function onChangeBuyin(event: any){
-        console.log(event.target);
+    function onChangeBuyin(event: any) {
         setBuyin(Number(event.target.value));
     }
 
-    function handleSliderChange(event:any, newValue: any){
+    function handleSliderChange(event: any, newValue: any) {
         setBuyin(Number(newValue))
     };
 
-    function invalidBuyin(){
+    function invalidBuyin() {
         return buyin < minBuyin || buyin > maxBuyin;
     }
 
-    function onSubmitSitDownForm(){
+    function invalidName() {
+        return name === ""
+    }
+
+
+    function onSubmitSitDownForm() {
         WsServer.send({
             actionType: ActionType.JOINTABLEANDSITDOWN,
             request: {
@@ -69,18 +82,21 @@ function OpenSeat(props) {
                 seatNumber: seatNumber,
             } as ClientWsMessageRequest,
         });
+        setDialogOpen(false);
     }
 
     return (
-        <IconButton
-            color="primary"
-            className={classnames(classes.root, className)}
-            style={style}
-            onClick={() => onClickSitDown()}
-        >
-            <EventSeatIcon className={classes.icon} />
-            <Dialog open={dialogOpen} onClose={dialogClose}>
-                <DialogContent>
+        <Fragment>
+            <IconButton
+                color="primary"
+                className={classnames(classes.root, className)}
+                style={style}
+                onClick={onClickSitDown}
+            >
+                <EventSeatIcon className={classes.icon} />
+            </IconButton>
+            <Dialog open={dialogOpen} className={classes.dialogRoot} maxWidth="xs" fullWidth >
+                <DialogContent className={classes.dialogContent} >
                     <TextField
                         autoFocus
                         id="name"
@@ -92,36 +108,36 @@ function OpenSeat(props) {
                         }
                         value={name}
                     />
-                    <div>
-                        <Slider
-                            value={buyin}
-                            onChange={handleSliderChange}
-                            min={minBuyin}
-                            max={maxBuyin}
-                            step={1}
-                        />
-                        <Input
-                            value={buyin}
-                            margin="dense"
-                            onChange={onChangeBuyin}
-                            inputProps={{type: "number", min: 25, max: 200, step: 1 }}
-                            error ={invalidBuyin()}
-                        />
-                    </div>
+
+                    <Slider
+                        value={buyin}
+                        onChange={handleSliderChange}
+                        min={minBuyin}
+                        max={maxBuyin}
+                        step={1}
+                    />
+                    <TextField
+                        className={classes.field}
+                        value={buyin}
+                        label="Buy In"
+                        onChange={onChangeBuyin}
+                        inputProps={{ type: "number", min: 25, max: 200, step: 1 }}
+                        error={invalidBuyin()}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={dialogClose} color="primary">
+                    <Button onClick={dialogClose}>
                         Cancel
-                    </Button>
-                    <Button 
-                        disabled={invalidBuyin()}
+                     </Button>
+                    <Button
+                        disabled={invalidBuyin() || invalidName()}
                         onClick={onSubmitSitDownForm} color="primary"
                     >
                         Sit Down
-                    </Button>
+             </Button>
                 </DialogActions>
             </Dialog>
-        </IconButton>
+        </Fragment>
     );
 }
 

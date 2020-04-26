@@ -1,5 +1,6 @@
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createMuiTheme, } from "@material-ui/core/styles";
 
+import { PaletteType } from "@material-ui/core";
 import lightBlue from "@material-ui/core/colors/lightBlue";
 import lightGreen from "@material-ui/core/colors/lightGreen";
 import green from "@material-ui/core/colors/green";
@@ -16,6 +17,8 @@ declare module "@material-ui/core/styles/createMuiTheme" {
         custom?: any;
     }
 }
+
+
 
 export const CUSTOM_THEME = {
     custom: {
@@ -91,6 +94,7 @@ export const CUSTOM_THEME = {
         fontFamily: "Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif",
     },
     palette: {
+        type: "dark" as PaletteType,
         primary: {
             main: teal["A400"],
             light: teal["100"],
@@ -101,23 +105,7 @@ export const CUSTOM_THEME = {
         },
     },
     overrides: {
-        MuiTypography: {
-            root: {
-                color: "white",
-            },
-        },
-        MuiFormLabel: {
-            root: {
-                color: "white",
-            },
-        },
         MuiOutlinedInput: {
-            notchedOutline: {
-                borderColor: `white`,
-            },
-            input: {
-                color: "white",
-            },
             root: {
                 "&:hover:not($disabled):not($focused):not($error) $notchedOutline": {
                     borderColor: teal["A200"],
@@ -130,24 +118,7 @@ export const CUSTOM_THEME = {
             },
             root: {
                 border: `1px solid white`,
-                backgroundColor: "rgba(0,0,0,0.9)",
-                color: "white",
-                overflow: "hidden",
-                "&:hover": {
-                    border: `1px solid ${teal["A400"]}`,
-                    transition: "",
-                    "&:before": {
-                        position: "absolute",
-                        content: '""',
-                        width: "100%",
-                        height: "100%",
-                        zIndex: -1,
-                        backgroundColor: teal["100"],
-                        "-webkit-animation": "$scale 0.1s 1 ease-in-out",
-                        animation: "$scale 0.1s 1 ease-in-out",
-                        opacity: 0.1,
-                    },
-                },
+                backgroundColor: "black",
             },
         },
     },
