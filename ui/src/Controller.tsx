@@ -116,7 +116,6 @@ const useStyles = makeStyles((theme: Theme) =>
             left: 0,
             margin: "2vmin",
             fontSize: "2vmin",
-            fontWeight: "bold",
             color: theme.palette.secondary.main
         },
         ...theme.custom.ACTION_BUTTONS,
