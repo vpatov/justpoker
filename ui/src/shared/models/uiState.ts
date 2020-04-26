@@ -140,9 +140,8 @@ export const FACING_BET_ACTION_BUTTONS = [
 
 export const ALL_ACTION_BUTTONS = [
     FOLD_BUTTON,
-
     CALL_BUTTON,
-    // RAISE_BUTTON,
+    BET_BUTTON,
 ];
 
 /* Common bet sizes */

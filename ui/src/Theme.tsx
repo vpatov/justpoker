@@ -72,26 +72,31 @@ export const CUSTOM_THEME = {
 
             // background: `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50, 30, 57, 0.4)70%);`,
         },
-        // ACTION_BUTTONS: {
-        //     FOLD: {
-        //         color: red[600],
-        //     },
-        //     BET: {
-        //         color: green[600],
-        //     },
-        //     CHECK: {
-        //         color: blue[500],
-        //     },
-        //     CALL: {
-        //         color: blue[800],
-        //     },
-        //     STARTGAME: {
-        //         color: lightGreen[800],
-        //     },
-        // },
+        ACTION_BUTTONS: {
+            FOLD: {
+                borderColor: red["A200"],
+                color: red["A200"],
+            },
+            BET: {
+                borderColor: green["A400"],
+                color: green["A400"],
+            },
+            CHECK: {
+                borderColor: blue["A200"],
+                color: blue["A200"],
+            },
+            CALL: {
+                borderColor: blue["A200"],
+                color: blue["A200"],
+            },
+            STARTGAME: {
+                borderColor: lightGreen["A400"],
+                color: lightGreen["A400"],
+            },
+        },
     },
     typography: {
-        fontFamily: "Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif",
+        fontFamily: "Futura, Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif",
     },
     palette: {
         type: "dark" as PaletteType,
@@ -113,12 +118,8 @@ export const CUSTOM_THEME = {
             },
         },
         MuiButton: {
-            text: {
+            outlined: {
                 padding: "0.4vmin 0.8vmin",
-            },
-            root: {
-                border: `1px solid white`,
-                backgroundColor: "black",
             },
         },
     },

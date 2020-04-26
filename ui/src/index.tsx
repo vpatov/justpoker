@@ -7,8 +7,9 @@ import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import rootReducer from "./store/rootReducer";
-import "./fonts/AvenirBold.otf";
+
 import "./fonts/Avenir.otf";
+import "./fonts/Futura.ttc";
 
 const store = createStore(rootReducer);
 
