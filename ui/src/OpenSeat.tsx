@@ -108,7 +108,6 @@ function OpenSeat(props) {
                         }
                         value={name}
                     />
-
                     <Slider
                         value={buyin}
                         onChange={handleSliderChange}

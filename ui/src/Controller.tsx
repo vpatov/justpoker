@@ -10,8 +10,6 @@ import Button from "@material-ui/core/Button";
 
 import { Controller } from "./shared/models/uiState";
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
-
-import ButtonWithKeyPress from "./ButtonWithKeyPress";
 import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -29,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
             ...theme.custom.CONTROLLER,
         },
         sizeAndBetActionsCont: {
-            width: "50vmin",
+            width: "40%",
             height: "100%",
             display: "flex",
             flexDirection: "row",
@@ -37,15 +35,16 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: "center",
         },
         betActionsCont: {
+            marginRight: "2vmin",
             height: "100%",
-            width: "30%",
+            width: "80%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
             flexWrap: "wrap",
-            flexDirection: "column",
         },
         bettingCont: {
+            marginRight: "2vmin",
             height: "100%",
             width: "80%",
             display: "flex",
@@ -90,13 +89,11 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: "1.4vmin",
             padding: "1vmin",
         },
-        betButton: {
-            height: "100%",
-            marginRight: "1vmin",
-        },
         button: {
-            width: "9vmin",
+            height: "33%",
+            width: "30%",
             fontSize: "1.4vmin",
+            marginRight: "0.8vmin",
         },
         incButton: {
             padding: 0,
@@ -114,10 +111,13 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: "1vmin",
         },
         handLabel: {
-            margin: "1vmin",
-            float: "right",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            margin: "2vmin",
             fontSize: "2vmin",
             fontWeight: "bold",
+            color: theme.palette.secondary.main
         },
         ...theme.custom.ACTION_BUTTONS,
     })
@@ -199,45 +199,28 @@ function ControllerComp(props: ControllerProps) {
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => {
-                        if (button.action !== ActionType.BET) {
-                            return (
-                                <ButtonWithKeyPress
-                                    keyPress={`Key${
-                                        KEY_ACTION_MAP[button.action]
-                                    }`}
-                                    className={classnames(
-                                        classes.button,
-                                        classes[button.action]
-                                    )}
-                                    onClick={() =>
-                                        onClickActionButton(button.action)
-                                    }
-                                    disabled={!toAct}
-                                >
-                                    {`${button.label} (${
-                                        KEY_ACTION_MAP[button.action]
-                                    })`}
-                                </ButtonWithKeyPress>
-                            );
-                        }
+                        return (
+                            <Button
+                                variant="outlined"
+                                className={classnames(
+                                    classes.button,
+                                    classes[button.action]
+                                )}
+                                onClick={() =>
+                                    onClickActionButton(button.action)
+                                }
+                                disabled={!toAct}
+                            >
+                                {button.label}
+                            </Button>
+                        );
+
                     })}
                 </div>
                 <div className={classes.bettingCont}>
                     {sizingButtons.length > 0 ? (
                         <Fragment>
                             <div className={classes.betFieldButtonCont}>
-                                <ButtonWithKeyPress
-                                    keyPress={`Key${KEY_ACTION_MAP["BET"]}`}
-                                    className={classnames(
-                                        classes.button,
-                                        classes.betButton,
-                                        classes["BET"]
-                                    )}
-                                    onClick={() => onClickActionButton("BET")}
-                                    disabled={!toAct}
-                                >
-                                    {`${"BET"} (${KEY_ACTION_MAP["BET"]})`}
-                                </ButtonWithKeyPress>
                                 <TextField
                                     className={classes.betTextField}
                                     InputProps={{
@@ -254,8 +237,8 @@ function ControllerComp(props: ControllerProps) {
                                     autoFocus={true}
                                 />
                                 <div className={classes.incrementCont}>
-                                    <ButtonWithKeyPress
-                                        keyPress={"Minus"}
+                                    <Button
+                                        variant="outlined"
                                         onClick={() =>
                                             changeBetAmount(betAmt - min)
                                         }
@@ -265,9 +248,9 @@ function ControllerComp(props: ControllerProps) {
                                         )}
                                     >
                                         -
-                                    </ButtonWithKeyPress>
-                                    <ButtonWithKeyPress
-                                        keyPress={"Equal"}
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
                                         onClick={() =>
                                             changeBetAmount(betAmt + min)
                                         }
@@ -276,12 +259,13 @@ function ControllerComp(props: ControllerProps) {
                                         )}
                                     >
                                         +
-                                    </ButtonWithKeyPress>
+                                    </Button>
                                 </div>
                             </div>
                             <div className={classes.sizingButtonsCont}>
                                 {sizingButtons.map((button) => (
                                     <Button
+                                        variant="outlined"
                                         className={classes.sizeButton}
                                         onClick={(e) =>
                                             changeBetAmount(button.value)
@@ -297,29 +281,30 @@ function ControllerComp(props: ControllerProps) {
             </div>
             <div className={classes.adminButtonCont}>
                 {(adminButtons || []).map((button) => (
-                    <ButtonWithKeyPress
+                    <Button
+                        variant="outlined"
                         className={classnames(
                             classes.adminButton,
                             classes[button.action]
                         )}
                         onClick={(e) => onClickAdminButton(button.action)}
                     >
-                        {`${button.label}`}
-                    </ButtonWithKeyPress>
+                        {button.label}
+                    </Button>
                 ))}
 
                 {(adminButtons || []).filter(
                     (button) => button.action === ActionType.ADDCHIPS
                 ).length > 0 ? (
-                    <TextField
-                        onChange={(event) =>
-                            setChipAmt(parseInt(event.target.value))
-                        }
-                        value={chipAmt === 0 ? "" : chipAmt}
-                        type="number"
-                        variant="outlined"
-                    />
-                ) : null}
+                        <TextField
+                            onChange={(event) =>
+                                setChipAmt(parseInt(event.target.value))
+                            }
+                            value={chipAmt === 0 ? "" : chipAmt}
+                            type="number"
+                            variant="outlined"
+                        />
+                    ) : null}
             </div>
         </div>
     );

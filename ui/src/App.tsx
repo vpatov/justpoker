@@ -10,21 +10,21 @@ import { TestGame } from "./shared/models/uiState";
 import Home from "./Home";
 
 function App() {
-  return (
-    <ThemeProvider theme={Theme}>
-      <Router>
-        <Switch>
-          <Route
-            exact
-            path="/game/test"
-            render={(props) => <Game {...props} game={TestGame} />}
-          />
-          <Route path="/game" component={GameContainer} />
-          <Route path="/" component={Home} />
-        </Switch>
-      </Router>
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider theme={Theme}>
+            <Router>
+                <Switch>
+                    <Route
+                        exact
+                        path="/game/test"
+                        render={(props) => <GameContainer useTestGame />}
+                    />
+                    <Route path="/game" component={GameContainer} />
+                    <Route path="/" component={Home} />
+                </Switch>
+            </Router>
+        </ThemeProvider>
+    );
 }
 
 export default App;

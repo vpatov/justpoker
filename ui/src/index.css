@@ -16,6 +16,11 @@ body {
     src: local("Avenir"), url(./fonts/Avenir.otf);
 }
 
+@font-face {
+    font-family: "Futura";
+    src: url(./fonts/Futura.ttc) format("truetype");
+}
+
 a {
     text-decoration: none;
     color: unset;

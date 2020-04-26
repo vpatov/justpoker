@@ -18,16 +18,22 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function GameContainer(): any {
+function GameContainer(props): any {
     const classes = useStyles();
-
-    const dispatch = useDispatch();
-
+    const dispatch = useDispatch()
     const [gameLoaded, setGameLoaded] = useState(false);
+
+
+
     useEffect(() => {
-        const succ = WsServer.openWs();
-        if (succ) {
-            WsServer.subscribe("game", onReceiveNewGame);
+        if (props.useTestGame) {
+            dispatch({ type: "SET_TEST_GAME" });
+            if (!gameLoaded) setGameLoaded(true);
+        } else {
+            const succ = WsServer.openWs();
+            if (succ) {
+                WsServer.subscribe("game", onReceiveNewGame);
+            }
         }
     }, []);
 
@@ -49,6 +55,8 @@ function GameContainer(): any {
     } else {
         return <div className={classes.root}>{renderLoading()}</div>;
     }
+
+
 }
 
 export default GameContainer;
