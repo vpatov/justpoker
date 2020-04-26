@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     },
     toAct: {
         ...theme.custom.STACK,
-        boxShadow: "0 0px 14px rgba(255,255,255,0.8)",
+        // boxShadow: "0 0px 14px rgba(255,255,255,0.8)",
         background: "linear-gradient(90deg, rgba(100,100,115,1) 0%, rgba(80,80,100,1) 50%, rgba(100,100,115,1)  100%);",
         backgroundSize: "200% 200%",
         "-webkit-animation": "$grad 2s linear infinite",
@@ -45,12 +45,6 @@ const useStyles = makeStyles((theme) => ({
             backgroundPosition: "200% -200%",
 
         },
-    },
-    playerTimer: {
-        position: "absolute",
-        width: "100%",
-        bottom: 0,
-        left: 0,
     },
     name: {
         paddingBottom: "0.8vmin",
@@ -93,7 +87,7 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, button, winner, playerTimer, toAct } = props;
+    const { stack, name, button, winner, toAct } = props;
     const prevStack = usePrevious(stack);
 
     return (
@@ -113,12 +107,7 @@ function PlayerStack(props) {
             <Typography variant="body1" className={classes.name}>
                 {name}
             </Typography>
-            {playerTimer ? (
-                <PlayerTimer
-                    className={classes.playerTimer}
-                    playerTimer={playerTimer}
-                />
-            ) : null}
+
         </div>
     );
 }

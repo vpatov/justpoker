@@ -54,7 +54,7 @@ export const CUSTOM_THEME = {
         },
         STACK: {
             color: "white",
-            backgroundColor: " rgba(28,28,42,1)",
+            backgroundColor: " rgba(22,22,36,1)",
             borderRadius: "0.6vmin",
             boxShadow: "0 5px 15px rgba(10,10,10,0.9)",
         },
@@ -110,6 +110,11 @@ export const CUSTOM_THEME = {
         },
     },
     overrides: {
+        MuiTypography: {
+            root: {
+                color: "white"
+            }
+        },
         MuiOutlinedInput: {
             root: {
                 "&:hover:not($disabled):not($focused):not($error) $notchedOutline": {
