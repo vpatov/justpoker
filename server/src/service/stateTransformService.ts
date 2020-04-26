@@ -64,7 +64,7 @@ export class StateTransformService {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const clientPlayerIsInGame = !!heroPlayer;
+        const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : '';
         const board = this.gameStateManager.getBoard();
 
@@ -73,8 +73,8 @@ export class StateTransformService {
             game: this.gameUpdated(updatedKeys)
                 ? {
                       gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
-                      heroInGame: clientPlayerIsInGame,
-                      controller: clientPlayerIsInGame
+                      heroIsSeated: clientPlayerIsSeated,
+                      controller: clientPlayerIsSeated
                           ? this.getUIController(clientUUID, heroPlayerUUID)
                           : cleanController,
                       table: {
@@ -88,7 +88,7 @@ export class StateTransformService {
                   }
                 : undefined,
             audio: this.audioUpdated(updatedKeys)
-                ? clientPlayerIsInGame
+                ? clientPlayerIsSeated
                     ? this.transformAudioForClient(heroPlayerUUID)
                     : this.audioService.getAudioQueue()
                 : undefined,

@@ -7,7 +7,7 @@ import classnames from "classnames";
 import { useSelector } from "react-redux";
 import {
     tableSelector,
-    heroInGameSelector,
+    heroIsSeatedSelector,
     playersSelector,
 } from "./store/selectors";
 
@@ -97,7 +97,7 @@ function Table(props) {
     console.log("render table");
     const classes = useStyles();
     const { className } = props;
-    const heroInGame = useSelector(heroInGameSelector);
+    const heroIsSeated = useSelector(heroIsSeatedSelector);
     const { communityCards, spots, pot } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
 
@@ -125,7 +125,7 @@ function Table(props) {
                         />
                     </Fragment>
                 );
-            } else if (!heroInGame) {
+            } else if (!heroIsSeated) {
                 ans.push(
                     <OpenSeat
                         key={index}

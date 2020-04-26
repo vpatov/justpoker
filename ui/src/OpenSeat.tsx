@@ -10,6 +10,8 @@ import EventSeatIcon from "@material-ui/icons/EventSeat";
 import grey from "@material-ui/core/colors/grey";
 import Typography from "@material-ui/core/Typography";
 import { ClientWsMessageRequest } from "./shared/models/wsaction";
+import { Dialog, DialogContent, TextField, DialogActions, Button, Input } from "@material-ui/core";
+import Slider from "@material-ui/core/Slider";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -25,21 +27,45 @@ const useStyles = makeStyles((theme) => ({
     },
     icon: {
         fontSize: "3.4vmin",
-    },
+    }
 }));
 
 function OpenSeat(props) {
     const classes = useStyles();
     const { className, style, seatNumber } = props;
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [name, setName] = useState("");
+    const [minBuyin, setMinBuyin] = useState(25);
+    const [maxBuyin, setMaxBuyin] = useState(200);
+    const [buyin, setBuyin] = useState(100);
 
-    // TODO change this to onRequestSitDown, because the player has to request to sit down,
-    // declare their name, chips, waitForBigBlind?, etc...
-    function onSitDown() {
+    const dialogClose = () => {
+      setDialogOpen(false);
+    };
+  
+    function onClickSitDown() {
+        setDialogOpen(true);
+    }
+
+    function onChangeBuyin(event: any){
+        console.log(event.target);
+        setBuyin(Number(event.target.value));
+    }
+
+    function handleSliderChange(event:any, newValue: any){
+        setBuyin(Number(newValue))
+    };
+
+    function invalidBuyin(){
+        return buyin < minBuyin || buyin > maxBuyin;
+    }
+
+    function onSubmitSitDownForm(){
         WsServer.send({
             actionType: ActionType.JOINTABLEANDSITDOWN,
             request: {
-                name: `Player${seatNumber}`,
-                buyin: 200,
+                name,
+                buyin: Number(buyin),
                 seatNumber: seatNumber,
             } as ClientWsMessageRequest,
         });
@@ -50,9 +76,51 @@ function OpenSeat(props) {
             color="primary"
             className={classnames(classes.root, className)}
             style={style}
-            onClick={() => onSitDown()}
+            onClick={() => onClickSitDown()}
         >
             <EventSeatIcon className={classes.icon} />
+            <Dialog open={dialogOpen} onClose={dialogClose}>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        id="name"
+                        label="Name"
+                        type="text"
+                        fullWidth
+                        onChange={(event) =>
+                            setName(event.target.value)
+                        }
+                        value={name}
+                    />
+                    <div>
+                        <Slider
+                            value={buyin}
+                            onChange={handleSliderChange}
+                            min={minBuyin}
+                            max={maxBuyin}
+                            step={1}
+                        />
+                        <Input
+                            value={buyin}
+                            margin="dense"
+                            onChange={onChangeBuyin}
+                            inputProps={{type: "number", min: 25, max: 200, step: 1 }}
+                            error ={invalidBuyin()}
+                        />
+                    </div>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={dialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button 
+                        disabled={invalidBuyin()}
+                        onClick={onSubmitSitDownForm} color="primary"
+                    >
+                        Sit Down
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </IconButton>
     );
 }

@@ -519,7 +519,8 @@ export class GamePlayService {
     }
 
     ejectStackedPlayers() {
-        this.gsm.updatePlayers((player) => (player.chips === 0 ? { sitting: false } : {}));
+        // TODO this duplicates gameStateManager.standUpPlayer
+        this.gsm.updatePlayers((player) => (player.chips === 0 ? { sitting: false, seatNumber: -1 } : {}));
     }
 
     // TODO Redesign pot structure to make it simple.
