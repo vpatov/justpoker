@@ -6,6 +6,7 @@ import PlayerStack from "./PlayerStack";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import deepOrange from "@material-ui/core/colors/deepOrange";
+import PlayerTimer from "./PlayerTimer";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,9 +28,6 @@ const useStyles = makeStyles((theme) => ({
         borderTop: `none`,
         borderBottomLeftRadius: "0.6vmin",
         borderBottomRightRadius: "0.5vmin",
-    },
-    playerTimer: {
-        width: "100%",
     },
 }));
 
@@ -65,6 +63,11 @@ function Player(props) {
                 playerTimer={playerTimer}
                 winner={winner}
             />
+            {playerTimer ? (
+                <PlayerTimer
+                    playerTimer={playerTimer}
+                />
+            ) : null}
             {/* {handLabel ? (
                 <Typography className={classes.handLabel}>
                     {handLabel}
