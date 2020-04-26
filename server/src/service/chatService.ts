@@ -3,8 +3,10 @@ import { ChatMessage, ChatLog } from '../../../ui/src/shared/models/chat';
 import { ClientChatMessage } from '../../../ui/src/shared/models/wsaction';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { ValidationService, hasError } from './validationService';
 
-const nameCommandRegEx = /\/name\s(\w+)/;
+const changeNameCommandRegEx = /\/name\s(.+)$/;
+const sitDownCommandRegEx = /\/sitdown\s(\d{1,2})$/;
 
 @Service()
 export class ChatService {
@@ -15,7 +17,10 @@ export class ChatService {
 
     lastMessage: ChatMessage;
 
-    constructor(private readonly gameStateManager: GameStateManager) {}
+    constructor(
+        private readonly gameStateManager: GameStateManager,
+        private readonly validationService: ValidationService,
+    ) {}
 
     getMessage() {
         return this.lastMessage;
@@ -44,12 +49,29 @@ export class ChatService {
 
     performSpecialDebugActions(clientUUID: string, message: ClientChatMessage) {
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const nameMatch = message.content.match(nameCommandRegEx);
+        const nameMatch = message.content.match(changeNameCommandRegEx);
         if (nameMatch) {
             const name = nameMatch[1];
             if (player) {
                 this.gameStateManager.updatePlayer(player.uuid, { name });
                 this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
+            }
+            return;
+        }
+        const sitDownMatch = message.content.match(sitDownCommandRegEx);
+        if (sitDownMatch) {
+            if (!player) {
+                return;
+            }
+            const seatNumber = Number(sitDownMatch[1]);
+            if (!isNaN(seatNumber)) {
+                const response = this.validationService.validateSitDownRequest(clientUUID, { seatNumber });
+                if (!hasError(response)) {
+                    this.gameStateManager.sitDownPlayer(player.uuid, seatNumber);
+                    console.log(`just sat down ${player.name} to ${seatNumber}`);
+                } else {
+                    console.log(response);
+                }
             }
         }
     }

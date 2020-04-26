@@ -14,7 +14,7 @@ export declare interface UiGameState {
     controller: Controller;
     table: Table;
     players: Player[];
-    heroInGame: boolean;
+    heroIsSeated: boolean;
     gameStarted: boolean;
 }
 
@@ -172,7 +172,7 @@ export const cleanController: Controller = {
 };
 
 export const CleanGame: UiGameState = {
-    heroInGame: false,
+    heroIsSeated: false,
     gameStarted: false,
     controller: {
         toAct: false,
@@ -222,7 +222,7 @@ export const testUiChatLog: UiChatLog = {
 };
 
 export const TestGame: UiGameState = {
-    heroInGame: true,
+    heroIsSeated: true,
     gameStarted: true,
     controller: {
         toAct: true,

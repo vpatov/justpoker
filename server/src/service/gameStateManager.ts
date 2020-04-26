@@ -468,6 +468,20 @@ export class GameStateManager {
         const name = request.name;
         const buyin = request.buyin;
         const player = this.createNewPlayer(name, buyin);
+
+        // TODO remove temporary logic
+        // this delets previous player association and replaces it
+        // with new one
+        const client = this.getConnectedClient(clientUUID);
+        if (client.playerUUID) {
+            this.updateGameState({
+                players: Object.fromEntries(
+                    Object.entries(this.getPlayers()).filter(([uuid, player]) => uuid !== client.playerUUID),
+                ),
+            });
+        }
+        // -----
+
         const associatedClient = this.associateClientAndPlayer(clientUUID, player);
         this.gameState = {
             ...this.gameState,

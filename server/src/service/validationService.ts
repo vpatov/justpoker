@@ -119,10 +119,11 @@ export class ValidationService {
     }
 
     validateJoinTableRequest(clientUUID: string, request: JoinTableRequest): ValidationResponse {
-        const response = this.ensureClientIsNotInGame(clientUUID);
-        if (hasError(response)) {
-            return response;
-        }
+        // TODO return this logic later
+        // const response = this.ensureClientIsNotInGame(clientUUID);
+        // if (hasError(response)) {
+        //     return response;
+        // }
         if (request.name.length > MAX_NAME_LENGTH) {
             return {
                 errorString: `Name ${request.name} is too long - exceeds limit of 32 characters.`,
