@@ -1,4 +1,4 @@
-import { createMuiTheme, } from "@material-ui/core/styles";
+import { createMuiTheme } from "@material-ui/core/styles";
 
 import { PaletteType } from "@material-ui/core";
 import lightBlue from "@material-ui/core/colors/lightBlue";
@@ -18,7 +18,16 @@ declare module "@material-ui/core/styles/createMuiTheme" {
     }
 }
 
-
+const CUSTOM_PALETTE = {
+    primary: {
+        main: teal["A400"],
+        light: teal["100"],
+    },
+    secondary: {
+        main: orange["A400"],
+        light: orange["100"],
+    },
+};
 
 export const CUSTOM_THEME = {
     custom: {
@@ -61,16 +70,19 @@ export const CUSTOM_THEME = {
         CONTROLLER: {
             backgroundColor: "rgba(0,0,0,0.3)",
             background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
+            boxSizing: "border-box",
+        },
+        CONTROLLER_TO_ACT: {
+            boxShadow: `0 0px 20px ${CUSTOM_PALETTE.primary.main}`,
         },
         BET: {
             border: "1px solid white",
             backgroundColor: teal[200],
         },
         CHAT: {
-            backgroundColor: "rgba(40, 30, 40, 0.3)",
+            zIndex: 10,
+            backgroundColor: "rgba(40, 40, 40, 0.3)",
             boxShadow: ` 0 3px 3px 3px rgba(0,0,0,0.2)`,
-
-            // background: `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50, 30, 57, 0.4)70%);`,
         },
         ACTION_BUTTONS: {
             FOLD: {
@@ -80,7 +92,6 @@ export const CUSTOM_THEME = {
             FOLD_QUEUED: {
                 backgroundColor: red["A200"] + " !important",
                 color: "black",
-
             },
             BET: {
                 borderColor: green["A400"],
@@ -97,7 +108,6 @@ export const CUSTOM_THEME = {
             CHECK_QUEUED: {
                 backgroundColor: blue["A200"] + " !important",
                 color: "black",
-
             },
             CALL: {
                 borderColor: blue["A200"],
@@ -106,7 +116,6 @@ export const CUSTOM_THEME = {
             CALL_QUEUED: {
                 backgroundColor: blue["A200"] + " !important",
                 color: "black",
-
             },
             STARTGAME: {
                 borderColor: lightGreen["A400"],
@@ -115,25 +124,18 @@ export const CUSTOM_THEME = {
         },
     },
     typography: {
-        fontFamily: "Futura, Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif",
+        fontFamily:
+            "Futura, Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif",
     },
     palette: {
         type: "dark" as PaletteType,
-        primary: {
-            main: teal["A400"],
-            light: teal["100"],
-        },
-        secondary: {
-            main: orange["A400"],
-            light: orange["100"],
-        },
+        ...CUSTOM_PALETTE,
     },
     overrides: {
-
         MuiTypography: {
             root: {
-                color: "white"
-            }
+                color: "white",
+            },
         },
         MuiOutlinedInput: {
             root: {
@@ -151,9 +153,8 @@ export const CUSTOM_THEME = {
                         position: "absolute",
                         height: "100%",
                         width: "100%",
-                    }
-
-                }
+                    },
+                },
             },
 
             outlined: {
