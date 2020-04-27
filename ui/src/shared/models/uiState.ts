@@ -37,6 +37,7 @@ export declare interface SizingButton {
 export declare interface ActionButton {
     label: string;
     action: ActionType;
+    disabled?: boolean;
 }
 
 export declare interface UiCard {

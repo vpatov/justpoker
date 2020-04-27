@@ -271,6 +271,10 @@ export class GameStateManager {
         return minimumBetSize > player.chips ? player.chips : minimumBetSize;
     }
 
+    isGameStarted() {
+        return this.getBettingRoundStage() !== BettingRoundStage.WAITING;
+    }
+
     isPlayerInGame(playerUUID: string): boolean {
         return !!this.getPlayer(playerUUID);
     }

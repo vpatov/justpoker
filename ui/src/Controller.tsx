@@ -8,7 +8,6 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
-
 import { Controller } from "./shared/models/uiState";
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
 import { Typography } from "@material-ui/core";
@@ -116,18 +115,17 @@ const useStyles = makeStyles((theme: Theme) =>
         handLabel: {
             marginTop: "2vmin",
             fontSize: "2vmin",
-            color: theme.palette.secondary.main
+            color: theme.palette.secondary.main,
         },
         toActLabel: {
             fontSize: "2vmin",
             color: theme.palette.primary.main,
-            animation: "$blinking 1.3s linear infinite;"
-
+            animation: "$blinking 1.3s linear infinite;",
         },
         "@keyframes blinking": {
             "50%": {
-                opacity: 0
-            }
+                opacity: 0,
+            },
         },
         ...theme.custom.ACTION_BUTTONS,
     })
@@ -167,9 +165,7 @@ function ControllerComp(props: ControllerProps) {
     const [chipAmt, setChipAmt] = useState(0);
     const [betAmt, setBetAmt] = useState(0);
 
-
     const [queued, setQueued] = useState("");
-
 
     const changeBetAmount = (newAmt) => {
         // parse string into int
@@ -186,19 +182,18 @@ function ControllerComp(props: ControllerProps) {
 
     function onClickActionButton(action) {
         if (toAct) {
-            sendServerAction(action)
+            sendServerAction(action);
         } else {
             if (queued === action) {
-                setQueued("")
+                setQueued("");
             } else {
-                setQueued(action)
+                setQueued(action);
             }
-
         }
     }
     if (toAct && queued !== "") {
-        sendServerAction(queued)
-        setQueued("")
+        sendServerAction(queued);
+        setQueued("");
     }
 
     function sendServerAction(action) {
@@ -226,9 +221,11 @@ function ControllerComp(props: ControllerProps) {
                 <Typography className={classes.handLabel}>
                     {heroHandLabel}
                 </Typography>
-                {toAct ? <Typography className={classes.toActLabel}>
-                    {"☉ Your Turn"}
-                </Typography> : null}
+                {toAct ? (
+                    <Typography className={classes.toActLabel}>
+                        {"☉ Your Turn"}
+                    </Typography>
+                ) : null}
             </div>
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
@@ -239,17 +236,19 @@ function ControllerComp(props: ControllerProps) {
                                 className={classnames(
                                     classes.button,
                                     classes[button.action],
-                                    { [classes[`${button.action}_QUEUED`]]: button.action === queued }
+                                    {
+                                        [classes[`${button.action}_QUEUED`]]:
+                                            button.action === queued,
+                                    }
                                 )}
+                                disabled={button.disabled}
                                 onClick={() =>
                                     onClickActionButton(button.action)
                                 }
-                                disabled={!toAct}
                             >
                                 {button.label}
                             </Button>
                         );
-
                     })}
                 </div>
                 <div className={classes.bettingCont}>
@@ -331,15 +330,15 @@ function ControllerComp(props: ControllerProps) {
                 {(adminButtons || []).filter(
                     (button) => button.action === ActionType.ADDCHIPS
                 ).length > 0 ? (
-                        <TextField
-                            onChange={(event) =>
-                                setChipAmt(parseInt(event.target.value))
-                            }
-                            value={chipAmt === 0 ? "" : chipAmt}
-                            type="number"
-                            variant="outlined"
-                        />
-                    ) : null}
+                    <TextField
+                        onChange={(event) =>
+                            setChipAmt(parseInt(event.target.value))
+                        }
+                        value={chipAmt === 0 ? "" : chipAmt}
+                        type="number"
+                        variant="outlined"
+                    />
+                ) : null}
             </div>
         </div>
     );
