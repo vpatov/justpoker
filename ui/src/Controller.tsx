@@ -26,28 +26,36 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: "center",
             ...theme.custom.CONTROLLER,
         },
+        rootToAct: {
+            ...theme.custom.CONTROLLER_TO_ACT,
+        },
         gameInfoCont: {
+            marginLeft: "2vw",
+            width: "20%",
             height: "100%",
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-start",
         },
         sizeAndBetActionsCont: {
+            width: "50%",
             height: "100%",
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-evenly",
             alignItems: "center",
         },
-        betActionsCont: {
-            marginRight: "2vmin",
+        adminButtonCont: {
+            marginLeft: "2vw",
+            width: "30%",
+            float: "right",
             height: "100%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
         },
-        adminButtonCont: {
-            float: "right",
+        betActionsCont: {
+            marginRight: "2vw",
             height: "100%",
             display: "flex",
             justifyContent: "space-evenly",
@@ -204,6 +212,9 @@ function ControllerComp(props: ControllerProps) {
                 amount: Number(betAmt),
             } as ClientWsMessageRequest,
         });
+        if (action === ActionType.BET) {
+            changeBetAmount(0);
+        }
     }
 
     function onClickAdminButton(action) {
@@ -215,8 +226,17 @@ function ControllerComp(props: ControllerProps) {
         });
     }
 
+    function isBetValid() {
+        if (0 < betAmt && betAmt < min) return true;
+        return false;
+    }
+
     return (
-        <div className={classnames(classes.root, className)}>
+        <div
+            className={classnames(classes.root, className, {
+                [classes.rootToAct]: toAct,
+            })}
+        >
             <div className={classes.gameInfoCont}>
                 <Typography className={classes.handLabel}>
                     {heroHandLabel}
@@ -269,6 +289,12 @@ function ControllerComp(props: ControllerProps) {
                                     type="number"
                                     variant="outlined"
                                     autoFocus={true}
+                                    error={isBetValid()}
+                                    helperText={
+                                        isBetValid()
+                                            ? `Minimum Bet is ${min}`
+                                            : ""
+                                    }
                                 />
                                 <div className={classes.incrementCont}>
                                     <Button
