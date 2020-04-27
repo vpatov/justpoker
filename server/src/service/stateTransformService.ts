@@ -72,7 +72,7 @@ export class StateTransformService {
         const uiState: UiState = {
             game: this.gameUpdated(updatedKeys)
                 ? {
-                      gameStarted: this.gameStateManager.getBettingRoundStage() !== BettingRoundStage.WAITING,
+                      gameStarted: this.gameStateManager.isGameStarted(),
                       heroIsSeated: clientPlayerIsSeated,
                       controller: clientPlayerIsSeated
                           ? this.getUIController(clientUUID, heroPlayerUUID)
@@ -116,7 +116,7 @@ export class StateTransformService {
             unsetQueuedAction: false,
             min: this.getMinimumBetSize(heroPlayerUUID),
             max: this.gameStateManager.getPlayer(heroPlayerUUID).chips,
-            sizingButtons: !toAct
+            sizingButtons: !this.gameStateManager.isGameStarted()
                 ? []
                 : bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
                 ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
@@ -131,29 +131,30 @@ export class StateTransformService {
     }
 
     getValidBetActions(clientUUID: string, heroPlayerUUID: string): ActionButton[] {
-        const currentPlayerToAct = this.gameStateManager.getCurrentPlayerToAct();
-        if (currentPlayerToAct !== heroPlayerUUID) {
+        const actionButtons = [] as ActionButton[];
+        const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const clientPlayerIsSeated = heroPlayer?.sitting;
+        if (!clientPlayerIsSeated || !this.gameStateManager.isGameStarted()) {
             return [];
         }
-        const actionButtons = [];
-        let response = this.validationService.validateFoldAction(clientUUID);
-        if (!hasError(response)) {
-            actionButtons.push(FOLD_BUTTON);
-        }
-        response = this.validationService.validateCheckAction(clientUUID);
-        if (!hasError(response)) {
-            actionButtons.push(CHECK_BUTTON);
-        }
-        response = this.validationService.validateCallAction(clientUUID);
-        if (!hasError(response)) {
-            actionButtons.push(CALL_BUTTON);
+
+        const disableButton = (b: ActionButton) => Object.assign({}, b, { disabled: true });
+
+        if (
+            !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
+            this.gameStateManager.isPlayerAllIn(heroPlayerUUID)
+        ) {
+            return [disableButton(FOLD_BUTTON), disableButton(CHECK_BUTTON), disableButton(BET_BUTTON)];
         }
 
-        //  TODO - create generic bet action that can be used here, or augment
-        //     validation code path to allow for checking whether a bet is possible
-        // if (!hasError(this.validationService.validateBetAction(clientUUID,null))){
+        // player can always queue a bet or fold action but we decide if it is check or call
+        actionButtons.push(FOLD_BUTTON);
+        if (this.gameStateManager.isPlayerFacingBet(heroPlayerUUID)) {
+            actionButtons.push(CALL_BUTTON);
+        } else {
+            actionButtons.push(CHECK_BUTTON);
+        }
         actionButtons.push(BET_BUTTON);
-        // }
 
         return actionButtons;
     }
