@@ -77,17 +77,36 @@ export const CUSTOM_THEME = {
                 borderColor: red["A200"],
                 color: red["A200"],
             },
+            FOLD_QUEUED: {
+                backgroundColor: red["A200"] + " !important",
+                color: "black",
+
+            },
             BET: {
                 borderColor: green["A400"],
                 color: green["A400"],
+            },
+            BET_QUEUED: {
+                backgroundColor: green["A200"] + " !important",
+                color: "black",
             },
             CHECK: {
                 borderColor: blue["A200"],
                 color: blue["A200"],
             },
+            CHECK_QUEUED: {
+                backgroundColor: blue["A200"] + " !important",
+                color: "black",
+
+            },
             CALL: {
                 borderColor: blue["A200"],
                 color: blue["A200"],
+            },
+            CALL_QUEUED: {
+                backgroundColor: blue["A200"] + " !important",
+                color: "black",
+
             },
             STARTGAME: {
                 borderColor: lightGreen["A400"],
@@ -110,6 +129,7 @@ export const CUSTOM_THEME = {
         },
     },
     overrides: {
+
         MuiTypography: {
             root: {
                 color: "white"
@@ -123,8 +143,21 @@ export const CUSTOM_THEME = {
             },
         },
         MuiButton: {
+            root: {
+                "&:hover": {
+                    "&:after": {
+                        content: "''",
+                        backgroundColor: "rgba(255,255,255,0.15)",
+                        position: "absolute",
+                        height: "100%",
+                        width: "100%",
+                    }
+
+                }
+            },
+
             outlined: {
-                padding: "0.4vmin 0.8vmin",
+                // padding: "0.4vmin 0.8vmin",
             },
         },
     },
