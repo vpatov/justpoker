@@ -26,7 +26,7 @@ export declare interface Controller {
     adminButtons?: ActionButton[];
 
     toAct?: boolean;
-    unsetCheckCall?: boolean;
+    unsetQueuedAction?: boolean;
 }
 
 export declare interface SizingButton {
@@ -162,7 +162,7 @@ export const cleanUiChatLog: UiChatLog = {
 /* Clean Controller for init. */
 export const cleanController: Controller = {
     toAct: false,
-    unsetCheckCall: false,
+    unsetQueuedAction: false,
     min: 0,
     max: 0,
     sizingButtons: [],
@@ -175,7 +175,7 @@ export const CleanGame: UiGameState = {
     gameStarted: false,
     controller: {
         toAct: false,
-        unsetCheckCall: true,
+        unsetQueuedAction: false,
         min: 0,
         max: 0,
         sizingButtons: [],
@@ -225,7 +225,7 @@ export const TestGame: UiGameState = {
     gameStarted: true,
     controller: {
         toAct: true,
-        unsetCheckCall: true,
+        unsetQueuedAction: false,
         min: 25,
         max: 43000,
         sizingButtons: [

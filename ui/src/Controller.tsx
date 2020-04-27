@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import classnames from "classnames";
 import { WsServer } from "./api/ws";
 import { useSelector } from "react-redux";
@@ -7,6 +7,7 @@ import { controllerSelector, heroHandLabelSelector } from "./store/selectors";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+
 
 import { Controller } from "./shared/models/uiState";
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
@@ -22,12 +23,17 @@ const useStyles = makeStyles((theme: Theme) =>
             bottom: 0,
             zIndex: 2,
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-around",
             alignItems: "center",
             ...theme.custom.CONTROLLER,
         },
+        gameInfoCont: {
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+        },
         sizeAndBetActionsCont: {
-            width: "40%",
             height: "100%",
             display: "flex",
             flexDirection: "row",
@@ -37,11 +43,16 @@ const useStyles = makeStyles((theme: Theme) =>
         betActionsCont: {
             marginRight: "2vmin",
             height: "100%",
-            width: "80%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
-            flexWrap: "wrap",
+        },
+        adminButtonCont: {
+            float: "right",
+            height: "100%",
+            display: "flex",
+            justifyContent: "space-evenly",
+            alignItems: "center",
         },
         bettingCont: {
             marginRight: "2vmin",
@@ -54,14 +65,6 @@ const useStyles = makeStyles((theme: Theme) =>
             flexDirection: "column",
         },
         sizingButtonsCont: {
-            display: "flex",
-            justifyContent: "space-evenly",
-            alignItems: "center",
-        },
-        adminButtonCont: {
-            float: "right",
-            height: "100%",
-            width: "30%",
             display: "flex",
             justifyContent: "space-evenly",
             alignItems: "center",
@@ -91,7 +94,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         button: {
             height: "33%",
-            width: "30%",
+            width: "8vmin",
             fontSize: "1.4vmin",
             marginRight: "0.8vmin",
         },
@@ -111,12 +114,20 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: "1vmin",
         },
         handLabel: {
-            position: "absolute",
-            top: 0,
-            left: 0,
-            margin: "2vmin",
+            marginTop: "2vmin",
             fontSize: "2vmin",
             color: theme.palette.secondary.main
+        },
+        toActLabel: {
+            fontSize: "2vmin",
+            color: theme.palette.primary.main,
+            animation: "$blinking 1.3s linear infinite;"
+
+        },
+        "@keyframes blinking": {
+            "50%": {
+                opacity: 0
+            }
         },
         ...theme.custom.ACTION_BUTTONS,
     })
@@ -143,7 +154,7 @@ function ControllerComp(props: ControllerProps) {
     const { className } = props;
     const {
         toAct,
-        unsetCheckCall,
+        unsetQueuedAction,
         min,
         max,
         sizingButtons,
@@ -155,6 +166,10 @@ function ControllerComp(props: ControllerProps) {
 
     const [chipAmt, setChipAmt] = useState(0);
     const [betAmt, setBetAmt] = useState(0);
+
+
+    const [queued, setQueued] = useState("");
+
 
     const changeBetAmount = (newAmt) => {
         // parse string into int
@@ -169,9 +184,24 @@ function ControllerComp(props: ControllerProps) {
         return;
     };
 
-    // TODO Redesign ClientWsMessageRequest type to better use typescripts features to better
-    // represent the "one-of" idea
     function onClickActionButton(action) {
+        if (toAct) {
+            sendServerAction(action)
+        } else {
+            if (queued === action) {
+                setQueued("")
+            } else {
+                setQueued(action)
+            }
+
+        }
+    }
+    if (toAct && queued !== "") {
+        sendServerAction(queued)
+        setQueued("")
+    }
+
+    function sendServerAction(action) {
         WsServer.send({
             actionType: action,
             request: {
@@ -192,9 +222,14 @@ function ControllerComp(props: ControllerProps) {
 
     return (
         <div className={classnames(classes.root, className)}>
-            <Typography className={classes.handLabel}>
-                {heroHandLabel}
-            </Typography>
+            <div className={classes.gameInfoCont}>
+                <Typography className={classes.handLabel}>
+                    {heroHandLabel}
+                </Typography>
+                {toAct ? <Typography className={classes.toActLabel}>
+                    {"☉ Your Turn"}
+                </Typography> : null}
+            </div>
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
                     {actionButtons.map((button) => {
@@ -203,7 +238,8 @@ function ControllerComp(props: ControllerProps) {
                                 variant="outlined"
                                 className={classnames(
                                     classes.button,
-                                    classes[button.action]
+                                    classes[button.action],
+                                    { [classes[`${button.action}_QUEUED`]]: button.action === queued }
                                 )}
                                 onClick={() =>
                                     onClickActionButton(button.action)
