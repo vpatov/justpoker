@@ -169,7 +169,6 @@ export class StateTransformService {
 
         const adminButtons = [];
         adminButtons.push(this.gameStateManager.shouldDealNextHand() ? STOP_GAME_BUTTON : START_GAME_BUTTON);
-        adminButtons.push(ADD_CHIPS_BUTTON);
         return adminButtons;
     }
 
@@ -227,6 +226,7 @@ export class StateTransformService {
         const toAct = this.gameStateManager.getCurrentPlayerToAct() === player.uuid;
         const newPlayer = {
             stack: player.chips - player.betAmount,
+            uuid: player.uuid,
             hand: {
                 cards: shouldCardsBeVisible ? player.holeCards : player.holeCards.map(() => ({ hidden: true })),
             },

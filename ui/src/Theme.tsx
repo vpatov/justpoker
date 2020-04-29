@@ -122,6 +122,10 @@ export const CUSTOM_THEME = {
                 borderColor: lightGreen["A400"],
                 color: lightGreen["A400"],
             },
+            STOPGAME: {
+                borderColor: red[900],
+                color: red[900],
+            },
         },
     },
     typography: {

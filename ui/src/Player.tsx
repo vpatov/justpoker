@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import deepOrange from "@material-ui/core/colors/deepOrange";
 import PlayerTimer from "./PlayerTimer";
+import PlayerMenu from "./PlayerMenu";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -14,8 +15,8 @@ const useStyles = makeStyles((theme) => ({
         height: "11vmin",
         transition: "transform 0.3s linear 0s",
         alignItems: "flex-end",
-        display: 'flex',
-        flexWrap: 'wrap',
+        display: "flex",
+        flexWrap: "wrap",
     },
     folded: {
         ...theme.custom.FOLDED,
@@ -43,17 +44,35 @@ function Player(props) {
         winner,
         button,
         folded,
-        handLabel,
+        uuid,
     } = props.player;
+
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        console.log(event.currentTarget);
+        setAnchorEl(event.currentTarget as any);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     return (
         <div
             className={classnames(classes.root, className, {
-                // [classes.winner]: winner,
                 [classes.folded]: folded,
             })}
             style={style}
+            onContextMenu={handleClick}
         >
+            <PlayerMenu
+                handleClose={handleClose}
+                anchorEl={anchorEl}
+                uuid={uuid}
+                name={name}
+                stack={stack}
+            />
             <Hand hand={hand} />
             <PlayerStack
                 toAct={toAct}
@@ -63,16 +82,7 @@ function Player(props) {
                 playerTimer={playerTimer}
                 winner={winner}
             />
-            {playerTimer ? (
-                <PlayerTimer
-                    playerTimer={playerTimer}
-                />
-            ) : null}
-            {/* {handLabel ? (
-                <Typography className={classes.handLabel}>
-                    {handLabel}
-                </Typography>
-            ) : null} */}
+            {playerTimer ? <PlayerTimer playerTimer={playerTimer} /> : null}
         </div>
     );
 }

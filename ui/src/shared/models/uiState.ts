@@ -61,7 +61,7 @@ export declare interface Player {
     name: string;
     position: number;
     stack: number;
-
+    uuid?: string;
     hero?: boolean;
     folded?: boolean;
     toAct?: boolean;
@@ -139,11 +139,7 @@ export const FACING_BET_ACTION_BUTTONS = [
     RAISE_BUTTON,
 ];
 
-export const ALL_ACTION_BUTTONS = [
-    FOLD_BUTTON,
-    CALL_BUTTON,
-    BET_BUTTON,
-];
+export const ALL_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, BET_BUTTON];
 
 /* Common bet sizes */
 export const COMMON_BB_SIZINGS: Array<number> = [2, 3, 4, 5];
