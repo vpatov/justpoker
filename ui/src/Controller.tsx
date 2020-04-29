@@ -220,9 +220,7 @@ function ControllerComp(props: ControllerProps) {
     function onClickAdminButton(action) {
         WsServer.send({
             actionType: action,
-            request: (action === ActionType.ADDCHIPS
-                ? { chipAmount: chipAmt }
-                : {}) as ClientWsMessageRequest,
+            request: {} as ClientWsMessageRequest,
         });
     }
 

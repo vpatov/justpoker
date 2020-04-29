@@ -168,6 +168,10 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
     }
 
+    setPlayerChips(playerUUID: string, setChips: number) {
+        this.updatePlayer(playerUUID, { chips: setChips });
+    }
+
     // returns time in milliseconds
     getTimeCurrentPlayerTurnStarted() {
         return this.gameState.timeCurrentPlayerTurnStarted;

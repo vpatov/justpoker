@@ -116,6 +116,15 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ActionType.SETCHIPS]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, request) => {
+                this.validationService.ensureClientIsInGame(uuid);
+                const player = this.gameStateManager.getPlayer(request.playerUUID);
+                this.gameStateManager.setPlayerChips(player.uuid, Number(request.chipAmount));
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
     };
 
     processMessage(message: ClientWsMessage, clientUUID: string) {
