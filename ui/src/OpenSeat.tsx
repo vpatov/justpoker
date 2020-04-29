@@ -10,7 +10,14 @@ import EventSeatIcon from "@material-ui/icons/EventSeat";
 import grey from "@material-ui/core/colors/grey";
 import Typography from "@material-ui/core/Typography";
 import { ClientWsMessageRequest } from "./shared/models/wsaction";
-import { Dialog, DialogContent, TextField, DialogActions, Button, Input } from "@material-ui/core";
+import {
+    Dialog,
+    DialogContent,
+    TextField,
+    DialogActions,
+    Button,
+    Input,
+} from "@material-ui/core";
 import Slider from "@material-ui/core/Slider";
 
 const useStyles = makeStyles((theme) => ({
@@ -22,21 +29,18 @@ const useStyles = makeStyles((theme) => ({
         color: "white",
         "&:hover": {
             backgroundColor: grey[900],
-            borderColor: "black",
         },
     },
     field: {
-        width: "30%"
+        width: "30%",
     },
-    icon: {
-        fontSize: "3.4vmin",
+    sit: {
+        fontSize: "1.3vmin",
     },
-    dialogRoot: {
-
-    },
+    dialogRoot: {},
     dialogContent: {
-        height: "20vmin"
-    }
+        height: "20vmin",
+    },
 }));
 
 function OpenSeat(props) {
@@ -61,17 +65,16 @@ function OpenSeat(props) {
     }
 
     function handleSliderChange(event: any, newValue: any) {
-        setBuyin(Number(newValue))
-    };
+        setBuyin(Number(newValue));
+    }
 
     function invalidBuyin() {
         return buyin < minBuyin || buyin > maxBuyin;
     }
 
     function invalidName() {
-        return name === ""
+        return name === "";
     }
-
 
     function onSubmitSitDownForm() {
         WsServer.send({
@@ -93,19 +96,22 @@ function OpenSeat(props) {
                 style={style}
                 onClick={onClickSitDown}
             >
-                <EventSeatIcon className={classes.icon} />
+                <Typography className={classes.sit}>Sit Here</Typography>
             </IconButton>
-            <Dialog open={dialogOpen} className={classes.dialogRoot} maxWidth="xs" fullWidth >
-                <DialogContent className={classes.dialogContent} >
+            <Dialog
+                open={dialogOpen}
+                className={classes.dialogRoot}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogContent className={classes.dialogContent}>
                     <TextField
                         autoFocus
                         id="name"
                         label="Name"
                         type="text"
                         fullWidth
-                        onChange={(event) =>
-                            setName(event.target.value)
-                        }
+                        onChange={(event) => setName(event.target.value)}
                         value={name}
                     />
                     <Slider
@@ -120,20 +126,24 @@ function OpenSeat(props) {
                         value={buyin}
                         label="Buy In"
                         onChange={onChangeBuyin}
-                        inputProps={{ type: "number", min: 25, max: 200, step: 1 }}
+                        inputProps={{
+                            type: "number",
+                            min: 25,
+                            max: 200,
+                            step: 1,
+                        }}
                         error={invalidBuyin()}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={dialogClose}>
-                        Cancel
-                     </Button>
+                    <Button onClick={dialogClose}>Cancel</Button>
                     <Button
                         disabled={invalidBuyin() || invalidName()}
-                        onClick={onSubmitSitDownForm} color="primary"
+                        onClick={onSubmitSitDownForm}
+                        color="primary"
                     >
                         Sit Down
-             </Button>
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Fragment>

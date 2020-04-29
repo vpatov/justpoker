@@ -352,19 +352,6 @@ function ControllerComp(props: ControllerProps) {
                         {button.label}
                     </Button>
                 ))}
-
-                {(adminButtons || []).filter(
-                    (button) => button.action === ActionType.ADDCHIPS
-                ).length > 0 ? (
-                    <TextField
-                        onChange={(event) =>
-                            setChipAmt(parseInt(event.target.value))
-                        }
-                        value={chipAmt === 0 ? "" : chipAmt}
-                        type="number"
-                        variant="outlined"
-                    />
-                ) : null}
             </div>
         </div>
     );
