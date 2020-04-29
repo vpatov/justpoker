@@ -13,52 +13,45 @@ const useStyles = makeStyles((theme) => ({
     root: {
         height: "100%",
         width: "100%",
-    },
-    gameChatCont: {
         display: "flex",
-        height: "85vh",
-        width: "100%",
-        overflow: "hidden",
     },
-    table: {
+    gameTableCont: {
+        height: "100%",
+        width: "calc(100%- 300px)",
+        position: "relative",
         flex: "1 1 100%",
     },
-    chatlog: {},
-    controller: {},
+    table: {
+        height: "85%",
+    },
+    chatlog: {
+        width: "300px",
+    },
+    controller: {
+        height: "15%",
+        width: "100%",
+    },
     hideButton: {
         margin: "2vmin",
         fontSize: "1vmin",
-
         zIndex: 5,
-        position: "fixed",
-        bottom: 0,
-        right: 0,
+        position: "absolute",
+        top: 0,
+        right: "0",
     },
 }));
 
 function Game(props) {
     const classes = useStyles();
-    const [hideChat, setHideChat] = useState(false);
-
-    function renderHideChatButton() {
-        return (
-            <Button
-                className={classes.hideButton}
-                onClick={(e) => setHideChat(!hideChat)}
-            >
-                {`${hideChat ? "Show" : "Hide"} Chat`}
-            </Button>
-        );
-    }
 
     return (
         <div className={classes.root}>
-            <div className={classes.gameChatCont}>
+            <div className={classes.gameTableCont}>
                 <Table className={classes.table} />
-                <ChatLog className={classes.chatlog} hideChat={hideChat} />
-                {renderHideChatButton()}
+                <Controller className={classes.controller} />
             </div>
-            <Controller className={classes.controller} />
+            <ChatLog className={classes.chatlog} />
+
             <AudioModule />
         </div>
     );

@@ -74,7 +74,7 @@ export const CUSTOM_THEME = {
             transition: "box-shadow 0.4s ease-in-out;",
         },
         CONTROLLER_TO_ACT: {
-            boxShadow: `0 0px 26px ${CUSTOM_PALETTE.primary.main}`,
+            boxShadow: `0px -12px 20px 8px ${CUSTOM_PALETTE.primary.main}`,
         },
         BET: {
             border: "1px solid white",
@@ -82,7 +82,7 @@ export const CUSTOM_THEME = {
         },
         CHAT: {
             zIndex: 10,
-            backgroundColor: "rgba(40, 40, 40, 0.3)",
+            backgroundColor: "rgba(22, 22, 32, 1)",
             boxShadow: ` 0 3px 3px 3px rgba(0,0,0,0.2)`,
         },
         ACTION_BUTTONS: {
