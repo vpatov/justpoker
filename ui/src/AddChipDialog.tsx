@@ -41,13 +41,15 @@ function AddChipDialog(props) {
         setMode((event.target as HTMLInputElement).value);
     };
 
-    function onSubmit(action) {
+    function onSubmit() {
         WsServer.send({
-            actionType: action,
-            request: (action === ActionType.ADDCHIPS
-                ? { chipAmount: chipAmt }
-                : {}) as ClientWsMessageRequest,
+            actionType: ActionType.SETCHIPS,
+            request: {
+                chipAmount: computeResultingChips(),
+                playerUUID: uuid,
+            } as ClientWsMessageRequest,
         });
+        handleClose();
     }
 
     function computeResultingChips() {
@@ -103,7 +105,7 @@ function AddChipDialog(props) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handleClose} color="primary" autoFocus>
+                <Button onClick={onSubmit} color="primary" autoFocus>
                     {mode} Chips
                 </Button>
             </DialogActions>

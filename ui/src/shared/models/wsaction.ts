@@ -13,40 +13,45 @@ export enum ActionType {
     FOLD = "FOLD",
     CALL = "CALL",
     CHAT = "CHAT",
-    ADDCHIPS = "ADDCHIPS"
+    ADDCHIPS = "ADDCHIPS",
+    SETCHIPS = "SETCHIPS",
 }
 
 export declare interface SitDownRequest {
-  seatNumber: number;
-  // waitForBlind: boolean;
+    seatNumber: number;
+    // waitForBlind: boolean;
 }
 
 export declare interface JoinTableRequest {
-  name: string;
-  buyin: number;
-  // admin: boolean;
-  // sitdown: boolean;
-  // password?: string;
+    name: string;
+    buyin: number;
+    // admin: boolean;
+    // sitdown: boolean;
+    // password?: string;
 }
 
 export declare interface AddChipsRequest {
-  chipAmount: number;
+    chipAmount: number;
+}
+
+export declare interface SetChipsRequest {
+    chipAmount: number;
+    playerUUID: string;
 }
 
 export declare interface ClientChatMessage {
-  content: string;
+    content: string;
 }
 
-export type ClientWsMessageRequest = 
-  SitDownRequest & 
-  JoinTableRequest & 
-  (SitDownRequest & JoinTableRequest) 
-  & BettingRoundAction & 
-  AddChipsRequest &
-  ClientChatMessage; 
+export type ClientWsMessageRequest = SitDownRequest &
+    JoinTableRequest &
+    (SitDownRequest & JoinTableRequest) &
+    BettingRoundAction &
+    AddChipsRequest &
+    SetChipsRequest &
+    ClientChatMessage;
 
 export declare interface ClientWsMessage {
-  actionType: ActionType;
-  request: ClientWsMessageRequest;
+    actionType: ActionType;
+    request: ClientWsMessageRequest;
 }
-
