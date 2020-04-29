@@ -71,9 +71,10 @@ export const CUSTOM_THEME = {
             backgroundColor: "rgba(0,0,0,0.3)",
             background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
             boxSizing: "border-box",
+            transition: "box-shadow 0.4s ease-in-out;",
         },
         CONTROLLER_TO_ACT: {
-            boxShadow: `0 0px 20px ${CUSTOM_PALETTE.primary.main}`,
+            boxShadow: `0 0px 26px ${CUSTOM_PALETTE.primary.main}`,
         },
         BET: {
             border: "1px solid white",
