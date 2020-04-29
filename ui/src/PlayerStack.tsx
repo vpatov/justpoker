@@ -19,19 +19,19 @@ const useStyles = makeStyles((theme) => ({
     toAct: {
         ...theme.custom.STACK,
         // boxShadow: "0 0px 14px rgba(255,255,255,0.8)",
-        background: "linear-gradient(90deg, rgba(100,100,115,1) 0%, rgba(80,80,100,1) 50%, rgba(100,100,115,1)  100%);",
+        background:
+            "linear-gradient(90deg, rgba(100,100,115,1) 0%, rgba(80,80,100,1) 50%, rgba(100,100,115,1)  100%);",
         backgroundSize: "200% 200%",
         "-webkit-animation": "$grad 2s linear infinite",
         animation: "$grad 2s linear infinite",
         "-moz-animation": "$grad 2s linear infinite",
-
     },
     winner: {
         ...theme.custom.STACK,
-        color: "black",
         backgroundColor: "white",
         boxShadow: "0 0px 10px rgba(255,255,255,0.8)",
-        background: "linear-gradient(90deg, rgba(0,255,255,0.4) 0%, rgba(255,0,255,0.4) 50%, rgba(0,255,255,0.4) 100%);",
+        background:
+            "linear-gradient(90deg, rgba(0,255,255,0.4) 0%, rgba(255,0,255,0.4) 50%, rgba(0,255,255,0.4) 100%);",
         backgroundSize: "200% 200%",
         "-webkit-animation": "$grad 2s linear infinite",
         animation: "$grad 2s linear infinite",
@@ -43,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
         },
         "100%": {
             backgroundPosition: "200% -200%",
-
         },
     },
     name: {
@@ -68,13 +67,10 @@ const useStyles = makeStyles((theme) => ({
         float: "right",
         height: "2vmin",
         width: "2vmin",
-
     },
     act: {
         backgroundColor: "rgba(0, 236, 255, 1)",
     },
-
-
 }));
 
 function usePrevious(value) {
@@ -91,23 +87,25 @@ function PlayerStack(props) {
     const prevStack = usePrevious(stack);
 
     return (
-        <div className={classnames(classes.stackCont, { [classes.toAct]: toAct, [classes.winner]: winner, })}>
+        <div
+            className={classnames(classes.stackCont, {
+                [classes.toAct]: toAct,
+                [classes.winner]: winner,
+            })}
+        >
             {button ? (
-                <Typography className={classes.buttonR} >
-                    {"★"}
-                </Typography>
+                <Typography className={classes.buttonR}>{"★"}</Typography>
             ) : null}
             <Typography variant="h4" className={classes.stack}>
                 {winner ? (
                     <CountUp start={prevStack} end={stack} separator="," />
                 ) : (
-                        stack.toLocaleString()
-                    )}
+                    stack.toLocaleString()
+                )}
             </Typography>
             <Typography variant="body1" className={classes.name}>
                 {name}
             </Typography>
-
         </div>
     );
 }
