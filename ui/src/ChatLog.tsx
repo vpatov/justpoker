@@ -6,7 +6,7 @@ import get from "lodash/get";
 
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import Fade from "@material-ui/core/Fade";
+import Button from "@material-ui/core/Button";
 
 import { WsServer } from "./api/ws";
 import { UiChatMessage } from "./shared/models/uiState";
@@ -16,8 +16,6 @@ const useStyles = makeStyles((theme: Theme) =>
         root: {
             zIndex: 5,
             height: "100%",
-            width: "20%",
-            maxWidth: "360px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -49,7 +47,7 @@ const useStyles = makeStyles((theme: Theme) =>
         messageTextField: {
             flexGrow: 1,
             marginRight: "1vmin",
-            marginBottom: 0,
+            marginBottom: "1vmin",
             marginTop: 0,
         },
         messageTextFieldInput: {
@@ -67,22 +65,35 @@ const useStyles = makeStyles((theme: Theme) =>
         messageContent: {
             color: "rgb(220,210,230)",
         },
+        hideButton: {
+            margin: "2vmin",
+            fontSize: "1vmin",
+            zIndex: 5,
+            position: "absolute",
+            top: 0,
+            right: "0",
+        },
+        unread: {
+            borderColor: theme.palette.secondary.main,
+            color: theme.palette.secondary.main,
+        },
     })
 );
 
 interface ChatLogProps {
     className?: string;
-    hideChat: boolean;
 }
 
 function ChatLog(props: ChatLogProps) {
     console.log("chat render");
     const classes = useStyles();
 
-    const { className, hideChat } = props;
+    const { className } = props;
 
+    const [hideChat, setHideChat] = useState(false);
     const [messages, setMessages] = useState([] as any);
     const [draftMessage, setDraftMessage] = useState("");
+    const [unreadChats, setUnreadChats] = useState(false);
 
     const messagesRef = useRef(null);
 
@@ -114,57 +125,76 @@ function ChatLog(props: ChatLogProps) {
     }
 
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
+        setUnreadChats(true);
         setMessages((oldMessages) => [...oldMessages, chatMessage]);
+    }
+
+    function renderHideChatButton() {
+        return (
+            <Button
+                variant="outlined"
+                className={classnames(classes.hideButton, {
+                    [classes.unread]: unreadChats && hideChat,
+                })}
+                onClick={(e) => {
+                    setUnreadChats(false);
+                    setHideChat(!hideChat);
+                }}
+                style={hideChat ? {} : { right: 270 }}
+            >
+                {`${hideChat ? "Show" : "Hide"} Chat`}
+            </Button>
+        );
     }
 
     function renderChat() {
         return (
-            <Fade in mountOnEnter unmountOnExit>
-                <div className={classnames(classes.root, className)}>
-                    <div className={classes.chatLog}>
-                        {messages.map((message) => (
-                            <Typography
-                                key={message.timestamp}
-                                className={classes.chatMessage}
-                            >
-                                <span className={classes.senderName}>
-                                    {message.senderName}:
-                                </span>
-                                <span className={classes.messageContent}>
-                                    {message.content}
-                                </span>
-                            </Typography>
-                        ))}
-                        <div ref={messagesRef} />
-                    </div>
-                    <div className={classes.chatInputSection}>
-                        <TextField
-                            variant="outlined"
-                            value={draftMessage}
-                            className={classes.messageTextField}
-                            margin="dense"
-                            onChange={(event) =>
-                                setDraftMessage(event.target.value)
-                            }
-                            InputProps={{
-                                classes: {
-                                    input: classes.messageTextFieldInput,
-                                },
-                            }}
-                            onKeyPress={(event) => onTextAreaPressEnter(event)}
-                            multiline
-                            rowsMax={4}
-                        />
-                    </div>
+            <div className={classnames(classes.root, className)}>
+                <div className={classes.chatLog}>
+                    {messages.map((message) => (
+                        <Typography
+                            key={message.timestamp}
+                            className={classes.chatMessage}
+                        >
+                            <span className={classes.senderName}>
+                                {message.senderName}:
+                            </span>
+                            <span className={classes.messageContent}>
+                                {message.content}
+                            </span>
+                        </Typography>
+                    ))}
+                    <div ref={messagesRef} />
                 </div>
-            </Fade>
+                <div className={classes.chatInputSection}>
+                    <TextField
+                        label="Send Message"
+                        variant="outlined"
+                        value={draftMessage}
+                        className={classes.messageTextField}
+                        margin="dense"
+                        onChange={(event) =>
+                            setDraftMessage(event.target.value)
+                        }
+                        InputProps={{
+                            classes: {
+                                input: classes.messageTextFieldInput,
+                            },
+                        }}
+                        onKeyPress={(event) => onTextAreaPressEnter(event)}
+                        multiline
+                        rowsMax={4}
+                    />
+                </div>
+                {renderHideChatButton()}
+            </div>
         );
     }
 
     if (!hideChat) {
         return renderChat();
     } else {
-        return null;
+        return renderHideChatButton();
     }
 }
 

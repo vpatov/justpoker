@@ -14,8 +14,6 @@ import { flipTable } from "./AnimiationModule";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            width: "100%",
-            height: "15%",
             position: "absolute",
             right: 0,
             bottom: 0,
