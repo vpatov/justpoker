@@ -170,7 +170,7 @@ function Table(props) {
     }
     return (
         <div className={classnames(classes.root, className)}>
-            <div className={classes.table}>
+            <div className={classnames(classes.table, "ani_table")}>
                 <Typography
                     className={classes.mainPot}
                 >{`${pot.toLocaleString()}`}</Typography>

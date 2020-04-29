@@ -20,10 +20,8 @@ const useStyles = makeStyles((theme) => ({
 
 function GameContainer(props): any {
     const classes = useStyles();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const [gameLoaded, setGameLoaded] = useState(false);
-
-
 
     useEffect(() => {
         if (props.useTestGame) {
@@ -55,8 +53,6 @@ function GameContainer(props): any {
     } else {
         return <div className={classes.root}>{renderLoading()}</div>;
     }
-
-
 }
 
 export default GameContainer;

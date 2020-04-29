@@ -8,10 +8,9 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
-import { Controller } from "./shared/models/uiState";
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
 import { Typography } from "@material-ui/core";
-
+import { flipTable } from "./AnimiationModule";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -338,6 +337,9 @@ function ControllerComp(props: ControllerProps) {
                 </div>
             </div>
             <div className={classes.adminButtonCont}>
+                <Button variant="outlined" onClick={() => flipTable()}>
+                    Flip Table
+                </Button>
                 {(adminButtons || []).map((button) => (
                     <Button
                         variant="outlined"

@@ -27,13 +27,16 @@ function Bet(props) {
 
     return (
         <div
-            className={classnames(classes.root, className)}
+            className={classnames(classes.root, className, "bet")}
             style={{
                 ...style,
             }}
         >
             <ChipStack amount={amount} />
-            <Typography variant={"h6"} className={classnames(classes.amount)}>
+            <Typography
+                variant={"h6"}
+                className={classnames(classes.amount, "ani_betLabel")}
+            >
                 {amount.toLocaleString()}
             </Typography>
         </div>
