@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import classnames from 'classnames'
+import classnames from "classnames";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
-import Collapse from '@material-ui/core/Collapse';
+import Collapse from "@material-ui/core/Collapse";
 import transitions from "@material-ui/core/styles/transitions";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -23,17 +23,17 @@ const useStyles = makeStyles((theme: Theme) =>
             margin: "0 auto",
             width: "80%",
             transform: "translateX(-50%)",
-            transition: "transform 0.3s ease-in-out"
+            transition: "transform 0.3s ease-in-out",
         },
         show: {
-            transform: "translateY(100%) translateX(-50%)"
+            transform: "translateY(100%) translateX(-50%)",
         },
         linearTimer: {
             width: "100%",
         },
         secondsRemaining: {
             width: "2.1vmin",
-            fontSize: "1vmin"
+            fontSize: "1vmin",
         },
         linearTimerRoot: {
             flexShrink: 1,
@@ -58,18 +58,19 @@ function PlayerTimer(props) {
 
     const [completed, setCompleted] = useState(100.0);
     const [timer, setTimer] = useState();
-    const [secondsRemaining, setSecondsRemaining] = useState(timeLimit - timeElapsed);
+    const [secondsRemaining, setSecondsRemaining] = useState(
+        timeLimit - timeElapsed
+    );
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        setShow(true)
+        setShow(true);
         setCompleted(getPercetTimeRemaining(timeElapsed, timeLimit));
         const updateIntervalMs = 1000;
         const reduceBy = (100.0 / timeLimit) * (updateIntervalMs / 1000);
         function progress() {
             setCompleted((oldCompleted) => oldCompleted - reduceBy);
             setSecondsRemaining((oldSR) => oldSR - updateIntervalMs / 1000);
-
         }
         const timer = setInterval(progress, updateIntervalMs);
         setTimer(timer as any);
@@ -83,7 +84,11 @@ function PlayerTimer(props) {
     }
 
     return (
-        <div className={classnames(classes.root, className, { [classes.show]: show })}>
+        <div
+            className={classnames(classes.root, className, {
+                [classes.show]: show,
+            })}
+        >
             <Typography className={classes.secondsRemaining}>
                 {Math.floor(secondsRemaining)}
             </Typography>
@@ -97,7 +102,6 @@ function PlayerTimer(props) {
                 }}
             />
         </div>
-
     );
 }
 

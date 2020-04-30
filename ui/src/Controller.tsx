@@ -97,8 +97,8 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: "1vmin",
         },
         button: {
-            height: "33%",
-            width: "8vmin",
+            height: "40%",
+            width: "10vmin",
             fontSize: "1.4vmin",
             marginRight: "0.8vmin",
         },

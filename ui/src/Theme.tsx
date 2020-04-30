@@ -62,10 +62,19 @@ export const CUSTOM_THEME = {
             background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
         },
         STACK: {
-            color: "white",
-            backgroundColor: " rgba(22,22,36,1)",
+            color: "black",
+            backgroundColor: blueGrey[200],
             borderRadius: "0.6vmin",
-            boxShadow: "0 5px 15px rgba(10,10,10,0.9)",
+            boxShadow: "0 8px 18px 3px rgba(0,0,0,0.9)",
+        },
+        STACK_TO_ACT: {
+            boxShadow: "0px 0px 18px 3px rgba(255,255,255,0.6)",
+            backgroundColor: CUSTOM_PALETTE.primary.main,
+            background: `linear-gradient(90deg, ${CUSTOM_PALETTE.primary.main} 0%, ${CUSTOM_PALETTE.primary.light} 50%, ${CUSTOM_PALETTE.primary.main}  100%)`,
+            backgroundSize: "200% 200%",
+            "-webkit-animation": "$grad 2s linear infinite",
+            animation: "$grad 2s linear infinite",
+            "-moz-animation": "$grad 2s linear infinite",
         },
         CONTROLLER: {
             backgroundColor: "rgba(0,0,0,0.3)",
@@ -139,7 +148,7 @@ export const CUSTOM_THEME = {
     overrides: {
         MuiTypography: {
             root: {
-                color: "white",
+                color: "inherit",
             },
         },
         MuiOutlinedInput: {

@@ -8,23 +8,16 @@ import classnames from "classnames";
 import PlayerTimer from "./PlayerTimer";
 
 const useStyles = makeStyles((theme) => ({
-    root: {},
     stackCont: {
         width: "100%",
         fontSize: "18px",
-        marginTop: "-2vmin",
+        marginTop: "-5vmin",
         zIndex: 2,
         ...theme.custom.STACK,
     },
     toAct: {
         ...theme.custom.STACK,
-        // boxShadow: "0 0px 14px rgba(255,255,255,0.8)",
-        background:
-            "linear-gradient(90deg, rgba(100,100,115,1) 0%, rgba(80,80,100,1) 50%, rgba(100,100,115,1)  100%);",
-        backgroundSize: "200% 200%",
-        "-webkit-animation": "$grad 2s linear infinite",
-        animation: "$grad 2s linear infinite",
-        "-moz-animation": "$grad 2s linear infinite",
+        ...theme.custom.STACK_TO_ACT,
     },
     winner: {
         ...theme.custom.STACK,

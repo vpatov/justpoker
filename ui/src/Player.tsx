@@ -11,8 +11,8 @@ import PlayerMenu from "./PlayerMenu";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: "15vmin",
-        height: "11vmin",
+        width: "16vmin",
+        height: "15vmin",
         transition: "transform 0.3s linear 0s",
         alignItems: "flex-end",
         display: "flex",
@@ -79,10 +79,11 @@ function Player(props) {
                 name={name}
                 stack={stack}
                 button={button}
-                playerTimer={playerTimer}
                 winner={winner}
             />
-            {playerTimer ? <PlayerTimer playerTimer={playerTimer} /> : null}
+            <div>
+                {playerTimer ? <PlayerTimer playerTimer={playerTimer} /> : null}
+            </div>
         </div>
     );
 }
