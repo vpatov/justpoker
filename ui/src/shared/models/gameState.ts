@@ -54,6 +54,8 @@ export declare interface GameState {
     /** The extra amount put into the pot by an all-in that was below the min-raise. */
     partialAllInLeftOver: number;
 
+    unsetQueuedAction: boolean;
+
     // smallBlindUUID: Readonly<string>;
     // bigBlindUUID: Readonly<string>;
     // bettingRoundActions: ReadonlyArray<BettingRoundAction>
@@ -92,6 +94,7 @@ export const cleanGameState: GameState = {
     currentPlayerToAct: "",
     canCurrentPlayerAct: false,
     shouldDealNextHand: false,
+    unsetQueuedAction: false,
     deck: {
         cards: [],
     },

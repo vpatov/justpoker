@@ -211,7 +211,7 @@ export const testUiChatLog: UiChatLog = {
     ],
 };
 
-function shuffle(a) {
+function shuffle(a: any) {
     var j, x, i;
     for (i = a.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));

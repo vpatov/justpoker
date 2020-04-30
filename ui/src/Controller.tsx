@@ -167,11 +167,17 @@ function ControllerComp(props: ControllerProps) {
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
-
-    const [chipAmt, setChipAmt] = useState(0);
     const [betAmt, setBetAmt] = useState(0);
-
     const [queued, setQueued] = useState("");
+
+    useEffect(() => {
+        if (unsetQueuedAction) {
+            setQueued("")
+            setBetAmt(0)
+            console.log("reset")
+        }
+    }, [unsetQueuedAction]);
+
 
     const changeBetAmount = (newAmt) => {
         // parse string into int

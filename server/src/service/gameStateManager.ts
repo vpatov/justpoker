@@ -40,7 +40,7 @@ export class GameStateManager {
         this.updatedKeys = new Set(updatedKeys);
     }
 
-    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) {}
+    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) { }
 
     /* Getters */
 
@@ -82,6 +82,13 @@ export class GameStateManager {
         };
     }
 
+
+    resetSingltonState() {
+        this.updateGameState({
+            unsetQueuedAction: false
+        });
+    }
+
     updatePlayer(playerUUID: string, updates: Partial<Player>) {
         const player = this.getPlayer(playerUUID);
 
@@ -114,12 +121,16 @@ export class GameStateManager {
         if (clients.length !== 1) {
             console.log(
                 `clients.length was ${clients.length} and not 1. ` +
-                    `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
-                        this.getConnectedClients(),
-                    )}`,
+                `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
+                    this.getConnectedClients(),
+                )}`,
             );
         }
         return clients[0].uuid;
+    }
+
+    getUnsetQueuedAction(): boolean {
+        return this.gameState.unsetQueuedAction
     }
 
     getConnectedClients() {
@@ -541,6 +552,12 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { lastActionType });
     }
 
+    setUnsetQueuedAction() {
+        this.updateGameState({
+            unsetQueuedAction: true
+        });
+    }
+
     getPlayerHandDescription(playerUUID: string) {
         const bestHand = this.handSolverService.computeBestHandFromCards([
             ...this.getBoard(),
@@ -661,4 +678,5 @@ export class GameStateManager {
     clearBettingRoundStage() {
         this.updateGameState({ bettingRoundStage: BettingRoundStage.WAITING });
     }
+
 }
