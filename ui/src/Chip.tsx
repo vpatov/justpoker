@@ -1,6 +1,6 @@
 import React from "react";
 import get from "lodash/get";
-import {} from "./utils";
+import { MAX_VALUES } from "./shared/util/consts"
 
 import purple from "@material-ui/core/colors/purple";
 import pink from "@material-ui/core/colors/pink";
@@ -10,7 +10,9 @@ import lightGreen from "@material-ui/core/colors/lightGreen";
 import cyan from "@material-ui/core/colors/cyan";
 import lime from "@material-ui/core/colors/lime";
 import yellow from "@material-ui/core/colors/yellow";
-import orange from "@material-ui/core/colors/orange";
+import deepOrange from "@material-ui/core/colors/deepOrange";
+import red from "@material-ui/core/colors/red";
+import deepPurple from "@material-ui/core/colors/deepPurple";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -26,25 +28,26 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export const MAX_CHIP_SIZE = Math.pow(10, 7);
 
 function Chip(props) {
     const classes = useStyles();
     const { yPos = "50%", xPos = "50%", amount } = props;
 
     function getChipHueFromAmount(amount) {
-        if (MAX_CHIP_SIZE < amount) {
+        if (MAX_VALUES.PLAYER_STACK < amount) {
             return grey;
         }
         const hues = [
             cyan,
+            deepOrange,
             green,
-            lime,
             purple,
             lightGreen,
-            yellow,
             pink,
-            orange,
+            yellow,
+            deepPurple,
+            lime,
+            red,
         ];
         const hueIndex = Math.floor(Math.log10(amount));
         return hues[hueIndex];
