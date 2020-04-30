@@ -19,7 +19,7 @@ export class GamePlayService {
         private readonly timerManager: TimerManager,
         private readonly audioService: AudioService,
         private readonly validationService: ValidationService,
-    ) {}
+    ) { }
 
     /* Gameplay functionality */
 
@@ -250,7 +250,7 @@ export class GamePlayService {
 
     bet(betAmount: number, playerPlacingBlindBetUUID?: string) {
         this.audioService.playBetSFX();
-
+        this.gsm.setUnsetQueuedAction()
         // TODO is playerPlacingBlindBet correct design?
         // after all, a blind is a special case of a normal bet,
         // so in theory it belongs in this method as a code path.
@@ -271,8 +271,8 @@ export class GamePlayService {
             isPlayerAllIn
                 ? BettingRoundActionType.ALL_IN
                 : playerPlacingBlindBetUUID
-                ? BettingRoundActionType.PLACE_BLIND
-                : BettingRoundActionType.BET,
+                    ? BettingRoundActionType.PLACE_BLIND
+                    : BettingRoundActionType.BET,
         );
 
         /* TODO
@@ -475,7 +475,7 @@ export class GamePlayService {
             this.gsm.updatePlayers((player) =>
                 winningPlayers.includes(player.uuid)
                     ? // TODO the players winning hand would go here too.
-                      { chips: player.chips + amountsWon[player.uuid], winner: true }
+                    { chips: player.chips + amountsWon[player.uuid], winner: true }
                     : { winner: false },
             );
 
@@ -491,7 +491,7 @@ export class GamePlayService {
         for (const index in snapShots) {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
-                () => {},
+                () => { },
                 () => snapShot,
                 interval * Number(index),
             );
@@ -512,6 +512,7 @@ export class GamePlayService {
     }
 
     finishHand() {
+        this.gsm.setUnsetQueuedAction();
         this.gsm.clearBettingRoundStage();
         this.ejectStackedPlayers();
         this.gsm.clearStateOfRoundInfo();

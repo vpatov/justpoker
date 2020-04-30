@@ -114,7 +114,7 @@ export class StateTransformService {
         const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID;
         const controller: Controller = {
             toAct,
-            unsetQueuedAction: false,
+            unsetQueuedAction: this.gameStateManager.getUnsetQueuedAction(),
             min: this.getMinimumBetSize(heroPlayerUUID),
             max: this.gameStateManager.getPlayer(heroPlayerUUID).chips,
             sizingButtons: !this.gameStateManager.isGameStarted()
