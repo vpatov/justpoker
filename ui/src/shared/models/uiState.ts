@@ -63,6 +63,7 @@ export declare interface Player {
     stack: number;
     uuid?: string;
     hero?: boolean;
+    sittingOut?: boolean;
     folded?: boolean;
     toAct?: boolean;
     button?: boolean;
@@ -316,10 +317,10 @@ export const TestGame: UiGameState = {
             },
         },
         {
-            name: "Tommy Bones",
+            name: "Lenny Rigus",
             position: 5,
             stack: 323,
-
+            sittingOut: true,
             hand: {
                 cards: [genRandomCard(), genRandomCard()],
             },
@@ -339,6 +340,7 @@ export const TestGame: UiGameState = {
             name: "Nicki Lam",
             stack: 20499,
             position: 7,
+            sittingOut: true,
             bet: genRandomInt(0, 100000000),
             hand: {
                 cards: [genRandomCard(), genRandomCard()],
@@ -349,6 +351,7 @@ export const TestGame: UiGameState = {
             position: 8,
             stack: 323,
             folded: true,
+
             hand: {
                 cards: [genRandomCard(), genRandomCard()],
             },
