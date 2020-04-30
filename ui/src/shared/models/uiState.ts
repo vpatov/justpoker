@@ -49,6 +49,7 @@ export declare interface UiCard {
 export declare interface Table {
     spots: number;
     pot: number;
+    fullPot: number;
     readonly communityCards: UiCard[];
 }
 
@@ -182,6 +183,7 @@ export const CleanGame: UiGameState = {
     table: {
         spots: 9,
         pot: 0,
+        fullPot: 0,
         communityCards: [],
     },
     players: [],
@@ -250,7 +252,7 @@ export const TestGame: UiGameState = {
     table: {
         spots: 9,
         pot: 12000,
-
+        fullPot: 50000,
         communityCards: [
             genRandomCard(),
             genRandomCard(),

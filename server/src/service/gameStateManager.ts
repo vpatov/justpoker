@@ -194,6 +194,15 @@ export class GameStateManager {
         return this.gameState.pots.reduce((sum, pot) => pot.value + sum, 0);
     }
 
+    getAllCommitedBets() {
+        return Object.values(this.getPlayers()).reduce((sum, player) => player.betAmount + sum, 0);
+    }
+
+    // pots plus all commited bets
+    getFullPot() {
+        return this.getTotalPot() + this.getAllCommitedBets();
+    }
+
     getSB() {
         return this.gameState.gameParameters.smallBlind;
     }
