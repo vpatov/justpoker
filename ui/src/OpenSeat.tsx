@@ -1,12 +1,11 @@
 import React, { useState, Fragment } from "react";
 import classnames from "classnames";
-import Hand from "./Hand";
 import { WsServer } from "./api/ws";
 import { ActionType } from "./shared/models/wsaction";
+import TextFieldWrap from "./reuseable/TextFieldWrap"
 
 import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
-import EventSeatIcon from "@material-ui/icons/EventSeat";
 import grey from "@material-ui/core/colors/grey";
 import Typography from "@material-ui/core/Typography";
 import { ClientWsMessageRequest } from "./shared/models/wsaction";
@@ -61,7 +60,7 @@ function OpenSeat(props) {
     }
 
     function onChangeBuyin(event: any) {
-        setBuyin(Number(event.target.value));
+        setBuyin(event.target.value);
     }
 
     function handleSliderChange(event: any, newValue: any) {
@@ -105,7 +104,7 @@ function OpenSeat(props) {
                 fullWidth
             >
                 <DialogContent className={classes.dialogContent}>
-                    <TextField
+                    <TextFieldWrap
                         autoFocus
                         id="name"
                         label="Name"
@@ -113,6 +112,7 @@ function OpenSeat(props) {
                         fullWidth
                         onChange={(event) => setName(event.target.value)}
                         value={name}
+                        maxChars={24}
                     />
                     <Slider
                         value={buyin}
@@ -121,17 +121,17 @@ function OpenSeat(props) {
                         max={maxBuyin}
                         step={1}
                     />
-                    <TextField
+                    <TextFieldWrap
+                        type="number"
                         className={classes.field}
                         value={buyin}
                         label="Buy In"
                         onChange={onChangeBuyin}
                         inputProps={{
-                            type: "number",
-                            min: 25,
-                            max: 200,
                             step: 1,
                         }}
+                        min={minBuyin}
+                        max={maxBuyin}
                         error={invalidBuyin()}
                     />
                 </DialogContent>
