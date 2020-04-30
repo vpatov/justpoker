@@ -5,14 +5,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import classnames from "classnames";
 
-import PlayerTimer from "./PlayerTimer";
-
 const useStyles = makeStyles((theme) => ({
     stackCont: {
         width: "100%",
         fontSize: "18px",
-        marginTop: "-5vmin",
-        zIndex: 2,
+        marginTop: "-2vmin",
         ...theme.custom.STACK,
     },
     toAct: {
@@ -93,8 +90,8 @@ function PlayerStack(props) {
                 {winner ? (
                     <CountUp start={prevStack} end={stack} separator="," />
                 ) : (
-                    stack.toLocaleString()
-                )}
+                        stack.toLocaleString()
+                    )}
             </Typography>
             <Typography variant="body1" className={classes.name}>
                 {name}

@@ -1,8 +1,8 @@
-import { Suit, genRandomCard } from "./cards";
-import { ActionType } from "./wsaction";
-import { genRandomInt } from "../util/util";
-import { AudioQueue, getCleanAudioQueue } from "./audioQueue";
-import { MAX_VALUES } from "../util/consts";
+import { Suit, genRandomCard } from './cards';
+import { ActionType } from './wsaction';
+import { genRandomInt } from '../util/util';
+import { AudioQueue, getCleanAudioQueue } from './audioQueue';
+import { MAX_VALUES } from '../util/consts';
 
 export declare interface UiState {
     game: UiGameState;
@@ -91,55 +91,47 @@ export declare interface UiChatLog {
 /* Action Buttons */
 export const FOLD_BUTTON: ActionButton = {
     action: ActionType.FOLD,
-    label: "Fold",
+    label: 'Fold',
 };
 
 export const CHECK_BUTTON: ActionButton = {
     action: ActionType.CHECK,
-    label: "Check",
+    label: 'Check',
 };
 
 export const CALL_BUTTON: ActionButton = {
     action: ActionType.CALL,
-    label: "Call",
+    label: 'Call',
 };
 
 export const BET_BUTTON: ActionButton = {
     action: ActionType.BET,
-    label: "Bet",
+    label: 'Bet',
 };
 
 export const RAISE_BUTTON: ActionButton = {
     action: ActionType.BET,
-    label: "Raise",
+    label: 'Raise',
 };
 
 export const START_GAME_BUTTON = {
     action: ActionType.STARTGAME,
-    label: "Start Game",
+    label: 'Start Game',
 };
 
 export const STOP_GAME_BUTTON = {
     action: ActionType.STOPGAME,
-    label: "Stop Game",
+    label: 'Stop Game',
 };
 
 export const ADD_CHIPS_BUTTON = {
     action: ActionType.ADDCHIPS,
-    label: "Add Chips",
+    label: 'Add Chips',
 };
 
-export const NOT_FACING_BET_ACTION_BUTTONS = [
-    FOLD_BUTTON,
-    CHECK_BUTTON,
-    BET_BUTTON,
-];
+export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
 
-export const FACING_BET_ACTION_BUTTONS = [
-    FOLD_BUTTON,
-    CALL_BUTTON,
-    RAISE_BUTTON,
-];
+export const FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, RAISE_BUTTON];
 
 export const ALL_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, BET_BUTTON];
 
@@ -193,8 +185,8 @@ export const CleanRootState: UiState = {
     game: CleanGame,
     audio: getCleanAudioQueue(),
     chat: {
-        senderName: "Vasia",
-        content: "Message in the chat log.",
+        senderName: 'Vasia',
+        content: 'Message in the chat log.',
         timestamp: 0,
     },
 };
@@ -202,23 +194,36 @@ export const CleanRootState: UiState = {
 export const testUiChatLog: UiChatLog = {
     messages: [
         {
-            senderName: "Vasia",
-            content: "Message in the chat log.",
+            senderName: 'Vasia',
+            content: 'Message in the chat log.',
             timestamp: 0,
         },
         {
-            senderName: "Jules",
-            content: "witty response to something clever.",
+            senderName: 'Jules',
+            content: 'witty response to something clever.',
             timestamp: 0,
         },
         {
-            senderName: "ShaemusGoatmaster",
-            content:
-                "Message in the chataaaasssssssssss sadasdasd asdasd lots of words lorem ipsum lorel sdfsdf log.",
+            senderName: 'ShaemusGoatmaster',
+            content: 'Message in the chataaaasssssssssss sadasdasd asdasd lots of words lorem ipsum lorel sdfsdf log.',
             timestamp: 0,
         },
     ],
 };
+
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
+}
+
+let positions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+shuffle(positions);
 
 export const TestGame: UiGameState = {
     heroIsSeated: true,
@@ -230,19 +235,19 @@ export const TestGame: UiGameState = {
         max: 43000,
         sizingButtons: [
             {
-                label: "1/2",
+                label: '1/2',
                 value: 6000,
             },
             {
-                label: "3/4",
+                label: '3/4',
                 value: 9000,
             },
             {
-                label: "Pot",
+                label: 'Pot',
                 value: 12000,
             },
             {
-                label: "All In",
+                label: 'All In',
                 value: 43000,
             },
         ],
@@ -253,110 +258,102 @@ export const TestGame: UiGameState = {
         spots: 9,
         pot: 12000,
         fullPot: 50000,
-        communityCards: [
-            genRandomCard(),
-            genRandomCard(),
-            genRandomCard(),
-            genRandomCard(),
-            genRandomCard(),
-        ],
+        communityCards: [genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard()],
     },
     players: [
         {
-            name: "Rick Dolo",
-            position: 0,
+            name: 'Rick Dolo',
+            position: positions[0],
             stack: 5500,
-            toAct: true,
-            handLabel: "Set of Kings",
-            playerTimer: {
-                timeElapsed: 7.6,
-                timeLimit: 30,
-            },
+            hero: true,
+            handLabel: 'Set of Kings',
             bet: genRandomInt(0, 10),
             hand: {
                 cards: [genRandomCard(), genRandomCard()],
             },
         },
         {
-            name: "Marty Shakus",
-            position: 1,
+            name: 'Marty Shakus',
+            position: positions[1],
             stack: 425320,
             winner: true,
             bet: genRandomInt(0, 100),
-            handLabel: "Four of a Kind",
-            hand: {
-                cards: [genRandomCard(), genRandomCard()],
-            },
-        },
-        {
-            name: "Dean Markus",
-            position: 2,
-            stack: 323,
-            bet: genRandomInt(0, 1000),
-            handLabel: "Straight Flush",
+            handLabel: 'Four of a Kind',
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
         },
         {
-            name: "Johnny Bones",
-            position: 3,
+            name: 'Dean Markus',
+            position: positions[2],
             stack: 323,
-            bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK * 10),
+            toAct: true,
+            playerTimer: {
+                timeElapsed: 7.6,
+                timeLimit: 30,
+            },
+            bet: genRandomInt(0, 1000),
+            handLabel: 'Straight Flush',
             hand: {
-                cards: [genRandomCard(), genRandomCard()],
+                cards: [{ hidden: true }, { hidden: true }],
             },
         },
+        // {
+        //     name: "Johnny Bones",
+        //     position: positions[3],
+        //     stack: 323,
+        //     bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK * 10),
+        //     hand: {
+        //         cards: [{ hidden: true }, { hidden: true }],
+        //     },
+        // },
 
         {
             button: true,
-            name: "Langus Yanger",
-            position: 4,
+            name: 'Langus Yanger',
+            position: positions[4],
             stack: 323,
             bet: genRandomInt(0, 100000),
-            handLabel: "Top Two",
+            handLabel: 'Top Two',
             hand: {
-                cards: [genRandomCard(), genRandomCard()],
+                cards: [{ hidden: true }, { hidden: true }],
             },
         },
         {
-            name: "Lenny Rigus",
-            position: 5,
+            name: 'Lenny',
+            position: positions[5],
             stack: 323,
-            sittingOut: true,
             hand: {
-                cards: [genRandomCard(), genRandomCard()],
+                cards: [{ hidden: true }, { hidden: true }],
             },
         },
         {
-            hero: true,
-            name: "Jimmy Dean",
-            position: 6,
+            name: 'Jimmy Dean',
+            position: positions[6],
             stack: 43020,
             bet: genRandomInt(0, 1000000),
-            handLabel: "Three Queens",
             hand: {
-                cards: [genRandomCard(), genRandomCard()],
+                cards: [{ hidden: true }, { hidden: true }],
             },
         },
         {
-            name: "Nicki Lam",
+            name: 'Nicki Lam',
             stack: 20499,
-            position: 7,
+            position: positions[7],
             sittingOut: true,
             bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK),
             hand: {
-                cards: [genRandomCard(), genRandomCard()],
+                cards: [{ hidden: true }, { hidden: true }],
             },
         },
         {
-            name: "Tommy Bones",
-            position: 8,
+            name: 'Tommy Bones',
+            position: positions[8],
             stack: 323,
             folded: true,
 
             hand: {
-                cards: [genRandomCard(), genRandomCard()],
+                cards: [{ hidden: true }, { hidden: true }],
             },
         },
     ],

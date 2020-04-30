@@ -1,61 +1,52 @@
-import React, { useState } from "react";
-import classnames from "classnames";
-import Hand from "./Hand";
-import PlayerStack from "./PlayerStack";
+import React, { useState } from 'react';
+import classnames from 'classnames';
+import Hand from './Hand';
+import PlayerStack from './PlayerStack';
 
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import blueGrey from "@material-ui/core/colors/blueGrey";
-import PlayerTimer from "./PlayerTimer";
-import PlayerMenu from "./PlayerMenu";
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import blueGrey from '@material-ui/core/colors/blueGrey';
+import PlayerTimer from './PlayerTimer';
+import PlayerMenu from './PlayerMenu';
 
+const PLAYER_WIDTH = 16;
+const PLAYER_HEIGHT = 13;
+const HERO_SCALE = 1.2;
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: "16vmin",
-        height: "15vmin",
-        transition: "transform 0.3s linear 0s",
-        alignItems: "flex-end",
-        display: "flex",
-        flexWrap: "wrap",
+        width: `${PLAYER_WIDTH}vmin`,
+        // height: `${PLAYER_HEIGHT}vmin`,
+    },
+    playerHero: {
+        // width: `${PLAYER_WIDTH * HERO_SCALE}vmin`,
+        // height: `${PLAYER_HEIGHT * HERO_SCALE}vmin`,
     },
     folded: {
         ...theme.custom.FOLDED,
     },
     sittingOut: {
-        width: "100%",
-        height: "35%",
-        borderTopLeftRadius: "2vmin",
-        borderTopRightRadius: "2vmin",
+        width: '100%',
+        height: '7vmin',
+        borderTopLeftRadius: '2vmin',
+        borderTopRightRadius: '2vmin',
         backgroundColor: blueGrey[400],
-        display: "flex",
-        justifyContent: "space-evenly",
+        display: 'flex',
+        justifyContent: 'space-evenly',
     },
     sittingOutText: {
-        marginTop: "5%",
-        fontSize: "2vmin",
+        marginTop: '5%',
+        fontSize: '2vmin',
     },
 }));
 
 function Player(props) {
     const classes = useStyles();
-    const { className, style } = props;
-    const {
-        stack,
-        hand,
-        name,
-        toAct,
-        playerTimer,
-        winner,
-        button,
-        folded,
-        uuid,
-        sittingOut,
-    } = props.player;
+    const { className, style, setHeroRotation, virtualPositon } = props;
+    const { stack, hand, name, toAct, playerTimer, winner, button, folded, uuid, sittingOut, hero } = props.player;
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
-        console.log(event.currentTarget);
         setAnchorEl(event.currentTarget as any);
     };
 
@@ -67,6 +58,7 @@ function Player(props) {
         <div
             className={classnames(classes.root, className, {
                 [classes.folded]: folded || sittingOut,
+                [classes.playerHero]: hero,
             })}
             style={style}
             onContextMenu={handleClick}
@@ -77,26 +69,18 @@ function Player(props) {
                 uuid={uuid}
                 name={name}
                 stack={stack}
+                setHeroRotation={setHeroRotation}
+                virtualPositon={virtualPositon}
             />
             {sittingOut ? (
                 <Typography className={classes.sittingOut}>
-                    <Typography className={classes.sittingOutText}>
-                        Sitting Out
-                    </Typography>
+                    <Typography className={classes.sittingOutText}>Sitting Out</Typography>
                 </Typography>
             ) : (
                 <Hand hand={hand} />
             )}
-            <PlayerStack
-                toAct={toAct}
-                name={name}
-                stack={stack}
-                button={button}
-                winner={winner}
-            />
-            <div>
-                {playerTimer ? <PlayerTimer playerTimer={playerTimer} /> : null}
-            </div>
+            <PlayerStack toAct={toAct} name={name} stack={stack} button={button} winner={winner} />
+            <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} /> : null}</div>
         </div>
     );
 }
