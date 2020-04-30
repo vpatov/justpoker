@@ -3,12 +3,11 @@ import { } from "./utils";
 import { withRouter } from "react-router-dom";
 import get from "lodash/get";
 import { createGame } from "./api/http";
+import { MIN_VALUES, MAX_VALUES } from "./shared/util/consts"
 
 import { makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
+import TextFieldWrap from "./reuseable/TextFieldWrap"
 import Button from "@material-ui/core/Button";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -30,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
         margin: 24,
     },
 }));
+
 
 function MakeGame(props) {
     const classes = useStyles();
@@ -72,67 +72,48 @@ function MakeGame(props) {
         createGame(createReq, createSuccess, createFailure);
     }
 
-    // setName("DefaultPlayer");
-    // setBuyin(200);
-    // setBigBlind(2);
-    // setSmallBlind(1);
-
     return (
         <div className={classes.root}>
-            {/* <TextField
-        className={classes.field}
-        label="Name"
-        variant="outlined"
-        onChange={(event) => setName(event.target.value)}
-        value={name}
-      /> */}
-            {/* <Select
-        variant="outlined"
-        className={classes.field}
-        value={gameType}
-        onChange={(event) => setGameType(event.target.value as string)}
-      >
-        <MenuItem value={"NLHOLDEM"}>No Limit Hold'em</MenuItem>
-      </Select> */}
-            <TextField
+            <TextFieldWrap
                 className={classes.field}
                 label="Small Blind"
                 variant="outlined"
                 onChange={(event) => setSmallBlind(Number(event.target.value))}
                 value={smallBlind}
+                min={MIN_VALUES.SMALL_BLIND}
+                max={MAX_VALUES.SMALL_BLIND}
                 type="number"
             />
-            <TextField
+            <TextFieldWrap
                 className={classes.field}
                 label="Big Blind"
                 variant="outlined"
                 onChange={(event) => setBigBlind(Number(event.target.value))}
                 value={bigBlind}
+                min={MIN_VALUES.BIG_BLIND}
+                max={MAX_VALUES.BIG_BLIND}
                 type="number"
             />
-            <TextField
+            <TextFieldWrap
                 className={classes.field}
                 label="Buyin"
                 variant="outlined"
                 onChange={(event) => setBuyin(Number(event.target.value))}
                 value={buyin}
+                min={MIN_VALUES.BUY_IN}
+                max={MAX_VALUES.BUY_IN}
                 type="number"
             />
-            <TextField
+            <TextFieldWrap
                 className={classes.field}
                 label="Time To Act"
                 variant="outlined"
                 onChange={(event) => setTimeToAct(Number(event.target.value))}
                 value={timeToAct}
+                min={MIN_VALUES.TIME_TO_ACT}
+                max={MAX_VALUES.TIME_TO_ACT}
                 type="number"
             />
-            {/* <TextField
-        className={classes.field}
-        label="Password"
-        variant="outlined"
-        onChange={(event) => setPassword(event.target.value)}
-        value={password}
-      /> */}
             <Button
                 className={classes.button}
                 variant="contained"

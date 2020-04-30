@@ -2,7 +2,7 @@ import { Suit, genRandomCard } from "./cards";
 import { ActionType } from "./wsaction";
 import { genRandomInt } from "../util/util";
 import { AudioQueue, getCleanAudioQueue } from "./audioQueue";
-import { ChatMessage } from "./chat";
+import { MAX_VALUES } from "../util/consts";
 
 export declare interface UiState {
     game: UiGameState;
@@ -302,6 +302,7 @@ export const TestGame: UiGameState = {
             name: "Johnny Bones",
             position: 3,
             stack: 323,
+            bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK * 10),
             hand: {
                 cards: [genRandomCard(), genRandomCard()],
             },
@@ -343,7 +344,7 @@ export const TestGame: UiGameState = {
             stack: 20499,
             position: 7,
             sittingOut: true,
-            bet: genRandomInt(0, 100000000),
+            bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK),
             hand: {
                 cards: [genRandomCard(), genRandomCard()],
             },

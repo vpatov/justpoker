@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import Chip from "./Chip";
 import classnames from "classnames";
 import { makeStyles } from "@material-ui/core/styles";
+import { MAX_VALUES } from "./shared/util/consts"
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -17,8 +18,6 @@ const useStyles = makeStyles((theme) => ({
         marginTop: "-3vmin",
     },
 }));
-
-export const MAX_STACK_SIZE = Math.pow(10, 6);
 
 function ChipStack(props) {
     const classes = useStyles();
@@ -46,7 +45,7 @@ function ChipStack(props) {
     }
 
     function generatesChipsStacksFromAmount(amount) {
-        if (amount > MAX_STACK_SIZE) {
+        if (amount > MAX_VALUES.PLAYER_STACK) {
             return generateAStackOfChips(amount, 1);
         }
         const chipsStacks = [] as any;

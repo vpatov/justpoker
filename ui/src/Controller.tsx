@@ -3,6 +3,7 @@ import classnames from "classnames";
 import { WsServer } from "./api/ws";
 import { useSelector } from "react-redux";
 import { controllerSelector, heroHandLabelSelector } from "./store/selectors";
+import TextFieldWrap from "./reuseable/TextFieldWrap"
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -270,7 +271,7 @@ function ControllerComp(props: ControllerProps) {
                     {sizingButtons.length > 0 ? (
                         <Fragment>
                             <div className={classes.betFieldButtonCont}>
-                                <TextField
+                                <TextFieldWrap
                                     className={classes.betTextField}
                                     InputProps={{
                                         classes: {
@@ -278,11 +279,12 @@ function ControllerComp(props: ControllerProps) {
                                         },
                                     }}
                                     onChange={(event) =>
-                                        changeBetAmount(event.target.value)
+                                        setBetAmt(event.target.value)
                                     }
-                                    value={betAmt === 0 ? "" : betAmt}
+                                    min={0}
+                                    max={max}
+                                    value={betAmt}
                                     type="number"
-                                    variant="outlined"
                                     autoFocus={true}
                                     error={isBetValid()}
                                     helperText={

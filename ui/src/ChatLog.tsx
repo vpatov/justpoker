@@ -4,7 +4,8 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import classnames from "classnames";
 import get from "lodash/get";
 
-import TextField from "@material-ui/core/TextField";
+import TextFieldWrap from "./reuseable/TextFieldWrap"
+
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 
@@ -51,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) =>
             marginTop: 0,
         },
         messageTextFieldInput: {
-            fontSize: "1.5vmin",
+            fontSize: "1.3vmin",
         },
         chatMessage: {
             margin: "5px",
@@ -167,14 +168,15 @@ function ChatLog(props: ChatLogProps) {
                     <div ref={messagesRef} />
                 </div>
                 <div className={classes.chatInputSection}>
-                    <TextField
+                    <TextFieldWrap
                         label="Send Message"
-                        variant="outlined"
                         value={draftMessage}
                         className={classes.messageTextField}
                         margin="dense"
-                        onChange={(event) =>
+                        onChange={(event) => {
+                            console.log("onC", event)
                             setDraftMessage(event.target.value)
+                        }
                         }
                         InputProps={{
                             classes: {
@@ -182,8 +184,9 @@ function ChatLog(props: ChatLogProps) {
                             },
                         }}
                         onKeyPress={(event) => onTextAreaPressEnter(event)}
-                        multiline
-                        rowsMax={4}
+                        multiline={true}
+                        rowsMax={7}
+                        maxChars={300}
                     />
                 </div>
                 {renderHideChatButton()}
