@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     },
     sittingOut: {
         width: "100%",
-        height: "30%",
+        height: "35%",
         borderTopLeftRadius: "2vmin",
         borderTopRightRadius: "2vmin",
         backgroundColor: blueGrey[400],
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "space-evenly",
     },
     sittingOutText: {
-        marginTop: "4%",
+        marginTop: "5%",
         fontSize: "2vmin",
     },
 }));
