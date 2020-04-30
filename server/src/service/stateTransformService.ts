@@ -80,6 +80,7 @@ export class StateTransformService {
                       table: {
                           spots: 9, // TODO configure
                           pot: this.gameStateManager.getTotalPot(),
+                          fullPot: this.gameStateManager.getFullPot(),
                           communityCards: [...board],
                       },
                       players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>

@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
     },
     gameTableCont: {
         height: "100%",
-        width: "calc(100%- 300px)",
         position: "relative",
         flex: "1 1 100%",
     },

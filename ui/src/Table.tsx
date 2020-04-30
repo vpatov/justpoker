@@ -12,6 +12,7 @@ import {
 } from "./store/selectors";
 
 import { makeStyles } from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 
 const TABLE_HEIGHT = 50;
@@ -68,10 +69,6 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         flexDirection: "column",
         ...theme.custom.TABLE,
-        // transition: "transform 2s linear 0s",
-        // "&:hover": {
-        //   transform: "rotateX(720deg)",
-        // },
     },
     spot: {
         position: "absolute",
@@ -82,14 +79,21 @@ const useStyles = makeStyles((theme) => ({
     mainPot: {
         fontSize: "3vmin",
         position: "absolute",
-        transform: "translateY(-10vh)",
+        top: "22%",
         backgroundColor: "rgba(0,0,0,0.4)",
         color: "white",
         borderRadius: 40,
         padding: "1vmin 3vmin",
     },
-    totalPot: {
-        fontSize: "2vmin",
+    fullPot: {
+        borderRadius: "0.5vmin",
+        zIndex: 5,
+        padding: "0.5vmin 0.8vmin",
+        backgroundColor: "rgba(0,0,0,0.3)",
+        color: "white",
+        top: "-8%",
+        position: "absolute",
+        fontSize: "1vmin",
     },
 }));
 
@@ -98,7 +102,7 @@ function Table(props) {
     const classes = useStyles();
     const { className } = props;
     const heroIsSeated = useSelector(heroIsSeatedSelector);
-    const { communityCards, spots, pot } = useSelector(tableSelector);
+    const { communityCards, spots, pot, fullPot } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
 
     function createSpotsAtTable() {
@@ -171,6 +175,14 @@ function Table(props) {
     return (
         <div className={classnames(classes.root, className)}>
             <div className={classnames(classes.table, "ani_table")}>
+                <Tooltip
+                    placement="top"
+                    title="Current main pot plus all commited bets by every player."
+                >
+                    <Typography
+                        className={classes.fullPot}
+                    >{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
+                </Tooltip>
                 <Typography
                     className={classes.mainPot}
                 >{`${pot.toLocaleString()}`}</Typography>
