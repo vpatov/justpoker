@@ -5,6 +5,7 @@ import Controller from "./Controller";
 import AudioModule from "./AudioModule";
 import { UiGameState } from "./shared/models/uiState";
 import ChatLog from "./ChatLog";
+import GameMenu from "./GameMenu";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -46,6 +47,7 @@ function Game(props) {
 
     return (
         <div className={classes.root}>
+            <GameMenu />
             <div className={classes.gameTableCont}>
                 <Table className={classes.table} />
                 <Controller className={classes.controller} />

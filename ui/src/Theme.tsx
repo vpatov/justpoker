@@ -83,7 +83,7 @@ export const CUSTOM_THEME = {
             transition: "box-shadow 0.4s ease-in-out;",
         },
         CONTROLLER_TO_ACT: {
-            boxShadow: `0px -12px 20px 8px ${CUSTOM_PALETTE.primary.main}`,
+            boxShadow: `0px -8px 10px 3px ${CUSTOM_PALETTE.primary.main}`,
         },
         BET: {
             border: "1px solid white",
