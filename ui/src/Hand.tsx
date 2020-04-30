@@ -5,7 +5,8 @@ import CardSmall from "./CardSmall";
 const useStyles = makeStyles((theme) => ({
     root: {
         margin: "0 auto",
-        width: "80%",
+        width: "100%",
+        height: "50%",
         display: "flex",
         justifyContent: "space-evenly",
     },

@@ -277,7 +277,8 @@ export const TestGame: UiGameState = {
         {
             name: "Marty Shakus",
             position: 1,
-            stack: 425323,
+            stack: 425320,
+            winner: true,
             bet: genRandomInt(0, 100),
             handLabel: "Four of a Kind",
             hand: {

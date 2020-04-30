@@ -42,6 +42,7 @@ function positionToPlacement(width, height, index) {
 }
 const useStyles = makeStyles((theme) => ({
     root: {
+        transform: "translateY(-3%)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
