@@ -7,22 +7,22 @@ export declare interface AudioQueue {
 
 export enum SoundByte {
     NONE = "NONE",
-    DEAL_CARDS = "DEAL_CARDS",
+    // DEAL_CARDS = "DEAL_CARDS",
     CHECK = "CHECK",
     BET = "BET",
     FOLD = "FOLD",
     CALL = "CALL",
-    CHAT = "CHAT",
+    // CHAT = "CHAT",
     HERO_WIN = "HERO_WIN",
-    BIG_HERO_WIN="BIG_HERO_WIN",
+    // BIG_HERO_WIN="BIG_HERO_WIN",
     VILLAIN_WIN = "VILLAIN_WIN",
     HERO_TURN_TO_ACT = "HERO_TURN_TO_ACT",
     START_OF_HAND = "START_OF_HAND",
-    START_OF_BETTING_ROUND = "START_OF_BETTING_ROUND",
+    // START_OF_BETTING_ROUND = "START_OF_BETTING_ROUND",
 }
 
 export function getCleanAudioQueue(): AudioQueue {
     return {
-            global: SoundByte.NONE
+        global: SoundByte.NONE
     };
 }
