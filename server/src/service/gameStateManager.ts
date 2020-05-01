@@ -566,6 +566,15 @@ export class GameStateManager {
         return bestHand.descr;
     }
 
+    getGameType(): GameType {
+        return this.gameState.gameParameters.gameType
+    }
+
+    // TODO
+    getAllowStraddle(): boolean {
+        return true
+    }
+
     getChips(playerUUID: string) {
         return this.getPlayer(playerUUID).chips;
     }

@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import classnames from "classnames";
 
+import { flipTable } from "./AnimiationModule";
+import { WsServer } from "./api/ws";
+import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
+
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import Collapse from "@material-ui/core/Collapse";
-
 import Paper from "@material-ui/core/Paper";
 import AdminIcon from "@material-ui/icons/SupervisorAccount";
 import SeatIcon from "@material-ui/icons/EventSeat";
@@ -14,6 +17,7 @@ import StartIcon from "@material-ui/icons/PlayArrow";
 import SettingsIcon from "@material-ui/icons/Settings";
 import VolumeOnIcon from "@material-ui/icons/VolumeUp";
 import MenuIcon from "@material-ui/icons/Menu";
+import FlipIcon from "@material-ui/icons/FlipSharp";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -71,13 +75,26 @@ function Default(props) {
     };
 
     const actions = [
-        { icon: <StartIcon className={classes.icon} />, name: "Start Game" },
+        { icon: <StartIcon className={classes.icon} />, name: "Start Game", onClick: onClickStartGame },
         { icon: <SeatIcon className={classes.icon} />, name: "Sit Out" },
         { icon: <QuitIcon className={classes.icon} />, name: "Quit" },
         { icon: <VolumeOnIcon className={classes.icon} />, name: "Volume" },
         { icon: <SettingsIcon className={classes.icon} />, name: "Settings" },
         { icon: <AdminIcon className={classes.icon} />, name: "Admin" },
+        { icon: <FlipIcon className={classes.icon} />, name: "Flip Table", onClick: () => flipTable() },
+
     ];
+
+    function onClickStartGame() {
+        sendServerAction(ActionType.STARTGAME)
+    }
+
+    function sendServerAction(action) {
+        WsServer.send({
+            actionType: action,
+            request: {} as ClientWsMessageRequest,
+        });
+    }
 
     return (
         <>
@@ -92,16 +109,16 @@ function Default(props) {
                 {open ? (
                     actions.map((action) => (
                         <Tooltip title={action.name} placement="right">
-                            <IconButton className={classes.iconButton}>
+                            <IconButton className={classes.iconButton} onClick={action.onClick}>
                                 {action.icon}
                             </IconButton>
                         </Tooltip>
                     ))
                 ) : (
-                    <IconButton className={classes.iconButton}>
-                        <MenuIcon className={classes.icon} />
-                    </IconButton>
-                )}
+                        <IconButton className={classes.iconButton}>
+                            <MenuIcon className={classes.icon} />
+                        </IconButton>
+                    )}
             </Paper>
         </>
     );

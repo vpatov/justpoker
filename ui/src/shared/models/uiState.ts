@@ -3,6 +3,7 @@ import { ActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { AudioQueue, getCleanAudioQueue } from './audioQueue';
 import { MAX_VALUES } from '../util/consts';
+import { GameType } from "./game";
 
 export declare interface UiState {
     game: UiGameState;
@@ -11,16 +12,27 @@ export declare interface UiState {
 }
 
 export declare interface UiGameState {
+    global: Global;
     controller: Controller;
     table: Table;
     players: Player[];
+}
+
+export declare interface Global {
     heroIsSeated: boolean;
     gameStarted: boolean;
+    bigBlind: number;
+    smallBlind: number;
+    allowStraddle: boolean;
+    gameType: GameType;
 }
+
+
 
 export declare interface Controller {
     min: number;
     max: number;
+    timeBanks?: number
     sizingButtons: SizingButton[];
     actionButtons: ActionButton[];
     adminButtons?: ActionButton[];
@@ -162,13 +174,20 @@ export const cleanController: Controller = {
 };
 
 export const CleanGame: UiGameState = {
-    heroIsSeated: false,
-    gameStarted: false,
+    global: {
+        heroIsSeated: false,
+        gameStarted: false,
+        bigBlind: 2,
+        smallBlind: 1,
+        allowStraddle: false,
+        gameType: GameType.NLHOLDEM,
+    },
     controller: {
         toAct: false,
         unsetQueuedAction: false,
         min: 0,
         max: 0,
+        timeBanks: 0,
         sizingButtons: [],
         actionButtons: [],
     },
@@ -226,13 +245,20 @@ let positions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 shuffle(positions);
 
 export const TestGame: UiGameState = {
-    heroIsSeated: true,
-    gameStarted: true,
+    global: {
+        heroIsSeated: true,
+        gameStarted: true,
+        bigBlind: 2,
+        smallBlind: 1,
+        allowStraddle: true,
+        gameType: GameType.NLHOLDEM,
+    },
     controller: {
         toAct: true,
         unsetQueuedAction: false,
         min: 25,
         max: 43000,
+        timeBanks: 2,
         sizingButtons: [
             {
                 label: '1/2',
@@ -252,7 +278,7 @@ export const TestGame: UiGameState = {
             },
         ],
         actionButtons: ALL_ACTION_BUTTONS,
-        adminButtons: [START_GAME_BUTTON],
+        // adminButtons: [START_GAME_BUTTON],
     },
     table: {
         spots: 9,

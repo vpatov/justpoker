@@ -2,16 +2,17 @@ import React, { useState, useEffect, Fragment } from "react";
 import classnames from "classnames";
 import { WsServer } from "./api/ws";
 import { useSelector } from "react-redux";
-import { controllerSelector, heroHandLabelSelector } from "./store/selectors";
+import { controllerSelector, heroHandLabelSelector, allowStraddleSelector } from "./store/selectors";
 import TextFieldWrap from "./reuseable/TextFieldWrap"
 
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import Button from "@material-ui/core/Button";
 
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
 import { Typography } from "@material-ui/core";
-import { flipTable } from "./AnimiationModule";
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -22,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
             display: "flex",
             justifyContent: "space-around",
             alignItems: "center",
+            color: "white",
             ...theme.custom.CONTROLLER,
         },
         rootToAct: {
@@ -45,12 +47,14 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         adminButtonCont: {
             marginLeft: "2vw",
+            marginRight: "2vw",
             width: "30%",
             float: "right",
             height: "100%",
             display: "flex",
             justifyContent: "space-evenly",
-            alignItems: "center",
+            flexDirection: "column",
+            alignItems: "flex-end",
         },
         betActionsCont: {
             marginRight: "2vw",
@@ -164,9 +168,12 @@ function ControllerComp(props: ControllerProps) {
         sizingButtons,
         actionButtons,
         adminButtons,
+        timeBanks,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
+    const allowStraddle = useSelector(allowStraddleSelector);
+
     const [betAmt, setBetAmt] = useState(0);
     const [queued, setQueued] = useState("");
 
@@ -221,12 +228,6 @@ function ControllerComp(props: ControllerProps) {
         }
     }
 
-    function onClickAdminButton(action) {
-        WsServer.send({
-            actionType: action,
-            request: {} as ClientWsMessageRequest,
-        });
-    }
 
     function isBetValid() {
         if (0 < betAmt && betAmt < min) return true;
@@ -343,21 +344,18 @@ function ControllerComp(props: ControllerProps) {
                 </div>
             </div>
             <div className={classes.adminButtonCont}>
-                <Button variant="outlined" onClick={() => flipTable()}>
-                    Flip Table
-                </Button>
-                {(adminButtons || []).map((button) => (
-                    <Button
-                        variant="outlined"
-                        className={classnames(
-                            classes.adminButton,
-                            classes[button.action]
-                        )}
-                        onClick={(e) => onClickAdminButton(button.action)}
-                    >
-                        {button.label}
-                    </Button>
-                ))}
+                {timeBanks !== undefined ? <Button variant="outlined" onClick={() => null} disabled={timeBanks === 0}>
+                    {`Time Bank (${timeBanks})`}
+                </Button> : null}
+                {allowStraddle ? <FormControlLabel
+                    control={<Checkbox checked={false} onChange={() => null} />}
+                    label="Straddle"
+                /> : null}
+                <FormControlLabel
+                    control={<Checkbox checked={false} onChange={() => null} />}
+                    label="Sit Out Next Hand"
+                />
+
             </div>
         </div>
     );

@@ -23,6 +23,7 @@ import { AudioService } from './audioService';
 import { printObj } from '../../../ui/src/shared/util/util';
 
 import {
+    Global,
     Controller,
     cleanController,
     ActionButton,
@@ -72,8 +73,7 @@ export class StateTransformService {
         const uiState: UiState = {
             game: this.gameUpdated(updatedKeys)
                 ? {
-                      gameStarted: this.gameStateManager.isGameStarted(),
-                      heroIsSeated: clientPlayerIsSeated,
+                    global: this.getUIGobal(clientUUID),
                       controller: clientPlayerIsSeated
                           ? this.getUIController(clientUUID, heroPlayerUUID)
                           : cleanController,
@@ -102,6 +102,23 @@ export class StateTransformService {
         };
         return uiState;
     }
+
+    getUIGobal(clientUUID: string): Global {
+        const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const clientPlayerIsSeated = heroPlayer?.sitting;
+
+        const global: Global = {
+            gameStarted: this.gameStateManager.isGameStarted(),
+            heroIsSeated: clientPlayerIsSeated,
+            bigBlind: this.gameStateManager.getBB(),
+            smallBlind: this.gameStateManager.getSB(),
+            allowStraddle: this.gameStateManager.getAllowStraddle(),
+            gameType: this.gameStateManager.getGameType()
+        };
+
+        return global;
+    }
+
 
     // TODO determine preconditions for when this is called. Is this function called for every player,
     // and returns an unpopulated controller for when its not the players turn? Or is this function
