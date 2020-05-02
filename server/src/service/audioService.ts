@@ -38,10 +38,6 @@ export class AudioService {
     playStartOfHandSFX() {
         this.setSound(SoundByte.START_OF_HAND);
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> f3d75791616de35394c568102ce6f6d45af246b3
     // playStartOfBettingRoundSFX() {
     //     this.setSound(SoundByte.START_OF_BETTING_ROUND);
     // }
