@@ -73,7 +73,7 @@ export class StateConverter {
         const uiState: UiState = {
             game: this.gameUpdated(updatedKeys)
                 ? {
-                    global: this.getUIGobal(clientUUID),
+                      global: this.getUIGobal(clientUUID),
                       controller: clientPlayerIsSeated
                           ? this.getUIController(clientUUID, heroPlayerUUID)
                           : cleanController,
@@ -113,12 +113,11 @@ export class StateConverter {
             bigBlind: this.gameStateManager.getBB(),
             smallBlind: this.gameStateManager.getSB(),
             allowStraddle: this.gameStateManager.getAllowStraddle(),
-            gameType: this.gameStateManager.getGameType()
+            gameType: this.gameStateManager.getGameType(),
         };
 
         return global;
     }
-
 
     // TODO determine preconditions for when this is called. Is this function called for every player,
     // and returns an unpopulated controller for when its not the players turn? Or is this function
@@ -255,7 +254,7 @@ export class StateConverter {
                       // subtract one second such that the server timer ends just a little bit after
                       // the visual component of the UI indicates that the turn is over, to compensate
                       // and prevent from the vice-versa scenario (which would be way worse)
-                      timeLimit: (this.gameStateManager.getTimeToAct() / 1000) - 1,
+                      timeLimit: this.gameStateManager.getTimeToAct() / 1000 - 1,
                   }
                 : undefined,
             handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? player.handDescription : undefined,

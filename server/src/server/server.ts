@@ -52,7 +52,7 @@ class Server {
         private timerManager: TimerManager,
         private readonly chatService: ChatService,
         private readonly audioService: AudioService,
-    ) { }
+    ) {}
 
     updateSnippet(snippet: ExecutionSnippet, ms: number) {
         this.performanceMetrics.snippets[snippet][0] += ms;
@@ -119,7 +119,7 @@ class Server {
         }
         // TODO remove this from server and place into stateTransformService
         this.audioService.reset();
-        this.gsm.resetSingltonState()
+        this.gsm.resetSingltonState();
     }
 
     //refactor this mess of a function

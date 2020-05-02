@@ -3,7 +3,7 @@ import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
 import { GamePlayService } from './gamePlayService';
-import { ValidationResponse, NO_ERROR } from '../../../ui/src/shared/models/validation';
+import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 
@@ -42,6 +42,16 @@ export class MessageService {
                 this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
             },
             updates: [ServerStateKey.GAMESTATE],
+        },
+        [ActionType.SITIN]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid, req) => {},
+            updates: [],
+        },
+        [ActionType.SITOUT]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid, req) => {},
+            updates: [],
         },
         [ActionType.STANDUP]: {
             validation: (uuid, req) => this.validationService.validateStandUpRequest(uuid),

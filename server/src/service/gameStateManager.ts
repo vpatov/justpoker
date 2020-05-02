@@ -40,7 +40,7 @@ export class GameStateManager {
         this.updatedKeys = new Set(updatedKeys);
     }
 
-    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) { }
+    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) {}
 
     /* Getters */
 
@@ -82,10 +82,9 @@ export class GameStateManager {
         };
     }
 
-
     resetSingltonState() {
         this.updateGameState({
-            unsetQueuedAction: false
+            unsetQueuedAction: false,
         });
     }
 
@@ -121,16 +120,16 @@ export class GameStateManager {
         if (clients.length !== 1) {
             console.log(
                 `clients.length was ${clients.length} and not 1. ` +
-                `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
-                    this.getConnectedClients(),
-                )}`,
+                    `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
+                        this.getConnectedClients(),
+                    )}`,
             );
         }
         return clients[0].uuid;
     }
 
     getUnsetQueuedAction(): boolean {
-        return this.gameState.unsetQueuedAction
+        return this.gameState.unsetQueuedAction;
     }
 
     getConnectedClients() {
@@ -554,7 +553,7 @@ export class GameStateManager {
 
     setUnsetQueuedAction() {
         this.updateGameState({
-            unsetQueuedAction: true
+            unsetQueuedAction: true,
         });
     }
 
@@ -567,12 +566,12 @@ export class GameStateManager {
     }
 
     getGameType(): GameType {
-        return this.gameState.gameParameters.gameType
+        return this.gameState.gameParameters.gameType;
     }
 
     // TODO
     getAllowStraddle(): boolean {
-        return true
+        return true;
     }
 
     getChips(playerUUID: string) {
@@ -687,5 +686,4 @@ export class GameStateManager {
     clearBettingRoundStage() {
         this.updateGameState({ bettingRoundStage: BettingRoundStage.WAITING });
     }
-
 }
