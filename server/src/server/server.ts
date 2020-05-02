@@ -13,7 +13,7 @@ import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
 import { GameState, ServerStateKey, ALL_STATE_KEYS } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
-import { StateTransformService } from '../service/stateTransformService';
+import { StateConverter } from '../service/stateConverter';
 import { generateUUID, logGameState } from '../../../ui/src/shared/util/util';
 import { TimerManager } from '../service/timerManager';
 import { AudioService } from '../service/audioService';
@@ -48,7 +48,7 @@ class Server {
     constructor(
         private messageService: MessageService,
         private gsm: GameStateManager,
-        private stateTransformService: StateTransformService,
+        private stateConverter: StateConverter,
         private timerManager: TimerManager,
         private readonly chatService: ChatService,
         private readonly audioService: AudioService,
@@ -106,7 +106,7 @@ class Server {
         }
 
         for (const client of this.gsm.getConnectedClients()) {
-            const res = this.stateTransformService.getUIState(client.uuid, updatedKeys);
+            const res = this.stateConverter.getUIState(client.uuid, updatedKeys);
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
@@ -164,7 +164,7 @@ class Server {
                 }),
             );
 
-            ws.send(JSON.stringify(this.stateTransformService.getUIState(clientID, ALL_STATE_KEYS)));
+            ws.send(JSON.stringify(this.stateConverter.getUIState(clientID, ALL_STATE_KEYS)));
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log('Incoming data:', util.inspect(data, false, null, true));
