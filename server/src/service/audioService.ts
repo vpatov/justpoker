@@ -38,9 +38,10 @@ export class AudioService {
     playStartOfHandSFX() {
         this.setSound(SoundByte.START_OF_HAND);
     }
-    playStartOfBettingRoundSFX() {
-        this.setSound(SoundByte.START_OF_BETTING_ROUND);
-    }
+
+    // playStartOfBettingRoundSFX() {
+    //     this.setSound(SoundByte.START_OF_BETTING_ROUND);
+    // }
 
     // TODO refactor personal/global and design the best way to do this
 
@@ -50,9 +51,9 @@ export class AudioService {
     getVillainWinSFX(): AudioQueue {
         return { global: SoundByte.VILLAIN_WIN };
     }
-    getBigHeroWinSFX(): AudioQueue {
-        return { global: SoundByte.BIG_HERO_WIN };
-    }
+    // getBigHeroWinSFX(): AudioQueue {
+    //     return { global: SoundByte.BIG_HERO_WIN };
+    // }
     getHeroTurnToActSFX(): AudioQueue {
         return { global: SoundByte.HERO_TURN_TO_ACT };
     }
