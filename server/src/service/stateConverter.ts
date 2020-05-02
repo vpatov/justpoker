@@ -38,7 +38,7 @@ import { ChatService } from './chatService';
 import { ChatMessage } from '../../../ui/src/shared/models/chat';
 
 @Service()
-export class StateTransformService {
+export class StateConverter {
     constructor(
         private readonly gameStateManager: GameStateManager,
         private readonly validationService: ValidationService,
@@ -255,7 +255,7 @@ export class StateTransformService {
                       // subtract one second such that the server timer ends just a little bit after
                       // the visual component of the UI indicates that the turn is over, to compensate
                       // and prevent from the vice-versa scenario (which would be way worse)
-                      timeLimit: this.gameStateManager.getTimeToAct() / 1000 - 1,
+                      timeLimit: (this.gameStateManager.getTimeToAct() / 1000) - 1,
                   }
                 : undefined,
             handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? player.handDescription : undefined,

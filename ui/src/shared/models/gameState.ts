@@ -2,15 +2,27 @@ import {
     GameParameters,
     GameType,
     BettingRoundStage,
-    BettingRoundAction,
 } from "./game";
 
-import { ActionType } from "./wsaction";
 import { Player } from "./player";
 import { Table } from "./table";
 import { Card, Deck } from "./cards";
 
+export const enum GameStage {
+    NOT_IN_PROGRESS = 0,
+    INITIALIZE_NEW_HAND = 1,
+    SHOW_START_OF_HAND = 2,
+    SHOW_START_OF_BETTING_ROUND = 3,
+    WAITING_FOR_BET_ACTION = 4,
+    SHOW_BET_ACTION = 5,
+    SHOW_PLACE_BETS_IN_POT = 6,
+    SHOW_WINNER = 7
+}
+
 export declare interface GameState {
+    gameStage: GameStage;
+
+    // TODO remove isStateReady field. It is a poor design.
     /** Server queries this field to determine if it should send the state or not. */
     isStateReady: boolean;
 
@@ -75,6 +87,7 @@ export const enum ServerStateKey {
 export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
 
 export const cleanGameState: GameState = {
+    gameStage: GameStage.NOT_IN_PROGRESS,
     isStateReady: true,
     players: {},
     board: [],
