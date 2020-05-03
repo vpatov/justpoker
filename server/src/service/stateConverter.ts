@@ -62,7 +62,6 @@ export class StateConverter {
 
     // Hero refers to the player who is receiving this particular UiState.
     transformGameStateToUIState(clientUUID: string, updatedKeys: Set<ServerStateKey>): UiState {
-        debugger;
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);

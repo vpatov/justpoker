@@ -130,7 +130,6 @@ class Server {
         this.wss = new WebSocket.Server({ server: this.server });
 
         this.timerManager.observeUpdates().subscribe(([gameState, updatedKeys]) => {
-            debugger;
             this.sendUpdatesToClients(gameState, updatedKeys);
             /* Debug Logging */
             // logGameState(gameState);
@@ -190,8 +189,8 @@ class Server {
                         /* -------------- */
                     } catch (e) {
                         /* Debug Logging */
-                        console.log(e);
                         logGameState(this.gsm.getGameState());
+                        throw e;
                         /* -------------- */
                     }
                 } else {

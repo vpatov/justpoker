@@ -2,46 +2,53 @@ import { Service } from 'typedi';
 import {
     Condition,
     StateGraph,
-    Event,
     Action,
     Timeout,
     EventType,
     GraphNode,
     GraphEdge,
     instanceOfCondition,
+    StageDelayMap,
 } from '../../../ui/src/shared/models/stateGraph';
 import { GameStage } from '../../../ui/src/shared/models/gameState';
 import { ActionType } from '../../../ui/src/shared/models/wsaction';
 import { GameStateManager } from './gameStateManager';
+import { GamePlayService } from './gamePlayService';
+import { TimerManager } from './timerManager';
+
+const MAX_CONDITION_DEPTH = 3;
 
 @Service()
-export class StateUpdateService {
-    constructor(private readonly gameStateManager: GameStateManager) {}
+export class StateGraphManager {
+    constructor(
+        private readonly gameStateManager: GameStateManager,
+        private readonly gamePlayService: GamePlayService,
+        private readonly timerManager: TimerManager,
+    ) {}
 
     canContinueGameCondition: Condition = {
-        // fn -> # players sitting in >= 2 && shouldDealNextHand
-        fn: () => true,
+        fn: () => this.gamePlayService.canContinueGame(),
         TRUE: GameStage.INITIALIZE_NEW_HAND,
         FALSE: GameStage.NOT_IN_PROGRESS,
     };
 
     isHandGamePlayOverCondition: Condition = {
         // everyoneFolded || timeForShowdown
-        fn: () => true,
+        fn: () => false,
         TRUE: GameStage.SHOW_WINNER,
         FALSE: GameStage.SHOW_START_OF_BETTING_ROUND,
     };
 
     isAllInRunOutCondition: Condition = {
         // fn -> #playersAllIn >= playersInHand - 1
-        fn: () => true,
+        fn: () => false,
         TRUE: this.isHandGamePlayOverCondition,
         FALSE: GameStage.WAITING_FOR_BET_ACTION,
     };
 
     isBettingRoundOverCondition: Condition = {
         // fn -> hasEveryoneActed
-        fn: () => true,
+        fn: () => false,
         TRUE: GameStage.SHOW_PLACE_BETS_IN_POT,
         FALSE: GameStage.WAITING_FOR_BET_ACTION,
     };
@@ -58,6 +65,7 @@ export class StateUpdateService {
             [ActionType.STARTGAME, this.canContinueGameCondition],
             [ActionType.SITDOWN, this.canContinueGameCondition],
             [ActionType.SITIN, this.canContinueGameCondition],
+            [ActionType.JOINTABLEANDSITDOWN, this.canContinueGameCondition],
         ]),
         [GameStage.INITIALIZE_NEW_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_HAND]]),
         [GameStage.SHOW_START_OF_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_BETTING_ROUND]]),
@@ -71,6 +79,21 @@ export class StateUpdateService {
         [GameStage.SHOW_PLACE_BETS_IN_POT]: new Map([['TIMEOUT', this.isHandGamePlayOverCondition]]),
         [GameStage.SHOW_WINNER]: new Map([['TIMEOUT', this.sidePotsRemainingCondition]]),
     };
+
+    stageDelayMap: StageDelayMap = {
+        [GameStage.NOT_IN_PROGRESS]: 0,
+        [GameStage.INITIALIZE_NEW_HAND]: 250,
+        [GameStage.SHOW_START_OF_HAND]: 400,
+        [GameStage.SHOW_START_OF_BETTING_ROUND]: 750,
+        [GameStage.WAITING_FOR_BET_ACTION]: 0,
+        [GameStage.SHOW_BET_ACTION]: 200,
+        [GameStage.SHOW_PLACE_BETS_IN_POT]: 600,
+        [GameStage.SHOW_WINNER]: 2300,
+    };
+
+    getDelay(stage: GameStage) {
+        return this.stageDelayMap[stage];
+    }
 
     // TODO logic for getting edges that represent actions can be executed during any stage
     getEdge(eventType: EventType): GraphEdge {
@@ -92,8 +115,19 @@ export class StateUpdateService {
 
     getNextStage(eventType: EventType): GraphNode {
         let edge = this.getEdge(eventType);
+        let conditionDepth = 0;
+        if (!edge) {
+            return null;
+        }
         while (instanceOfCondition(edge)) {
             edge = this.processCondition(edge);
+            conditionDepth += 1;
+
+            // This check has to go inside the loop, because if put into the loop condition, the compiler
+            // no longer understands the guarantee of the return type of edge, and thus errors.
+            if (conditionDepth === MAX_CONDITION_DEPTH) {
+                throw Error('Reached maximum condition depth. This is a bug.');
+            }
         }
         return edge;
     }
@@ -103,24 +137,26 @@ export class StateUpdateService {
     }
 
     /*
-        This method will only process actions that can potentially change the gameStage. Other
-        actions will be directly executed by the messageService. For example, users can chat, add chips,
-        stand up, sit out, and update their name during any gameStage. These actions cannot directly 
-        affect the stage transition, so the messageService will handle them, and will send actions like
-        SITDOWN, STARTGAME, SITIN, BETACTION to this module. Once queuing is implemented, then actions
-        like ADDCHIPS and UPDATEGAMEPARAMS will also be sent to this module.
-    */
-    processAction(action: Action) {
-        // validate action
-        // if action is valid, execute.
-        // getNextStage and transition to the next stage (even if the stage is the same).
-        // TODO queue or discard
+        MessageService receives the message, validates the action 
+            (validation service will use stages to simplify validation)
+        Executes the action if valid. After executing the action, messageService calls
+        the stateUpdater's processEvent is triggered. Then, depending on state conditions,
+        the stage is changed.
 
-        const nextStage = this.getNextStage(action.actionType);
+    */
+    processEvent(event: EventType) {
+        debugger;
+        const nextStage = this.getNextStage(event);
+        console.log('processEvent. event:', event, 'nextStage:', nextStage);
+        // TODO once getEdge method is guaranteed to return non-null, you can remove this
+        // guard from here and from getNextStage.
+        if (!!nextStage) {
+            this.initializeGameStage(nextStage);
+        }
     }
 
-    processTimerEvent() {
-        const nextStage = this.getNextStage('TIMEOUT');
+    processTimeout() {
+        this.processEvent('TIMEOUT');
     }
 
     startGameStageTransitionSequence() {}
@@ -128,9 +164,57 @@ export class StateUpdateService {
     // The changes executed while entering a game stage should be general and applicable no matter
     // what path was taken to get to that stage. If there is logic that is specific to a path, then
     // that logic should be executed on the way to the stage.
-    updateGameStage(stage: GameStage) {
+    initializeGameStage(stage: GameStage) {
+        this.gameStateManager.updateGameStage(stage);
+
+        switch (stage) {
+            case GameStage.INITIALIZE_NEW_HAND: {
+                this.gameStateManager.clearStateOfRoundInfo();
+
+                // TODO initializeBetting round actually goes into start of betting round
+                // TODO trigger timer, look up delay from delay map
+
+                break;
+            }
+
+            case GameStage.SHOW_START_OF_HAND: {
+                break;
+            }
+
+            case GameStage.SHOW_START_OF_BETTING_ROUND: {
+                this.gamePlayService.initializeBettingRound();
+
+                break;
+            }
+
+            case GameStage.WAITING_FOR_BET_ACTION: {
+                break;
+            }
+
+            case GameStage.SHOW_BET_ACTION: {
+                break;
+            }
+
+            case GameStage.SHOW_PLACE_BETS_IN_POT: {
+                break;
+            }
+
+            case GameStage.SHOW_WINNER: {
+                break;
+            }
+        }
+
+        const delay = this.getDelay(stage);
+        console.log('delay:', delay);
+        if (delay) {
+            console.log('setting timer..');
+            this.timerManager.setStateTimer(() => this.processTimeout(), delay);
+        }
+        // this.timerManager.setTimer()
+
         // change the stage
         // execute those stages changes
+        // starttimer
         /*
             initialize new hand:
                 - execute queued actions

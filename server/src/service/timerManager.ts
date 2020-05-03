@@ -4,6 +4,7 @@ import { GameState, ServerStateKey } from '../../../ui/src/shared/models/gameSta
 
 @Service()
 export class TimerManager {
+    private stateTimer: NodeJS.Timer;
     private gameTimer: NodeJS.Timer;
     private updateEmitter: Subject<[GameState, Set<ServerStateKey>]> = new Subject<[GameState, Set<ServerStateKey>]>();
 
@@ -37,5 +38,14 @@ export class TimerManager {
 
     clearTimer() {
         global.clearTimeout(this.gameTimer);
+    }
+
+    setStateTimer(fn: Function, timeout: number) {
+        global.clearTimeout(this.stateTimer);
+        this.stateTimer = global.setTimeout(() => fn(), timeout);
+    }
+
+    cancelStateTimer() {
+        global.clearTimeout(this.stateTimer);
     }
 }

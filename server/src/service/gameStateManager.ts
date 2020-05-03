@@ -52,6 +52,10 @@ export class GameStateManager {
         return this.gameState.gameStage;
     }
 
+    updateGameStage(gameStage: GameStage) {
+        this.updateGameState({ gameStage });
+    }
+
     isStateReady(): boolean {
         return this.gameState.isStateReady;
     }

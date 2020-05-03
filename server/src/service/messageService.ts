@@ -6,6 +6,7 @@ import { GamePlayService } from './gamePlayService';
 import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
+import { StateGraphManager } from './stateGraphManager';
 
 declare interface ActionProcessor {
     validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -22,6 +23,7 @@ export class MessageService {
         private readonly validationService: ValidationService,
         private readonly gamePlayService: GamePlayService,
         private readonly chatService: ChatService,
+        private readonly stateGraphManager: StateGraphManager,
     ) {}
 
     messageProcessor: MessageProcessor = {
@@ -132,12 +134,12 @@ export class MessageService {
                 `clientUUID: ${clientUUID}, messagePayload: ${message.request}, actionType: ${message.actionType}`,
             );
             actionProcessor.perform(clientUUID, message.request);
+            this.stateGraphManager.processEvent(message.actionType);
             this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
         } else {
             // TODO process error and send error to client
             console.log(response);
         }
-        this.gamePlayService.startHandIfReady();
     }
 
     // TODO should sitdown, standup, jointable, chat, add chips, be put into their own service?

@@ -45,6 +45,7 @@ export class GamePlayService {
     // regardless, better to not tie start game condition check
     // to be dependent on those actions
     startHandIfReady() {
+        throw Error('Shouldnt be calling this.');
         if (
             // TODO uncomment this once startGame button is added
             this.gsm.shouldDealNextHand() &&
@@ -54,6 +55,10 @@ export class GamePlayService {
             this.gsm.clearStateOfRoundInfo();
             this.initializeBettingRound();
         }
+    }
+
+    canContinueGame(): boolean {
+        return this.gsm.shouldDealNextHand() && this.gsm.getNumberPlayersSitting() >= 2;
     }
 
     setCurrentPlayerToAct(playerUUID: string) {
@@ -122,7 +127,10 @@ export class GamePlayService {
          * The betting round is in all-in run out if either everyone has gone all in,
          * or there is one person who is not all in, but they have called the all-in.
          */
-        const isAllInRunOut = playersEligibleToActNext.length === 1;
+        // TODO this line is causing a bug right now, because initializeBettingRound is being
+        // called before the cards are being dealt, and thus the playersEligibleToAct is length 0.
+        // and lonePlayerUUID is undefined.
+        const isAllInRunOut = playersEligibleToActNext.length == 1;
 
         if (isAllInRunOut) {
             const lonePlayerUUID = playersEligibleToActNext[0];
@@ -522,6 +530,8 @@ export class GamePlayService {
         this.gsm.clearBettingRoundStage();
         this.ejectStackedPlayers();
         this.gsm.clearStateOfRoundInfo();
+
+        // TODO remove this call.
         this.startHandIfReady();
     }
 
