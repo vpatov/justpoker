@@ -113,7 +113,7 @@ export class ValidationService {
             return response;
         }
         const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
-        const canCurrentPlayerAct = this.gsm.getCanCurrentPlayerAct();
+        const canCurrentPlayerAct = this.gsm.canCurrentPlayerAct();
         if (player.uuid !== currentPlayerToAct || !canCurrentPlayerAct) {
             return {
                 errorType: ErrorType.OUT_OF_TURN,

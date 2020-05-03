@@ -15,9 +15,9 @@ import { GameState, ServerStateKey, ALL_STATE_KEYS } from '../../../ui/src/share
 import { GameStateManager } from '../service/gameStateManager';
 import { StateConverter } from '../service/stateConverter';
 import { generateUUID, logGameState } from '../../../ui/src/shared/util/util';
-import { TimerManager } from '../service/timerManager';
 import { AudioService } from '../service/audioService';
 import { ChatService } from '../service/chatService';
+import { StateGraphManager } from '../service/stateGraphManager';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -49,7 +49,7 @@ class Server {
         private messageService: MessageService,
         private gsm: GameStateManager,
         private stateConverter: StateConverter,
-        private timerManager: TimerManager,
+        private stateGraphManager: StateGraphManager,
         private readonly chatService: ChatService,
         private readonly audioService: AudioService,
     ) {}
@@ -100,13 +100,9 @@ class Server {
         this.app.use('/', router);
     }
 
-    sendUpdatesToClients(gameState: GameState, updatedKeys?: Set<ServerStateKey>) {
-        if (!gameState.isStateReady) {
-            return;
-        }
-
+    sendUpdatesToClients() {
         for (const client of this.gsm.getConnectedClients()) {
-            const res = this.stateConverter.getUIState(client.uuid, updatedKeys);
+            const res = this.stateConverter.getUIState(client.uuid);
             const jsonRes = JSON.stringify(res);
             client.ws.send(jsonRes);
 
@@ -129,12 +125,8 @@ class Server {
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ server: this.server });
 
-        this.timerManager.observeUpdates().subscribe(([gameState, updatedKeys]) => {
-            this.sendUpdatesToClients(gameState, updatedKeys);
-            /* Debug Logging */
-            // logGameState(gameState);
-            // logGameState(this.gameStateManager.getGameState());
-            /* -------------- */
+        this.stateGraphManager.observeUpdates().subscribe(() => {
+            this.sendUpdatesToClients();
         });
 
         this.wss.on('connection', (ws: WebSocket, req) => {
@@ -163,7 +155,7 @@ class Server {
                 }),
             );
 
-            ws.send(JSON.stringify(this.stateConverter.getUIState(clientID, ALL_STATE_KEYS)));
+            ws.send(JSON.stringify(this.stateConverter.getUIState(clientID)));
 
             ws.on('message', (data: WebSocket.Data) => {
                 console.log('Incoming data:', util.inspect(data, false, null, true));
@@ -176,7 +168,7 @@ class Server {
                         this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
 
                         const startSendUpdatesTime = Date.now();
-                        this.sendUpdatesToClients(this.gsm.getGameState());
+                        // this.sendUpdatesToClients();
                         const sendUpdatesTime = Date.now() - startSendUpdatesTime;
                         this.updateSnippet(ExecutionSnippet.SEND_UPDATES, sendUpdatesTime);
                         const totalMessageProcessTime = Date.now() - receivedMessageTime;

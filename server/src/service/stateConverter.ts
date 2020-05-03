@@ -48,22 +48,23 @@ export class StateConverter {
         private readonly chatService: ChatService,
     ) {}
 
-    gameUpdated(updatedKeys: Set<ServerStateKey>): boolean {
-        return updatedKeys.has(ServerStateKey.GAMESTATE);
+    gameUpdated(): boolean {
+        return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.GAMESTATE);
     }
 
-    audioUpdated(updatedKeys: Set<ServerStateKey>): boolean {
-        return updatedKeys.has(ServerStateKey.AUDIO);
+    audioUpdated(): boolean {
+        return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.AUDIO);
     }
 
-    chatUpdated(updatedKeys: Set<ServerStateKey>): boolean {
-        return updatedKeys.has(ServerStateKey.CHAT);
+    chatUpdated(): boolean {
+        return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.CHAT);
     }
 
     // Hero refers to the player who is receiving this particular UiState.
-    transformGameStateToUIState(clientUUID: string, updatedKeys: Set<ServerStateKey>): UiState {
+    transformGameStateToUIState(clientUUID: string): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
+        console.log('in stateConverter, updatedKeys:', this.gameStateManager.getUpdatedKeys());
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : '';
@@ -71,7 +72,7 @@ export class StateConverter {
 
         // TODO put each key into its own function
         const uiState: UiState = {
-            game: this.gameUpdated(updatedKeys)
+            game: this.gameUpdated()
                 ? {
                       global: this.getUIGobal(clientUUID),
                       controller: clientPlayerIsSeated
@@ -88,13 +89,11 @@ export class StateConverter {
                       ),
                   }
                 : undefined,
-            audio: this.audioUpdated(updatedKeys)
-                ? clientPlayerIsSeated
-                    ? this.transformAudioForClient(heroPlayerUUID)
-                    : this.audioService.getAudioQueue()
-                : undefined,
+            audio: clientPlayerIsSeated
+                ? this.transformAudioForClient(heroPlayerUUID)
+                : this.audioService.getAudioQueue(),
             // TODO refactor to send entire chatlog on init.
-            chat: this.chatUpdated(updatedKeys)
+            chat: this.chatUpdated()
                 ? this.chatService.getMessage()
                     ? this.transformChatMessage(this.chatService.getMessage())
                     : undefined
@@ -223,7 +222,10 @@ export class StateConverter {
          this way the sound for when someone bets and when its someones turn 
          are part of different states and are easier to handle.
         */
-        if (this.gameStateManager.getCurrentPlayerToAct() === playerUUID) {
+        if (
+            this.gameStateManager.getCurrentPlayerToAct() === playerUUID &&
+            this.gameStateManager.canCurrentPlayerAct()
+        ) {
             return this.audioService.getHeroTurnToActSFX();
         } else {
             return this.audioService.getAudioQueue();
@@ -240,7 +242,9 @@ export class StateConverter {
 
         const isHero = heroPlayerUUID === player.uuid;
         const shouldCardsBeVisible = isHero || !player.cardsAreHidden;
-        const toAct = this.gameStateManager.getCurrentPlayerToAct() === player.uuid;
+        const toAct =
+            this.gameStateManager.getCurrentPlayerToAct() === player.uuid &&
+            this.gameStateManager.canCurrentPlayerAct();
         const newPlayer = {
             stack: player.chips - player.betAmount,
             uuid: player.uuid,
@@ -271,12 +275,9 @@ export class StateConverter {
         return newPlayer;
     }
 
-    getUIState(clientUUID: string, updatedKeys?: Set<ServerStateKey>): UiState {
+    getUIState(clientUUID: string): UiState {
         // TODO document the usage of updatedKeys and consider a refactor/redesign if too complex
-        const uiState = this.transformGameStateToUIState(
-            clientUUID,
-            updatedKeys || this.gameStateManager.getUpdatedKeys(),
-        );
+        const uiState = this.transformGameStateToUIState(clientUUID);
         return uiState;
     }
 

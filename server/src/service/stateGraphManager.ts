@@ -10,11 +10,13 @@ import {
     instanceOfCondition,
     StageDelayMap,
 } from '../../../ui/src/shared/models/stateGraph';
-import { GameStage } from '../../../ui/src/shared/models/gameState';
+import { GameStage, GameState, ServerStateKey, ALL_STATE_KEYS } from '../../../ui/src/shared/models/gameState';
 import { ActionType } from '../../../ui/src/shared/models/wsaction';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
+import { BettingRoundStage } from '../../../ui/src/shared/models/game';
+import { Subject } from 'rxjs';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -26,6 +28,18 @@ export class StateGraphManager {
         private readonly timerManager: TimerManager,
     ) {}
 
+    private updateEmitter: Subject<Set<ServerStateKey>> = new Subject<Set<ServerStateKey>>();
+
+    // globalTimerFn(fn: Function, getUpdate: () => GameState) {
+    //     fn();
+    //     // TODO perhaps timerManager can simply send all keys?
+    //     this.updateEmitter.next([getUpdate(), new Set([ServerStateKey.GAMESTATE, ServerStateKey.AUDIO])]);
+    // }
+
+    observeUpdates() {
+        return this.updateEmitter.asObservable();
+    }
+
     canContinueGameCondition: Condition = {
         fn: () => this.gamePlayService.canContinueGame(),
         TRUE: GameStage.INITIALIZE_NEW_HAND,
@@ -33,8 +47,9 @@ export class StateGraphManager {
     };
 
     isHandGamePlayOverCondition: Condition = {
-        // everyoneFolded || timeForShowdown
-        fn: () => false,
+        fn: () =>
+            this.gameStateManager.hasEveryoneButOnePlayerFolded() ||
+            this.gameStateManager.getBettingRoundStage() === BettingRoundStage.RIVER,
         TRUE: GameStage.SHOW_WINNER,
         FALSE: GameStage.SHOW_START_OF_BETTING_ROUND,
     };
@@ -47,9 +62,8 @@ export class StateGraphManager {
     };
 
     isBettingRoundOverCondition: Condition = {
-        // fn -> hasEveryoneActed
-        fn: () => false,
-        TRUE: GameStage.SHOW_PLACE_BETS_IN_POT,
+        fn: () => this.gameStateManager.isBettingRoundOver() || this.gameStateManager.hasEveryoneButOnePlayerFolded(),
+        TRUE: GameStage.FINISH_BETTING_ROUND,
         FALSE: GameStage.WAITING_FOR_BET_ACTION,
     };
 
@@ -71,12 +85,11 @@ export class StateGraphManager {
         [GameStage.SHOW_START_OF_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_BETTING_ROUND]]),
         [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([['TIMEOUT', this.isAllInRunOutCondition]]),
         [GameStage.WAITING_FOR_BET_ACTION]: new Map([
-            // TODO unique case where timeout should execute action
-            // ["TIMEOUT", GameStage.SHOW_BET_ACTION]
             [ActionType.BETACTION, GameStage.SHOW_BET_ACTION],
+            ['TIMEOUT' as any, GameStage.SHOW_BET_ACTION],
         ]),
         [GameStage.SHOW_BET_ACTION]: new Map([['TIMEOUT', this.isBettingRoundOverCondition]]),
-        [GameStage.SHOW_PLACE_BETS_IN_POT]: new Map([['TIMEOUT', this.isHandGamePlayOverCondition]]),
+        [GameStage.FINISH_BETTING_ROUND]: new Map([['TIMEOUT', this.isHandGamePlayOverCondition]]),
         [GameStage.SHOW_WINNER]: new Map([['TIMEOUT', this.sidePotsRemainingCondition]]),
     };
 
@@ -87,21 +100,28 @@ export class StateGraphManager {
         [GameStage.SHOW_START_OF_BETTING_ROUND]: 750,
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
         [GameStage.SHOW_BET_ACTION]: 200,
-        [GameStage.SHOW_PLACE_BETS_IN_POT]: 600,
+        [GameStage.FINISH_BETTING_ROUND]: 600,
         [GameStage.SHOW_WINNER]: 2300,
     };
 
     getDelay(stage: GameStage) {
-        return this.stageDelayMap[stage];
+        return stage === GameStage.WAITING_FOR_BET_ACTION
+            ? this.gameStateManager.getTimeToAct()
+            : this.stageDelayMap[stage];
     }
 
-    // TODO logic for getting edges that represent actions can be executed during any stage
+    /**
+     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
+     * @returns The graph edge that represents the state transition if the transition is defined,
+     * null otherwise.
+     */
     getEdge(eventType: EventType): GraphEdge {
         const gameStage = this.gameStateManager.getGameStage();
         const edge = this.stateGraph[gameStage].get(eventType);
 
         if (!!edge) {
             /* 
+                TODO
                 If the edge is not defined in the map, one of the following conditions is true:
                     - A timeout event has occurred during the NOT_IN_PROGRESS stage, during which
                     timeout processing is undefined. This is a bug if it happens.
@@ -113,6 +133,11 @@ export class StateGraphManager {
         return edge;
     }
 
+    /**
+     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
+     * @returns The next stage to transition to if the event/current stage represent a defined
+     * state transition. Returns null otherwise.
+     */
     getNextStage(eventType: EventType): GraphNode {
         let edge = this.getEdge(eventType);
         let conditionDepth = 0;
@@ -132,62 +157,79 @@ export class StateGraphManager {
         return edge;
     }
 
+    /**
+     * @param condition Condition to evaluate
+     * @returns Evaluates the condition and returns the corresponding edge.
+     */
     processCondition(condition: Condition): GraphEdge {
         return condition.fn() ? condition.TRUE : condition.FALSE;
     }
 
-    /*
-        MessageService receives the message, validates the action 
-            (validation service will use stages to simplify validation)
-        Executes the action if valid. After executing the action, messageService calls
-        the stateUpdater's processEvent is triggered. Then, depending on state conditions,
-        the stage is changed.
-
-    */
+    // - MessageService receives the message, validates the action
+    //     (validation service will use stages to simplify validation)
+    // - MessageService executes the action if valid.
+    // - After executing the action, messageService calls this processEvent method.
+    // - If the event is a defined state transition path, a state transition is executed.
     processEvent(event: EventType) {
-        debugger;
         const nextStage = this.getNextStage(event);
         console.log('processEvent. event:', event, 'nextStage:', nextStage);
-        // TODO once getEdge method is guaranteed to return non-null, you can remove this
-        // guard from here and from getNextStage.
-        if (!!nextStage) {
+
+        if (nextStage) {
             this.initializeGameStage(nextStage);
         }
+
+        this.updateEmitter.next();
     }
 
     processTimeout() {
+        // If the timer runs out and we are in the waiting for bet action stage, that means that
+        // the player time has run out. This is the only case where it is necessary to perform
+        // an action manually before transitioning to the next stage, and so this is the only case
+        // that slightly breaks the pattern. The alternative is to create an extra GameStage that
+        // a timeout could map to, but that's not ideal because its a more verbose solution,
+        // and transitioning from that intermediary stage to SHOW_BET_ACTION would require a
+        // no-op delay, which also breaks the pattern
+        if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
+            this.gamePlayService.timeOutPlayer();
+        }
         this.processEvent('TIMEOUT');
     }
 
-    startGameStageTransitionSequence() {}
-
     // The changes executed while entering a game stage should be general and applicable no matter
     // what path was taken to get to that stage. If there is logic that is specific to a path, then
-    // that logic should be executed on the way to the stage.
+    // that logic should be executed on the way to the stage. This method should only be called if
+    // a defined state transition path was executed. For example, if someone adds chips during the
+    // WAITING_FOR_BET_ACTION stage, that should not trigger any timer restarts (this method shouldnt
+    // be called)
     initializeGameStage(stage: GameStage) {
+        console.log('initializing gameStage: ', stage);
         this.gameStateManager.updateGameStage(stage);
 
         switch (stage) {
             case GameStage.INITIALIZE_NEW_HAND: {
                 this.gameStateManager.clearStateOfRoundInfo();
-
-                // TODO initializeBetting round actually goes into start of betting round
-                // TODO trigger timer, look up delay from delay map
-
                 break;
             }
 
             case GameStage.SHOW_START_OF_HAND: {
+                this.gameStateManager.initializeNewDeck();
+                this.gamePlayService.initializeDealerButton();
+                this.gamePlayService.placeBlinds();
+                this.gameStateManager.updateGameState({ bettingRoundStage: BettingRoundStage.WAITING });
                 break;
             }
 
             case GameStage.SHOW_START_OF_BETTING_ROUND: {
-                this.gamePlayService.initializeBettingRound();
-
+                this.gameStateManager.incrementBettingRoundStage();
+                this.gamePlayService.resetBettingRoundActions();
+                this.gamePlayService.dealCards();
+                this.gamePlayService.setFirstToActAtStartOfBettingRound();
+                this.gamePlayService.startOfBettingRound();
                 break;
             }
 
             case GameStage.WAITING_FOR_BET_ACTION: {
+                this.gamePlayService.setCurrentPlayerToAct();
                 break;
             }
 
@@ -195,11 +237,16 @@ export class StateGraphManager {
                 break;
             }
 
-            case GameStage.SHOW_PLACE_BETS_IN_POT: {
+            case GameStage.FINISH_BETTING_ROUND: {
+                this.gamePlayService.placeBetsInPot();
+
                 break;
             }
 
+            // TODO Showdown probably should be a separate stage from show winner. They can be one stage for now.
             case GameStage.SHOW_WINNER: {
+                // if one person in hand, show them as winner (without showing their hand)
+                // otherwise execute showdown logic
                 break;
             }
         }

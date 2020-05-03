@@ -1,13 +1,19 @@
 import { Service } from 'typedi';
 import { AudioQueue, getCleanAudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
+import { GameStateManager } from './gameStateManager';
+import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 
 @Service()
 export class AudioService {
     private audioQueue: AudioQueue = getCleanAudioQueue();
 
+    constructor(private readonly gameStateManager: GameStateManager) {}
+
     // TODO we most likely dont need "global" and "personal",
     // because it seems like there will only be one sound per client per wsmessage
     private setSound(soundByte: SoundByte) {
+        this.gameStateManager.addUpdatedKeys(ServerStateKey.AUDIO);
+        console.log('audio setSond updatedKeys: ', this.gameStateManager.getUpdatedKeys());
         return (this.audioQueue.global = soundByte);
     }
 
