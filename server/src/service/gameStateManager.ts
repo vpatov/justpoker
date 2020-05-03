@@ -348,6 +348,11 @@ export class GameStateManager {
         return false;
     }
 
+    getPlayerStraddle(playerUUID: string): boolean {
+        const player = this.getPlayer(playerUUID);
+        return player.straddle;
+    }
+
     getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
         //TODO is this method ever called while nobody is sitting?
         // in a single-threaded env, probably
@@ -531,6 +536,10 @@ export class GameStateManager {
                 ]),
             },
         };
+    }
+
+    setPlayerStraddle(playerUUID: string, straddle: boolean) {
+        this.updatePlayer(playerUUID, { straddle: straddle });
     }
 
     setPlayerDealInNextHand(playerUUID: string) {

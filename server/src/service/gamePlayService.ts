@@ -24,7 +24,7 @@ export class GamePlayService {
         private readonly timerManager: TimerManager,
         private readonly audioService: AudioService,
         private readonly validationService: ValidationService,
-    ) { }
+    ) {}
 
     /* Gameplay functionality */
 
@@ -277,8 +277,8 @@ export class GamePlayService {
             isPlayerAllIn
                 ? BettingRoundActionType.ALL_IN
                 : playerPlacingBlindBetUUID
-                    ? BettingRoundActionType.PLACE_BLIND
-                    : BettingRoundActionType.BET,
+                ? BettingRoundActionType.PLACE_BLIND
+                : BettingRoundActionType.BET,
         );
 
         /* TODO
@@ -377,20 +377,24 @@ export class GamePlayService {
         const smallBlindUUID =
             numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID);
         const bigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(smallBlindUUID);
+        const postBigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
 
-        // the players have to be waiting to act because they can still raise even
-        // if everyone before them calls
+        const isHeadsUp = this.gsm.getPlayersReadyToPlay().length === 2;
+        const isStraddle = this.gsm.getPlayerStraddle(postBigBlindUUID); //TODO implement straddle logic
 
         this.bet(SB, smallBlindUUID);
         this.bet(BB, bigBlindUUID);
 
-        // If heads up, dealer is first to act
-        const firstToActPreflop =
-            this.gsm.getPlayersReadyToPlay().length === 2
-                ? dealerUUID
-                : this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+        let nextToAct;
+        if (!isHeadsUp) {
+            // no straddle
+            nextToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+        } else {
+            // heads up
+            nextToAct = dealerUUID;
+        }
 
-        this.gsm.setFirstToAct(firstToActPreflop);
+        this.gsm.setFirstToAct(nextToAct);
 
         assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
     }
@@ -479,7 +483,7 @@ export class GamePlayService {
             this.gsm.updatePlayers((player) =>
                 winningPlayers.includes(player.uuid)
                     ? // TODO the players winning hand would go here too.
-                    { chips: player.chips + amountsWon[player.uuid], winner: true }
+                      { chips: player.chips + amountsWon[player.uuid], winner: true }
                     : { winner: false },
             );
 
@@ -495,7 +499,7 @@ export class GamePlayService {
         for (const index in snapShots) {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
-                () => { },
+                () => {},
                 () => snapShot,
                 interval * Number(index),
             );
@@ -519,7 +523,7 @@ export class GamePlayService {
         this.gsm.setUnsetQueuedAction();
         this.gsm.clearBettingRoundStage();
         this.ejectStackedPlayers();
-        this.gsm.setPlayersSittingOutByDealInNextHand()
+        this.gsm.setPlayersSittingOutByDealInNextHand();
         this.gsm.clearStateOfRoundInfo();
         this.startHandIfReady();
     }

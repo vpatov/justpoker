@@ -37,6 +37,7 @@ export declare interface Controller {
     adminButtons?: ActionButton[];
     dealInNextHand: boolean;
     toAct?: boolean;
+    straddle: boolean;
     unsetQueuedAction?: boolean;
 }
 
@@ -173,6 +174,7 @@ export const cleanController: Controller = {
     unsetQueuedAction: false,
     min: 0,
     max: 0,
+    straddle: false,
     dealInNextHand: true,
     sizingButtons: [],
     bettingRoundActionButtons: [],
@@ -195,6 +197,7 @@ export const CleanGame: UiGameState = {
         min: 0,
         max: 0,
         dealInNextHand: true,
+        straddle: false,
         timeBanks: 0,
         sizingButtons: [],
         bettingRoundActionButtons: [],
@@ -269,6 +272,7 @@ export const TestGame: UiGameState = {
         max: 43000,
         timeBanks: 2,
         dealInNextHand: false,
+        straddle: true,
         sizingButtons: [
             {
                 label: '1/2',

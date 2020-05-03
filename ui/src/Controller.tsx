@@ -10,7 +10,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 
-import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
+import { ActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/wsaction';
 import { Typography } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game';
 
@@ -178,6 +178,7 @@ function ControllerComp(props: ControllerProps) {
         bettingRoundActionButtons: actionButtons,
         dealInNextHand,
         timeBanks,
+        straddle,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
@@ -242,10 +243,16 @@ function ControllerComp(props: ControllerProps) {
     }
 
     function onToggleSitOutNextHand() {
-        console.log('toggle');
         WsServer.send({
             actionType: dealInNextHand ? ActionType.DEAL_OUT_NEXT_HAND : ActionType.DEAL_IN_NEXT_HAND,
             request: {} as ClientWsMessageRequest,
+        });
+    }
+
+    function onToggleStraddle() {
+        WsServer.send({
+            actionType: ActionType.SET_PLAYER_STRADDLE,
+            request: { straddle: !straddle } as ClientWsMessageRequest,
         });
     }
 
@@ -342,7 +349,7 @@ function ControllerComp(props: ControllerProps) {
                 {allowStraddle ? (
                     <FormControlLabel
                         classes={{ label: classes.checkLabel }}
-                        control={<Checkbox className={classes.button} checked={false} onChange={() => null} />}
+                        control={<Checkbox className={classes.button} checked={straddle} onChange={onToggleStraddle} />}
                         label="Straddle"
                     />
                 ) : null}
