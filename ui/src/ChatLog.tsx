@@ -1,84 +1,84 @@
-import React, { useState, useEffect, useRef } from "react";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import React, { useState, useEffect, useRef } from 'react';
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
-import classnames from "classnames";
-import get from "lodash/get";
+import classnames from 'classnames';
+import get from 'lodash/get';
 
-import TextFieldWrap from "./reuseable/TextFieldWrap"
+import TextFieldWrap from './reuseable/TextFieldWrap';
 
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
-import { WsServer } from "./api/ws";
-import { UiChatMessage } from "./shared/models/uiState";
+import { WsServer } from './api/ws';
+import { UiChatMessage } from './shared/models/uiState';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             zIndex: 5,
-            height: "100%",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexDirection: "column",
-            paddingLeft: "1.2vmin",
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'column',
+            paddingLeft: '1.2vmin',
             ...theme.custom.CHAT,
         },
         chatLog: {
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-            width: "100%",
-            overflowY: "auto",
-            overflowWrap: "break-word",
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            width: '100%',
+            overflowY: 'auto',
+            overflowWrap: 'break-word',
         },
         chatInputSection: {
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            alignItems: "center",
-            width: "100%",
-            paddingTop: "2vmin",
-            paddingBottom: "1vmin",
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            width: '100%',
+            paddingTop: '2vmin',
+            paddingBottom: '1vmin',
         },
         sendButton: {
-            fontSize: "1vmin",
-            marginRight: "1vmin",
+            fontSize: '1vmin',
+            marginRight: '1vmin',
         },
         messageTextField: {
             flexGrow: 1,
-            marginRight: "1vmin",
-            marginBottom: "1vmin",
+            marginRight: '1vmin',
+            marginBottom: '1vmin',
             marginTop: 0,
         },
         messageTextFieldInput: {
-            fontSize: "1.3vmin",
+            fontSize: '1.4vmin',
         },
         chatMessage: {
-            margin: "5px",
-            fontSize: "1.8vmin",
+            margin: '0.5vmin 0.2vmin',
+            fontSize: '1.4vmin',
         },
         senderName: {
-            fontWeight: "bold",
-            color: "rgb(255, 163, 97)",
-            marginRight: "8px",
+            fontWeight: 'bold',
+            color: 'rgb(255, 163, 97)',
+            marginRight: '8px',
         },
         messageContent: {
-            color: "rgb(220,210,230)",
+            color: 'rgb(220,210,230)',
         },
         hideButton: {
-            margin: "2vmin",
-            fontSize: "1vmin",
+            margin: '2vmin',
+            fontSize: '1vmin',
             zIndex: 5,
-            position: "absolute",
+            position: 'absolute',
             top: 0,
-            right: "0",
+            right: '0',
         },
         unread: {
             borderColor: theme.palette.secondary.main,
             color: theme.palette.secondary.main,
         },
-    })
+    }),
 );
 
 interface ChatLogProps {
@@ -86,22 +86,20 @@ interface ChatLogProps {
 }
 
 function ChatLog(props: ChatLogProps) {
-    console.log("chat render");
+    console.log('chat render');
     const classes = useStyles();
 
     const { className } = props;
 
     const [hideChat, setHideChat] = useState(false);
     const [messages, setMessages] = useState([] as any);
-    const [draftMessage, setDraftMessage] = useState("");
+    const [draftMessage, setDraftMessage] = useState('');
     const [unreadChats, setUnreadChats] = useState(false);
 
     const messagesRef = useRef(null);
 
     const scrollToBottom = () => {
-        (
-            get(messagesRef, "current") || { scrollIntoView: (_) => null }
-        ).scrollIntoView({ behavior: "smooth" });
+        (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
     };
 
     useEffect(scrollToBottom, [messages, hideChat]);
@@ -109,17 +107,17 @@ function ChatLog(props: ChatLogProps) {
     useEffect(() => {
         const succ = WsServer.openWs();
         if (succ) {
-            WsServer.subscribe("chat", onReceiveNewChatMessage);
+            WsServer.subscribe('chat', onReceiveNewChatMessage);
         }
     }, []);
 
     function sendMessage() {
         WsServer.sendChatMessage(draftMessage);
-        setDraftMessage("");
+        setDraftMessage('');
     }
 
     function onTextAreaPressEnter(event: any) {
-        if (event.key === "Enter" && !event.shiftKey) {
+        if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             sendMessage();
         }
@@ -143,7 +141,7 @@ function ChatLog(props: ChatLogProps) {
                 }}
                 style={hideChat ? {} : { right: 270 }}
             >
-                {`${hideChat ? "Show" : "Hide"} Chat`}
+                {`${hideChat ? 'Show' : 'Hide'} Chat`}
             </Button>
         );
     }
@@ -153,16 +151,9 @@ function ChatLog(props: ChatLogProps) {
             <div className={classnames(classes.root, className)}>
                 <div className={classes.chatLog}>
                     {messages.map((message) => (
-                        <Typography
-                            key={message.timestamp}
-                            className={classes.chatMessage}
-                        >
-                            <span className={classes.senderName}>
-                                {message.senderName}:
-                            </span>
-                            <span className={classes.messageContent}>
-                                {message.content}
-                            </span>
+                        <Typography key={message.timestamp} className={classes.chatMessage}>
+                            <span className={classes.senderName}>{message.senderName}:</span>
+                            <span className={classes.messageContent}>{message.content}</span>
                         </Typography>
                     ))}
                     <div ref={messagesRef} />
@@ -174,10 +165,9 @@ function ChatLog(props: ChatLogProps) {
                         className={classes.messageTextField}
                         margin="dense"
                         onChange={(event) => {
-                            console.log("onC", event)
-                            setDraftMessage(event.target.value)
-                        }
-                        }
+                            console.log('onC', event);
+                            setDraftMessage(event.target.value);
+                        }}
                         InputProps={{
                             classes: {
                                 input: classes.messageTextFieldInput,

@@ -1,40 +1,40 @@
-import React from "react";
-import { generateStringFromSuit, SUITS } from "./utils";
-import classnames from "classnames";
+import React from 'react';
+import { generateStringFromSuit, SUITS } from './utils';
+import classnames from 'classnames';
 
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         borderRadius: 6,
-        display: "inline-block",
-        textAlign: "center",
-        position: "relative",
-        backgroundColor: "white",
-        height: "11vmin",
-        width: "8.6vmin",
-        margin: "0.5vmin",
-        overflow: "hidden",
+        display: 'inline-block',
+        textAlign: 'center',
+        position: 'relative',
+        backgroundColor: 'white',
+        height: '11vmin',
+        width: '8.6vmin',
+        margin: '0.5vmin',
+        overflow: 'hidden',
     },
     text: {
-        fontWeight: "bold",
+        fontWeight: 'bold',
     },
     rank: {
-        fontSize: "4.8vmin",
-        lineHeight: "1em",
-        position: "absolute",
-        top: "8%",
-        left: "11%",
-        color: "white",
+        fontSize: '4.8vmin',
+        lineHeight: '1em',
+        position: 'absolute',
+        top: '8%',
+        left: '11%',
+        color: 'white',
     },
     suit: {
-        fontSize: "4.8vmin",
-        lineHeight: "5vmin",
-        position: "absolute",
-        bottom: "5%",
-        right: "5%",
-        color: "white",
+        fontSize: '4.8vmin',
+        lineHeight: '5vmin',
+        position: 'absolute',
+        bottom: '5%',
+        right: '5%',
+        color: 'white',
         opacity: 0.7,
     },
     [SUITS.HEARTS]: {
@@ -57,12 +57,8 @@ function CardLarge(props) {
 
     return (
         <div className={classnames(classes.root, classes[suit], className)}>
-            <Typography className={classnames(classes.text, classes.rank)}>
-                {rank}
-            </Typography>
-            <Typography className={classnames(classes.text, classes.suit)}>
-                {generateStringFromSuit(suit)}
-            </Typography>
+            <Typography className={classnames(classes.text, classes.rank)}>{rank}</Typography>
+            <Typography className={classnames(classes.text, classes.suit)}>{generateStringFromSuit(suit)}</Typography>
         </div>
     );
 }

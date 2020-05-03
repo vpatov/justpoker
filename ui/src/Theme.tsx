@@ -1,18 +1,18 @@
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createMuiTheme } from '@material-ui/core/styles';
 
-import { PaletteType } from "@material-ui/core";
-import lightBlue from "@material-ui/core/colors/lightBlue";
-import lightGreen from "@material-ui/core/colors/lightGreen";
-import green from "@material-ui/core/colors/green";
-import blue from "@material-ui/core/colors/blue";
-import indigo from "@material-ui/core/colors/indigo";
-import red from "@material-ui/core/colors/red";
-import grey from "@material-ui/core/colors/grey";
-import teal from "@material-ui/core/colors/teal";
-import blueGrey from "@material-ui/core/colors/blueGrey";
-import orange from "@material-ui/core/colors/orange";
+import { PaletteType } from '@material-ui/core';
+import lightBlue from '@material-ui/core/colors/lightBlue';
+import lightGreen from '@material-ui/core/colors/lightGreen';
+import green from '@material-ui/core/colors/green';
+import blue from '@material-ui/core/colors/blue';
+import indigo from '@material-ui/core/colors/indigo';
+import red from '@material-ui/core/colors/red';
+import grey from '@material-ui/core/colors/grey';
+import teal from '@material-ui/core/colors/teal';
+import blueGrey from '@material-ui/core/colors/blueGrey';
+import orange from '@material-ui/core/colors/orange';
 
-declare module "@material-ui/core/styles/createMuiTheme" {
+declare module '@material-ui/core/styles/createMuiTheme' {
     interface Theme {
         custom?: any;
     }
@@ -20,19 +20,19 @@ declare module "@material-ui/core/styles/createMuiTheme" {
 
 const CUSTOM_PALETTE = {
     primary: {
-        main: teal["A400"],
-        light: teal["100"],
+        main: teal['A400'],
+        light: teal['100'],
     },
     secondary: {
-        main: orange["A400"],
-        light: orange["100"],
+        main: orange['A400'],
+        light: orange['100'],
     },
 };
 
 export const CUSTOM_THEME = {
     custom: {
         HEARTS: {
-            backgroundColor: red["A700"],
+            backgroundColor: red['A700'],
         },
         DIAMONDS: {
             backgroundColor: indigo[800],
@@ -49,88 +49,87 @@ export const CUSTOM_THEME = {
         },
         FOLDED: {
             opacity: 0.8,
-            filter: "grayscale(50%) brightness(0.4)",
+            filter: 'grayscale(50%) brightness(0.4)',
         },
         BACKGROUND: {
-            background:
-                "linear-gradient(360deg, rgba(50,50,55) 0%, rgb(22,22,30));",
+            background: 'linear-gradient(360deg, rgba(50,50,55) 0%, rgb(22,22,30));',
         },
         TABLE: {
             border: `0.7vmin solid rgba(0,0,0,0.4)`,
             boxShadow: ` 0 3px 3px 3px rgba(255,255,255,0.4)`,
-            backgroundColor: "black",
+            backgroundColor: 'black',
             background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
         },
         STACK: {
-            color: "black",
+            color: 'black',
             backgroundColor: blueGrey[200],
-            borderRadius: "0.6vmin",
-            boxShadow: "0 8px 18px 3px rgba(0,0,0,0.9)",
+            borderRadius: '0.6vmin',
+            boxShadow: '0 8px 18px 3px rgba(0,0,0,0.9)',
         },
         STACK_TO_ACT: {
-            boxShadow: "0px 0px 10px 1px rgba(255,255,255,0.4)",
+            boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',
             backgroundColor: CUSTOM_PALETTE.primary.main,
             background: `linear-gradient(90deg, ${CUSTOM_PALETTE.primary.main} 0%, ${CUSTOM_PALETTE.primary.light} 50%, ${CUSTOM_PALETTE.primary.main}  100%)`,
-            backgroundSize: "200% 200%",
-            "-webkit-animation": "$grad 2s linear infinite",
-            animation: "$grad 2s linear infinite",
-            "-moz-animation": "$grad 2s linear infinite",
+            backgroundSize: '200% 200%',
+            '-webkit-animation': '$grad 2s linear infinite',
+            animation: '$grad 2s linear infinite',
+            '-moz-animation': '$grad 2s linear infinite',
         },
         CONTROLLER: {
-            backgroundColor: "rgba(0,0,0,0.3)",
+            backgroundColor: 'rgba(0,0,0,0.3)',
             background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
-            boxSizing: "border-box",
-            transition: "box-shadow 0.4s ease-in-out;",
+            boxSizing: 'border-box',
+            transition: 'box-shadow 0.4s ease-in-out;',
         },
         CONTROLLER_TO_ACT: {
             boxShadow: `0px -8px 10px 3px ${CUSTOM_PALETTE.primary.main}`,
         },
         BET: {
-            border: "1px solid white",
+            border: '1px solid white',
             backgroundColor: teal[200],
         },
         CHAT: {
             zIndex: 10,
-            backgroundColor: "rgba(22, 22, 32, 1)",
+            backgroundColor: 'rgba(22, 22, 32, 1)',
             boxShadow: ` 0 4px 4px 4px rgba(0,0,0,0.2)`,
-            borderLeft: "2px solid rgba(0,0,0,0.7)",
+            borderLeft: '2px solid rgba(0,0,0,0.7)',
         },
         ACTION_BUTTONS: {
             FOLD: {
-                borderColor: red["A200"],
-                color: red["A200"],
+                borderColor: red['A200'],
+                color: red['A200'],
             },
             FOLD_QUEUED: {
-                backgroundColor: red["A200"] + " !important",
-                color: "black",
+                backgroundColor: red['A200'] + ' !important',
+                color: 'black',
             },
             BET: {
-                borderColor: green["A400"],
-                color: green["A400"],
+                borderColor: green['A400'],
+                color: green['A400'],
             },
             BET_QUEUED: {
-                backgroundColor: green["A200"] + " !important",
-                color: "black",
+                backgroundColor: green['A200'] + ' !important',
+                color: 'black',
             },
             CHECK: {
-                borderColor: blue["A200"],
-                color: blue["A200"],
+                borderColor: blue['A200'],
+                color: blue['A200'],
             },
             CHECK_QUEUED: {
-                backgroundColor: blue["A200"] + " !important",
-                color: "black",
+                backgroundColor: blue['A200'] + ' !important',
+                color: 'black',
             },
             CALL: {
-                borderColor: blue["A200"],
-                color: blue["A200"],
+                borderColor: blue['A200'],
+                color: blue['A200'],
             },
             CALL_QUEUED: {
-                backgroundColor: blue["A200"] + " !important",
-                color: "black",
+                backgroundColor: blue['A200'] + ' !important',
+                color: 'black',
             },
             STARTGAME: {
-                borderColor: lightGreen["A400"],
-                color: lightGreen["A400"],
+                borderColor: lightGreen['A400'],
+                color: lightGreen['A400'],
             },
             STOPGAME: {
                 borderColor: red[900],
@@ -139,35 +138,35 @@ export const CUSTOM_THEME = {
         },
     },
     typography: {
-        fontFamily:
-            "Futura, Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif",
+        fontFamily: 'Futura, Avenir, AkzidenzGrotesk, Questrial, Helvetica, sans-serif',
     },
     palette: {
-        type: "dark" as PaletteType,
+        type: 'dark' as PaletteType,
         ...CUSTOM_PALETTE,
     },
     overrides: {
         MuiTypography: {
             root: {
-                color: "inherit",
+                color: 'inherit',
+                fontSize: '1vmin',
             },
         },
         MuiOutlinedInput: {
             root: {
-                "&:hover:not($disabled):not($focused):not($error) $notchedOutline": {
-                    borderColor: teal["A200"],
+                '&:hover:not($disabled):not($focused):not($error) $notchedOutline': {
+                    borderColor: teal['A200'],
                 },
             },
         },
         MuiButton: {
             root: {
-                "&:hover": {
-                    "&:after": {
+                '&:hover': {
+                    '&:after': {
                         content: "''",
-                        backgroundColor: "rgba(255,255,255,0.15)",
-                        position: "absolute",
-                        height: "100%",
-                        width: "100%",
+                        backgroundColor: 'rgba(255,255,255,0.15)',
+                        position: 'absolute',
+                        height: '100%',
+                        width: '100%',
                     },
                 },
             },

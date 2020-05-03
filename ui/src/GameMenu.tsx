@@ -25,8 +25,8 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'fixed',
             left: 0,
             top: 0,
-            width: '5vw',
-            height: '50vh',
+            width: '7vw',
+            height: '45vh',
         },
         root: {
             zIndex: 5,
@@ -74,7 +74,6 @@ function Default(props) {
     };
 
     const actions = [
-        { icon: <SeatIcon className={classes.icon} />, name: 'Sit Out' },
         { icon: <QuitIcon className={classes.icon} />, name: 'Quit' },
         { icon: <VolumeOnIcon className={classes.icon} />, name: 'Volume' },
         { icon: <SettingsIcon className={classes.icon} />, name: 'Settings' },
@@ -92,28 +91,28 @@ function Default(props) {
 
     return (
         <>
-            <Paper
-                elevation={4}
-                className={classnames(classes.root, {
-                    [classes.rootExpanded]: open,
-                })}
-                onMouseOver={handleOpen}
-                onMouseLeave={handleClose}
-            >
-                {open ? (
-                    actions.map((action) => (
-                        <Tooltip title={action.name} placement="right">
-                            <IconButton className={classes.iconButton} onClick={action.onClick}>
-                                {action.icon}
-                            </IconButton>
-                        </Tooltip>
-                    ))
-                ) : (
+            <div className={classes.hoverArea} onMouseOver={handleOpen} onMouseLeave={handleClose}>
+                <Paper
+                    elevation={4}
+                    className={classnames(classes.root, {
+                        [classes.rootExpanded]: open,
+                    })}
+                >
+                    {open ? (
+                        actions.map((action) => (
+                            <Tooltip title={action.name} placement="right">
+                                <IconButton className={classes.iconButton} onClick={action.onClick}>
+                                    {action.icon}
+                                </IconButton>
+                            </Tooltip>
+                        ))
+                    ) : (
                         <IconButton className={classes.iconButton}>
                             <MenuIcon className={classes.icon} />
                         </IconButton>
                     )}
-            </Paper>
+                </Paper>
+            </div>
         </>
     );
 }
