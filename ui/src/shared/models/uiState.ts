@@ -3,7 +3,7 @@ import { ActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { AudioQueue, getCleanAudioQueue } from './audioQueue';
 import { MAX_VALUES } from '../util/consts';
-import { GameType, BettingRoundActionType } from "./game";
+import { GameType, BettingRoundActionType } from './game';
 
 export declare interface UiState {
     game: UiGameState;
@@ -25,14 +25,13 @@ export declare interface Global {
     smallBlind: number;
     allowStraddle: boolean;
     gameType: GameType;
+    canStartGame: boolean;
 }
-
-
 
 export declare interface Controller {
     min: number;
     max: number;
-    timeBanks?: number
+    timeBanks?: number;
     sizingButtons: SizingButton[];
     bettingRoundActionButtons: BettingRoundActionButton[];
     adminButtons?: ActionButton[];
@@ -188,6 +187,7 @@ export const CleanGame: UiGameState = {
         smallBlind: 1,
         allowStraddle: false,
         gameType: GameType.NLHOLDEM,
+        canStartGame: false,
     },
     controller: {
         toAct: false,
@@ -260,6 +260,7 @@ export const TestGame: UiGameState = {
         smallBlind: 1,
         allowStraddle: true,
         gameType: GameType.NLHOLDEM,
+        canStartGame: false,
     },
     controller: {
         toAct: true,

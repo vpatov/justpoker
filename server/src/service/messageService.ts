@@ -6,6 +6,7 @@ import { GamePlayService } from './gamePlayService';
 import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
+import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 
 declare interface ActionProcessor {
     validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -22,7 +23,7 @@ export class MessageService {
         private readonly validationService: ValidationService,
         private readonly gamePlayService: GamePlayService,
         private readonly chatService: ChatService,
-    ) { }
+    ) {}
 
     messageProcessor: MessageProcessor = {
         [ActionType.STARTGAME]: {
@@ -48,26 +49,32 @@ export class MessageService {
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
                 this.gameStateManager.setPlayerDealInNextHand(player.uuid);
+                if (this.gameStateManager.getBettingRoundStage() === BettingRoundStage.WAITING) {
+                    this.gameStateManager.setPlayersSittingOutByDealInNextHand();
+                }
             },
             updates: [ServerStateKey.GAMESTATE],
         },
         [ActionType.DEAL_OUT_NEXT_HAND]: {
             validation: (_, __) => NO_ERROR,
             perform: (uuid, req) => {
-                console.log("hit")
+                console.log('hit');
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
                 this.gameStateManager.setPlayerDealOutNextHand(player.uuid);
+                if (this.gameStateManager.getBettingRoundStage() === BettingRoundStage.WAITING) {
+                    this.gameStateManager.setPlayersSittingOutByDealInNextHand();
+                }
             },
             updates: [ServerStateKey.GAMESTATE],
         },
         [ActionType.SITIN]: {
             validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid, req) => { },
+            perform: (uuid, req) => {},
             updates: [],
         },
         [ActionType.SITOUT]: {
             validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid, req) => { },
+            perform: (uuid, req) => {},
             updates: [],
         },
         [ActionType.STANDUP]: {
@@ -104,7 +111,7 @@ export class MessageService {
         },
         [ActionType.PINGSTATE]: {
             validation: (uuid, req) => NO_ERROR,
-            perform: (uuid, req) => { },
+            perform: (uuid, req) => {},
             updates: [ServerStateKey.GAMESTATE],
         },
         [ActionType.BETACTION]: {
