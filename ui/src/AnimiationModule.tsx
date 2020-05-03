@@ -49,8 +49,9 @@ export function dealCards() {
         translateY: (target) => {
             return [y - target.getBoundingClientRect().y, 0];
         },
+        opacity: [0, 1],
         duration: duration,
-        rotate: '1turn',
+        rotateZ: [-720, 0],
         easing: 'easeOutExpo',
         delay: anime.stagger(50),
     });
