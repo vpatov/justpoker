@@ -23,6 +23,10 @@ export declare interface Player {
      */
     readonly sitting: boolean;
 
+
+    readonly sittingOut: boolean;
+    readonly dealInNextHand: boolean;
+
     /** Gameplay goes from lower seat number to higher seat number and wraps around. */
     readonly seatNumber: number;
 
@@ -55,6 +59,8 @@ export const cleanPlayer: Player = {
     holeCards: [],
     handDescription: '',
     sitting: false,
+    sittingOut: false,
+    dealInNextHand: true,
     seatNumber: -1,
     lastActionType: BettingRoundActionType.NOT_IN_HAND,
     winner: false,

@@ -36,7 +36,7 @@ export declare interface Controller {
     sizingButtons: SizingButton[];
     bettingRoundActionButtons: BettingRoundActionButton[];
     adminButtons?: ActionButton[];
-
+    dealInNextHand: boolean;
     toAct?: boolean;
     unsetQueuedAction?: boolean;
 }
@@ -174,6 +174,7 @@ export const cleanController: Controller = {
     unsetQueuedAction: false,
     min: 0,
     max: 0,
+    dealInNextHand: true,
     sizingButtons: [],
     bettingRoundActionButtons: [],
     adminButtons: [],
@@ -193,6 +194,7 @@ export const CleanGame: UiGameState = {
         unsetQueuedAction: false,
         min: 0,
         max: 0,
+        dealInNextHand: true,
         timeBanks: 0,
         sizingButtons: [],
         bettingRoundActionButtons: [],
@@ -265,6 +267,7 @@ export const TestGame: UiGameState = {
         min: 25,
         max: 43000,
         timeBanks: 2,
+        dealInNextHand: false,
         sizingButtons: [
             {
                 label: '1/2',

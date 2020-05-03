@@ -170,7 +170,7 @@ function ControllerComp(props: ControllerProps) {
         max,
         sizingButtons,
         bettingRoundActionButtons: actionButtons,
-        adminButtons,
+        dealInNextHand,
         timeBanks,
     } = useSelector(controllerSelector);
 
@@ -220,6 +220,8 @@ function ControllerComp(props: ControllerProps) {
 
 
 
+
+
     function sendBettingRoundAction(betActionType) {
         WsServer.send({
             actionType: ActionType.BETACTION,
@@ -238,6 +240,16 @@ function ControllerComp(props: ControllerProps) {
         if (0 < betAmt && betAmt < min) return true;
         return false;
     }
+
+
+    function onToggleSitOutNextHand() {
+        console.log("toggle")
+        WsServer.send({
+            actionType: dealInNextHand ? ActionType.DEAL_OUT_NEXT_HAND : ActionType.DEAL_IN_NEXT_HAND,
+            request: {} as ClientWsMessageRequest
+        });
+    }
+
 
     return (
         <div
@@ -357,7 +369,7 @@ function ControllerComp(props: ControllerProps) {
                     label="Straddle"
                 /> : null}
                 <FormControlLabel
-                    control={<Checkbox checked={false} onChange={() => null} />}
+                    control={<Checkbox checked={!dealInNextHand} onChange={onToggleSitOutNextHand} />}
                     label="Sit Out Next Hand"
                 />
 
