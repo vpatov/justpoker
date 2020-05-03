@@ -74,7 +74,6 @@ function Default(props) {
     };
 
     const actions = [
-        { icon: <StartIcon className={classes.icon} />, name: 'Start Game', onClick: onClickStartGame },
         { icon: <SeatIcon className={classes.icon} />, name: 'Sit Out' },
         { icon: <QuitIcon className={classes.icon} />, name: 'Quit' },
         { icon: <VolumeOnIcon className={classes.icon} />, name: 'Volume' },
@@ -83,10 +82,6 @@ function Default(props) {
         { icon: <FlipIcon className={classes.icon} />, name: 'Flip Table', onClick: () => flipTable() },
         { icon: <FlipIcon className={classes.icon} />, name: 'Animate Deal', onClick: () => dealCards() },
     ];
-
-    function onClickStartGame() {
-        sendServerAction(ActionType.STARTGAME);
-    }
 
     function sendServerAction(action) {
         WsServer.send({
@@ -114,10 +109,10 @@ function Default(props) {
                         </Tooltip>
                     ))
                 ) : (
-                    <IconButton className={classes.iconButton}>
-                        <MenuIcon className={classes.icon} />
-                    </IconButton>
-                )}
+                        <IconButton className={classes.iconButton}>
+                            <MenuIcon className={classes.icon} />
+                        </IconButton>
+                    )}
             </Paper>
         </>
     );
