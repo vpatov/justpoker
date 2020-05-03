@@ -144,6 +144,14 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ActionType.SET_PLAYER_STRADDLE]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.setPlayerStraddle(player.uuid, req.straddle);
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
     };
 
     processMessage(message: ClientWsMessage, clientUUID: string) {
