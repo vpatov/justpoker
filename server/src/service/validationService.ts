@@ -8,7 +8,12 @@ import {
     ClientChatMessage,
 } from '../../../ui/src/shared/models/wsaction';
 import { printObj } from '../../../ui/src/shared/util/util';
-import { ValidationResponse, ErrorType, NO_ERROR } from '../../../ui/src/shared/models/validation';
+import {
+    ValidationResponse,
+    ErrorType,
+    NO_ERROR,
+    INTERNAL_SERVER_ERROR,
+} from '../../../ui/src/shared/models/validation';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -202,12 +207,26 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateCheckAction(clientUUID: string): ValidationResponse {
+    validateBettingRoundAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
         const response = this.ensurePlayerCanActRightNow(clientUUID);
         if (hasError(response)) {
             return response;
         }
+        switch (action.type) {
+            case BettingRoundActionType.CHECK:
+                return this.validateCheckAction(clientUUID);
+            case BettingRoundActionType.FOLD:
+                return this.validateFoldAction(clientUUID);
+            case BettingRoundActionType.CALL:
+                return this.validateCallAction(clientUUID);
+            case BettingRoundActionType.BET:
+                return this.validateBetAction(clientUUID, action);
+            default:
+                return INTERNAL_SERVER_ERROR;
+        }
+    }
 
+    private validateCheckAction(clientUUID: string): ValidationResponse {
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const bettingRoundActions = this.gsm.getBettingRoundActionTypes();
         const playerBetAmt = player.betAmount;
@@ -237,12 +256,7 @@ export class ValidationService {
     // You can fold anytime. In the future, would be nice to implement
     // "Are you sure you want to fold?" prompt if user tries to fold
     // without facing a bet
-    validateFoldAction(clientUUID: string): ValidationResponse {
-        const response = this.ensurePlayerCanActRightNow(clientUUID);
-        if (hasError(response)) {
-            return response;
-        }
-
+    private validateFoldAction(clientUUID: string): ValidationResponse {
         // TODO ensure that player has cards. If they do not have cards, they should never be able to
         // perform this action unless theres a bug.
         return NO_ERROR;
@@ -260,13 +274,7 @@ export class ValidationService {
     - player hasnt folded (if a player has folded, it should never be their turn to act)
 
     */
-    //TODO complete
-    validateBetAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
-        const response = this.ensurePlayerCanActRightNow(clientUUID);
-        if (hasError(response)) {
-            return response;
-        }
-
+    private validateBetAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
         // TODO remove this from here and put this extra checking in a type validation layer.
         const betAmount = typeof action.amount === 'number' ? action.amount : Number(action.amount);
 
@@ -316,18 +324,10 @@ export class ValidationService {
         Player can call if they havent folded
         Player can call if they are facing a bet.
     */
-    validateCallAction(clientUUID: string): ValidationResponse {
-        debugger;
-        // this should be all we need, because if a player has folded, it will never be their turn to act,
-        // and if they are all in, it shouldn't be their turn to act either.
-        const response = this.ensurePlayerCanActRightNow(clientUUID);
-        if (hasError(response)) {
-            return response;
-        }
+    private validateCallAction(clientUUID: string): ValidationResponse {
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot Call\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
-        //TODO is a noop right now
         if (!this.gsm.isPlayerFacingBet(player.uuid)) {
             return {
                 errorType: ErrorType.ILLEGAL_BETTING_ACTION,

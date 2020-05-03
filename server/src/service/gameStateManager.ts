@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import WebSocket from 'ws';
 
 import { strict as assert } from 'assert';
-import { GameState, cleanGameState, ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { GameState, cleanGameState, ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 import {
     StraddleType,
     GameType,
@@ -46,6 +46,10 @@ export class GameStateManager {
 
     getGameState(): GameState {
         return this.gameState;
+    }
+
+    getGameStage(): GameStage {
+        return this.gameState.gameStage;
     }
 
     isStateReady(): boolean {

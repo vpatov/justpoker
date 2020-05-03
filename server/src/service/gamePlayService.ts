@@ -1,6 +1,11 @@
 import { Service } from 'typedi';
 import { GameStateManager } from './gameStateManager';
-import { BettingRoundAction, BettingRoundActionType, BettingRoundStage } from '../../../ui/src/shared/models/game';
+import {
+    BettingRoundAction,
+    BettingRoundActionType,
+    BettingRoundStage,
+    CHECK_ACTION,
+} from '../../../ui/src/shared/models/game';
 import { strict as assert } from 'assert';
 import { HandSolverService, Hand } from './handSolverService';
 import { TimerManager } from './timerManager';
@@ -90,7 +95,8 @@ export class GamePlayService {
             logGameState(this.gsm.getGameState());
             return;
         }
-        if (!hasError(this.validationService.validateCheckAction(this.gsm.getClientByPlayerUUID(playerUUID)))) {
+        const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
+        if (!hasError(this.validationService.validateBettingRoundAction(clientUUID, CHECK_ACTION))) {
             this.check();
         } else {
             this.fold();

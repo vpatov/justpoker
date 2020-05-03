@@ -10,13 +10,10 @@ export enum ActionType {
     JOINTABLE = "JOINTABLE",
     JOINTABLEANDSITDOWN = "JOINTABLEANDSITDOWN",
     PINGSTATE = "PINGSTATE",
-    CHECK = "CHECK",
-    BET = "BET",
-    FOLD = "FOLD",
-    CALL = "CALL",
     CHAT = "CHAT",
     ADDCHIPS = "ADDCHIPS",
     SETCHIPS = "SETCHIPS",
+    BETACTION = "BETACTION"
 }
 
 export declare interface SitDownRequest {

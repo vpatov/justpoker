@@ -12,6 +12,7 @@ import Button from "@material-ui/core/Button";
 
 import { ActionType, ClientWsMessageRequest } from "./shared/models/wsaction";
 import { Typography } from "@material-ui/core";
+import { BettingRoundActionType } from "./shared/models/game";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -148,12 +149,14 @@ export interface ControllerProps {
 // conflicting with chat
 // TODO either get rid of hotkeys and ensure
 // chat isnt in focus..
+/*
 const KEY_ACTION_MAP = {
     [ActionType.BET]: "B",
     [ActionType.CHECK]: "K",
     [ActionType.CALL]: "A",
     [ActionType.FOLD]: "F",
 };
+*/
 
 function ControllerComp(props: ControllerProps) {
     console.log("render controller");
@@ -166,7 +169,7 @@ function ControllerComp(props: ControllerProps) {
         min,
         max,
         sizingButtons,
-        actionButtons,
+        bettingRoundActionButtons: actionButtons,
         adminButtons,
         timeBanks,
     } = useSelector(controllerSelector);
@@ -199,31 +202,33 @@ function ControllerComp(props: ControllerProps) {
         return;
     };
 
-    function onClickActionButton(action) {
+    function onClickActionButton(betActionType) {
         if (toAct) {
-            sendServerAction(action);
+            sendBettingRoundAction(betActionType);
         } else {
-            if (queued === action) {
+            if (queued === betActionType) {
                 setQueued("");
             } else {
-                setQueued(action);
+                setQueued(betActionType);
             }
         }
     }
     if (toAct && queued !== "") {
-        sendServerAction(queued);
+        sendBettingRoundAction(queued);
         setQueued("");
     }
 
-    function sendServerAction(action) {
+
+
+    function sendBettingRoundAction(betActionType) {
         WsServer.send({
-            actionType: action,
+            actionType: ActionType.BETACTION,
             request: {
-                type: action,
+                type: betActionType,
                 amount: Number(betAmt),
             } as ClientWsMessageRequest,
         });
-        if (action === ActionType.BET) {
+        if (betActionType === BettingRoundActionType.BET) {
             changeBetAmount(0);
         }
     }
