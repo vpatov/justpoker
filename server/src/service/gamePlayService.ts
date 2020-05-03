@@ -24,7 +24,7 @@ export class GamePlayService {
         private readonly timerManager: TimerManager,
         private readonly audioService: AudioService,
         private readonly validationService: ValidationService,
-    ) {}
+    ) { }
 
     /* Gameplay functionality */
 
@@ -49,7 +49,7 @@ export class GamePlayService {
             // TODO uncomment this once startGame button is added
             this.gsm.shouldDealNextHand() &&
             this.gsm.getBettingRoundStage() === BettingRoundStage.WAITING &&
-            this.gsm.getNumberPlayersSitting() >= 2
+            this.gsm.getPlayersReadyToPlay().length >= 2
         ) {
             this.gsm.clearStateOfRoundInfo();
             this.initializeBettingRound();
@@ -277,8 +277,8 @@ export class GamePlayService {
             isPlayerAllIn
                 ? BettingRoundActionType.ALL_IN
                 : playerPlacingBlindBetUUID
-                ? BettingRoundActionType.PLACE_BLIND
-                : BettingRoundActionType.BET,
+                    ? BettingRoundActionType.PLACE_BLIND
+                    : BettingRoundActionType.BET,
         );
 
         /* TODO
@@ -399,9 +399,7 @@ export class GamePlayService {
         const deck = this.gsm.getDeck();
         // TODO remove assertion
         assert(deck.cards.length === 52);
-        Object.values(this.gsm.getPlayers())
-            .filter((player) => player.sitting)
-            .forEach((player) => this.gsm.dealCardsToPlayer(2, player.uuid));
+        this.gsm.getPlayersReadyToPlay().forEach((player) => this.gsm.dealCardsToPlayer(2, player.uuid));
     }
 
     /* STREETS */
@@ -481,7 +479,7 @@ export class GamePlayService {
             this.gsm.updatePlayers((player) =>
                 winningPlayers.includes(player.uuid)
                     ? // TODO the players winning hand would go here too.
-                      { chips: player.chips + amountsWon[player.uuid], winner: true }
+                    { chips: player.chips + amountsWon[player.uuid], winner: true }
                     : { winner: false },
             );
 
@@ -497,7 +495,7 @@ export class GamePlayService {
         for (const index in snapShots) {
             const snapShot = snapShots[index];
             this.timerManager.setTimer(
-                () => {},
+                () => { },
                 () => snapShot,
                 interval * Number(index),
             );
@@ -521,6 +519,7 @@ export class GamePlayService {
         this.gsm.setUnsetQueuedAction();
         this.gsm.clearBettingRoundStage();
         this.ejectStackedPlayers();
+        this.gsm.setPlayersSittingOutByDealInNextHand()
         this.gsm.clearStateOfRoundInfo();
         this.startHandIfReady();
     }

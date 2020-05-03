@@ -22,7 +22,7 @@ export class MessageService {
         private readonly validationService: ValidationService,
         private readonly gamePlayService: GamePlayService,
         private readonly chatService: ChatService,
-    ) {}
+    ) { }
 
     messageProcessor: MessageProcessor = {
         [ActionType.STARTGAME]: {
@@ -43,14 +43,31 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ActionType.DEAL_IN_NEXT_HAND]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.setPlayerDealInNextHand(player.uuid);
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ActionType.DEAL_OUT_NEXT_HAND]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, req) => {
+                console.log("hit")
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.setPlayerDealOutNextHand(player.uuid);
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
         [ActionType.SITIN]: {
             validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid, req) => {},
+            perform: (uuid, req) => { },
             updates: [],
         },
         [ActionType.SITOUT]: {
             validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid, req) => {},
+            perform: (uuid, req) => { },
             updates: [],
         },
         [ActionType.STANDUP]: {
@@ -87,7 +104,7 @@ export class MessageService {
         },
         [ActionType.PINGSTATE]: {
             validation: (uuid, req) => NO_ERROR,
-            perform: (uuid, req) => {},
+            perform: (uuid, req) => { },
             updates: [ServerStateKey.GAMESTATE],
         },
         [ActionType.BETACTION]: {

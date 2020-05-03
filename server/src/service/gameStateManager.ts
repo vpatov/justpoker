@@ -40,7 +40,7 @@ export class GameStateManager {
         this.updatedKeys = new Set(updatedKeys);
     }
 
-    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) {}
+    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) { }
 
     /* Getters */
 
@@ -124,9 +124,9 @@ export class GameStateManager {
         if (clients.length !== 1) {
             console.log(
                 `clients.length was ${clients.length} and not 1. ` +
-                    `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
-                        this.getConnectedClients(),
-                    )}`,
+                `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
+                    this.getConnectedClients(),
+                )}`,
             );
         }
         return clients[0].uuid;
@@ -239,6 +239,7 @@ export class GameStateManager {
         return Object.entries(this.gameState.players).filter(([uuid, player]) => player.sitting).length;
     }
 
+
     getSeats() {
         const seats: [number, string][] = Object.values(this.gameState.players)
             .filter((player) => player.seatNumber >= 0)
@@ -307,7 +308,7 @@ export class GameStateManager {
     }
 
     isPlayerReadyToPlay(playerUUID: string): boolean {
-        return this.getPlayer(playerUUID).sitting;
+        return this.getPlayer(playerUUID).sitting && !this.getPlayer(playerUUID).sittingOut;
     }
 
     isPlayerInHand(playerUUID: string): boolean {
@@ -525,6 +526,26 @@ export class GameStateManager {
                 ]),
             },
         };
+    }
+
+    setPlayerDealInNextHand(playerUUID: string) {
+        this.updatePlayer(playerUUID, { dealInNextHand: true });
+
+    }
+
+    setPlayerDealOutNextHand(playerUUID: string) {
+        this.updatePlayer(playerUUID, { dealInNextHand: false });
+    }
+
+    setPlayersSittingOutByDealInNextHand() {
+        Object.values(this.getPlayers()).forEach(p => {
+            const playerUUID = p.uuid
+            if (p.dealInNextHand) {
+                this.updatePlayer(playerUUID, { sittingOut: false });
+            } else {
+                this.updatePlayer(playerUUID, { sittingOut: true });
+            }
+        })
     }
 
     sitDownPlayer(playerUUID: string, seatNumber: number) {
