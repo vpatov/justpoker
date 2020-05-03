@@ -3,7 +3,7 @@ import { ActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { AudioQueue, getCleanAudioQueue } from './audioQueue';
 import { MAX_VALUES } from '../util/consts';
-import { GameType } from "./game";
+import { GameType, BettingRoundActionType } from "./game";
 
 export declare interface UiState {
     game: UiGameState;
@@ -34,7 +34,7 @@ export declare interface Controller {
     max: number;
     timeBanks?: number
     sizingButtons: SizingButton[];
-    actionButtons: ActionButton[];
+    bettingRoundActionButtons: BettingRoundActionButton[];
     adminButtons?: ActionButton[];
 
     toAct?: boolean;
@@ -49,6 +49,12 @@ export declare interface SizingButton {
 export declare interface ActionButton {
     label: string;
     action: ActionType;
+    disabled?: boolean;
+}
+
+export declare interface BettingRoundActionButton {
+    label: string;
+    action: BettingRoundActionType;
     disabled?: boolean;
 }
 
@@ -101,28 +107,28 @@ export declare interface UiChatLog {
 }
 
 /* Action Buttons */
-export const FOLD_BUTTON: ActionButton = {
-    action: ActionType.FOLD,
+export const FOLD_BUTTON: BettingRoundActionButton = {
+    action: BettingRoundActionType.FOLD,
     label: 'Fold',
 };
 
-export const CHECK_BUTTON: ActionButton = {
-    action: ActionType.CHECK,
+export const CHECK_BUTTON: BettingRoundActionButton = {
+    action: BettingRoundActionType.CHECK,
     label: 'Check',
 };
 
-export const CALL_BUTTON: ActionButton = {
-    action: ActionType.CALL,
+export const CALL_BUTTON: BettingRoundActionButton = {
+    action: BettingRoundActionType.CALL,
     label: 'Call',
 };
 
-export const BET_BUTTON: ActionButton = {
-    action: ActionType.BET,
+export const BET_BUTTON: BettingRoundActionButton = {
+    action: BettingRoundActionType.BET,
     label: 'Bet',
 };
 
-export const RAISE_BUTTON: ActionButton = {
-    action: ActionType.BET,
+export const RAISE_BUTTON: BettingRoundActionButton = {
+    action: BettingRoundActionType.BET,
     label: 'Raise',
 };
 
@@ -169,7 +175,7 @@ export const cleanController: Controller = {
     min: 0,
     max: 0,
     sizingButtons: [],
-    actionButtons: [],
+    bettingRoundActionButtons: [],
     adminButtons: [],
 };
 
@@ -189,7 +195,7 @@ export const CleanGame: UiGameState = {
         max: 0,
         timeBanks: 0,
         sizingButtons: [],
-        actionButtons: [],
+        bettingRoundActionButtons: [],
     },
     table: {
         spots: 9,
@@ -277,7 +283,7 @@ export const TestGame: UiGameState = {
                 value: 43000,
             },
         ],
-        actionButtons: ALL_ACTION_BUTTONS,
+        bettingRoundActionButtons: ALL_ACTION_BUTTONS,
         // adminButtons: [START_GAME_BUTTON],
     },
     table: {

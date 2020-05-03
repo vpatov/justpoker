@@ -15,6 +15,7 @@ import {
     STOP_GAME_BUTTON,
     ADD_CHIPS_BUTTON,
     UiChatMessage,
+    BettingRoundActionButton,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -140,22 +141,22 @@ export class StateConverter {
                 : COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
                       this.createPotSizeButton(numerator, denominator, potSize),
                   ),
-            actionButtons: this.getValidBetActions(clientUUID, heroPlayerUUID),
+            bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             adminButtons: this.getValidAdminButtons(clientUUID),
         };
 
         return controller;
     }
 
-    getValidBetActions(clientUUID: string, heroPlayerUUID: string): ActionButton[] {
-        const actionButtons = [] as ActionButton[];
+    getValidBettingRoundActions(clientUUID: string, heroPlayerUUID: string): BettingRoundActionButton[] {
+        const buttons = [] as BettingRoundActionButton[];
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
         if (!clientPlayerIsSeated || !this.gameStateManager.isGameStarted()) {
             return [];
         }
 
-        const disableButton = (b: ActionButton) => Object.assign({}, b, { disabled: true });
+        const disableButton = (b: BettingRoundActionButton) => Object.assign({}, b, { disabled: true });
 
         if (
             !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
@@ -165,15 +166,15 @@ export class StateConverter {
         }
 
         // player can always queue a bet or fold action but we decide if it is check or call
-        actionButtons.push(FOLD_BUTTON);
+        buttons.push(FOLD_BUTTON);
         if (this.gameStateManager.isPlayerFacingBet(heroPlayerUUID)) {
-            actionButtons.push(CALL_BUTTON);
+            buttons.push(CALL_BUTTON);
         } else {
-            actionButtons.push(CHECK_BUTTON);
+            buttons.push(CHECK_BUTTON);
         }
-        actionButtons.push(BET_BUTTON);
+        buttons.push(BET_BUTTON);
 
-        return actionButtons;
+        return buttons;
     }
 
     getMinimumBetSize(heroPlayerUUID: string) {

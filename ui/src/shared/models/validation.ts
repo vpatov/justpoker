@@ -17,7 +17,8 @@ export declare interface ValidationResponse {
   SEAT_IS_TAKEN = 'SEAT_IS_TAKEN',
   ILLEGAL_BETTING_ACTION = 'ILLEGAL_BETTING_ACTION',
   MAX_CHAT_MESSAGE_LENGTH_EXCEEDED = "MAX_CHAT_MESSAGE_LENGTH_EXCEEDED",
-  NOT_IMPLEMENTED_YET = "NOT_IMPLEMENTED_YET"
+  NOT_IMPLEMENTED_YET = "NOT_IMPLEMENTED_YET",
+  INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR"
 }
   
   export const NO_ERROR: ValidationResponse = {
@@ -28,4 +29,9 @@ export declare interface ValidationResponse {
   export const NOT_IMPLEMENTED_YET: ValidationResponse = {
     errorType: ErrorType.NOT_IMPLEMENTED_YET,
     errorString: "This code path hasn't been implemented yet."
+  };
+
+  export const INTERNAL_SERVER_ERROR: ValidationResponse = {
+    errorType: ErrorType.INTERNAL_SERVER_ERROR,
+    errorString: "There has been an internal server error."
   };

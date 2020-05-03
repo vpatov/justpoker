@@ -90,23 +90,8 @@ export class MessageService {
             perform: (uuid, req) => {},
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.CHECK]: {
-            validation: (uuid, req) => this.validationService.validateCheckAction(uuid),
-            perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
-            updates: [ServerStateKey.GAMESTATE, ServerStateKey.AUDIO],
-        },
-        [ActionType.BET]: {
-            validation: (uuid, req) => this.validationService.validateBetAction(uuid, req),
-            perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
-            updates: [ServerStateKey.GAMESTATE, ServerStateKey.AUDIO],
-        },
-        [ActionType.FOLD]: {
-            validation: (uuid, req) => this.validationService.validateFoldAction(uuid),
-            perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
-            updates: [ServerStateKey.GAMESTATE, ServerStateKey.AUDIO],
-        },
-        [ActionType.CALL]: {
-            validation: (uuid, req) => this.validationService.validateCallAction(uuid),
+        [ActionType.BETACTION]: {
+            validation: (uuid, req) => this.validationService.validateBettingRoundAction(uuid, req),
             perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
             updates: [ServerStateKey.GAMESTATE, ServerStateKey.AUDIO],
         },
