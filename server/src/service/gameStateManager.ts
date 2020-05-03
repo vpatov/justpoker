@@ -2,7 +2,13 @@ import { Service } from 'typedi';
 import WebSocket from 'ws';
 
 import { strict as assert } from 'assert';
-import { GameState, cleanGameState, ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import {
+    GameState,
+    cleanGameState,
+    ServerStateKey,
+    GameStage,
+    ALL_STATE_KEYS,
+} from '../../../ui/src/shared/models/gameState';
 import {
     StraddleType,
     GameType,
@@ -18,6 +24,7 @@ import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
 import { HandSolverService } from './handSolverService';
+import { TimerManager } from './timerManager';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -26,7 +33,7 @@ export class GameStateManager {
     private gameState: Readonly<GameState> = cleanGameState;
 
     // TODO place updatedKey logic into a seperate ServerStateManager file.
-    updatedKeys: Set<ServerStateKey> = new Set();
+    updatedKeys: Set<ServerStateKey> = ALL_STATE_KEYS;
 
     getUpdatedKeys(): Set<ServerStateKey> {
         return this.updatedKeys;
@@ -36,11 +43,15 @@ export class GameStateManager {
         updatedKeys.forEach((updatedKey) => this.updatedKeys.add(updatedKey));
     }
 
-    setUpdatedKeys(updatedKeys: ServerStateKey[]) {
+    setUpdatedKeys(updatedKeys: Set<ServerStateKey>) {
         this.updatedKeys = new Set(updatedKeys);
     }
 
-    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) {}
+    constructor(
+        private readonly deckService: DeckService,
+        private readonly handSolverService: HandSolverService,
+        private readonly timerManager: TimerManager,
+    ) {}
 
     /* Getters */
 
@@ -178,6 +189,14 @@ export class GameStateManager {
         return this.gameState.dealerUUID;
     }
 
+    getBigBlindUUID() {
+        return this.gameState.bigBlindUUID;
+    }
+
+    getSmallBlindUUID() {
+        return this.gameState.smallBlindUUID;
+    }
+
     getBoard() {
         return this.gameState.board;
     }
@@ -287,8 +306,8 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
-    getCanCurrentPlayerAct() {
-        return this.gameState.canCurrentPlayerAct;
+    canCurrentPlayerAct() {
+        return this.gameState.currentPlayerToAct && this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
     }
 
     getMinimumBetSize() {
@@ -373,10 +392,10 @@ export class GameStateManager {
     getNextPlayerInHandUUID(currentPlayerUUID: string) {
         //TODO duplicate safeguard.
         if (this.haveAllPlayersActed()) {
-            return '';
+            throw Error('getNextPlayerInHandUUID shouldnt be called if all palyers have acted.');
         }
         if (!currentPlayerUUID) {
-            return '';
+            throw Error('getNextPlayerInHandUUID shouldnt be called without a currentPalyerUUID');
         }
         const seats = this.getSeats();
         const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
@@ -462,6 +481,7 @@ export class GameStateManager {
                 // consider adding timeToAct and maxPlayers to form
             },
         };
+        this.timerManager.cancelStateTimer();
         return this.gameState.table.uuid;
     }
 
@@ -687,7 +707,7 @@ export class GameStateManager {
         return BETTING_ROUND_STAGES[BETTING_ROUND_STAGES.indexOf(bettingRoundStage) + 1];
     }
 
-    nextBettingRound() {
+    incrementBettingRoundStage() {
         this.updateGameState({ bettingRoundStage: this.getNextBettingRoundStage() });
     }
 

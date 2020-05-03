@@ -134,8 +134,8 @@ export class MessageService {
                 `clientUUID: ${clientUUID}, messagePayload: ${message.request}, actionType: ${message.actionType}`,
             );
             actionProcessor.perform(clientUUID, message.request);
-            this.stateGraphManager.processEvent(message.actionType);
             this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
+            this.stateGraphManager.processEvent(message.actionType);
         } else {
             // TODO process error and send error to client
             console.log(response);

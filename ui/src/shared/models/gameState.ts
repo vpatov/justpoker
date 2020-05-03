@@ -9,14 +9,14 @@ import { Table } from "./table";
 import { Card, Deck } from "./cards";
 
 export const enum GameStage {
-    NOT_IN_PROGRESS = 0,
-    INITIALIZE_NEW_HAND = 1,
-    SHOW_START_OF_HAND = 2,
-    SHOW_START_OF_BETTING_ROUND = 3,
-    WAITING_FOR_BET_ACTION = 4,
-    SHOW_BET_ACTION = 5,
-    SHOW_PLACE_BETS_IN_POT = 6,
-    SHOW_WINNER = 7
+    NOT_IN_PROGRESS = "NOT_IN_PROGRESS",
+    INITIALIZE_NEW_HAND = "INITIALIZE_NEW_HAND",
+    SHOW_START_OF_HAND = "SHOW_START_OF_HAND",
+    SHOW_START_OF_BETTING_ROUND = "SHOW_START_OF_BETTING_ROUND",
+    WAITING_FOR_BET_ACTION = "WAITING_FOR_BET_ACTION",
+    SHOW_BET_ACTION = "SHOW_BET_ACTION",
+    FINISH_BETTING_ROUND = "SHOW_PLACE_BETS_IN_POT",
+    SHOW_WINNER = "SHOW_WINNER"
 }
 
 export declare interface GameState {
@@ -35,13 +35,15 @@ export declare interface GameState {
 
     dealerUUID: Readonly<string>;
 
+    smallBlindUUID: Readonly<string>;
+
+    bigBlindUUID: Readonly<string>;
+
     bettingRoundStage: Readonly<BettingRoundStage>;
 
     firstToAct: Readonly<string>;
 
     currentPlayerToAct: Readonly<string>;
-
-    canCurrentPlayerAct: Readonly<boolean>;
 
     timeCurrentPlayerTurnStarted: number;
 
@@ -68,8 +70,7 @@ export declare interface GameState {
 
     unsetQueuedAction: boolean;
 
-    // smallBlindUUID: Readonly<string>;
-    // bigBlindUUID: Readonly<string>;
+
     // bettingRoundActions: ReadonlyArray<BettingRoundAction>
 }
 
@@ -99,13 +100,12 @@ export const cleanGameState: GameState = {
         maxPlayers: 9,
     },
     dealerUUID: "",
-    // smallBlindUUID: '',
-    // bigBlindUUID: '',
+    smallBlindUUID: '',
+    bigBlindUUID: '',
     bettingRoundStage: BettingRoundStage.WAITING,
     // bettingRoundActions: [],
     firstToAct: "",
     currentPlayerToAct: "",
-    canCurrentPlayerAct: false,
     shouldDealNextHand: false,
     unsetQueuedAction: false,
     deck: {
