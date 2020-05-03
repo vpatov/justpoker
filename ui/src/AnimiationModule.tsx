@@ -1,4 +1,4 @@
-import anime from "animejs/lib/anime.es.js";
+import anime from 'animejs/lib/anime.es.js';
 
 export function flipTable() {
     const animations = [] as any;
@@ -6,25 +6,53 @@ export function flipTable() {
     const resetDuration = 6000;
     animations.push(
         anime({
-            targets: ".ani_table",
+            targets: '.ani_table',
             translateY: window.innerHeight * -1.5,
-            rotateX: "3turn",
+            rotateX: '3turn',
             duration: duration,
-            easing: "easeOutCubic",
-        })
+            easing: 'easeOutCubic',
+        }),
     );
     animations.push(
         anime({
-            targets: [".ani_chipStack", ".ani_betLabel"],
+            targets: ['.ani_chipStack', '.ani_betLabel'],
             translateX: () => window.innerWidth * (Math.random() * 2 - 1),
             translateY: () => window.innerHeight * (Math.random() * 2 - 1),
-            rotate: "2turn",
+            rotate: '2turn',
             duration: duration,
-            easing: "easeOutCubic",
-        })
+            easing: 'easeOutCubic',
+        }),
     );
 
     setTimeout(() => {
         animations.forEach((a) => a.reset());
     }, resetDuration);
+}
+
+function getCenterOfTable() {
+    const { bottom, left, right, top } = document.getElementsByClassName('ani_table')[0].getBoundingClientRect();
+    const x = (right - left) / 2 + left;
+    const y = (top - bottom) / 2 + bottom;
+    return [x, y];
+}
+
+export function dealCards() {
+    const duration = 1800;
+
+    const [x, y] = getCenterOfTable();
+
+    const a = anime({
+        targets: ['.ani_playerCard_0', '.ani_playerCard_1'],
+        translateX: (target) => {
+            return [x - target.getBoundingClientRect().x, 0];
+        },
+        translateY: (target) => {
+            return [y - target.getBoundingClientRect().y, 0];
+        },
+        duration: duration,
+        rotate: '1turn',
+        easing: 'easeOutExpo',
+        delay: anime.stagger(50),
+    });
+    // setTimeout(() => a.reset(), duration);
 }
