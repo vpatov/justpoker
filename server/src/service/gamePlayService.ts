@@ -241,9 +241,10 @@ export class GamePlayService {
         const smallBlindUUID =
             numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID);
         const bigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(smallBlindUUID);
+        const postBigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
 
-        // the players have to be waiting to act because they can still raise even
-        // if everyone before them calls
+        const isHeadsUp = this.gsm.getPlayersReadyToPlay().length === 2;
+        const isStraddle = this.gsm.getPlayerStraddle(postBigBlindUUID); //TODO implement straddle logic
 
         this.bet(SB, smallBlindUUID);
         this.bet(BB, bigBlindUUID);
@@ -252,6 +253,16 @@ export class GamePlayService {
             smallBlindUUID,
             bigBlindUUID,
         });
+        let nextToAct;
+        if (!isHeadsUp) {
+            // no straddle
+            nextToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+        } else {
+            // heads up
+            nextToAct = dealerUUID;
+        }
+
+        this.gsm.setFirstToAct(nextToAct);
 
         assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
     }

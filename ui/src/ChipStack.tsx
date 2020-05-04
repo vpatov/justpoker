@@ -1,21 +1,21 @@
-import React, { Fragment } from "react";
-import Chip from "./Chip";
-import classnames from "classnames";
-import { makeStyles } from "@material-ui/core/styles";
-import { MAX_VALUES } from "./shared/util/consts"
+import React, { Fragment } from 'react';
+import Chip from './Chip';
+import classnames from 'classnames';
+import { makeStyles } from '@material-ui/core/styles';
+import { MAX_VALUES } from './shared/util/consts';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "10vmin",
-        flexWrap: "wrap",
-        flexDirection: "row-reverse",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '7.5vmin',
+        flexWrap: 'wrap',
+        flexDirection: 'row-reverse',
     },
     svgCont: {
-        position: "relative",
-        marginTop: "-3vmin",
+        position: 'relative',
+        marginTop: '-3vmin',
     },
 }));
 
@@ -34,10 +34,10 @@ function ChipStack(props) {
         }
         return (
             <svg
-                className={classnames(classes.svgCont, "ani_chipStack")}
+                className={classnames(classes.svgCont, 'ani_chipStack')}
                 viewBox="0 0 100 200"
-                width="3vmin"
-                height="6vmin"
+                width="2.5vmin"
+                height="5vmin"
             >
                 <Fragment> {chips}</Fragment>
             </svg>
@@ -61,11 +61,7 @@ function ChipStack(props) {
 
         return chipsStacks;
     }
-    return (
-        <div className={classes.root}>
-            {generatesChipsStacksFromAmount(amount)}
-        </div>
-    );
+    return <div className={classes.root}>{generatesChipsStacksFromAmount(amount)}</div>;
 }
 
 export default ChipStack;

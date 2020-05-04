@@ -1,5 +1,5 @@
-import { Card } from "./cards";
-import { BettingRoundAction, BettingRoundActionType } from "./game";
+import { Card } from './cards';
+import { BettingRoundAction, BettingRoundActionType } from './game';
 
 export declare interface Player {
     /** Unique identifier for player. */
@@ -22,6 +22,15 @@ export declare interface Player {
      * in the current hand, or are waiting to be dealt in the next hand.
      */
     readonly sitting: boolean;
+
+    // player is at the table but not being dealt in
+    readonly sittingOut: boolean;
+
+    // player does not want to be dealt in next hand
+    readonly dealInNextHand: boolean;
+
+    // player is straddling
+    readonly straddle: boolean;
 
     /** Gameplay goes from lower seat number to higher seat number and wraps around. */
     readonly seatNumber: number;
@@ -55,11 +64,14 @@ export const cleanPlayer: Player = {
     holeCards: [],
     handDescription: '',
     sitting: false,
+    sittingOut: false,
+    dealInNextHand: true,
+    straddle: false,
     seatNumber: -1,
     lastActionType: BettingRoundActionType.NOT_IN_HAND,
     winner: false,
     betAmount: 0,
     cardsAreHidden: true,
     chipsAtStartOfHand: 0,
-    chipDelta: 0
-}
+    chipDelta: 0,
+};

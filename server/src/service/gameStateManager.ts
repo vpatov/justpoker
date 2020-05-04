@@ -339,7 +339,7 @@ export class GameStateManager {
     }
 
     isPlayerReadyToPlay(playerUUID: string): boolean {
-        return this.getPlayer(playerUUID).sitting;
+        return this.getPlayer(playerUUID).sitting && !this.getPlayer(playerUUID).sittingOut;
     }
 
     isPlayerInHand(playerUUID: string): boolean {
@@ -372,6 +372,17 @@ export class GameStateManager {
 
     hasEveryoneButOnePlayerFolded(): boolean {
         return this.getPlayersInHand().length === 1;
+    }
+
+    canPlayerStartGame(playerUUID: string) {
+        const player = this.getPlayer(playerUUID);
+        if (player.sitting && this.getPlayersReadyToPlay().length >= 2 && !this.isGameStarted()) return true;
+        return false;
+    }
+
+    getPlayerStraddle(playerUUID: string): boolean {
+        const player = this.getPlayer(playerUUID);
+        return player.straddle;
     }
 
     getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
@@ -559,6 +570,29 @@ export class GameStateManager {
                 ]),
             },
         };
+    }
+
+    setPlayerStraddle(playerUUID: string, straddle: boolean) {
+        this.updatePlayer(playerUUID, { straddle: straddle });
+    }
+
+    setPlayerDealInNextHand(playerUUID: string) {
+        this.updatePlayer(playerUUID, { dealInNextHand: true });
+    }
+
+    setPlayerDealOutNextHand(playerUUID: string) {
+        this.updatePlayer(playerUUID, { dealInNextHand: false });
+    }
+
+    setPlayersSittingOutByDealInNextHand() {
+        Object.values(this.getPlayers()).forEach((p) => {
+            const playerUUID = p.uuid;
+            if (p.dealInNextHand) {
+                this.updatePlayer(playerUUID, { sittingOut: false });
+            } else {
+                this.updatePlayer(playerUUID, { sittingOut: true });
+            }
+        });
     }
 
     sitDownPlayer(playerUUID: string, seatNumber: number) {

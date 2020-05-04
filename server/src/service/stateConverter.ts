@@ -107,6 +107,7 @@ export class StateConverter {
             smallBlind: this.gameStateManager.getSB(),
             allowStraddle: this.gameStateManager.getAllowStraddle(),
             gameType: this.gameStateManager.getGameType(),
+            canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
         };
 
         return global;
@@ -121,6 +122,7 @@ export class StateConverter {
         const bbValue = this.gameStateManager.getBB();
         const potSize = this.gameStateManager.getTotalPot();
         const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID;
+        const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
         const controller: Controller = {
             toAct,
             unsetQueuedAction: this.gameStateManager.getUnsetQueuedAction(),
@@ -135,6 +137,8 @@ export class StateConverter {
                   ),
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             adminButtons: this.getValidAdminButtons(clientUUID),
+            dealInNextHand: hero.dealInNextHand,
+            straddle: hero.straddle,
         };
 
         return controller;
@@ -234,6 +238,7 @@ export class StateConverter {
             button: this.gameStateManager.getDealerUUID() === player.uuid,
             winner: player.winner,
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
+            sittingOut: player.sittingOut,
         };
         return newPlayer;
     }

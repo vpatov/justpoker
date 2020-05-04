@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         position: 'relative',
         backgroundColor: 'white',
-        height: '8.8vmin',
+        height: '8vmin',
         width: '6.8vmin',
         display: 'flex',
         justifyContent: 'space-evenly',
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '3vmin',
         color: 'white',
         fontWeight: 'bold',
-        marginTop: '18%',
+        marginTop: '12%',
     },
     hidden: {
         margin: '0 0.5vmin',

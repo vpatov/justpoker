@@ -6,11 +6,14 @@ import Bet from './Bet';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { tableSelector, heroIsSeatedSelector, playersSelector } from './store/selectors';
+import { tableSelector, playersSelector, globalGameStateSelector } from './store/selectors';
+import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
+import { WsServer } from './api/ws';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import { Button } from '@material-ui/core';
 
 const TABLE_HEIGHT = 48;
 const TABLE_WIDTH = 78;
@@ -75,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
         top: 0,
         left: 0,
         transform: 'translateY(-50%) translateX(-50%)',
-        transition: 'all 0.6s ease-in-out',
+        transition: 'all 0.4s ease-in-out',
     },
     mainPot: {
         fontSize: '3vmin',
@@ -96,6 +99,10 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         fontSize: '1vmin',
     },
+    startGame: {
+        zIndex: 5,
+        fontSize: '4vmin',
+    },
 }));
 
 function mod(n, m) {
@@ -105,7 +112,7 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const heroIsSeated = useSelector(heroIsSeatedSelector);
+    const { canStartGame, heroIsSeated, gameStarted } = useSelector(globalGameStateSelector);
     const { communityCards, spots, pot, fullPot } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
@@ -126,7 +133,6 @@ function Table(props) {
                         <Player
                             key={index}
                             setHeroRotation={(r) => {
-                                console.log('called', r);
                                 setHeroRotation(r);
                             }}
                             virtualPositon={mod(index + offset - 1, 9)}
@@ -158,6 +164,17 @@ function Table(props) {
         return ans;
     }
 
+    function onClickStartGame() {
+        sendServerAction(ActionType.STARTGAME);
+    }
+
+    function sendServerAction(action) {
+        WsServer.send({
+            actionType: action,
+            request: {} as ClientWsMessageRequest,
+        });
+    }
+
     function createBetsAtTable() {
         const ans = [] as any;
 
@@ -185,10 +202,21 @@ function Table(props) {
     return (
         <div className={classnames(classes.root, className)}>
             <div className={classnames(classes.table, 'ani_table')}>
-                <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
-                    <Typography className={classes.fullPot}>{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
-                </Tooltip>
-                <Typography className={classes.mainPot}>{`${pot.toLocaleString()}`}</Typography>
+                {canStartGame ? (
+                    <Button className={classes.startGame} color="primary" variant="outlined" onClick={onClickStartGame}>
+                        Start Game
+                    </Button>
+                ) : null}
+                {gameStarted ? (
+                    <>
+                        <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
+                            <Typography
+                                className={classes.fullPot}
+                            >{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
+                        </Tooltip>
+                        <Typography className={classes.mainPot}>{`${pot.toLocaleString()}`}</Typography>
+                    </>
+                ) : null}
                 <CommunityCards communityCards={communityCards} />
             </div>
 
