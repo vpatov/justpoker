@@ -14,7 +14,7 @@ import { MessageService } from '../service/messageService';
 import { GameState, ServerStateKey, ALL_STATE_KEYS } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateConverter } from '../service/stateConverter';
-import { generateUUID, logGameState } from '../../../ui/src/shared/util/util';
+import { generateUUID, logGameState, printObj } from '../../../ui/src/shared/util/util';
 import { AudioService } from '../service/audioService';
 import { AnimationService } from '../service/animationService';
 
@@ -64,6 +64,9 @@ class Server {
 
     logAverages() {
         Object.entries(this.performanceMetrics.snippets).forEach(([snippet, [sum, count]]) => {
+            if (count === 0) {
+                return;
+            }
             // dont flood the console
             if (count % 10 === 0) {
                 console.log(`${snippet}: Average over ${count} samples: ${sum / count}`);
@@ -118,10 +121,6 @@ class Server {
             console.log(util.inspect(res, false, null, true));
             /* -------------- */
         }
-        // TODO remove this from server and place into stateTransformService
-        this.audioService.reset();
-        this.animationService.reset();
-        this.gsm.resetSingltonState();
     }
 
     initWSSListeners() {
@@ -146,16 +145,12 @@ class Server {
             // other intermediary that will handle WS robustness
             this.gsm.initConnectedClient(clientID, ws);
 
-            ws.send(
-                JSON.stringify({
-                    clientID,
-                }),
-            );
-
+            ws.send(JSON.stringify({ clientID }));
             ws.send(JSON.stringify(this.stateConverter.getUIState(clientID)));
 
             ws.on('message', (data: WebSocket.Data) => {
-                console.log('Incoming data:', util.inspect(data, false, null, true));
+                console.log('Incoming data:');
+                printObj(data);
                 if (typeof data === 'string') {
                     try {
                         const receivedMessageTime = Date.now();
@@ -164,23 +159,10 @@ class Server {
                         const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
                         this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
 
-                        const startSendUpdatesTime = Date.now();
-                        // this.sendUpdatesToClients();
-                        const sendUpdatesTime = Date.now() - startSendUpdatesTime;
-                        this.updateSnippet(ExecutionSnippet.SEND_UPDATES, sendUpdatesTime);
-                        const totalMessageProcessTime = Date.now() - receivedMessageTime;
-                        this.updateSnippet(ExecutionSnippet.TOTAL_WS_MESSAGE_PROCESS, totalMessageProcessTime);
-
                         this.logAverages();
-
-                        /* Debug Logging */
-                        // logGameState(this.gsm.getGameState());
-                        /* -------------- */
                     } catch (e) {
-                        /* Debug Logging */
                         logGameState(this.gsm.getGameState());
                         throw e;
-                        /* -------------- */
                     }
                 } else {
                     const unsupportedMsg = 'Received data of unsupported type.';
@@ -200,6 +182,9 @@ class Server {
 
         this.stateGraphManager.observeUpdates().subscribe(() => {
             this.sendUpdatesToClients();
+            this.audioService.reset();
+            this.animationService.reset();
+            this.gsm.resetSingletonState();
         });
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {
