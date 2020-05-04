@@ -2,6 +2,7 @@
 // because it seems like there will only be one sound per client per wsmessage
 export declare interface AudioQueue {
     global: SoundByte;
+    personal: {[playerUUID: string]: SoundByte};
     // personal: SoundByte;
 }
 
@@ -23,6 +24,7 @@ export enum SoundByte {
 
 export function getCleanAudioQueue(): AudioQueue {
     return {
-        global: SoundByte.NONE
+        global: SoundByte.NONE,
+        personal: {}
     };
 }

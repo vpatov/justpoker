@@ -13,6 +13,7 @@ import AdminIcon from '@material-ui/icons/SupervisorAccount';
 import SeatIcon from '@material-ui/icons/EventSeat';
 import QuitIcon from '@material-ui/icons/Clear';
 import StartIcon from '@material-ui/icons/PlayArrow';
+import StopIcon from '@material-ui/icons/Stop';
 import SettingsIcon from '@material-ui/icons/Settings';
 import VolumeOnIcon from '@material-ui/icons/VolumeUp';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -74,6 +75,10 @@ function Default(props) {
     };
 
     const actions = [
+        { icon: <StartIcon className={classes.icon} />, name: 'Start Game', onClick: onClickStartGame },
+        { icon: <StopIcon className={classes.icon} />, name: 'Stop Game', onClick: onClickStopGame },
+
+        { icon: <SeatIcon className={classes.icon} />, name: 'Sit Out' },
         { icon: <QuitIcon className={classes.icon} />, name: 'Quit' },
         { icon: <VolumeOnIcon className={classes.icon} />, name: 'Volume' },
         { icon: <SettingsIcon className={classes.icon} />, name: 'Settings' },
@@ -81,6 +86,14 @@ function Default(props) {
         { icon: <FlipIcon className={classes.icon} />, name: 'Flip Table', onClick: () => flipTable() },
         { icon: <FlipIcon className={classes.icon} />, name: 'Animate Deal', onClick: () => dealCards() },
     ];
+
+    function onClickStartGame() {
+        sendServerAction(ActionType.STARTGAME);
+    }
+
+    function onClickStopGame() {
+        sendServerAction(ActionType.STOPGAME);
+    }
 
     function sendServerAction(action) {
         WsServer.send({

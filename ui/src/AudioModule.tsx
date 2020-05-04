@@ -25,13 +25,13 @@ function AudioModule(props) {
         WsServer.subscribe("audio", onReceiveNewAudioState);
     }, []);
 
-    const onReceiveNewAudioState = (audioState: AudioQueue) => {
-        const audio = AUDIO_MAP[audioState.global];
+    const onReceiveNewAudioState = (soundByte: SoundByte) => {
+        const audio = AUDIO_MAP[soundByte];
         if (audio) {
-            console.log("playing", audioState.global);
+            console.log("playing", soundByte);
             audio.play();
         } else {
-            console.log(`No audio file provided for ${audioState.global}`);
+            console.log(`No audio file provided for ${soundByte}`);
         }
     };
 

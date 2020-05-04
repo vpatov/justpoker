@@ -2,7 +2,14 @@ import { Service } from 'typedi';
 import WebSocket from 'ws';
 
 import { strict as assert } from 'assert';
-import { GameState, cleanGameState, ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import {
+    GameState,
+    cleanGameState,
+    ServerStateKey,
+    GameStage,
+    ALL_STATE_KEYS,
+    Pot,
+} from '../../../ui/src/shared/models/gameState';
 import {
     StraddleType,
     GameType,
@@ -18,6 +25,7 @@ import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
 import { HandSolverService } from './handSolverService';
+import { TimerManager } from './timerManager';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -26,7 +34,7 @@ export class GameStateManager {
     private gameState: Readonly<GameState> = cleanGameState;
 
     // TODO place updatedKey logic into a seperate ServerStateManager file.
-    updatedKeys: Set<ServerStateKey> = new Set();
+    updatedKeys: Set<ServerStateKey> = ALL_STATE_KEYS;
 
     getUpdatedKeys(): Set<ServerStateKey> {
         return this.updatedKeys;
@@ -36,11 +44,15 @@ export class GameStateManager {
         updatedKeys.forEach((updatedKey) => this.updatedKeys.add(updatedKey));
     }
 
-    setUpdatedKeys(updatedKeys: ServerStateKey[]) {
+    setUpdatedKeys(updatedKeys: Set<ServerStateKey>) {
         this.updatedKeys = new Set(updatedKeys);
     }
 
-    constructor(private readonly deckService: DeckService, private readonly handSolverService: HandSolverService) {}
+    constructor(
+        private readonly deckService: DeckService,
+        private readonly handSolverService: HandSolverService,
+        private readonly timerManager: TimerManager,
+    ) {}
 
     /* Getters */
 
@@ -52,8 +64,8 @@ export class GameStateManager {
         return this.gameState.gameStage;
     }
 
-    isStateReady(): boolean {
-        return this.gameState.isStateReady;
+    updateGameStage(gameStage: GameStage) {
+        this.updateGameState({ gameStage });
     }
 
     updateGameState(updates: Partial<GameState>) {
@@ -174,6 +186,14 @@ export class GameStateManager {
         return this.gameState.dealerUUID;
     }
 
+    getBigBlindUUID() {
+        return this.gameState.bigBlindUUID;
+    }
+
+    getSmallBlindUUID() {
+        return this.gameState.smallBlindUUID;
+    }
+
     getBoard() {
         return this.gameState.board;
     }
@@ -202,6 +222,18 @@ export class GameStateManager {
 
     getPots() {
         return this.gameState.pots;
+    }
+
+    popPot(): Pot {
+        const potsLength = this.gameState.pots.length;
+        assert(potsLength > 0, 'Cannot call popPot when length of pot array is zero. This is a bug.');
+        const poppedPot = this.gameState.pots[0];
+        this.updateGameState({ pots: this.gameState.pots.filter((pot) => pot != poppedPot) });
+        assert(
+            this.gameState.pots.length === potsLength - 1,
+            'Pot array should have pot removed after calling popPot. This is a bug.',
+        );
+        return poppedPot;
     }
 
     getTotalPot() {
@@ -237,6 +269,11 @@ export class GameStateManager {
 
     getNumberPlayersSitting() {
         return Object.entries(this.gameState.players).filter(([uuid, player]) => player.sitting).length;
+    }
+
+    getNumberPlayersSittingIn() {
+        return Object.entries(this.gameState.players).filter(([uuid, player]) => player.sitting && !player.sittingOut)
+            .length;
     }
 
     getSeats() {
@@ -283,8 +320,8 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
-    getCanCurrentPlayerAct() {
-        return this.gameState.canCurrentPlayerAct;
+    canCurrentPlayerAct() {
+        return this.gameState.currentPlayerToAct && this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
     }
 
     getMinimumBetSize() {
@@ -342,6 +379,7 @@ export class GameStateManager {
         return this.getPlayersInHand().length === 1;
     }
 
+    // TODO put into validationService
     canPlayerStartGame(playerUUID: string) {
         const player = this.getPlayer(playerUUID);
         if (player.sitting && this.getPlayersReadyToPlay().length >= 2 && !this.isGameStarted()) return true;
@@ -380,10 +418,10 @@ export class GameStateManager {
     getNextPlayerInHandUUID(currentPlayerUUID: string) {
         //TODO duplicate safeguard.
         if (this.haveAllPlayersActed()) {
-            return '';
+            throw Error('getNextPlayerInHandUUID shouldnt be called if all palyers have acted.');
         }
         if (!currentPlayerUUID) {
-            return '';
+            throw Error('getNextPlayerInHandUUID shouldnt be called without a currentPalyerUUID');
         }
         const seats = this.getSeats();
         const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
@@ -465,10 +503,12 @@ export class GameStateManager {
                 bigBlind: Number(newGameForm.bigBlind),
                 gameType: newGameForm.gameType,
                 timeToAct: Number(newGameForm.timeToAct) * 1000,
+                maxBuyin: Number(newGameForm.maxBuyin),
                 maxPlayers: 9,
                 // consider adding timeToAct and maxPlayers to form
             },
         };
+        this.timerManager.cancelStateTimer();
         return this.gameState.table.uuid;
     }
 
@@ -512,7 +552,7 @@ export class GameStateManager {
         const player = this.createNewPlayer(name, buyin);
 
         // TODO remove temporary logic
-        // this delets previous player association and replaces it
+        // this deletes previous player association and replaces it
         // with new one
         const client = this.getConnectedClient(clientUUID);
         if (client.playerUUID) {
@@ -542,31 +582,12 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { straddle: straddle });
     }
 
-    setPlayerDealInNextHand(playerUUID: string) {
-        this.updatePlayer(playerUUID, { dealInNextHand: true });
-    }
-
-    setPlayerDealOutNextHand(playerUUID: string) {
-        this.updatePlayer(playerUUID, { dealInNextHand: false });
-    }
-
-    setPlayersSittingOutByDealInNextHand() {
-        Object.values(this.getPlayers()).forEach((p) => {
-            const playerUUID = p.uuid;
-            if (p.dealInNextHand) {
-                this.updatePlayer(playerUUID, { sittingOut: false });
-            } else {
-                this.updatePlayer(playerUUID, { sittingOut: true });
-            }
-        });
-    }
-
     sitDownPlayer(playerUUID: string, seatNumber: number) {
-        this.updatePlayer(playerUUID, { sitting: true, seatNumber: seatNumber });
+        this.updatePlayer(playerUUID, { sitting: true, sittingOut: false, seatNumber: seatNumber });
     }
 
     standUpPlayer(playerUUID: string) {
-        this.updatePlayer(playerUUID, { sitting: false, seatNumber: -1 });
+        this.updatePlayer(playerUUID, { sitting: false, sittingOut: false, seatNumber: -1 });
     }
 
     getFirstToAct() {
@@ -637,7 +658,6 @@ export class GameStateManager {
         }));
 
         this.updateGameState({
-            isStateReady: true,
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
             firstToAct: '',
@@ -682,6 +702,18 @@ export class GameStateManager {
         return player.lastActionType === BettingRoundActionType.ALL_IN;
     }
 
+    getPlayersAllIn(): string[] {
+        return Object.entries(this.gameState.players)
+            .filter(([uuid, player]) => this.isPlayerAllIn(uuid))
+            .map(([uuid, player]) => uuid);
+    }
+
+    isAllInRunOut() {
+        const playersAllIn = this.getPlayersAllIn();
+        const playersInHand = this.getPlayersInHand();
+        return playersAllIn.length >= playersInHand.length - 1;
+    }
+
     hasPlayerPutAllChipsInThePot(playerUUID: string): boolean {
         return this.getChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
     }
@@ -717,7 +749,7 @@ export class GameStateManager {
         return BETTING_ROUND_STAGES[BETTING_ROUND_STAGES.indexOf(bettingRoundStage) + 1];
     }
 
-    nextBettingRound() {
+    incrementBettingRoundStage() {
         this.updateGameState({ bettingRoundStage: this.getNextBettingRoundStage() });
     }
 
