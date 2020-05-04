@@ -98,7 +98,7 @@ export class GameStateManager {
         };
     }
 
-    resetSingltonState() {
+    resetSingletonState() {
         this.updateGameState({
             unsetQueuedAction: false,
         });
