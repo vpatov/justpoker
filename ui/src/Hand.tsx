@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CardSmall from './CardSmall';
+import classnames from 'classnames';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -8,14 +9,22 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'center',
     },
+    hero: {
+        transform: 'scale(1.2)',
+    },
 }));
 
 function Hand(props) {
     const classes = useStyles();
+    const { hero } = props;
     const { cards } = props.hand;
 
     return (
-        <div className={classes.root}>
+        <div
+            className={classnames(classes.root, {
+                [classes.hero]: hero,
+            })}
+        >
             {cards.map((c, i) => (
                 <CardSmall
                     suit={c.suit}

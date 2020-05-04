@@ -8,12 +8,17 @@ import classnames from 'classnames';
 const useStyles = makeStyles((theme) => ({
     stackCont: {
         width: '100%',
-        fontSize: '18px',
-        marginTop: '-2vmin',
+        marginTop: '-1vmin',
+
         ...theme.custom.STACK,
     },
+    hero: {
+        transform: 'scale(1.2)',
+    },
     toAct: {
-        ...theme.custom.STACK,
+        // prevents blurryness on timer animation
+        '-webkit-backface-visibility': 'hidden',
+        '-webkit-transform': 'translateZ(0)',
         ...theme.custom.STACK_TO_ACT,
     },
     winner: {
@@ -73,7 +78,7 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, button, winner, toAct } = props;
+    const { stack, name, button, winner, toAct, hero } = props;
     const prevStack = usePrevious(stack);
 
     return (
@@ -81,6 +86,7 @@ function PlayerStack(props) {
             className={classnames(classes.stackCont, {
                 [classes.toAct]: toAct,
                 [classes.winner]: winner,
+                [classes.hero]: hero,
             })}
         >
             {button ? <Typography className={classes.buttonR}>{'★'}</Typography> : null}
