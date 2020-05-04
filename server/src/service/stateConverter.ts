@@ -35,6 +35,8 @@ import {
 import { ValidationService, hasError } from './validationService';
 import { AudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
 import { MessageService } from './messageService';
+import { AnimationService } from './animationService';
+
 import { ChatService } from './chatService';
 import { ChatMessage } from '../../../ui/src/shared/models/chat';
 
@@ -44,6 +46,7 @@ export class StateConverter {
         private readonly gameStateManager: GameStateManager,
         private readonly validationService: ValidationService,
         private readonly audioService: AudioService,
+        private readonly animationService: AnimationService,
         private readonly messageService: MessageService,
         private readonly chatService: ChatService,
     ) {}
@@ -90,6 +93,7 @@ export class StateConverter {
                   }
                 : undefined,
             audio: this.audioUpdated() ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
+            animation: this.animationService.getAnimationTrigger(),
             // TODO refactor to send entire chatlog on init.
             chat: this.chatUpdated() ? this.transformChatMessage() : undefined,
         };

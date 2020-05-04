@@ -12,6 +12,7 @@ import { TimerManager } from './timerManager';
 import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
 
 import { AudioService } from './audioService';
+import { AnimationService } from '../service/animationService';
 
 import { printObj, logGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';
@@ -23,6 +24,8 @@ export class GamePlayService {
         private readonly handSolverService: HandSolverService,
         private readonly timerManager: TimerManager,
         private readonly audioService: AudioService,
+        private readonly animationService: AnimationService,
+
         private readonly validationService: ValidationService,
     ) {}
 
@@ -287,6 +290,7 @@ export class GamePlayService {
 
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
+                this.animationService.animateDeal();
                 Object.keys(this.gsm.getPlayers())
                     .filter((playerUUID) => this.gsm.isPlayerReadyToPlay(playerUUID))
                     .forEach((playerUUID) => this.gsm.dealCardsToPlayer(2, playerUUID));

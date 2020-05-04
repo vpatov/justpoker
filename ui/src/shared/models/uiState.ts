@@ -1,7 +1,9 @@
 import { Suit, genRandomCard } from './cards';
 import { ActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
-import { getCleanAudioQueue, SoundByte } from './audioQueue';
+import { SoundByte } from './audioQueue';
+import { AnimationTrigger } from './animationState';
+
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType } from './game';
 
@@ -9,6 +11,7 @@ export declare interface UiState {
     game: UiGameState;
     audio: SoundByte;
     chat: UiChatMessage;
+    animation: AnimationTrigger;
 }
 
 export declare interface UiGameState {
@@ -219,6 +222,7 @@ export const CleanRootState: UiState = {
         content: 'Message in the chat log.',
         timestamp: 0,
     },
+    animation: AnimationTrigger.NONE,
 };
 
 export const testUiChatLog: UiChatLog = {
