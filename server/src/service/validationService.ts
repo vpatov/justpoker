@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { GameStateManager } from './gameStateManager';
-import { BettingRoundActionType, BettingRoundAction } from '../../../ui/src/shared/models/game';
+import { BettingRoundActionType, BettingRoundAction, GameType } from '../../../ui/src/shared/models/game';
 import {
     SitDownRequest,
     JoinTableRequest,
@@ -336,6 +336,18 @@ export class ValidationService {
         }
 
         const minimumBet = this.gsm.getMinimumBetSizeForPlayer(player.uuid);
+
+        if (this.gsm.getGameType() === GameType.PLOMAHA) {
+            const maximumBetSize = this.gsm.getMaxPotLimitBetSize();
+            if (betAmount > maximumBetSize) {
+                return {
+                    errorType: ErrorType.ILLEGAL_BETTING_ACTION,
+                    errorString:
+                        `${errorPrefix} Player cannot bet ${betAmount}\nmaximum bet is ${maximumBetSize} in PLOMAHA` +
+                        ` previousRaise is ${this.gsm.getPreviousRaise()}, fullPot is ${this.gsm.getFullPot()}.`,
+                };
+            }
+        }
 
         if (betAmount < minimumBet) {
             return {

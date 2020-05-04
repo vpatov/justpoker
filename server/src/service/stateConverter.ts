@@ -17,7 +17,7 @@ import {
     UiChatMessage,
     BettingRoundActionButton,
 } from '../../../ui/src/shared/models/uiState';
-import { BettingRoundStage } from '../../../ui/src/shared/models/game';
+import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
 import { AudioService } from './audioService';
 
@@ -131,7 +131,7 @@ export class StateConverter {
             toAct,
             unsetQueuedAction: this.gameStateManager.getUnsetQueuedAction(),
             min: this.getMinimumBetSize(heroPlayerUUID),
-            max: this.gameStateManager.getPlayer(heroPlayerUUID).chips,
+            max: this.getMaxBetSizeForPlayer(heroPlayerUUID),
             sizingButtons: !this.gameStateManager.isGameStarted()
                 ? []
                 : bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
@@ -146,6 +146,12 @@ export class StateConverter {
         };
 
         return controller;
+    }
+
+    getMaxBetSizeForPlayer(playerUUID: string) {
+        return this.gameStateManager.getGameType() === GameType.PLOMAHA
+            ? this.gameStateManager.getMaxPotLimitBetSize()
+            : this.gameStateManager.getPlayer(playerUUID).chips;
     }
 
     getValidBettingRoundActions(clientUUID: string, heroPlayerUUID: string): BettingRoundActionButton[] {

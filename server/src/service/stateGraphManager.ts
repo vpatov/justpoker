@@ -204,7 +204,9 @@ export class StateGraphManager {
 
         switch (stage) {
             case GameStage.NOT_IN_PROGRESS: {
+                this.gameStateManager.setUnsetQueuedAction();
                 this.gameStateManager.clearStateOfRoundInfo();
+                break;
             }
             case GameStage.INITIALIZE_NEW_HAND: {
                 this.gameStateManager.setUnsetQueuedAction();

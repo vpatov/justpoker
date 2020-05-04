@@ -335,6 +335,10 @@ export class GameStateManager {
         return minimumBetSize > player.chips ? player.chips : minimumBetSize;
     }
 
+    getMaxPotLimitBetSize() {
+        return this.getFullPot() + this.getPreviousRaise() * 2;
+    }
+
     isGameStarted() {
         return this.gameState.shouldDealNextHand;
     }
@@ -501,7 +505,7 @@ export class GameStateManager {
             gameParameters: {
                 smallBlind: Number(newGameForm.smallBlind),
                 bigBlind: Number(newGameForm.bigBlind),
-                gameType: newGameForm.gameType,
+                gameType: newGameForm.gameType || GameType.NLHOLDEM,
                 timeToAct: Number(newGameForm.timeToAct) * 1000,
                 maxBuyin: Number(newGameForm.maxBuyin),
                 maxPlayers: 9,
@@ -616,11 +620,14 @@ export class GameStateManager {
         });
     }
 
+    computeBestHandForPlayer(playerUUID: string) {
+        return this.getGameType() === GameType.PLOMAHA
+            ? this.handSolverService.computeBestPLOHand(this.getPlayer(playerUUID).holeCards, this.getBoard())
+            : this.handSolverService.computeBestNLEHand(this.getPlayer(playerUUID).holeCards, this.getBoard());
+    }
+
     getPlayerHandDescription(playerUUID: string) {
-        const bestHand = this.handSolverService.computeBestHandFromCards([
-            ...this.getBoard(),
-            ...this.getPlayer(playerUUID).holeCards,
-        ]);
+        const bestHand = this.computeBestHandForPlayer(playerUUID);
         return bestHand.descr;
     }
 

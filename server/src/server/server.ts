@@ -20,6 +20,7 @@ import { AnimationService } from '../service/animationService';
 
 import { ChatService } from '../service/chatService';
 import { StateGraphManager } from '../service/stateGraphManager';
+import { NewGameForm } from '../../../ui/src/shared/models/table';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -82,7 +83,7 @@ class Server {
         });
 
         router.post('/createGame', (req, res) => {
-            const newGameForm = {
+            const newGameForm: NewGameForm = {
                 smallBlind: req.body.smallBlind,
                 bigBlind: req.body.bigBlind,
                 gameType: req.body.gameType,

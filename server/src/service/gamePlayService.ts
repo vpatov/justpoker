@@ -5,6 +5,7 @@ import {
     BettingRoundActionType,
     BettingRoundStage,
     CHECK_ACTION,
+    GameType,
 } from '../../../ui/src/shared/models/game';
 import { strict as assert } from 'assert';
 import { HandSolverService, Hand } from './handSolverService';
@@ -285,6 +286,23 @@ export class GamePlayService {
         this.gsm.setFirstToAct(firstToAct);
     }
 
+    dealHoleCards(playerUUID: string) {
+        const gameType = this.gsm.getGameType();
+        switch (gameType) {
+            case GameType.NLHOLDEM: {
+                this.gsm.dealCardsToPlayer(2, playerUUID);
+                break;
+            }
+            case GameType.PLOMAHA: {
+                this.gsm.dealCardsToPlayer(4, playerUUID);
+                break;
+            }
+            default: {
+                throw Error(`GameType: ${gameType} is not implemented yet.`);
+            }
+        }
+    }
+
     dealCards() {
         const bettingRoundStage = this.gsm.getBettingRoundStage();
 
@@ -293,7 +311,7 @@ export class GamePlayService {
                 this.animationService.animateDeal();
                 Object.keys(this.gsm.getPlayers())
                     .filter((playerUUID) => this.gsm.isPlayerReadyToPlay(playerUUID))
-                    .forEach((playerUUID) => this.gsm.dealCardsToPlayer(2, playerUUID));
+                    .forEach((playerUUID) => this.dealHoleCards(playerUUID));
                 break;
             }
 
@@ -319,16 +337,9 @@ export class GamePlayService {
     }
 
     showDown() {
-        const board = this.gsm.getBoard();
         const playersHands: [string, any][] = this.gsm
             .getPlayersInHand()
-            .map((playerUUID) => [
-                playerUUID,
-                this.handSolverService.computeBestHandFromCards([
-                    ...this.gsm.getPlayer(playerUUID).holeCards,
-                    ...board,
-                ]),
-            ]);
+            .map((playerUUID) => [playerUUID, this.gsm.computeBestHandForPlayer(playerUUID)]);
 
         const pot = this.gsm.popPot();
 
@@ -340,7 +351,8 @@ export class GamePlayService {
             .filter(([uuid, hand]) => winningHands.includes(hand))
             .map(([uuid, hand]) => uuid);
 
-        /** Split chips evenly amongst winners, distributing odd chips by early position
+        /**
+         *  Split chips evenly amongst winners, distributing odd chips by early position
          *  Example: 3-way pot of 14 would get first get split into 4, 4, 4.
          *  There are 2 odd chips left:
          *      earliest position gets one
