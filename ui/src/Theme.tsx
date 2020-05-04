@@ -55,8 +55,8 @@ export const CUSTOM_THEME = {
             background: 'linear-gradient(360deg, rgba(50,50,55) 0%, rgb(22,22,30));',
         },
         TABLE: {
-            border: `0.7vmin solid rgba(0,0,0,0.4)`,
-            boxShadow: ` 0 3px 3px 3px rgba(255,255,255,0.4)`,
+            border: `0.2vmin solid rgba(0,0,0,0.4)`,
+            // boxShadow: ` 0 1px 1px 1px rgba(255,255,255,0.3)`,
             backgroundColor: 'black',
             background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
         },
@@ -69,7 +69,7 @@ export const CUSTOM_THEME = {
         STACK_TO_ACT: {
             boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',
             backgroundColor: CUSTOM_PALETTE.primary.main,
-            background: `linear-gradient(90deg, ${CUSTOM_PALETTE.primary.light} 0%, ${CUSTOM_PALETTE.primary.main} 50%, ${CUSTOM_PALETTE.primary.light} 100%)`,
+            background: `linear-gradient(90deg, ${CUSTOM_PALETTE.primary.light} -33%, ${CUSTOM_PALETTE.primary.main} 50%, ${CUSTOM_PALETTE.primary.light} 133%)`,
             // backgroundSize: '200% 200%',
             // '-webkit-animation': '$grad 2s linear infinite',
             // animation: '$grad 2s linear infinite',

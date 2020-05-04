@@ -10,32 +10,28 @@ import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 
 const PLAYER_WIDTH = 16;
-const PLAYER_HEIGHT = 13;
-const HERO_SCALE = 1.2;
+
 const useStyles = makeStyles((theme) => ({
     root: {
         width: `${PLAYER_WIDTH}vmin`,
-        // height: `${PLAYER_HEIGHT}vmin`,
     },
-    playerHero: {
-        // width: `${PLAYER_WIDTH * HERO_SCALE}vmin`,
-        // height: `${PLAYER_HEIGHT * HERO_SCALE}vmin`,
-    },
+
     folded: {
         ...theme.custom.FOLDED,
     },
     sittingOut: {
-        width: '100%',
-        height: '7vmin',
-        borderTopLeftRadius: '2vmin',
-        borderTopRightRadius: '2vmin',
+        width: '80%',
+        margin: '0 auto',
+        borderTopLeftRadius: '1vmin',
+        borderTopRightRadius: '1vmin',
         backgroundColor: blueGrey[400],
         display: 'flex',
         justifyContent: 'space-evenly',
     },
     sittingOutText: {
-        marginTop: '5%',
-        fontSize: '2vmin',
+        marginTop: '3%',
+        marginBottom: '10%',
+        fontSize: '1.6vmin',
     },
 }));
 
@@ -58,7 +54,6 @@ function Player(props) {
         <div
             className={classnames(classes.root, className, {
                 [classes.folded]: folded || sittingOut,
-                [classes.playerHero]: hero,
             })}
             style={style}
             onContextMenu={handleClick}
@@ -77,9 +72,9 @@ function Player(props) {
                     <Typography className={classes.sittingOutText}>Sitting Out</Typography>
                 </Typography>
             ) : (
-                <Hand hand={hand} />
+                <Hand hand={hand} hero={hero} />
             )}
-            <PlayerStack toAct={toAct} name={name} stack={stack} button={button} winner={winner} />
+            <PlayerStack toAct={toAct} name={name} stack={stack} button={button} winner={winner} hero={hero} />
             <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} /> : null}</div>
         </div>
     );
