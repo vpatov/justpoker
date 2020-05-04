@@ -15,8 +15,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { Button } from '@material-ui/core';
 
-const TABLE_HEIGHT = 48;
-const TABLE_WIDTH = 78;
+const TABLE_HEIGHT = 45;
+const TABLE_WIDTH = 75;
 
 const PLAYER_HEIGHT = 64;
 const PLAYER_WIDTH = 90;
@@ -36,7 +36,7 @@ function positionToPlacement(width, height, index, offset) {
         2: { x: width, y: yInc * 2 },
         3: { x: width, y: yInc * 4 },
         4: { x: xInc * 6.5, y: yInc * 5.7 },
-        5: { x: xInc * 4, y: yInc * 5.7 },
+        5: { x: xInc * 4, y: yInc * 5.85 },
         6: { x: xInc * 1.5, y: yInc * 5.7 },
         7: { x: 0, y: yInc * 4 },
         8: { x: 0, y: yInc * 2 },
@@ -78,16 +78,16 @@ const useStyles = makeStyles((theme) => ({
         top: 0,
         left: 0,
         transform: 'translateY(-50%) translateX(-50%)',
-        transition: 'all 0.4s ease-in-out',
+        // transition: 'all 0.4s ease-in-out',
     },
     mainPot: {
-        fontSize: '3vmin',
+        fontSize: '2.6vmin',
         position: 'absolute',
         top: '22%',
         backgroundColor: 'rgba(0,0,0,0.4)',
         color: 'white',
         borderRadius: 40,
-        padding: '1vmin 3vmin',
+        padding: '0.6vmin 3vmin',
     },
     fullPot: {
         borderRadius: '0.5vmin',
@@ -188,7 +188,6 @@ function Table(props) {
                             top: `${bPos.y}vmin`,
                             left: `${bPos.x}vmin`,
                             transform: 'translateY(-50%) translateX(-50%)',
-                            transition: 'all 0.6s ease-in-out',
                         }}
                         amount={player.bet}
                     />,
