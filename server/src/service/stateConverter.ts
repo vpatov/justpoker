@@ -124,7 +124,7 @@ export class StateConverter {
     getUIController(clientUUID: string, heroPlayerUUID: string): Controller {
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
-        const potSize = this.gameStateManager.getTotalPot();
+        const potSize = this.gameStateManager.getFullPot();
         const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID;
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
         const controller: Controller = {
