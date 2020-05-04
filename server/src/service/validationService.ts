@@ -102,6 +102,28 @@ export class ValidationService {
         return NO_ERROR;
     }
 
+    ensurePlayerIsSittingIn(playerUUID: string): ValidationResponse {
+        const player = this.gsm.getPlayer(playerUUID);
+        if (player.sittingOut) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is not sitting in:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
+            };
+        }
+        return NO_ERROR;
+    }
+
+    ensurePlayerIsSittingOut(playerUUID: string): ValidationResponse {
+        const player = this.gsm.getPlayer(playerUUID);
+        if (!player.sittingOut) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is not sitting out:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
+            };
+        }
+        return NO_ERROR;
+    }
+
     ensurePlayerCanActRightNow(clientUUID: string): ValidationResponse {
         let response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
@@ -183,6 +205,24 @@ export class ValidationService {
         }
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         return this.ensurePlayerIsSitting(player.uuid);
+    }
+
+    validateSitInAction(clientUUID: string): ValidationResponse {
+        const response = this.ensureClientIsInGame(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
+        return this.ensurePlayerIsSittingOut(player.uuid);
+    }
+
+    validateSitOutAction(clientUUID: string): ValidationResponse {
+        const response = this.ensureClientIsInGame(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
+        return this.ensurePlayerIsSittingIn(player.uuid);
     }
 
     validateStartGameRequest(clientUUID: string): ValidationResponse {

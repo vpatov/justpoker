@@ -271,6 +271,11 @@ export class GameStateManager {
         return Object.entries(this.gameState.players).filter(([uuid, player]) => player.sitting).length;
     }
 
+    getNumberPlayersSittingIn() {
+        return Object.entries(this.gameState.players).filter(([uuid, player]) => player.sitting && !player.sittingOut)
+            .length;
+    }
+
     getSeats() {
         const seats: [number, string][] = Object.values(this.gameState.players)
             .filter((player) => player.seatNumber >= 0)
@@ -374,6 +379,7 @@ export class GameStateManager {
         return this.getPlayersInHand().length === 1;
     }
 
+    // TODO put into validationService
     canPlayerStartGame(playerUUID: string) {
         const player = this.getPlayer(playerUUID);
         if (player.sitting && this.getPlayersReadyToPlay().length >= 2 && !this.isGameStarted()) return true;
@@ -576,31 +582,12 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { straddle: straddle });
     }
 
-    setPlayerDealInNextHand(playerUUID: string) {
-        this.updatePlayer(playerUUID, { dealInNextHand: true });
-    }
-
-    setPlayerDealOutNextHand(playerUUID: string) {
-        this.updatePlayer(playerUUID, { dealInNextHand: false });
-    }
-
-    setPlayersSittingOutByDealInNextHand() {
-        Object.values(this.getPlayers()).forEach((p) => {
-            const playerUUID = p.uuid;
-            if (p.dealInNextHand) {
-                this.updatePlayer(playerUUID, { sittingOut: false });
-            } else {
-                this.updatePlayer(playerUUID, { sittingOut: true });
-            }
-        });
-    }
-
     sitDownPlayer(playerUUID: string, seatNumber: number) {
-        this.updatePlayer(playerUUID, { sitting: true, seatNumber: seatNumber });
+        this.updatePlayer(playerUUID, { sitting: true, sittingOut: false, seatNumber: seatNumber });
     }
 
     standUpPlayer(playerUUID: string) {
-        this.updatePlayer(playerUUID, { sitting: false, seatNumber: -1 });
+        this.updatePlayer(playerUUID, { sitting: false, sittingOut: false, seatNumber: -1 });
     }
 
     getFirstToAct() {

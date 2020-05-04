@@ -137,7 +137,7 @@ export class StateConverter {
                   ),
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             adminButtons: this.getValidAdminButtons(clientUUID),
-            dealInNextHand: hero.dealInNextHand,
+            dealInNextHand: !hero.sittingOut,
             straddle: hero.straddle,
         };
 
@@ -238,7 +238,7 @@ export class StateConverter {
             button: this.gameStateManager.getDealerUUID() === player.uuid,
             winner: player.winner,
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
-            sittingOut: player.sittingOut,
+            sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
         };
         return newPlayer;
     }
