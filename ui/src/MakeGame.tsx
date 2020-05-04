@@ -8,6 +8,8 @@ import { MIN_VALUES, MAX_VALUES } from "./shared/util/consts"
 import { makeStyles } from "@material-ui/core/styles";
 import TextFieldWrap from "./reuseable/TextFieldWrap"
 import Button from "@material-ui/core/Button";
+import { Select, MenuItem } from "@material-ui/core";
+import { GameType } from "./shared/models/game";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,7 +43,7 @@ function MakeGame(props) {
     const [maxBuyin, setMaxBuyin] = useState(200);
     const [timeToAct, setTimeToAct] = useState(30);
     const [password, setPassword] = useState("");
-    const [gameType, setGameType] = useState("NLHOLDEM");
+    const [gameType, setGameType] = useState(GameType.NLHOLDEM);
 
     function canCreate() {
         return true;
@@ -116,6 +118,15 @@ function MakeGame(props) {
                 max={MAX_VALUES.TIME_TO_ACT}
                 type="number"
             />
+            <Select
+                variant="outlined"
+                className={classes.field}
+                value={gameType}
+                onChange={(event) => setGameType(event.target.value as GameType)}
+            >
+                <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
+                <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
+            </Select>
             <Button
                 className={classes.button}
                 variant="contained"
