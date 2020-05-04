@@ -1,4 +1,32 @@
+import React, { useEffect } from 'react';
+import { WsServer } from './api/ws';
+import { AnimationTrigger, AnimationState } from './shared/models/animationState';
+
 import anime from 'animejs/lib/anime.es.js';
+
+function AnimiationModule(props) {
+    useEffect(() => {
+        WsServer.subscribe('animation', onReceiveNewAnimationState);
+    }, []);
+
+    const onReceiveNewAnimationState = (animationState: AnimationTrigger) => {
+        const ani = ANIMATION_MAP[animationState];
+        if (ani && typeof ani === 'function') {
+            ani();
+        } else {
+            console.log(`No animation provided for ${animationState}`);
+        }
+    };
+
+    return null;
+}
+
+export default AnimiationModule;
+
+const ANIMATION_MAP = {
+    [AnimationTrigger.FLIP_TABLE]: flipTable,
+    [AnimationTrigger.DEAL_CARDS]: dealCards,
+};
 
 export function flipTable() {
     const animations = [] as any;

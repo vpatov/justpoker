@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import classnames from 'classnames';
 
-import { flipTable, dealCards } from './AnimiationModule';
+import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
 import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
 
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function Default(props) {
+function Default() {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
 
@@ -77,14 +77,12 @@ function Default(props) {
     const actions = [
         { icon: <StartIcon className={classes.icon} />, name: 'Start Game', onClick: onClickStartGame },
         { icon: <StopIcon className={classes.icon} />, name: 'Stop Game', onClick: onClickStopGame },
-
         { icon: <SeatIcon className={classes.icon} />, name: 'Sit Out' },
         { icon: <QuitIcon className={classes.icon} />, name: 'Quit' },
         { icon: <VolumeOnIcon className={classes.icon} />, name: 'Volume' },
         { icon: <SettingsIcon className={classes.icon} />, name: 'Settings' },
         { icon: <AdminIcon className={classes.icon} />, name: 'Admin' },
         { icon: <FlipIcon className={classes.icon} />, name: 'Flip Table', onClick: () => flipTable() },
-        { icon: <FlipIcon className={classes.icon} />, name: 'Animate Deal', onClick: () => dealCards() },
     ];
 
     function onClickStartGame() {
