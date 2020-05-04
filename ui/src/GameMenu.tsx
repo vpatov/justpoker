@@ -84,7 +84,6 @@ function Default(props) {
         { icon: <SettingsIcon className={classes.icon} />, name: 'Settings' },
         { icon: <AdminIcon className={classes.icon} />, name: 'Admin' },
         { icon: <FlipIcon className={classes.icon} />, name: 'Flip Table', onClick: () => flipTable() },
-        { icon: <FlipIcon className={classes.icon} />, name: 'Animate Deal', onClick: () => dealCards() },
     ];
 
     function onClickStartGame() {

@@ -1,43 +1,42 @@
-import React, { useState } from "react";
+import React from 'react';
 
-import Table from "./Table";
-import Controller from "./Controller";
-import AudioModule from "./AudioModule";
-import { UiGameState } from "./shared/models/uiState";
-import ChatLog from "./ChatLog";
-import GameMenu from "./GameMenu";
+import Table from './Table';
+import Controller from './Controller';
+import AudioModule from './AudioModule';
+import AnimiationModule from './AnimiationModule';
+import ChatLog from './ChatLog';
+import GameMenu from './GameMenu';
 
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: "100%",
-        width: "100%",
-        display: "flex",
+        height: '100%',
+        width: '100%',
+        display: 'flex',
     },
     gameTableCont: {
-        height: "100%",
-        position: "relative",
-        flex: "1 1 100%",
+        height: '100%',
+        position: 'relative',
+        flex: '1 1 100%',
     },
     table: {
-        height: "85%",
+        height: '85%',
     },
     chatlog: {
-        width: "300px",
+        width: '300px',
     },
     controller: {
-        height: "15%",
-        width: "100%",
+        height: '15%',
+        width: '100%',
     },
     hideButton: {
-        margin: "2vmin",
-        fontSize: "1vmin",
+        margin: '2vmin',
+        fontSize: '1vmin',
         zIndex: 5,
-        position: "absolute",
+        position: 'absolute',
         top: 0,
-        right: "0",
+        right: '0',
     },
 }));
 
@@ -54,6 +53,7 @@ function Game(props) {
             <ChatLog className={classes.chatlog} />
 
             <AudioModule />
+            <AnimiationModule />
         </div>
     );
 }
