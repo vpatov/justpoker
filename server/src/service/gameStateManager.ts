@@ -336,7 +336,7 @@ export class GameStateManager {
     }
 
     isGameStarted() {
-        return this.getBettingRoundStage() !== BettingRoundStage.WAITING;
+        return this.gameState.shouldDealNextHand;
     }
 
     isPlayerInGame(playerUUID: string): boolean {
