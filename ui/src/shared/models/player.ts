@@ -26,9 +26,6 @@ export declare interface Player {
     // player is at the table but not being dealt in
     readonly sittingOut: boolean;
 
-    // player does not want to be dealt in next hand
-    readonly dealInNextHand: boolean;
-
     // player is straddling
     readonly straddle: boolean;
 
@@ -65,7 +62,6 @@ export const cleanPlayer: Player = {
     handDescription: '',
     sitting: false,
     sittingOut: false,
-    dealInNextHand: true,
     straddle: false,
     seatNumber: -1,
     lastActionType: BettingRoundActionType.NOT_IN_HAND,

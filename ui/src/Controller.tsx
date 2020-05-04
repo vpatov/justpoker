@@ -244,7 +244,7 @@ function ControllerComp(props: ControllerProps) {
 
     function onToggleSitOutNextHand() {
         WsServer.send({
-            actionType: dealInNextHand ? ActionType.DEAL_OUT_NEXT_HAND : ActionType.DEAL_IN_NEXT_HAND,
+            actionType: dealInNextHand ? ActionType.SITOUT : ActionType.SITIN,
             request: {} as ClientWsMessageRequest,
         });
     }

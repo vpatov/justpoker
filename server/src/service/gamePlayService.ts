@@ -35,7 +35,7 @@ export class GamePlayService {
     }
 
     canContinueGame(): boolean {
-        return this.gsm.shouldDealNextHand() && this.gsm.getNumberPlayersSitting() >= 2;
+        return this.gsm.shouldDealNextHand() && this.gsm.getNumberPlayersSittingIn() >= 2;
     }
 
     setCurrentPlayerToAct() {
