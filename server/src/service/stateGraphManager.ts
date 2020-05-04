@@ -17,6 +17,7 @@ import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { Subject } from 'rxjs';
+import { logGameState } from '../../../ui/src/shared/util/util';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -28,13 +29,7 @@ export class StateGraphManager {
         private readonly timerManager: TimerManager,
     ) {}
 
-    private updateEmitter: Subject<Set<ServerStateKey>> = new Subject<Set<ServerStateKey>>();
-
-    // globalTimerFn(fn: Function, getUpdate: () => GameState) {
-    //     fn();
-    //     // TODO perhaps timerManager can simply send all keys?
-    //     this.updateEmitter.next([getUpdate(), new Set([ServerStateKey.GAMESTATE, ServerStateKey.AUDIO])]);
-    // }
+    private updateEmitter: Subject<void> = new Subject();
 
     observeUpdates() {
         return this.updateEmitter.asObservable();
@@ -55,8 +50,7 @@ export class StateGraphManager {
     };
 
     isAllInRunOutCondition: Condition = {
-        // fn -> #playersAllIn >= playersInHand - 1
-        fn: () => false,
+        fn: () => this.gameStateManager.isAllInRunOut(),
         TRUE: this.isHandGamePlayOverCondition,
         FALSE: GameStage.WAITING_FOR_BET_ACTION,
     };
@@ -68,10 +62,9 @@ export class StateGraphManager {
     };
 
     sidePotsRemainingCondition: Condition = {
-        // fn -> potsRemaining >= 1
-        fn: () => true,
+        fn: () => this.gameStateManager.getPots().length >= 1,
         TRUE: GameStage.SHOW_WINNER,
-        FALSE: this.canContinueGameCondition,
+        FALSE: GameStage.EJECT_STACKED_PLAYERS,
     };
 
     stateGraph: Readonly<StateGraph> = {
@@ -91,6 +84,7 @@ export class StateGraphManager {
         [GameStage.SHOW_BET_ACTION]: new Map([['TIMEOUT', this.isBettingRoundOverCondition]]),
         [GameStage.FINISH_BETTING_ROUND]: new Map([['TIMEOUT', this.isHandGamePlayOverCondition]]),
         [GameStage.SHOW_WINNER]: new Map([['TIMEOUT', this.sidePotsRemainingCondition]]),
+        [GameStage.EJECT_STACKED_PLAYERS]: new Map([['TIMEOUT', this.canContinueGameCondition]]),
     };
 
     stageDelayMap: StageDelayMap = {
@@ -100,8 +94,9 @@ export class StateGraphManager {
         [GameStage.SHOW_START_OF_BETTING_ROUND]: 750,
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
         [GameStage.SHOW_BET_ACTION]: 200,
-        [GameStage.FINISH_BETTING_ROUND]: 600,
-        [GameStage.SHOW_WINNER]: 2300,
+        [GameStage.FINISH_BETTING_ROUND]: 1200,
+        [GameStage.SHOW_WINNER]: 4000,
+        [GameStage.EJECT_STACKED_PLAYERS]: 400,
     };
 
     getDelay(stage: GameStage) {
@@ -192,6 +187,7 @@ export class StateGraphManager {
         if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
             this.gamePlayService.timeOutPlayer();
         }
+        this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
         this.processEvent('TIMEOUT');
     }
 
@@ -202,11 +198,16 @@ export class StateGraphManager {
     // WAITING_FOR_BET_ACTION stage, that should not trigger any timer restarts (this method shouldnt
     // be called)
     initializeGameStage(stage: GameStage) {
+        // TODO write assertions checking for preconditions of each stage after entering stage
         console.log('initializing gameStage: ', stage);
         this.gameStateManager.updateGameStage(stage);
 
         switch (stage) {
+            case GameStage.NOT_IN_PROGRESS: {
+                this.gameStateManager.clearStateOfRoundInfo();
+            }
             case GameStage.INITIALIZE_NEW_HAND: {
+                this.gameStateManager.setUnsetQueuedAction();
                 this.gameStateManager.clearStateOfRoundInfo();
                 break;
             }
@@ -223,7 +224,9 @@ export class StateGraphManager {
                 this.gameStateManager.incrementBettingRoundStage();
                 this.gamePlayService.resetBettingRoundActions();
                 this.gamePlayService.dealCards();
-                this.gamePlayService.setFirstToActAtStartOfBettingRound();
+                if (!this.gameStateManager.isAllInRunOut()) {
+                    this.gamePlayService.setFirstToActAtStartOfBettingRound();
+                }
                 this.gamePlayService.startOfBettingRound();
                 break;
             }
@@ -239,14 +242,18 @@ export class StateGraphManager {
 
             case GameStage.FINISH_BETTING_ROUND: {
                 this.gamePlayService.placeBetsInPot();
-
                 break;
             }
 
-            // TODO Showdown probably should be a separate stage from show winner. They can be one stage for now.
+            // TODO Showdown probably should be a separate stage from show winner.
+            // They can be one stage for now.
             case GameStage.SHOW_WINNER: {
-                // if one person in hand, show them as winner (without showing their hand)
-                // otherwise execute showdown logic
+                this.gamePlayService.showDown();
+                break;
+            }
+
+            case GameStage.EJECT_STACKED_PLAYERS: {
+                this.gamePlayService.ejectStackedPlayers();
                 break;
             }
         }
@@ -257,49 +264,5 @@ export class StateGraphManager {
             console.log('setting timer..');
             this.timerManager.setStateTimer(() => this.processTimeout(), delay);
         }
-        // this.timerManager.setTimer()
-
-        // change the stage
-        // execute those stages changes
-        // starttimer
-        /*
-            initialize new hand:
-                - execute queued actions
-            show start of hand:
-                - finalize players in hand
-                - update button
-                - place blinds
-            show start of betting round:
-                - update bettingRoundStage
-                - deal cards
-            waiting for bet action:
-                - update current player to act
-            show bet action:
-                - show action
-            show place bets in pot:
-                - coalesce pots
-                - show bets going into pot
-            show winner:
-                - take first pot from list of pots
-                - calculate winner of pot
-                - give winner pot and show winner
-        */
     }
-
-    /*
-    SHOW_STARTOF_BETTING_ROUND -> WAITINF_FOR_BET_ACTION
-    SHOW_BET_ACTION -> WAITING_FOR_BET_ACTION
-
-    in both cases we
-    waiting_for_bet_action node can have logic that checks the betting round stage, and sets the
-    current player to act accordingly
-
-
-
-    SHOW_START_OF_HAND -> SHOW_START_OF_BETTING_ROUND
-    SHOW_PLACE_BETS_IN_POT -> SHOW_START_OF_BETTING_ROUND
-
-    in both cases we increment the betting round stage according to its current value
-    we deal cards according to the betting roudn stage.
-*/
 }

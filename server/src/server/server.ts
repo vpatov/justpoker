@@ -80,10 +80,12 @@ class Server {
                 smallBlind: req.body.smallBlind,
                 bigBlind: req.body.bigBlind,
                 gameType: req.body.gameType,
+                maxBuyin: req.body.maxBuyin,
                 password: req.body.password,
                 timeToAct: req.body.timeToAct,
             };
             const tableId = this.gsm.initGame(newGameForm);
+            this.initWSSListeners();
             this.chatService.clearMessages();
             this.tableInitialized = true;
             console.log(tableId);
@@ -118,17 +120,8 @@ class Server {
         this.gsm.resetSingltonState();
     }
 
-    //refactor this mess of a function
-    init() {
-        this.app = express();
-        this.initRoutes();
-        this.server = http.createServer(this.app);
-        this.wss = new WebSocket.Server({ server: this.server });
-
-        this.stateGraphManager.observeUpdates().subscribe(() => {
-            this.sendUpdatesToClients();
-        });
-
+    initWSSListeners() {
+        this.wss.removeAllListeners();
         this.wss.on('connection', (ws: WebSocket, req) => {
             const ip = req.connection.remoteAddress;
             console.log('connected to ip:', ip);
@@ -191,6 +184,18 @@ class Server {
                     ws.send(JSON.stringify({ error: unsupportedMsg }));
                 }
             });
+        });
+    }
+
+    //refactor this mess of a function
+    init() {
+        this.app = express();
+        this.initRoutes();
+        this.server = http.createServer(this.app);
+        this.wss = new WebSocket.Server({ server: this.server });
+
+        this.stateGraphManager.observeUpdates().subscribe(() => {
+            this.sendUpdatesToClients();
         });
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {

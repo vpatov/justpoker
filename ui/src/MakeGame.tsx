@@ -38,14 +38,14 @@ function MakeGame(props) {
     const [name, setName] = useState("DefaultPlayer");
     const [bigBlind, setBigBlind] = useState(2);
     const [smallBlind, setSmallBlind] = useState(1);
-    const [buyin, setBuyin] = useState(200);
+    const [maxBuyin, setMaxBuyin] = useState(200);
     const [timeToAct, setTimeToAct] = useState(30);
     const [password, setPassword] = useState("");
     const [gameType, setGameType] = useState("NLHOLDEM");
 
     function canCreate() {
         return true;
-        if (name && bigBlind && smallBlind && buyin) {
+        if (name && bigBlind && smallBlind && maxBuyin) {
             return true;
         }
         return false;
@@ -59,12 +59,14 @@ function MakeGame(props) {
     const createFailure = (err) => {
         console.log(err);
     };
+    
+    // TODO use the NewGameForm interface
     function handleCreateGame() {
         const createReq = {
             name,
             bigBlind,
             smallBlind,
-            buyin,
+            maxBuyin,
             timeToAct,
             password,
             gameType,
@@ -98,8 +100,8 @@ function MakeGame(props) {
                 className={classes.field}
                 label="Buyin"
                 variant="outlined"
-                onChange={(event) => setBuyin(Number(event.target.value))}
-                value={buyin}
+                onChange={(event) => setMaxBuyin(Number(event.target.value))}
+                value={maxBuyin}
                 min={MIN_VALUES.BUY_IN}
                 max={MAX_VALUES.BUY_IN}
                 type="number"

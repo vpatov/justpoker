@@ -15,16 +15,13 @@ export const enum GameStage {
     SHOW_START_OF_BETTING_ROUND = "SHOW_START_OF_BETTING_ROUND",
     WAITING_FOR_BET_ACTION = "WAITING_FOR_BET_ACTION",
     SHOW_BET_ACTION = "SHOW_BET_ACTION",
-    FINISH_BETTING_ROUND = "SHOW_PLACE_BETS_IN_POT",
-    SHOW_WINNER = "SHOW_WINNER"
+    FINISH_BETTING_ROUND = "FINISH_BETTING_ROUND",
+    SHOW_WINNER = "SHOW_WINNER",
+    EJECT_STACKED_PLAYERS = "EJECT_STACKED_PLAYERS",
 }
 
 export declare interface GameState {
     gameStage: GameStage;
-
-    // TODO remove isStateReady field. It is a poor design.
-    /** Server queries this field to determine if it should send the state or not. */
-    isStateReady: boolean;
 
     /** Sensitive field. */
     players: Readonly<{ [key: string]: Player }>;
@@ -89,13 +86,13 @@ export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.
 
 export const cleanGameState: GameState = {
     gameStage: GameStage.NOT_IN_PROGRESS,
-    isStateReady: true,
     players: {},
     board: [],
     gameParameters: {
         smallBlind: 0,
         bigBlind: 0,
         gameType: GameType.NLHOLDEM,
+        maxBuyin: 0,
         timeToAct: 0,
         maxPlayers: 9,
     },
