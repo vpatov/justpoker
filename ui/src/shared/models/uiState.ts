@@ -1,13 +1,13 @@
 import { Suit, genRandomCard } from './cards';
 import { ActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
-import { AudioQueue, getCleanAudioQueue } from './audioQueue';
+import { getCleanAudioQueue, SoundByte } from './audioQueue';
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType } from './game';
 
 export declare interface UiState {
     game: UiGameState;
-    audio: AudioQueue;
+    audio: SoundByte;
     chat: UiChatMessage;
 }
 
@@ -213,7 +213,7 @@ export const CleanGame: UiGameState = {
 
 export const CleanRootState: UiState = {
     game: CleanGame,
-    audio: getCleanAudioQueue(),
+    audio: SoundByte.NONE,
     chat: {
         senderName: 'Vasia',
         content: 'Message in the chat log.',

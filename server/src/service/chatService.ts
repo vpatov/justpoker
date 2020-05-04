@@ -15,7 +15,7 @@ export class ChatService {
         messages: [],
     };
 
-    lastMessage: ChatMessage;
+    lastMessage: ChatMessage | null;
 
     constructor(
         private readonly gameStateManager: GameStateManager,
@@ -24,6 +24,10 @@ export class ChatService {
 
     getMessage() {
         return this.lastMessage;
+    }
+
+    clearLastMessage() {
+        this.lastMessage = null;
     }
 
     clearMessages() {

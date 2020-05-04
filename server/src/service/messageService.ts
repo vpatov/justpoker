@@ -6,6 +6,7 @@ import { GamePlayService } from './gamePlayService';
 import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
+import { StateGraphManager } from './stateGraphManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 
 declare interface ActionProcessor {
@@ -23,6 +24,7 @@ export class MessageService {
         private readonly validationService: ValidationService,
         private readonly gamePlayService: GamePlayService,
         private readonly chatService: ChatService,
+        private readonly stateGraphManager: StateGraphManager,
     ) {}
 
     messageProcessor: MessageProcessor = {
@@ -44,39 +46,24 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.DEAL_IN_NEXT_HAND]: {
-            validation: (_, __) => NO_ERROR,
+        [ActionType.SITOUT]: {
+            validation: (uuid, req) => this.validationService.validateSitOutAction(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.setPlayerDealInNextHand(player.uuid);
-                if (this.gameStateManager.getBettingRoundStage() === BettingRoundStage.WAITING) {
-                    this.gameStateManager.setPlayersSittingOutByDealInNextHand();
-                }
-            },
-            updates: [ServerStateKey.GAMESTATE],
-        },
-        [ActionType.DEAL_OUT_NEXT_HAND]: {
-            validation: (_, __) => NO_ERROR,
-            perform: (uuid, req) => {
-                console.log('hit');
-                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.setPlayerDealOutNextHand(player.uuid);
-                if (this.gameStateManager.getBettingRoundStage() === BettingRoundStage.WAITING) {
-                    this.gameStateManager.setPlayersSittingOutByDealInNextHand();
-                }
+                this.gameStateManager.updatePlayer(player.uuid, { sittingOut: true });
             },
             updates: [ServerStateKey.GAMESTATE],
         },
         [ActionType.SITIN]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid, req) => {},
-            updates: [],
+            validation: (uuid, req) => this.validationService.validateSitInAction(uuid),
+            perform: (uuid, req) => {
+                console.log('hit');
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.updatePlayer(player.uuid, { sittingOut: false });
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.SITOUT]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid, req) => {},
-            updates: [],
-        },
+
         [ActionType.STANDUP]: {
             validation: (uuid, req) => this.validationService.validateStandUpRequest(uuid),
             perform: (uuid, req) => {
@@ -165,11 +152,11 @@ export class MessageService {
             );
             actionProcessor.perform(clientUUID, message.request);
             this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
+            this.stateGraphManager.processEvent(message.actionType);
         } else {
             // TODO process error and send error to client
             console.log(response);
         }
-        this.gamePlayService.startHandIfReady();
     }
 
     // TODO should sitdown, standup, jointable, chat, add chips, be put into their own service?

@@ -26,66 +26,34 @@ export class GamePlayService {
         private readonly validationService: ValidationService,
     ) {}
 
-    /* Gameplay functionality */
-
-    // if game is started, and state is waiting, try to initializeGameRound
-    // perform this check after every incoming message
-    // this way, you don't have to check explicit events
     startGame() {
         this.gsm.updateGameState({ shouldDealNextHand: true });
     }
 
-    // TODO wipe gameplay game state.
     stopGame() {
         this.gsm.updateGameState({ shouldDealNextHand: false });
     }
 
-    // are there only two actions after which a round can start?
-    // after sit down and after start game?
-    // regardless, better to not tie start game condition check
-    // to be dependent on those actions
-    startHandIfReady() {
-        if (
-            // TODO uncomment this once startGame button is added
-            this.gsm.shouldDealNextHand() &&
-            this.gsm.getBettingRoundStage() === BettingRoundStage.WAITING &&
-            this.gsm.getPlayersReadyToPlay().length >= 2
-        ) {
-            this.gsm.clearStateOfRoundInfo();
-            this.initializeBettingRound();
-        }
+    canContinueGame(): boolean {
+        return this.gsm.shouldDealNextHand() && this.gsm.getNumberPlayersSittingIn() >= 2;
     }
 
-    setCurrentPlayerToAct(playerUUID: string) {
-        // if everyone has gone already, there are no further actors this round, and nobody should be
-        // illuminated
-        const currentPlayerToAct = this.gsm.haveAllPlayersActed() ? '' : playerUUID;
+    setCurrentPlayerToAct() {
+        const previousPlayerToAct = this.gsm.getCurrentPlayerToAct();
+
+        // if there is nor previous player to act, then we are starting the betting round.
+        const currentPlayerToAct = previousPlayerToAct
+            ? this.gsm.getNextPlayerInHandUUID(previousPlayerToAct)
+            : this.gsm.getFirstToAct();
+        // const currentPlayerToAct = this.gsm.haveAllPlayersActed() ? '' : playerUUID;
         this.gsm.setCurrentPlayerToAct(currentPlayerToAct);
+        this.audioService.playHeroTurnToActSFX(currentPlayerToAct);
 
         // start the timer if currentPlayerToAct has been set
-        if (currentPlayerToAct) {
-            console.log(`Setting player timer for playerUUID: ${currentPlayerToAct}`);
-            this.gsm.updateGameState({
-                canCurrentPlayerAct: true,
-                timeCurrentPlayerTurnStarted: Date.now(),
-            });
-            this.timerManager.setPlayerTimer(
-                () => this.timeOutPlayer(),
-                () => this.gsm.getGameState(),
-                this.gsm.getTimeToAct(),
-            );
-        } else {
-            this.gsm.updateGameState({ canCurrentPlayerAct: false });
-            this.timerManager.clearTimer();
-        }
-    }
-
-    endCurrentPlayerTurn() {
-        this.gsm.updateGameState({ canCurrentPlayerAct: false });
-    }
-
-    clearCurrentPlayerToAct() {
-        this.setCurrentPlayerToAct('');
+        console.log(`Setting player timer for playerUUID: ${currentPlayerToAct}`);
+        this.gsm.updateGameState({
+            timeCurrentPlayerTurnStarted: Date.now(),
+        });
     }
 
     timeOutPlayer() {
@@ -101,101 +69,35 @@ export class GamePlayService {
         } else {
             this.fold();
         }
-        this.triggerPostBettingRoundAction();
-    }
-
-    setNextPlayerToAct() {
-        this.setCurrentPlayerToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getCurrentPlayerToAct()));
     }
 
     updateHandDescriptions() {
-        this.gsm.updatePlayers((player) => ({ handDescription: this.gsm.getPlayerHandDescription(player.uuid) }));
+        this.gsm.updatePlayers((player) => ({
+            handDescription: this.gsm.isPlayerInHand(player.uuid) ? this.gsm.getPlayerHandDescription(player.uuid) : '',
+        }));
     }
 
-    initializeBettingRound() {
-        // TODO timer - this seems like it would a good place to handle the timer
+    startOfBettingRound() {
+        this.gsm.updateGameState({
+            minRaiseDiff: this.gsm.getBB(),
+            previousRaise:
+                this.gsm.getBettingRoundStage() === BettingRoundStage.PREFLOP ? this.gsm.getPreviousRaise() : 0,
+            partialAllInLeftOver: 0,
+        });
+        this.updateHandDescriptions();
+    }
 
-        const stage = this.gsm.getBettingRoundStage();
-        const playersEligibleToActNext = this.gsm.getPlayersEligibleToActNext();
-
-        /**
-         * The betting round is in all-in run out if either everyone has gone all in,
-         * or there is one person who is not all in, but they have called the all-in.
-         */
-        const isAllInRunOut = playersEligibleToActNext.length === 1;
-
-        if (isAllInRunOut) {
-            const lonePlayerUUID = playersEligibleToActNext[0];
-            this.gsm.setPlayerLastActionType(lonePlayerUUID, BettingRoundActionType.CALL);
-        } else {
-            this.gsm.updatePlayers((player) =>
-                this.gsm.isPlayerEligibleToActNext(player.uuid)
+    resetBettingRoundActions() {
+        this.gsm.updatePlayers((player) => {
+            if (this.gsm.isPlayerInHand(player.uuid)) {
+                return !this.gsm.isPlayerAllIn(player.uuid)
                     ? { lastActionType: BettingRoundActionType.WAITING_TO_ACT, betAmount: 0 }
-                    : {},
-            );
-        }
-
-        this.gsm.updateGameState({ minRaiseDiff: this.gsm.getBB(), previousRaise: 0, partialAllInLeftOver: 0 });
-
-        switch (stage) {
-            case BettingRoundStage.WAITING: {
-                this.gsm.nextBettingRound();
-                // TODO get rid of switch fallthrough
-                /* intentional switch-fallthrough */
-            }
-            case BettingRoundStage.PREFLOP: {
-                this.initializePreflop();
-                this.audioService.playStartOfHandSFX();
-                this.triggerSetFirstToAct();
-                break;
-            }
-            case BettingRoundStage.FLOP: {
-                this.initializeFlop();
-                // this.audioService.playStartOfBettingRoundSFX();
-                this.triggerSetFirstToAct();
-                break;
-            }
-            case BettingRoundStage.TURN: {
-                this.initializeTurn();
-                // this.audioService.playStartOfBettingRoundSFX();
-                this.triggerSetFirstToAct();
-                break;
-            }
-            case BettingRoundStage.RIVER: {
-                this.initializeRiver();
-                // this.audioService.playStartOfBettingRoundSFX();
-                this.triggerSetFirstToAct();
-                break;
-            }
-            case BettingRoundStage.SHOWDOWN: {
-                this.showDown();
-                // TODO it would be better if this method was kept here,
-                // and if you had a global queue system for pushing updates at
-                // pre-determined intervals, such that you could just call this function
-                // and it would work
-                // this.triggerFinishHand();
-                break;
-            }
-        }
-
-        // This code is executed during in all-in run out.
-        // That should be the only case when the betting round is over
-        // right as it is initialized.
-        if (this.gsm.isBettingRoundOver()) {
-            this.triggerFinishBettingRound();
-        }
-    }
-
-    triggerSetFirstToAct() {
-        this.timerManager.setTimer(
-            () => this.setCurrentPlayerToAct(this.gsm.getFirstToAct()),
-            () => this.gsm.getGameState(),
-            1000,
-        );
+                    : {};
+            } else return {};
+        });
     }
 
     /* Betting Round Actions */
-
     performBettingRoundAction(action: BettingRoundAction) {
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
@@ -216,26 +118,6 @@ export class GamePlayService {
             case BettingRoundActionType.CALL: {
                 this.callBet();
             }
-        }
-        this.triggerPostBettingRoundAction();
-    }
-
-    triggerPostBettingRoundAction() {
-        this.endCurrentPlayerTurn();
-        this.timerManager.setTimer(
-            () => this.postBettingRoundAction(),
-            () => this.gsm.getGameState(),
-            800,
-        );
-    }
-
-    postBettingRoundAction() {
-        if (this.gsm.hasEveryoneButOnePlayerFolded()) {
-            this.triggerVictoryByFolding();
-        } else if (this.gsm.isBettingRoundOver()) {
-            this.triggerFinishBettingRound();
-        } else {
-            this.setNextPlayerToAct();
         }
     }
 
@@ -335,24 +217,6 @@ export class GamePlayService {
         );
     }
 
-    initializePreflop() {
-        this.initializeDealerButton();
-        this.gsm.initializeNewDeck();
-        this.distributeHoleCards();
-
-        // important that the cards are distributed before the blinds are placed,
-        // because the setCurrentPlayerToAct method checks to see if everyone has acted,
-        // and if so, it nulls the currentPlayerToAct instead of setting it.
-        // Whether or not everyone has acted or not is calculated by looking at those
-        // who were dealt in. If the cards havent been distributed yet, nobody has been dealt in,
-        // and therefore hasEveryoneActed is vacuously true. It might be worthwhile to refactor
-        // the setCurrentPlayerToAct method, and remove that logic from it to avoid bugs.
-        this.placeBlinds();
-
-        // TODO bettingRoundStage is already preflop here. Remove
-        this.gsm.setBettingRoundStage(BettingRoundStage.PREFLOP);
-    }
-
     initializeDealerButton() {
         const seats = this.gsm.getSeats();
         const [_, seatZeroPlayerUUID] = seats[0];
@@ -385,6 +249,10 @@ export class GamePlayService {
         this.bet(SB, smallBlindUUID);
         this.bet(BB, bigBlindUUID);
 
+        this.gsm.updateGameState({
+            smallBlindUUID,
+            bigBlindUUID,
+        });
         let nextToAct;
         if (!isHeadsUp) {
             // no straddle
@@ -399,33 +267,51 @@ export class GamePlayService {
         assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
     }
 
-    distributeHoleCards() {
-        const deck = this.gsm.getDeck();
-        // TODO remove assertion
-        assert(deck.cards.length === 52);
-        this.gsm.getPlayersReadyToPlay().forEach((player) => this.gsm.dealCardsToPlayer(2, player.uuid));
+    setFirstToActAtStartOfBettingRound() {
+        const bigBlindUUID = this.gsm.getBigBlindUUID();
+        const dealerUUID = this.gsm.getDealerUUID();
+
+        // If heads up preflop, dealer is first to act
+        const firstToAct =
+            this.gsm.getBettingRoundStage() === BettingRoundStage.PREFLOP
+                ? this.gsm.getPlayersReadyToPlay().length === 2
+                    ? dealerUUID
+                    : this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID)
+                : this.gsm.getNextPlayerInHandUUID(dealerUUID);
+
+        this.gsm.setFirstToAct(firstToAct);
     }
 
-    /* STREETS */
-    initializeFlop() {
-        assert(this.gsm.getBettingRoundStage() === BettingRoundStage.FLOP);
-        this.gsm.setFirstToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
-        this.gsm.dealCardsToBoard(3);
-        this.updateHandDescriptions();
-    }
+    dealCards() {
+        const bettingRoundStage = this.gsm.getBettingRoundStage();
 
-    initializeTurn() {
-        assert(this.gsm.getBettingRoundStage() === BettingRoundStage.TURN);
-        this.gsm.setFirstToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
-        this.gsm.dealCardsToBoard(1);
-        this.updateHandDescriptions();
-    }
+        switch (bettingRoundStage) {
+            case BettingRoundStage.PREFLOP: {
+                Object.keys(this.gsm.getPlayers())
+                    .filter((playerUUID) => this.gsm.isPlayerReadyToPlay(playerUUID))
+                    .forEach((playerUUID) => this.gsm.dealCardsToPlayer(2, playerUUID));
+                break;
+            }
 
-    initializeRiver() {
-        assert(this.gsm.getBettingRoundStage() === BettingRoundStage.RIVER);
-        this.gsm.setFirstToAct(this.gsm.getNextPlayerInHandUUID(this.gsm.getDealerUUID()));
-        this.gsm.dealCardsToBoard(1);
-        this.updateHandDescriptions();
+            case BettingRoundStage.FLOP: {
+                this.gsm.dealCardsToBoard(3);
+                break;
+            }
+
+            case BettingRoundStage.TURN: {
+                this.gsm.dealCardsToBoard(1);
+                break;
+            }
+
+            case BettingRoundStage.RIVER: {
+                this.gsm.dealCardsToBoard(1);
+                break;
+            }
+
+            default: {
+                throw Error("Shouldn't be reaching default switch path in gamePlayService.dealCards. This is a bug.");
+            }
+        }
     }
 
     showDown() {
@@ -440,92 +326,57 @@ export class GamePlayService {
                 ]),
             ]);
 
-        const snapShots: GameState[] = [];
+        const pot = this.gsm.popPot();
 
-        // Calculte the winner for every pot, snapshot resulting gameState, store in queue.
-        this.gsm.getPots().forEach((pot) => {
-            const eligiblePlayers: [string, Hand][] = playersHands.filter(([uuid, hand]) =>
-                pot.contestors.includes(uuid),
-            );
-            const winningHands: Hand[] = this.handSolverService.getWinningHands(
-                eligiblePlayers.map(([uuid, hand]) => hand),
-            );
-            const winningPlayers: string[] = eligiblePlayers
-                .filter(([uuid, hand]) => winningHands.includes(hand))
-                .map(([uuid, hand]) => uuid);
-
-            /** Split chips evenly amongst winners, distributing odd chips by early position
-             *  Example: 3-way pot of 14 would get first get split into 4, 4, 4.
-             *  There are 2 odd chips left:
-             *      earliest position gets one
-             *      second earliest gets the second one
-             *  Final split ends up being 5, 5, 4
-             */
-
-            const numWinners = winningPlayers.length;
-            const evenSplit = Math.floor(pot.value / numWinners);
-            let oddChips = pot.value - evenSplit * numWinners;
-
-            // sort winning players by position
-            winningPlayers.sort((playerA, playerB) => this.gsm.comparePositions(playerA, playerB));
-            const amountsWon: { [uuid: string]: number } = Object.fromEntries(
-                winningPlayers.map((playerUUID) => {
-                    const amount = oddChips ? evenSplit + 1 : evenSplit;
-                    oddChips -= 1;
-                    return [playerUUID, amount];
-                }),
-            );
-
-            // Show everyones hand at showdown if they havent folded yet.
-            // TODO show only those hands youre supposed to show.
-            this.gsm.updatePlayers((player) => (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}));
-
-            this.gsm.updatePlayers((player) =>
-                winningPlayers.includes(player.uuid)
-                    ? // TODO the players winning hand would go here too.
-                      { chips: player.chips + amountsWon[player.uuid], winner: true }
-                    : { winner: false },
-            );
-
-            this.gsm.updateGameState({ isStateReady: true });
-            snapShots.push(this.gsm.snapShotGameState());
-        });
-        assert(snapShots.length > 0, 'snapShots length was 0.');
-
-        this.gsm.updateGameState({ isStateReady: false });
-
-        // TODO make external const
-        const interval = 3000;
-        for (const index in snapShots) {
-            const snapShot = snapShots[index];
-            this.timerManager.setTimer(
-                () => {},
-                () => snapShot,
-                interval * Number(index),
-            );
-        }
-        // TODO make this better. It seems they are not all being displayed.
-        this.triggerFinishHand(interval * snapShots.length);
-
-        // Inititate timer sequence that shows each pot winner for two seconds (or something)
-    }
-
-    // TODO make all references to this use a constant not a literal
-    triggerFinishHand(timeout: number) {
-        this.timerManager.setTimer(
-            () => this.finishHand(),
-            () => this.gsm.getGameState(),
-            timeout,
+        const eligiblePlayers: [string, Hand][] = playersHands.filter(([uuid, hand]) => pot.contestors.includes(uuid));
+        const winningHands: Hand[] = this.handSolverService.getWinningHands(
+            eligiblePlayers.map(([uuid, hand]) => hand),
         );
-    }
+        const winningPlayers: string[] = eligiblePlayers
+            .filter(([uuid, hand]) => winningHands.includes(hand))
+            .map(([uuid, hand]) => uuid);
 
-    finishHand() {
-        this.gsm.setUnsetQueuedAction();
-        this.gsm.clearBettingRoundStage();
-        this.ejectStackedPlayers();
-        this.gsm.setPlayersSittingOutByDealInNextHand();
-        this.gsm.clearStateOfRoundInfo();
-        this.startHandIfReady();
+        /** Split chips evenly amongst winners, distributing odd chips by early position
+         *  Example: 3-way pot of 14 would get first get split into 4, 4, 4.
+         *  There are 2 odd chips left:
+         *      earliest position gets one
+         *      second earliest gets the second one
+         *  Final split ends up being 5, 5, 4
+         */
+
+        const numWinners = winningPlayers.length;
+        const evenSplit = Math.floor(pot.value / numWinners);
+        let oddChips = pot.value - evenSplit * numWinners;
+
+        // sort winning players by position
+        winningPlayers.sort((playerA, playerB) => this.gsm.comparePositions(playerA, playerB));
+        const amountsWon: { [uuid: string]: number } = Object.fromEntries(
+            winningPlayers.map((playerUUID) => {
+                const amount = oddChips ? evenSplit + 1 : evenSplit;
+                oddChips -= 1;
+                return [playerUUID, amount];
+            }),
+        );
+
+        // Show everyones hand at showdown if they havent folded yet.
+        // TODO show only those hands youre supposed to show.
+        this.gsm.updatePlayers((player) =>
+            !this.gsm.hasEveryoneButOnePlayerFolded()
+                ? this.gsm.isPlayerInHand(player.uuid)
+                    ? { cardsAreHidden: false }
+                    : {}
+                : {},
+        );
+
+        this.gsm.updatePlayers((player) => {
+            const isPlayerWinner = winningPlayers.includes(player.uuid);
+            if (isPlayerWinner) {
+                this.audioService.playHeroWinSFX(player.uuid);
+                return { chips: player.chips + amountsWon[player.uuid], winner: true };
+            } else {
+                return { winner: false };
+            }
+        });
     }
 
     ejectStackedPlayers() {
@@ -533,9 +384,6 @@ export class GamePlayService {
         this.gsm.updatePlayers((player) => (player.chips === 0 ? { sitting: false, seatNumber: -1 } : {}));
     }
 
-    // TODO Redesign pot structure to make it simple.
-    // TODO create elegant methods for pot control in gameStateManager
-    // TODO make this more elegant
     placeBetsInPot() {
         let playerBets: [number, string][] = Object.entries(this.gsm.getPlayers()).map(([uuid, player]) => [
             player.betAmount,
@@ -601,52 +449,5 @@ export class GamePlayService {
 
         // update players chip counts
         this.gsm.updatePlayers((player) => ({ chips: player.chips - player.betAmount, betAmount: 0 }));
-    }
-
-    triggerVictoryByFolding() {
-        this.timerManager.setTimer(
-            () => this.victoryByFolding(),
-            () => this.gsm.getGameState(),
-            900,
-        );
-    }
-
-    victoryByFolding() {
-        const winnerUUID = this.gsm.getPlayersInHand()[0];
-        this.gsm.updatePlayer(winnerUUID, { winner: true });
-        this.clearCurrentPlayerToAct();
-        this.placeBetsInPot();
-        this.giveWinnerThePot(winnerUUID);
-        this.triggerFinishHand(2000);
-    }
-
-    giveWinnerThePot(winnerUUID: string) {
-        this.gsm.addPlayerChips(winnerUUID, this.gsm.getTotalPot());
-    }
-
-    triggerFinishBettingRound() {
-        this.clearCurrentPlayerToAct();
-        this.timerManager.setTimer(
-            () => this.finishBettingRound(),
-            () => this.gsm.getGameState(),
-            900,
-        );
-    }
-
-    finishBettingRound() {
-        this.placeBetsInPot();
-
-        // TODO this code will never not execute  here I believe. refactor
-        // placeBetsInPot and clearCurrentPlayerToAct seem to be common logic
-        // between victory by folding and finish betting round. See if you can
-        // put them in their own function, or incorporate victoryByFolding into finish
-        // betting round?
-        // What is the most logical time to check for a hand result? Immediately after an action
-        // or at "the end" of a betting round? The only "end of betting round" in which this applies
-        // is showdown.
-        if (!this.gsm.currentHandHasResult()) {
-            this.gsm.nextBettingRound();
-            this.initializeBettingRound();
-        }
     }
 }
