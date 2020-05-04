@@ -69,11 +69,11 @@ export const CUSTOM_THEME = {
         STACK_TO_ACT: {
             boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',
             backgroundColor: CUSTOM_PALETTE.primary.main,
-            background: `linear-gradient(90deg, ${CUSTOM_PALETTE.primary.main} 0%, ${CUSTOM_PALETTE.primary.light} 50%, ${CUSTOM_PALETTE.primary.main}  100%)`,
-            backgroundSize: '200% 200%',
-            '-webkit-animation': '$grad 2s linear infinite',
-            animation: '$grad 2s linear infinite',
-            '-moz-animation': '$grad 2s linear infinite',
+            background: `linear-gradient(90deg, ${CUSTOM_PALETTE.primary.light} 0%, ${CUSTOM_PALETTE.primary.main} 50%, ${CUSTOM_PALETTE.primary.light} 100%)`,
+            // backgroundSize: '200% 200%',
+            // '-webkit-animation': '$grad 2s linear infinite',
+            // animation: '$grad 2s linear infinite',
+            // '-moz-animation': '$grad 2s linear infinite',
         },
         CONTROLLER: {
             backgroundColor: 'rgba(0,0,0,0.3)',
