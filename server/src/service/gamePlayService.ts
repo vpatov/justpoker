@@ -253,16 +253,15 @@ export class GamePlayService {
             smallBlindUUID,
             bigBlindUUID,
         });
-        let nextToAct;
-        if (!isHeadsUp) {
-            // no straddle
-            nextToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
-        } else {
-            // heads up
-            nextToAct = dealerUUID;
-        }
 
-        this.gsm.setFirstToAct(nextToAct);
+        // let nextToAct;
+        // if (!isHeadsUp) {
+        //     // no straddle
+        //     nextToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+        // } else {
+        //     // heads up
+        //     nextToAct = dealerUUID;
+        // }
 
         assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
     }
@@ -279,6 +278,7 @@ export class GamePlayService {
                     : this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID)
                 : this.gsm.getNextPlayerInHandUUID(dealerUUID);
 
+        this.gsm.clearCurrentPlayerToAct();
         this.gsm.setFirstToAct(firstToAct);
     }
 
