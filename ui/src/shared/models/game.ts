@@ -23,6 +23,7 @@ export declare interface GameParameters {
     smallBlind: number;
     bigBlind: number;
     gameType: GameType;
+    maxBuyin: number;
     timeToAct: number;
     maxPlayers: number;
 }

@@ -33,7 +33,7 @@ import {
     COMMON_POT_SIZINGS,
 } from '../../../ui/src/shared/models/uiState';
 import { ValidationService, hasError } from './validationService';
-import { AudioQueue } from '../../../ui/src/shared/models/audioQueue';
+import { AudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
 import { MessageService } from './messageService';
 import { ChatService } from './chatService';
 import { ChatMessage } from '../../../ui/src/shared/models/chat';
@@ -89,15 +89,9 @@ export class StateConverter {
                       ),
                   }
                 : undefined,
-            audio: clientPlayerIsSeated
-                ? this.transformAudioForClient(heroPlayerUUID)
-                : this.audioService.getAudioQueue(),
+            audio: this.audioUpdated() ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
             // TODO refactor to send entire chatlog on init.
-            chat: this.chatUpdated()
-                ? this.chatService.getMessage()
-                    ? this.transformChatMessage(this.chatService.getMessage())
-                    : undefined
-                : undefined,
+            chat: this.chatUpdated() ? this.transformChatMessage() : undefined,
         };
         return uiState;
     }
@@ -180,15 +174,23 @@ export class StateConverter {
     }
 
     getValidAdminButtons(clientUUID: string): ActionButton[] {
+        // TODO admin functionality
         const client = this.gameStateManager.getConnectedClient(clientUUID);
-        // TODO if (client.admin)
-
         const adminButtons = [];
         adminButtons.push(this.gameStateManager.shouldDealNextHand() ? STOP_GAME_BUTTON : START_GAME_BUTTON);
         return adminButtons;
     }
 
-    transformChatMessage(chatMessage: ChatMessage): UiChatMessage {
+    transformAudioForPlayer(playerUUID: string): SoundByte {
+        const audioQueue = this.audioService.getAudioQueue();
+        return audioQueue.personal[playerUUID] || audioQueue.global;
+    }
+
+    transformChatMessage(): UiChatMessage {
+        const chatMessage = this.chatService.getMessage();
+        if (!chatMessage) {
+            return undefined;
+        }
         const uiChatMessage = {
             content: chatMessage.content,
             senderName: chatMessage.senderName,
@@ -196,45 +198,6 @@ export class StateConverter {
             timestamp: Date.now(),
         };
         return uiChatMessage;
-    }
-
-    transformAudioForClient(playerUUID: string): AudioQueue {
-        if (this.audioService.hasSFX()) {
-            return this.audioService.getAudioQueue();
-        }
-        const winners = this.gameStateManager.getWinners();
-        if (winners.length > 0) {
-            if (winners.includes(playerUUID)) {
-                // TODO check chip delta for big player win
-                return this.audioService.getHeroWinSFX();
-            } else {
-                return this.audioService.getVillainWinSFX();
-            }
-        }
-        /* TODO this approach isn't working exactly as intended because right now
-         there is no delay between a player action, and the resultant state.
-         for example, a player bets. Their bet, and the next
-         player to act, are part of the same state update. It would be probably be 
-         better for timing/sounds/animations if there was a slight delay in between
-         player actions and the next person to act. i.e.
-         player bets - updated state with their bet gets sent
-         next player to act - the state that immediately follows
-         this way the sound for when someone bets and when its someones turn 
-         are part of different states and are easier to handle.
-        */
-        if (
-            this.gameStateManager.getCurrentPlayerToAct() === playerUUID &&
-            this.gameStateManager.canCurrentPlayerAct()
-        ) {
-            return this.audioService.getHeroTurnToActSFX();
-        } else {
-            return this.audioService.getAudioQueue();
-        }
-        // TODO create pause between cards being dealt and the first to act of that street
-        // simplest way to do that, is in this method, have the start of hand sound take
-        // precedence over the turn to act sound.
-
-        // return this.audioService.getAudioQueue();
     }
 
     transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {

@@ -48,6 +48,10 @@ function OpenSeat(props) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [name, setName] = useState("");
     const [minBuyin, setMinBuyin] = useState(25);
+    // TODO maxBuyin should be read from game parameters.
+    // TODO when entering the buyin amount, the textbox adjusts it too quickly.
+    // For instance, if the minimum is 25, and you want to buyin for 50, when you 
+    // type the first 5, the text box automatically changes it to 25.
     const [maxBuyin, setMaxBuyin] = useState(200);
     const [buyin, setBuyin] = useState(100);
 

@@ -11,10 +11,13 @@ export class AudioService {
 
     // TODO we most likely dont need "global" and "personal",
     // because it seems like there will only be one sound per client per wsmessage
-    private setSound(soundByte: SoundByte) {
+    private setGlobalSound(soundByte: SoundByte) {
         this.gameStateManager.addUpdatedKeys(ServerStateKey.AUDIO);
-        console.log('audio setSond updatedKeys: ', this.gameStateManager.getUpdatedKeys());
-        return (this.audioQueue.global = soundByte);
+        this.audioQueue.global = soundByte;
+    }
+
+    private setPersonalSound(playerUUID: string, soundByte: SoundByte) {
+        this.audioQueue.personal[playerUUID] = soundByte;
     }
 
     getAudioQueue(): AudioQueue {
@@ -30,36 +33,26 @@ export class AudioService {
     }
 
     playCheckSFX() {
-        this.setSound(SoundByte.CHECK);
+        this.setGlobalSound(SoundByte.CHECK);
     }
     playFoldSFX() {
-        this.setSound(SoundByte.FOLD);
+        this.setGlobalSound(SoundByte.FOLD);
     }
     playBetSFX() {
-        this.setSound(SoundByte.BET);
+        this.setGlobalSound(SoundByte.BET);
     }
     playCallSFX() {
-        this.setSound(SoundByte.CALL);
+        this.setGlobalSound(SoundByte.CALL);
     }
     playStartOfHandSFX() {
-        this.setSound(SoundByte.START_OF_HAND);
+        this.setGlobalSound(SoundByte.START_OF_HAND);
     }
-    // playStartOfBettingRoundSFX() {
-    //     this.setSound(SoundByte.START_OF_BETTING_ROUND);
-    // }
 
-    // TODO refactor personal/global and design the best way to do this
+    playHeroWinSFX(playerUUID: string) {
+        this.setPersonalSound(playerUUID, SoundByte.HERO_WIN);
+    }
 
-    getHeroWinSFX(): AudioQueue {
-        return { global: SoundByte.HERO_WIN };
-    }
-    getVillainWinSFX(): AudioQueue {
-        return { global: SoundByte.VILLAIN_WIN };
-    }
-    // getBigHeroWinSFX(): AudioQueue {
-    //     return { global: SoundByte.BIG_HERO_WIN };
-    // }
-    getHeroTurnToActSFX(): AudioQueue {
-        return { global: SoundByte.HERO_TURN_TO_ACT };
+    playHeroTurnToActSFX(playerUUID: string) {
+        this.setPersonalSound(playerUUID, SoundByte.HERO_TURN_TO_ACT);
     }
 }

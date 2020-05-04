@@ -42,6 +42,7 @@ export declare interface NewGameForm {
     gameType: GameType;
     smallBlind: number;
     bigBlind: number;
+    maxBuyin: number;
     timeToAct: number;
     password?: string;
     adminOptions?: any;

@@ -8,6 +8,7 @@ import {
     ServerStateKey,
     GameStage,
     ALL_STATE_KEYS,
+    Pot,
 } from '../../../ui/src/shared/models/gameState';
 import {
     StraddleType,
@@ -65,10 +66,6 @@ export class GameStateManager {
 
     updateGameStage(gameStage: GameStage) {
         this.updateGameState({ gameStage });
-    }
-
-    isStateReady(): boolean {
-        return this.gameState.isStateReady;
     }
 
     updateGameState(updates: Partial<GameState>) {
@@ -225,6 +222,18 @@ export class GameStateManager {
 
     getPots() {
         return this.gameState.pots;
+    }
+
+    popPot(): Pot {
+        const potsLength = this.gameState.pots.length;
+        assert(potsLength > 0, 'Cannot call popPot when length of pot array is zero. This is a bug.');
+        const poppedPot = this.gameState.pots[0];
+        this.updateGameState({ pots: this.gameState.pots.filter((pot) => pot != poppedPot) });
+        assert(
+            this.gameState.pots.length === potsLength - 1,
+            'Pot array should have pot removed after calling popPot. This is a bug.',
+        );
+        return poppedPot;
     }
 
     getTotalPot() {
@@ -477,6 +486,7 @@ export class GameStateManager {
                 bigBlind: Number(newGameForm.bigBlind),
                 gameType: newGameForm.gameType,
                 timeToAct: Number(newGameForm.timeToAct) * 1000,
+                maxBuyin: Number(newGameForm.maxBuyin),
                 maxPlayers: 9,
                 // consider adding timeToAct and maxPlayers to form
             },
@@ -525,7 +535,7 @@ export class GameStateManager {
         const player = this.createNewPlayer(name, buyin);
 
         // TODO remove temporary logic
-        // this delets previous player association and replaces it
+        // this deletes previous player association and replaces it
         // with new one
         const client = this.getConnectedClient(clientUUID);
         if (client.playerUUID) {
@@ -627,7 +637,6 @@ export class GameStateManager {
         }));
 
         this.updateGameState({
-            isStateReady: true,
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
             firstToAct: '',
@@ -670,6 +679,18 @@ export class GameStateManager {
     isPlayerAllIn(playerUUID: string): boolean {
         const player = this.getPlayer(playerUUID);
         return player.lastActionType === BettingRoundActionType.ALL_IN;
+    }
+
+    getPlayersAllIn(): string[] {
+        return Object.entries(this.gameState.players)
+            .filter(([uuid, player]) => this.isPlayerAllIn(uuid))
+            .map(([uuid, player]) => uuid);
+    }
+
+    isAllInRunOut() {
+        const playersAllIn = this.getPlayersAllIn();
+        const playersInHand = this.getPlayersInHand();
+        return playersAllIn.length >= playersInHand.length - 1;
     }
 
     hasPlayerPutAllChipsInThePot(playerUUID: string): boolean {
