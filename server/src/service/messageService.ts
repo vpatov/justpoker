@@ -7,6 +7,7 @@ import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/s
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
+import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 
 declare interface ActionProcessor {
     validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -42,6 +43,29 @@ export class MessageService {
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
                 this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ActionType.DEAL_IN_NEXT_HAND]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.setPlayerDealInNextHand(player.uuid);
+                if (this.gameStateManager.getBettingRoundStage() === BettingRoundStage.WAITING) {
+                    this.gameStateManager.setPlayersSittingOutByDealInNextHand();
+                }
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ActionType.DEAL_OUT_NEXT_HAND]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, req) => {
+                console.log('hit');
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.setPlayerDealOutNextHand(player.uuid);
+                if (this.gameStateManager.getBettingRoundStage() === BettingRoundStage.WAITING) {
+                    this.gameStateManager.setPlayersSittingOutByDealInNextHand();
+                }
             },
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -119,6 +143,14 @@ export class MessageService {
                 this.validationService.ensureClientIsInGame(uuid);
                 const player = this.gameStateManager.getPlayer(request.playerUUID);
                 this.gameStateManager.setPlayerChips(player.uuid, Number(request.chipAmount));
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ActionType.SET_PLAYER_STRADDLE]: {
+            validation: (_, __) => NO_ERROR,
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.setPlayerStraddle(player.uuid, req.straddle);
             },
             updates: [ServerStateKey.GAMESTATE],
         },

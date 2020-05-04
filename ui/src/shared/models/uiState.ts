@@ -3,7 +3,7 @@ import { ActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { getCleanAudioQueue, SoundByte } from './audioQueue';
 import { MAX_VALUES } from '../util/consts';
-import { GameType, BettingRoundActionType } from "./game";
+import { GameType, BettingRoundActionType } from './game';
 
 export declare interface UiState {
     game: UiGameState;
@@ -25,19 +25,19 @@ export declare interface Global {
     smallBlind: number;
     allowStraddle: boolean;
     gameType: GameType;
+    canStartGame: boolean;
 }
-
-
 
 export declare interface Controller {
     min: number;
     max: number;
-    timeBanks?: number
+    timeBanks?: number;
     sizingButtons: SizingButton[];
     bettingRoundActionButtons: BettingRoundActionButton[];
     adminButtons?: ActionButton[];
-
+    dealInNextHand: boolean;
     toAct?: boolean;
+    straddle: boolean;
     unsetQueuedAction?: boolean;
 }
 
@@ -174,6 +174,8 @@ export const cleanController: Controller = {
     unsetQueuedAction: false,
     min: 0,
     max: 0,
+    straddle: false,
+    dealInNextHand: true,
     sizingButtons: [],
     bettingRoundActionButtons: [],
     adminButtons: [],
@@ -187,12 +189,15 @@ export const CleanGame: UiGameState = {
         smallBlind: 1,
         allowStraddle: false,
         gameType: GameType.NLHOLDEM,
+        canStartGame: false,
     },
     controller: {
         toAct: false,
         unsetQueuedAction: false,
         min: 0,
         max: 0,
+        dealInNextHand: true,
+        straddle: false,
         timeBanks: 0,
         sizingButtons: [],
         bettingRoundActionButtons: [],
@@ -258,6 +263,7 @@ export const TestGame: UiGameState = {
         smallBlind: 1,
         allowStraddle: true,
         gameType: GameType.NLHOLDEM,
+        canStartGame: false,
     },
     controller: {
         toAct: true,
@@ -265,6 +271,8 @@ export const TestGame: UiGameState = {
         min: 25,
         max: 43000,
         timeBanks: 2,
+        dealInNextHand: false,
+        straddle: true,
         sizingButtons: [
             {
                 label: '1/2',

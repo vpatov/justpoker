@@ -1,15 +1,15 @@
-import React, { useEffect, useRef } from "react";
-import CountUp from "react-countup";
+import React, { useEffect, useRef } from 'react';
+import CountUp from 'react-countup';
 
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import classnames from "classnames";
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import classnames from 'classnames';
 
 const useStyles = makeStyles((theme) => ({
     stackCont: {
-        width: "100%",
-        fontSize: "18px",
-        marginTop: "-2vmin",
+        width: '100%',
+        fontSize: '18px',
+        marginTop: '-2vmin',
         ...theme.custom.STACK,
     },
     toAct: {
@@ -18,48 +18,48 @@ const useStyles = makeStyles((theme) => ({
     },
     winner: {
         ...theme.custom.STACK,
-        backgroundColor: "white",
-        boxShadow: "0 0px 10px rgba(255,255,255,0.8)",
+        backgroundColor: 'white',
+        boxShadow: '0 0px 10px rgba(255,255,255,0.8)',
         background:
-            "linear-gradient(90deg, rgba(0,255,255,0.4) 0%, rgba(255,0,255,0.4) 50%, rgba(0,255,255,0.4) 100%);",
-        backgroundSize: "200% 200%",
-        "-webkit-animation": "$grad 2s linear infinite",
-        animation: "$grad 2s linear infinite",
-        "-moz-animation": "$grad 2s linear infinite",
+            'linear-gradient(90deg, rgba(0,255,255,0.4) 0%, rgba(255,0,255,0.4) 50%, rgba(0,255,255,0.4) 100%);',
+        // backgroundSize: '200% 200%',
+        // '-webkit-animation': '$grad 2s linear infinite',
+        // animation: '$grad 2s linear infinite',
+        // '-moz-animation': '$grad 2s linear infinite',
     },
-    "@keyframes grad": {
-        "0%": {
-            backgroundPosition: "0% 0%",
+    '@keyframes grad': {
+        '0%': {
+            backgroundPosition: '0% 0%',
         },
-        "100%": {
-            backgroundPosition: "200% -200%",
+        '100%': {
+            backgroundPosition: '200% -200%',
         },
     },
     name: {
-        paddingBottom: "0.8vmin",
-        paddingLeft: "0.6vmin",
-        whiteSpace: "nowrap",
-        textOverflow: "ellipsis",
-        overflow: "hidden",
-        fontSize: "1.3vmin",
+        paddingBottom: '0.8vmin',
+        paddingLeft: '0.6vmin',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        fontSize: '1.3vmin',
     },
     stack: {
-        paddingTop: "0.8vmin",
-        paddingLeft: "0.6vmin",
-        fontWeight: "bold",
-        fontSize: "1.7vmin",
+        paddingTop: '0.8vmin',
+        paddingLeft: '0.6vmin',
+        fontWeight: 'bold',
+        fontSize: '1.7vmin',
     },
     buttonR: {
-        fontWeight: "bold",
-        fontSize: "1.7vmin",
-        paddingTop: "0.3vmin",
-        paddingRight: "0.3vmin",
-        float: "right",
-        height: "2vmin",
-        width: "2vmin",
+        fontWeight: 'bold',
+        fontSize: '1.7vmin',
+        paddingTop: '0.3vmin',
+        paddingRight: '0.3vmin',
+        float: 'right',
+        height: '2vmin',
+        width: '2vmin',
     },
     act: {
-        backgroundColor: "rgba(0, 236, 255, 1)",
+        backgroundColor: 'rgba(0, 236, 255, 1)',
     },
 }));
 
@@ -83,15 +83,9 @@ function PlayerStack(props) {
                 [classes.winner]: winner,
             })}
         >
-            {button ? (
-                <Typography className={classes.buttonR}>{"★"}</Typography>
-            ) : null}
+            {button ? <Typography className={classes.buttonR}>{'★'}</Typography> : null}
             <Typography variant="h4" className={classes.stack}>
-                {winner ? (
-                    <CountUp start={prevStack} end={stack} separator="," />
-                ) : (
-                        stack.toLocaleString()
-                    )}
+                {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
             </Typography>
             <Typography variant="body1" className={classes.name}>
                 {name}
