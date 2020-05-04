@@ -16,6 +16,8 @@ import { GameStateManager } from '../service/gameStateManager';
 import { StateConverter } from '../service/stateConverter';
 import { generateUUID, logGameState } from '../../../ui/src/shared/util/util';
 import { AudioService } from '../service/audioService';
+import { AnimationService } from '../service/animationService';
+
 import { ChatService } from '../service/chatService';
 import { StateGraphManager } from '../service/stateGraphManager';
 
@@ -52,6 +54,7 @@ class Server {
         private stateGraphManager: StateGraphManager,
         private readonly chatService: ChatService,
         private readonly audioService: AudioService,
+        private readonly animationService: AnimationService,
     ) {}
 
     updateSnippet(snippet: ExecutionSnippet, ms: number) {
@@ -117,6 +120,7 @@ class Server {
         }
         // TODO remove this from server and place into stateTransformService
         this.audioService.reset();
+        this.animationService.reset();
         this.gsm.resetSingltonState();
     }
 

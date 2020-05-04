@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
     toAct: {
         // prevents blurryness on timer animation
         '-webkit-backface-visibility': 'hidden',
-        '-webkit-transform': 'translateZ(0)',
         ...theme.custom.STACK_TO_ACT,
     },
     winner: {
