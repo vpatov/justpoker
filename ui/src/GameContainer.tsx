@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
-import Game from "./Game";
-import { CleanGame } from "./shared/models/uiState";
-import { WsServer } from "./api/ws";
-import { Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import Game from './Game';
+import { CleanGame } from './shared/models/uiState';
+import { WsServer } from './api/ws';
+import { Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: "100vh",
-        width: "100vw",
+        height: '100vh',
+        width: '100vw',
+        color: 'white',
         ...theme.custom.BACKGROUND,
     },
     loading: {
@@ -25,18 +26,18 @@ function GameContainer(props): any {
 
     useEffect(() => {
         if (props.useTestGame) {
-            dispatch({ type: "SET_TEST_GAME" });
+            dispatch({ type: 'SET_TEST_GAME' });
             if (!gameLoaded) setGameLoaded(true);
         } else {
             const succ = WsServer.openWs();
             if (succ) {
-                WsServer.subscribe("game", onReceiveNewGame);
+                WsServer.subscribe('game', onReceiveNewGame);
             }
         }
     }, []);
 
     const onReceiveNewGame = (game: any) => {
-        dispatch({ type: "SET_GAME_STATE", game: game });
+        dispatch({ type: 'SET_GAME_STATE', game: game });
         if (!gameLoaded) setGameLoaded(true);
     };
 
