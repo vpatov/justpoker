@@ -1,9 +1,11 @@
 import { Card, Hand } from './cards';
-import { BettingRoundAction, BettingRoundActionType } from './game';
+import { BettingRoundActionType } from './game';
+
+export declare type PlayerUUID = string;
 
 export declare interface Player {
     /** Unique identifier for player. */
-    readonly uuid: string;
+    readonly uuid: PlayerUUID;
 
     /** Player's display name at the table. */
     readonly name: string;
