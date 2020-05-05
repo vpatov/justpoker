@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        background: `radial-gradient(circle, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+        background: `radial-gradient(circle, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 150%)`,
     },
     title: {
         margin: 36,
