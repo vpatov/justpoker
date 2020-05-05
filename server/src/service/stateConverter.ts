@@ -84,7 +84,7 @@ export class StateConverter {
         const uiState: UiState = {
             game: this.gameUpdated()
                 ? {
-                      global: this.getUIGobal(clientUUID),
+                      global: this.getUIGlobal(clientUUID),
                       controller: clientPlayerIsSeated
                           ? this.getUIController(clientUUID, heroPlayerUUID)
                           : cleanController,
@@ -107,12 +107,13 @@ export class StateConverter {
         return uiState;
     }
 
-    getUIGobal(clientUUID: string): Global {
+    getUIGlobal(clientUUID: string): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
 
         const global: Global = {
             gameStarted: this.gameStateManager.isGameStarted(),
+            heroIsAdmin: this.gameStateManager.getAdminUUID() === clientUUID,
             heroIsSeated: clientPlayerIsSeated,
             bigBlind: this.gameStateManager.getBB(),
             smallBlind: this.gameStateManager.getSB(),
