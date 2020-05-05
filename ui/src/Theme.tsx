@@ -74,13 +74,10 @@ export const CUSTOM_THEME = {
             background: `linear-gradient(90deg, ${CUSTOM_PALETTE.secondary.light} -33%, ${CUSTOM_PALETTE.secondary.main} 50%, ${CUSTOM_PALETTE.secondary.light} 133%)`,
         },
         CONTROLLER: {
-            backgroundColor: 'rgba(0,0,0,0.3)',
+            backgroundColor: grey[900],
             background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
             boxSizing: 'border-box',
             transition: 'box-shadow 0.4s ease-in-out;',
-        },
-        CONTROLLER_TO_ACT: {
-            boxShadow: `0px -8px 10px 3px ${CUSTOM_PALETTE.primary.main}`,
         },
         BET: {
             border: '1px solid white',

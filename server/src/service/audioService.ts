@@ -53,6 +53,6 @@ export class AudioService {
     }
 
     playHeroTurnToActSFX(playerUUID: string) {
-        this.setPersonalSound(playerUUID, SoundByte.HERO_TURN_TO_ACT);
+        this.setPersonalSound(playerUUID, SoundByte.HERO_TO_ACT);
     }
 }

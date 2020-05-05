@@ -2,8 +2,14 @@ import React, { useState, useEffect, Fragment } from 'react';
 import classnames from 'classnames';
 import { WsServer } from './api/ws';
 import { useSelector } from 'react-redux';
-import { controllerSelector, heroHandLabelSelector, allowStraddleSelector } from './store/selectors';
+import {
+    controllerSelector,
+    heroHandLabelSelector,
+    allowStraddleSelector,
+    heroPlayerTimerSelector,
+} from './store/selectors';
 import TextFieldWrap from './reuseable/TextFieldWrap';
+import ControllerTimer from './ControllerTimer';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -20,15 +26,11 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'absolute',
             right: 0,
             bottom: 0,
-            zIndex: 2,
             display: 'flex',
             justifyContent: 'space-around',
             alignItems: 'center',
             color: 'white',
             ...theme.custom.CONTROLLER,
-        },
-        rootToAct: {
-            ...theme.custom.CONTROLLER_TO_ACT,
         },
         gameInfoCont: {
             marginLeft: '2vw',
