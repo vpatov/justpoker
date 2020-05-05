@@ -116,7 +116,7 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, heroIsSeated, gameStarted } = useSelector(globalGameStateSelector);
+    const { canStartGame, heroIsSeated, isGameInProgress } = useSelector(globalGameStateSelector);
     const { communityCards, spots, pot, fullPot } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
@@ -210,7 +210,7 @@ function Table(props) {
                         Start Game
                     </Button>
                 ) : null}
-                {gameStarted ? (
+                {isGameInProgress ? (
                     <>
                         <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
                             <Typography

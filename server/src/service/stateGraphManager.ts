@@ -43,7 +43,7 @@ export class StateGraphManager {
     }
 
     canContinueGameCondition: Condition = {
-        fn: () => this.gamePlayService.canContinueGame(),
+        fn: () => this.gameStateManager.canDealNextHand(),
         TRUE: GameStage.INITIALIZE_NEW_HAND,
         FALSE: GameStage.NOT_IN_PROGRESS,
     };

@@ -111,7 +111,7 @@ export class StateConverter {
         const clientPlayerIsSeated = heroPlayer?.sitting;
 
         const global: Global = {
-            gameStarted: this.gameStateManager.isGameStarted(),
+            isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.getAdminUUID() === clientUUID,
             heroIsSeated: clientPlayerIsSeated,
             bigBlind: this.gameStateManager.getBB(),
@@ -140,7 +140,8 @@ export class StateConverter {
             lastBettingRoundAction: this.gameStateManager.getLastBettingRoundAction(),
             min: this.getMinimumBetSize(heroPlayerUUID),
             max: this.getMaxBetSizeForPlayer(heroPlayerUUID),
-            sizingButtons: !this.gameStateManager.isGameStarted()
+            // TODO break out into sizing buttons function
+            sizingButtons: !this.gameStateManager.isGameInProgress()
                 ? []
                 : bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
                 ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
@@ -162,32 +163,27 @@ export class StateConverter {
             : this.gameStateManager.getPlayer(playerUUID).chips;
     }
 
+    disableButton(button: BettingRoundActionButton) {
+        return { ...button, disabled: true };
+    }
+
     getValidBettingRoundActions(clientUUID: string, heroPlayerUUID: string): BettingRoundActionButton[] {
-        const buttons = [] as BettingRoundActionButton[];
-        const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const clientPlayerIsSeated = heroPlayer?.sitting;
-        if (!clientPlayerIsSeated || !this.gameStateManager.isGameStarted()) {
+        if (!this.gameStateManager.isGameInProgress()) {
             return [];
         }
 
-        const disableButton = (b: BettingRoundActionButton) => Object.assign({}, b, { disabled: true });
-
         if (
-            !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
-            this.gameStateManager.isPlayerAllIn(heroPlayerUUID)
+            this.gameStateManager.isPlayerAllIn(heroPlayerUUID) ||
+            !this.gameStateManager.isPlayerInHand(heroPlayerUUID)
         ) {
-            return [disableButton(FOLD_BUTTON), disableButton(CHECK_BUTTON), disableButton(BET_BUTTON)];
+            return [this.disableButton(FOLD_BUTTON), this.disableButton(CHECK_BUTTON), this.disableButton(BET_BUTTON)];
         }
 
+        const buttons = [] as BettingRoundActionButton[];
         // player can always queue a bet or fold action but we decide if it is check or call
+        buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
         buttons.push(FOLD_BUTTON);
-        if (this.gameStateManager.isPlayerFacingBet(heroPlayerUUID)) {
-            buttons.push(CALL_BUTTON);
-        } else {
-            buttons.push(CHECK_BUTTON);
-        }
         buttons.push(BET_BUTTON);
-
         return buttons;
     }
 
