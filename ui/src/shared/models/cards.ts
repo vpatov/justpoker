@@ -118,3 +118,21 @@ export function suitLetterToSuit(suitLetter: string): Suit {
 export function cardsAreEqual(cardA: Card, cardB: Card): boolean {
     return cardA.rank === cardB.rank && cardA.suit === cardB.suit;
 }
+
+export function getTwoCardCombinations(holeCards: Readonly<Card[]>): Card[][] {
+  const combinations: Card[][] = [];
+  for (let i = 0; i < holeCards.length; i += 1) {
+      for (let j = i + 1; j < holeCards.length; j += 1) {
+          combinations.push([holeCards[i], holeCards[j]]);
+      }
+  }
+  return combinations;
+}
+
+export function convertHandToCardArray(hand: Hand): Card[] {
+  return hand.cards.map((pokerSolverCard) => ({
+      suit: suitLetterToSuit(pokerSolverCard.suit),
+      rank: pokerSolverCard.value,
+  }));
+}
+
