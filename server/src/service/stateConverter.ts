@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
-import { GameState, ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { GameState, ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 import { strict as assert } from 'assert';
 
 import {
@@ -120,6 +120,7 @@ export class StateConverter {
             allowStraddle: this.gameStateManager.getAllowStraddle(),
             gameType: this.gameStateManager.getGameType(),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
+            unqueueAllBettingRoundActions: this.gameStateManager.getGameStage() === GameStage.INITIALIZE_NEW_HAND,
         };
 
         return global;
@@ -137,7 +138,7 @@ export class StateConverter {
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
         const controller: Controller = {
             toAct,
-            unsetQueuedAction: this.gameStateManager.getUnsetQueuedAction(),
+            lastBettingRoundAction: this.gameStateManager.getLastBettingRoundAction(),
             min: this.getMinimumBetSize(heroPlayerUUID),
             max: this.getMaxBetSizeForPlayer(heroPlayerUUID),
             sizingButtons: !this.gameStateManager.isGameStarted()
