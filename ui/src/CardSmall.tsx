@@ -26,10 +26,6 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 'bold',
         marginTop: '12%',
     },
-    // TODO change and make aesthetically pleasing. 
-    partOfWinningHand: {
-        boxShadow: "inset 0 0px 3px 3px #000, 0 0px 8px 4px #fff"
-    },
     hidden: {
         ...theme.custom.HIDDEN,
         overflow: 'hidden',
@@ -45,6 +41,10 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         fontSize: '3.64vmin',
         color: theme.palette.primary.main,
+    },
+    partOfWinningHand: {
+        transition: 'all 0.5s ease-in-out',
+        ...theme.custom.WINNING_CARD,
     },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
@@ -73,8 +73,11 @@ function CardSmall(props) {
         );
     }
     return (
-        <div className={classnames(classes.root, classes[suit], className, 
-            {[classes.partOfWinningHand] : partOfWinningHand})}>
+        <div
+            className={classnames(classes.root, classes[suit], className, {
+                [classes.partOfWinningHand]: partOfWinningHand,
+            })}
+        >
             <Typography className={classnames(classes.text)}>{`${rank} ${generateStringFromSuit(suit)}`}</Typography>
         </div>
     );

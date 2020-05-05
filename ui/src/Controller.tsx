@@ -134,7 +134,7 @@ const useStyles = makeStyles((theme: Theme) =>
         handLabel: {
             marginTop: '2vmin',
             fontSize: '2vmin',
-            color: theme.palette.secondary.main,
+            color: theme.palette.primary.main,
         },
         toActLabel: {
             fontSize: '2vmin',

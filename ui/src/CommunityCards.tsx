@@ -22,13 +22,7 @@ function CommunityCards(props) {
     return (
         <div className={classes.communityCardsCont}>
             {communityCards.map((c, i) => (
-                <CardLarge 
-                    suit={c.suit}
-                    rank={c.rank}
-                    fontSize={'2.5vmin'}
-                    className={classes.communityCard}
-                    partOfWinningHand={c.partOfWinningHand}
-                />
+                <CardLarge {...c} fontSize={'2.5vmin'} className={classes.communityCard} />
             ))}
         </div>
     );
