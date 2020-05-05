@@ -75,3 +75,14 @@ export const WAITING_TO_ACT: BettingRoundAction = {
 export const CALL_ACTION: BettingRoundAction = {
     type: BettingRoundActionType.CALL,
 };
+
+export const NOT_IN_HAND: BettingRoundAction = {
+    type: BettingRoundActionType.NOT_IN_HAND,
+};
+
+export const ALL_BETTING_ROUND_ACTION_TYPES: BettingRoundActionType[] = [
+    BettingRoundActionType.CHECK,
+    BettingRoundActionType.FOLD,
+    BettingRoundActionType.BET,
+    BettingRoundActionType.CALL
+];

@@ -4,6 +4,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import AddChipDialog from './AddChipDialog';
+import { WsServer } from './api/ws';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,6 +28,12 @@ function PlayerMenu(props) {
         setHeroRotation(virtualPositon);
         handleClose();
     };
+
+    const handleBootPlayer = () => {
+        WsServer.sendBootPlayerMessage(uuid);
+        handleClose();
+    }
+
     return (
         <Menu
             className={classes.root}
@@ -37,7 +44,7 @@ function PlayerMenu(props) {
         >
             <AddChipDialog open={chipsDialog} handleClose={handleCloseDialog} name={name} stack={stack} uuid={uuid} />
             <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem>
-            <MenuItem onClick={handleClose}>Boot Player</MenuItem>
+            <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
             <MenuItem onClick={handleClose}>Mute</MenuItem>
         </Menu>

@@ -5,6 +5,7 @@ import {
     ClientChatMessage,
     ActionType,
     ClientWsMessageRequest,
+    BootPlayerRequest,
 } from "../shared/models/wsaction";
 
 // TODO create stricter api for sending messages to server. DOM node source shouldnt be responsible
@@ -54,8 +55,16 @@ export class WsServer {
         const chatMessage: ClientChatMessage = { content };
         const clientWsMessage: ClientWsMessage = {
             actionType: ActionType.CHAT,
-            request: chatMessage as ClientWsMessageRequest,
+            request: chatMessage as ClientChatMessage as ClientWsMessageRequest,
         };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendBootPlayerMessage(playerUUID: string){
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ActionType.BOOTPLAYER,
+            request: {playerUUID} as BootPlayerRequest as ClientWsMessageRequest
+        }
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 

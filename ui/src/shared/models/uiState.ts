@@ -5,7 +5,7 @@ import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
 
 import { MAX_VALUES } from '../util/consts';
-import { GameType, BettingRoundActionType } from './game';
+import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
 
 export declare interface UiState {
     game: UiGameState;
@@ -30,6 +30,7 @@ export declare interface Global {
     allowStraddle: boolean;
     gameType: GameType;
     canStartGame: boolean;
+    unqueueAllBettingRoundActions: boolean;
 }
 
 export declare interface Controller {
@@ -42,7 +43,7 @@ export declare interface Controller {
     dealInNextHand: boolean;
     toAct?: boolean;
     straddle: boolean;
-    unsetQueuedAction?: boolean;
+    lastBettingRoundAction: BettingRoundAction;
 }
 
 export declare interface SizingButton {
@@ -176,7 +177,7 @@ export const cleanUiChatLog: UiChatLog = {
 /* Clean Controller for init. */
 export const cleanController: Controller = {
     toAct: false,
-    unsetQueuedAction: false,
+    lastBettingRoundAction: NOT_IN_HAND,
     min: 0,
     max: 0,
     straddle: false,
@@ -184,30 +185,24 @@ export const cleanController: Controller = {
     sizingButtons: [],
     bettingRoundActionButtons: [],
     adminButtons: [],
+    timeBanks: 0,
+};
+
+export const cleanGlobal: Global = {
+    heroIsAdmin: false,
+    heroIsSeated: false,
+    gameStarted: false,
+    bigBlind: 2,
+    smallBlind: 1,
+    allowStraddle: false,
+    gameType: GameType.NLHOLDEM,
+    canStartGame: false,
+    unqueueAllBettingRoundActions: true,
 };
 
 export const CleanGame: UiGameState = {
-    global: {
-        heroIsAdmin: false,
-        heroIsSeated: false,
-        gameStarted: false,
-        bigBlind: 2,
-        smallBlind: 1,
-        allowStraddle: false,
-        gameType: GameType.NLHOLDEM,
-        canStartGame: false,
-    },
-    controller: {
-        toAct: false,
-        unsetQueuedAction: false,
-        min: 0,
-        max: 0,
-        dealInNextHand: true,
-        straddle: false,
-        timeBanks: 0,
-        sizingButtons: [],
-        bettingRoundActionButtons: [],
-    },
+    global: cleanGlobal,
+    controller: cleanController,
     table: {
         spots: 9,
         pot: 0,
@@ -272,10 +267,11 @@ export const TestGame: UiGameState = {
         allowStraddle: true,
         gameType: GameType.NLHOLDEM,
         canStartGame: false,
+        unqueueAllBettingRoundActions: true,
     },
     controller: {
         toAct: true,
-        unsetQueuedAction: false,
+        lastBettingRoundAction: CHECK_ACTION,
         min: 25,
         max: 43000,
         timeBanks: 2,
