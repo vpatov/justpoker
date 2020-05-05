@@ -74,7 +74,8 @@ export const CUSTOM_THEME = {
             background: `linear-gradient(90deg, ${CUSTOM_PALETTE.secondary.light} -33%, ${CUSTOM_PALETTE.secondary.main} 50%, ${CUSTOM_PALETTE.secondary.light} 133%)`,
         },
         WINNING_CARD: {
-            boxShadow: `0px 0px 8px 2px ${CUSTOM_PALETTE.secondary.main}`,
+            transition: 'all 0.4s ease-in-out;',
+            boxShadow: `0px 0px 8px 2px ${CUSTOM_PALETTE.secondary.light}`,
         },
         CONTROLLER: {
             backgroundColor: grey[900],
