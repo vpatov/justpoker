@@ -37,6 +37,10 @@ const useStyles = makeStyles((theme) => ({
         color: 'white',
         opacity: 0.7,
     },
+    // TODO change and make aesthetically pleasing. 
+    partOfWinningHand: {
+        boxShadow: "10px 10px 15px 15px #ffffdd"
+    },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
     },
@@ -53,10 +57,10 @@ const useStyles = makeStyles((theme) => ({
 
 function CardLarge(props) {
     const classes = useStyles();
-    const { suit, rank, className } = props;
+    const { suit, rank, partOfWinningHand, className } = props;
 
     return (
-        <div className={classnames(classes.root, classes[suit], className)}>
+        <div className={classnames(classes.root, classes[suit], className, {[classes.partOfWinningHand]: partOfWinningHand})}>
             <Typography className={classnames(classes.text, classes.rank)}>{rank}</Typography>
             <Typography className={classnames(classes.text, classes.suit)}>{generateStringFromSuit(suit)}</Typography>
         </div>

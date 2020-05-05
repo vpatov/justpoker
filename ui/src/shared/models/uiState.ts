@@ -65,6 +65,7 @@ export declare interface UiCard {
     suit?: Suit;
     rank?: string;
     hidden?: boolean;
+    partOfWinningHand?: boolean;
 }
 
 export declare interface Table {

@@ -1,4 +1,4 @@
-import { Card } from './cards';
+import { Card, Hand } from './cards';
 import { BettingRoundAction, BettingRoundActionType } from './game';
 
 export declare interface Player {
@@ -17,16 +17,19 @@ export declare interface Player {
     /** Label describing the best hand the player current holds. */
     readonly handDescription: string;
 
+    /** Cards that make up the player's best hand.*/
+    readonly bestHand: Hand|null;
+
     /**
      * If a player is sitting they are either playing/have played
      * in the current hand, or are waiting to be dealt in the next hand.
      */
     readonly sitting: boolean;
 
-    // player is at the table but not being dealt in
+    /** Player is at the table but not being dealt in. */
     readonly sittingOut: boolean;
 
-    // player is straddling
+    /** Player is straddling. */
     readonly straddle: boolean;
 
     /** Gameplay goes from lower seat number to higher seat number and wraps around. */
@@ -60,6 +63,7 @@ export const cleanPlayer: Player = {
     chips: 0,
     holeCards: [],
     handDescription: '',
+    bestHand: null,
     sitting: false,
     sittingOut: false,
     straddle: false,

@@ -16,6 +16,7 @@ import {
     ADD_CHIPS_BUTTON,
     UiChatMessage,
     BettingRoundActionButton,
+    UiCard,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -38,7 +39,13 @@ import { MessageService } from './messageService';
 import { AnimationService } from './animationService';
 
 import { ChatService } from './chatService';
-import { ChatMessage } from '../../../ui/src/shared/models/chat';
+
+declare interface CardInformation {
+    hand: {
+        cards: UiCard[];
+    };
+    handLabel: string;
+}
 
 @Service()
 export class StateConverter {
@@ -85,7 +92,7 @@ export class StateConverter {
                           spots: 9, // TODO configure
                           pot: this.gameStateManager.getTotalPot(),
                           fullPot: this.gameStateManager.getFullPot(),
-                          communityCards: [...board],
+                          communityCards: this.transformCommunityCards(),
                       },
                       players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
                           this.transformPlayer(player, heroPlayerUUID),
@@ -214,20 +221,51 @@ export class StateConverter {
         return uiChatMessage;
     }
 
-    transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
-        const board = this.gameStateManager.getBoard();
-
+    transformPlayerCards(player: Player, heroPlayerUUID: string): CardInformation {
         const isHero = heroPlayerUUID === player.uuid;
         const shouldCardsBeVisible = isHero || !player.cardsAreHidden;
+
+        const isWinner = player.winner;
+
+        const cards: UiCard[] = player.holeCards.map((holeCard) => {
+            return shouldCardsBeVisible
+                ? {
+                      ...holeCard,
+                      partOfWinningHand:
+                          isWinner && this.gameStateManager.isCardInPlayersBestHand(player.uuid, holeCard),
+                  }
+                : { hidden: true };
+        });
+
+        return {
+            hand: { cards },
+            handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? player.handDescription : undefined,
+        };
+    }
+
+    transformCommunityCards(): UiCard[] {
+        const board = this.gameStateManager.getBoard();
+        const winners = this.gameStateManager.getWinners();
+
+        if (winners.length) {
+            const winnerUUID = winners[0];
+            return board.map((card) => ({
+                ...card,
+                partOfWinningHand: this.gameStateManager.isCardInPlayersBestHand(winnerUUID, card),
+            }));
+        } else {
+            return [...board];
+        }
+    }
+
+    transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
         const toAct =
             this.gameStateManager.getCurrentPlayerToAct() === player.uuid &&
             this.gameStateManager.canCurrentPlayerAct();
         const newPlayer = {
             stack: player.chips - player.betAmount,
             uuid: player.uuid,
-            hand: {
-                cards: shouldCardsBeVisible ? player.holeCards : player.holeCards.map(() => ({ hidden: true })),
-            },
+            ...this.transformPlayerCards(player, heroPlayerUUID),
             playerTimer: toAct
                 ? {
                       timeElapsed: this.gameStateManager.getCurrentPlayerTurnElapsedTime() / 1000,
@@ -238,9 +276,7 @@ export class StateConverter {
                       timeLimit: this.gameStateManager.getTimeToAct() / 1000 - 1,
                   }
                 : undefined,
-            handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? player.handDescription : undefined,
             name: player.name,
-            hidden: isHero ? false : player.cardsAreHidden,
             toAct: toAct,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
@@ -250,6 +286,7 @@ export class StateConverter {
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
         };
+        //  as UIPlayer;
         return newPlayer;
     }
 

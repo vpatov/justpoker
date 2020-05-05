@@ -8,7 +8,7 @@ import {
     GameType,
 } from '../../../ui/src/shared/models/game';
 import { strict as assert } from 'assert';
-import { HandSolverService, Hand } from './handSolverService';
+import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
 
@@ -17,6 +17,7 @@ import { AnimationService } from '../service/animationService';
 
 import { printObj, logGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';
+import { Hand } from '../../../ui/src/shared/models/cards';
 
 @Service()
 export class GamePlayService {
@@ -374,24 +375,21 @@ export class GamePlayService {
             }),
         );
 
+        const shouldShowWinnersCards = !this.gsm.hasEveryoneButOnePlayerFolded();
+
         // Show everyones hand at showdown if they havent folded yet.
         // TODO show only those hands youre supposed to show.
         this.gsm.updatePlayers((player) =>
-            !this.gsm.hasEveryoneButOnePlayerFolded()
-                ? this.gsm.isPlayerInHand(player.uuid)
-                    ? { cardsAreHidden: false }
-                    : {}
-                : {},
+            shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
         );
 
-        this.gsm.updatePlayers((player) => {
-            const isPlayerWinner = winningPlayers.includes(player.uuid);
-            if (isPlayerWinner) {
-                this.audioService.playHeroWinSFX(player.uuid);
-                return { chips: player.chips + amountsWon[player.uuid], winner: true };
-            } else {
-                return { winner: false };
-            }
+        this.gsm.clearWinners();
+        winningPlayers.forEach((playerUUID) => {
+            this.audioService.playHeroWinSFX(playerUUID);
+            this.gsm.updatePlayer(playerUUID, {
+                chips: this.gsm.getChips(playerUUID) + amountsWon[playerUUID],
+                winner: true,
+            });
         });
     }
 
