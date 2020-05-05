@@ -104,6 +104,7 @@ export class GamePlayService {
 
     /* Betting Round Actions */
     performBettingRoundAction(action: BettingRoundAction) {
+        this.gsm.setLastBettingRoundAction(action);
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
                 this.check();
@@ -143,7 +144,6 @@ export class GamePlayService {
 
     bet(betAmount: number, playerPlacingBlindBetUUID?: string) {
         this.audioService.playBetSFX();
-        this.gsm.setUnsetQueuedAction();
         // TODO is playerPlacingBlindBet correct design?
         // after all, a blind is a special case of a normal bet,
         // so in theory it belongs in this method as a code path.

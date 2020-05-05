@@ -9,6 +9,8 @@ import {
     GameStage,
     ALL_STATE_KEYS,
     Pot,
+    QueuedServerAction,
+    ServerActionType,
 } from '../../../ui/src/shared/models/gameState';
 import {
     StraddleType,
@@ -99,12 +101,6 @@ export class GameStateManager {
         };
     }
 
-    resetSingletonState() {
-        this.updateGameState({
-            unsetQueuedAction: false,
-        });
-    }
-
     updatePlayer(playerUUID: string, updates: Partial<Player>) {
         const player = this.getPlayer(playerUUID);
 
@@ -143,10 +139,6 @@ export class GameStateManager {
             );
         }
         return clients[0].uuid;
-    }
-
-    getUnsetQueuedAction(): boolean {
-        return this.gameState.unsetQueuedAction;
     }
 
     getConnectedClients() {
@@ -558,14 +550,68 @@ export class GameStateManager {
         };
     }
 
+    queueAction(queuedServerAction: QueuedServerAction) {
+        this.updateGameState({
+            queuedServerActions: [...this.gameState.queuedServerActions, queuedServerAction],
+        });
+    }
+
+    getQueuedServerActions(): QueuedServerAction[] {
+        return this.gameState.queuedServerActions;
+    }
+
     /* Player operations */
 
-    associateClientAndPlayer(clientUUID: string, player: Player): ConnectedClient {
+    associateClientAndPlayer(clientUUID: string, playerUUID: string): ConnectedClient {
         const connectedClient = this.getConnectedClient(clientUUID);
         return {
             ...connectedClient,
-            playerUUID: player.uuid,
+            playerUUID,
         };
+    }
+
+    bootPlayerFromGame(playerUUID: string) {
+        if (this.isPlayerInHand(playerUUID)) {
+            this.queueAction({
+                actionType: ServerActionType.BOOT_PLAYER,
+                args: [playerUUID],
+            });
+        } else {
+            if (this.getPlayer(playerUUID)) {
+                this.removePlayerFromPlayers(playerUUID);
+                this.deassociateClientAndPlayer(playerUUID);
+            }
+        }
+    }
+
+    removePlayerFromPlayers(playerUUID: string) {
+        this.updateGameState({
+            players: Object.fromEntries(
+                Object.entries(this.getPlayers()).filter(([uuid, player]) => uuid !== playerUUID),
+            ),
+        });
+    }
+
+    // TODO if you need to perform more operations like this, you need to create helpers
+    deassociateClientAndPlayer(playerUUID: string) {
+        const playerClientUUID = this.getClientByPlayerUUID(playerUUID);
+        if (!playerClientUUID) {
+            throw Error('deassociateClientAndPlayer called with a player that doesnt have a client.');
+        }
+        this.updateGameState({
+            table: {
+                ...this.gameState.table,
+                activeConnections: new Map(
+                    [...this.gameState.table.activeConnections].map(([clientUUID, client]) => [
+                        clientUUID,
+                        {
+                            ...client,
+                            playerUUID: clientUUID === playerClientUUID ? '' : client.playerUUID,
+                        },
+                    ]),
+                ),
+            },
+        });
     }
 
     addNewPlayerToGame(clientUUID: string, request: JoinTableRequest) {
@@ -578,15 +624,11 @@ export class GameStateManager {
         // with new one
         const client = this.getConnectedClient(clientUUID);
         if (client.playerUUID) {
-            this.updateGameState({
-                players: Object.fromEntries(
-                    Object.entries(this.getPlayers()).filter(([uuid, player]) => uuid !== client.playerUUID),
-                ),
-            });
+            this.removePlayerFromPlayers(client.playerUUID);
         }
         // -----
 
-        const associatedClient = this.associateClientAndPlayer(clientUUID, player);
+        const associatedClient = this.associateClientAndPlayer(clientUUID, player.uuid);
         this.gameState = {
             ...this.gameState,
             players: { ...this.gameState.players, [player.uuid]: player },
@@ -632,10 +674,12 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { lastActionType });
     }
 
-    setUnsetQueuedAction() {
-        this.updateGameState({
-            unsetQueuedAction: true,
-        });
+    getLastBettingRoundAction(): BettingRoundAction {
+        return this.gameState.lastBettingRoundAction;
+    }
+
+    setLastBettingRoundAction(lastBettingRoundAction: BettingRoundAction) {
+        this.updateGameState({ lastBettingRoundAction });
     }
 
     computeBestHandForPlayer(playerUUID: string): Hand {
