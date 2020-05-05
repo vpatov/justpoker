@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '3.64vmin',
         color: theme.palette.primary.main,
     },
-    winningCard: {
+    partOfWinningHand: {
         transition: 'all 0.5s ease-in-out',
         ...theme.custom.WINNING_CARD,
     },
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, winningCard, className } = props;
+    const { suit, rank, hidden, className, partOfWinningHand } = props;
 
     if (hidden) {
         return (
@@ -73,7 +73,11 @@ function CardSmall(props) {
         );
     }
     return (
-        <div className={classnames(classes.root, classes[suit], { [classes.winningCard]: winningCard }, className)}>
+        <div
+            className={classnames(classes.root, classes[suit], className, {
+                [classes.partOfWinningHand]: partOfWinningHand,
+            })}
+        >
             <Typography className={classnames(classes.text)}>{`${rank} ${generateStringFromSuit(suit)}`}</Typography>
         </div>
     );
