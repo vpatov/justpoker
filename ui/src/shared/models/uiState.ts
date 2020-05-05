@@ -335,7 +335,7 @@ export const TestGame: UiGameState = {
             winner: true,
             bet: genRandomInt(0, 100),
             hand: {
-                cards: [{ hidden: true }, { hidden: true }],
+                cards: [{ hidden: true }, { hidden: true }, { hidden: true }, { hidden: true }],
             },
         },
         {
@@ -364,13 +364,13 @@ export const TestGame: UiGameState = {
 
         {
             button: true,
-            name: 'Langus Yanger',
+            name: 'Langus PLO',
             position: positions[4],
             stack: 323,
             bet: genRandomInt(0, 100000),
             handLabel: 'Top Two',
             hand: {
-                cards: [{ hidden: true }, { hidden: true }],
+                cards: [genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard()],
             },
         },
         {

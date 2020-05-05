@@ -19,28 +19,41 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
     },
+    flexCard: {
+        width: 'unset',
+        flex: '6vmin 1 1',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+    },
+
     text: {
-        letterSpacing: '-0.3vmin',
         fontSize: '2.6vmin',
         color: 'white',
         fontWeight: 'bold',
         marginTop: '12%',
     },
+    flexText: {
+        marginTop: '0',
+        fontSize: '2.4vmin',
+        width: '100%',
+    },
+    flexTextSuit: {
+        marginTop: '-40%',
+        fontSize: '2vmin',
+    },
     hidden: {
         ...theme.custom.HIDDEN,
-        overflow: 'hidden',
     },
     hiddenText: {
+        marginTop: '12%',
         fontWeight: 'bold',
-        position: 'absolute',
-        fontSize: '3.3vmin',
+        fontSize: '3vmin',
         color: theme.palette.primary.light,
     },
-    hiddenText2: {
-        fontWeight: 'bold',
-        position: 'absolute',
-        fontSize: '3.64vmin',
-        color: theme.palette.primary.main,
+    flexTextHidden: {
+        marginTop: '50%',
+        fontSize: '2vmin',
     },
     partOfWinningHand: {
         transition: 'all 0.5s ease-in-out',
@@ -62,13 +75,14 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, partOfWinningHand } = props;
+    const { suit, rank, hidden, className, partOfWinningHand, shouldFlex } = props;
 
     if (hidden) {
         return (
-            <div className={classnames(classes.root, classes.hidden, className)}>
-                <Typography className={classnames(classes.hiddenText2)}>JP</Typography>
-                <Typography className={classnames(classes.hiddenText)}>JP</Typography>
+            <div className={classnames(classes.root, classes.hidden, { [classes.flexCard]: shouldFlex }, className)}>
+                <Typography className={classnames(classes.hiddenText, { [classes.flexTextHidden]: shouldFlex })}>
+                    JP
+                </Typography>
             </div>
         );
     }
@@ -76,9 +90,13 @@ function CardSmall(props) {
         <div
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
+                [classes.flexCard]: shouldFlex,
             })}
         >
-            <Typography className={classnames(classes.text)}>{`${rank} ${generateStringFromSuit(suit)}`}</Typography>
+            <Typography className={classnames(classes.text, { [classes.flexText]: shouldFlex })}>{rank}</Typography>
+            <Typography className={classnames(classes.text, { [classes.flexTextSuit]: shouldFlex })}>
+                {generateStringFromSuit(suit)}
+            </Typography>
         </div>
     );
 }
