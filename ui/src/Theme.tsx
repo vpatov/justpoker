@@ -24,7 +24,7 @@ const CUSTOM_PALETTE = {
         light: teal['100'],
     },
     secondary: {
-        main: orange['A400'],
+        main: orange['A200'],
         light: orange['100'],
     },
 };
@@ -44,8 +44,7 @@ export const CUSTOM_THEME = {
             backgroundColor: lightGreen[900],
         },
         HIDDEN: {
-            color: `${blueGrey[500]}`,
-            backgroundColor: `${blueGrey[700]}`,
+            backgroundColor: `${blueGrey[900]}`,
         },
         FOLDED: {
             opacity: 0.8,
@@ -56,7 +55,6 @@ export const CUSTOM_THEME = {
         },
         TABLE: {
             border: `0.2vmin solid rgba(0,0,0,0.4)`,
-            // boxShadow: ` 0 1px 1px 1px rgba(255,255,255,0.3)`,
             backgroundColor: 'black',
             background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
         },
@@ -64,16 +62,16 @@ export const CUSTOM_THEME = {
             color: 'black',
             backgroundColor: blueGrey[200],
             borderRadius: '0.6vmin',
-            boxShadow: '0 8px 18px 3px rgba(0,0,0,0.9)',
+            boxShadow: '0 6px 14px 3px rgba(0,0,0,0.9)',
         },
         STACK_TO_ACT: {
             boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',
             backgroundColor: CUSTOM_PALETTE.primary.main,
             background: `linear-gradient(90deg, ${CUSTOM_PALETTE.primary.light} -33%, ${CUSTOM_PALETTE.primary.main} 50%, ${CUSTOM_PALETTE.primary.light} 133%)`,
-            // backgroundSize: '200% 200%',
-            // '-webkit-animation': '$grad 2s linear infinite',
-            // animation: '$grad 2s linear infinite',
-            // '-moz-animation': '$grad 2s linear infinite',
+        },
+        STACK_WINNER: {
+            boxShadow: '0 0px 10px rgba(255,255,255,0.8)',
+            background: `linear-gradient(90deg, ${CUSTOM_PALETTE.secondary.light} -33%, ${CUSTOM_PALETTE.secondary.main} 50%, ${CUSTOM_PALETTE.secondary.light} 133%)`,
         },
         CONTROLLER: {
             backgroundColor: 'rgba(0,0,0,0.3)',

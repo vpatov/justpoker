@@ -19,7 +19,7 @@ const TABLE_HEIGHT = 45;
 const TABLE_WIDTH = 75;
 
 const PLAYER_HEIGHT = 64;
-const PLAYER_WIDTH = 90;
+const PLAYER_WIDTH = 93;
 
 const BET_HEIGHT = 35;
 const BET_WIDTH = 62;
@@ -35,9 +35,9 @@ function positionToPlacement(width, height, index, offset) {
         1: { x: xInc * 6, y: 0 },
         2: { x: width, y: yInc * 2 },
         3: { x: width, y: yInc * 4 },
-        4: { x: xInc * 6.5, y: yInc * 5.7 },
-        5: { x: xInc * 4, y: yInc * 5.85 },
-        6: { x: xInc * 1.5, y: yInc * 5.7 },
+        4: { x: xInc * 6.5, y: yInc * 5.75 },
+        5: { x: xInc * 4, y: yInc * 5.9 },
+        6: { x: xInc * 1.5, y: yInc * 5.75 },
         7: { x: 0, y: yInc * 4 },
         8: { x: 0, y: yInc * 2 },
     };
@@ -46,7 +46,7 @@ function positionToPlacement(width, height, index, offset) {
 }
 const useStyles = makeStyles((theme) => ({
     root: {
-        transform: 'translateY(-0%)',
+        transform: 'translateY(-1.5%)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -73,12 +73,16 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         ...theme.custom.TABLE,
     },
-    spot: {
+    openSeat: {
         position: 'absolute',
         top: 0,
         left: 0,
         transform: 'translateY(-50%) translateX(-50%)',
-        // transition: 'all 0.4s ease-in-out',
+    },
+    player: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
     },
     mainPot: {
         fontSize: '2.6vmin',
@@ -137,7 +141,7 @@ function Table(props) {
                             }}
                             virtualPositon={mod(index + offset - 1, 9)}
                             player={player}
-                            className={classes.spot}
+                            className={classes.player}
                             style={{
                                 top: `${pPos.y}vmin`,
                                 left: `${pPos.x}vmin`,
@@ -150,7 +154,7 @@ function Table(props) {
                     <OpenSeat
                         key={index}
                         seatNumber={index}
-                        className={classes.spot}
+                        className={classes.openSeat}
                         style={{
                             top: `${pPos.y}vmin`,
                             left: `${pPos.x}vmin`,
@@ -213,7 +217,9 @@ function Table(props) {
                                 className={classes.fullPot}
                             >{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
                         </Tooltip>
-                        <Typography className={classes.mainPot}>{`${pot.toLocaleString()}`}</Typography>
+                        <Typography
+                            className={classnames(classes.mainPot, 'ani_mainPot')}
+                        >{`${pot.toLocaleString()}`}</Typography>
                     </>
                 ) : null}
                 <CommunityCards communityCards={communityCards} />

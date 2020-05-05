@@ -27,10 +27,20 @@ const useStyles = makeStyles((theme) => ({
         marginTop: '12%',
     },
     hidden: {
-        fontSize: '3vmin',
-        color: 'white',
-        fontWeight: 'bold',
         ...theme.custom.HIDDEN,
+        overflow: 'hidden',
+    },
+    hiddenText: {
+        fontWeight: 'bold',
+        position: 'absolute',
+        fontSize: '3.3vmin',
+        color: theme.palette.primary.light,
+    },
+    hiddenText2: {
+        fontWeight: 'bold',
+        position: 'absolute',
+        fontSize: '3.64vmin',
+        color: theme.palette.primary.main,
     },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
@@ -51,7 +61,12 @@ function CardSmall(props) {
     const { suit, rank, hidden, className } = props;
 
     if (hidden) {
-        return <Typography className={classnames(classes.root, classes.hidden, className)}>JP</Typography>;
+        return (
+            <div className={classnames(classes.root, classes.hidden, className)}>
+                <Typography className={classnames(classes.hiddenText2)}>JP</Typography>
+                <Typography className={classnames(classes.hiddenText)}>JP</Typography>
+            </div>
+        );
     }
     return (
         <div className={classnames(classes.root, classes[suit], className)}>
