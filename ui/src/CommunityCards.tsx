@@ -17,10 +17,18 @@ function CommunityCards(props) {
     const classes = useStyles();
     const { communityCards } = props;
 
+    console.log(communityCards);
+
     return (
         <div className={classes.communityCardsCont}>
             {communityCards.map((c, i) => (
-                <CardLarge suit={c.suit} rank={c.rank} fontSize={'2.5vmin'} className={classes.communityCard} />
+                <CardLarge 
+                    suit={c.suit}
+                    rank={c.rank}
+                    fontSize={'2.5vmin'}
+                    className={classes.communityCard}
+                    partOfWinningHand={c.partOfWinningHand}
+                />
             ))}
         </div>
     );
