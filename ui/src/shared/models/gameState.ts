@@ -113,6 +113,7 @@ export const cleanGameState: GameState = {
         uuid: "",
         activeConnections: new Map(),
         password: "",
+        admin: "",
     },
     timeCurrentPlayerTurnStarted: 0,
     serverTime: 0,
