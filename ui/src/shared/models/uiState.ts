@@ -368,7 +368,7 @@ export const TestGame: UiGameState = {
             position: positions[5],
             stack: 323,
             hand: {
-                cards: [{ hidden: true }, { hidden: true }],
+                cards: [],
             },
         },
         {

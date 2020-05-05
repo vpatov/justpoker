@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '100%',
             width: '100%',
             overflowY: 'auto',
-            overflowWrap: 'break-word',
+            overflowWrap: 'anywhere',
         },
         chatInputSection: {
             display: 'flex',
@@ -86,7 +86,6 @@ interface ChatLogProps {
 }
 
 function ChatLog(props: ChatLogProps) {
-    console.log('chat render');
     const classes = useStyles();
 
     const { className } = props;

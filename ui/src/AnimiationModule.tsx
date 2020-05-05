@@ -57,13 +57,6 @@ export function flipTable() {
     }, resetDuration);
 }
 
-function getCenterOfTable() {
-    const { bottom, left, right, top } = document.getElementsByClassName('ani_table')[0].getBoundingClientRect();
-    const x = (right - left) / 2 + left;
-    const y = (top - bottom) / 2 + bottom;
-    return [x, y];
-}
-
 export function dealCards() {
     const duration = 1800;
 
@@ -83,5 +76,39 @@ export function dealCards() {
         easing: 'easeOutExpo',
         delay: anime.stagger(50),
     });
-    // setTimeout(() => a.reset(), duration);
+}
+
+export function animateWinner(playerEl) {
+    console.log(playerEl);
+    if (playerEl.current) {
+        const duration = 3000;
+
+        const [x, y] = getCenterOfRef(playerEl.current);
+
+        const a = anime({
+            targets: ['.ani_mainPot'],
+            translateX: (target) => {
+                return x - target.getBoundingClientRect().x;
+            },
+            translateY: (target) => {
+                return y - target.getBoundingClientRect().y;
+            },
+            opacity: 0,
+            duration: duration,
+            easing: 'easeInOutCirc',
+        });
+        setTimeout(() => a.reset(), duration);
+    }
+}
+
+// utility functions
+
+function getCenterOfRef(ref) {
+    const { bottom, left, right, top } = ref.getBoundingClientRect();
+    const x = (right - left) / 2 + left;
+    const y = (top - bottom) / 2 + bottom;
+    return [x, y];
+}
+function getCenterOfTable() {
+    return getCenterOfRef(document.getElementsByClassName('ani_table')[0]);
 }

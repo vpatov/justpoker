@@ -12,24 +12,11 @@ const useStyles = makeStyles((theme) => ({
 
         ...theme.custom.STACK,
     },
-    hero: {
-        transform: 'scale(1.2)',
-    },
     toAct: {
-        // prevents blurryness on timer animation
-        '-webkit-backface-visibility': 'hidden',
         ...theme.custom.STACK_TO_ACT,
     },
     winner: {
-        ...theme.custom.STACK,
-        backgroundColor: 'white',
-        boxShadow: '0 0px 10px rgba(255,255,255,0.8)',
-        background:
-            'linear-gradient(90deg, rgba(0,255,255,0.4) 0%, rgba(255,0,255,0.4) 50%, rgba(0,255,255,0.4) 100%);',
-        // backgroundSize: '200% 200%',
-        // '-webkit-animation': '$grad 2s linear infinite',
-        // animation: '$grad 2s linear infinite',
-        // '-moz-animation': '$grad 2s linear infinite',
+        ...theme.custom.STACK_WINNER,
     },
     '@keyframes grad': {
         '0%': {
@@ -77,7 +64,7 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, button, winner, toAct, hero } = props;
+    const { stack, name, button, winner, toAct } = props;
     const prevStack = usePrevious(stack);
 
     return (
@@ -85,7 +72,6 @@ function PlayerStack(props) {
             className={classnames(classes.stackCont, {
                 [classes.toAct]: toAct,
                 [classes.winner]: winner,
-                [classes.hero]: hero,
             })}
         >
             {button ? <Typography className={classes.buttonR}>{'★'}</Typography> : null}
