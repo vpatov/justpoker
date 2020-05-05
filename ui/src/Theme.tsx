@@ -73,6 +73,10 @@ export const CUSTOM_THEME = {
             boxShadow: '0 0px 10px rgba(255,255,255,0.8)',
             background: `linear-gradient(90deg, ${CUSTOM_PALETTE.secondary.light} -33%, ${CUSTOM_PALETTE.secondary.main} 50%, ${CUSTOM_PALETTE.secondary.light} 133%)`,
         },
+        WINNING_CARD: {
+            transition: 'all 0.4s ease-in-out;',
+            boxShadow: `0px 0px 8px 2px ${CUSTOM_PALETTE.secondary.light}`,
+        },
         CONTROLLER: {
             backgroundColor: grey[900],
             background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,

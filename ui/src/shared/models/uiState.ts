@@ -307,10 +307,11 @@ export const TestGame: UiGameState = {
         pot: 12000,
         fullPot: 50000,
         communityCards: [
-            {...genRandomCard(), partOfWinningHand: true},
-            {...genRandomCard(), partOfWinningHand: true},
-            {...genRandomCard(), partOfWinningHand: true},
-            genRandomCard(), genRandomCard()
+            { ...genRandomCard(), partOfWinningHand: true },
+            { ...genRandomCard(), partOfWinningHand: true },
+            { ...genRandomCard(), partOfWinningHand: true },
+            genRandomCard(),
+            genRandomCard(),
         ],
     },
     players: [
@@ -327,10 +328,7 @@ export const TestGame: UiGameState = {
             handLabel: 'Set of Kings',
             bet: genRandomInt(0, 10),
             hand: {
-                cards: [
-                    {...genRandomCard(), partOfWinningHand: true},
-                    {...genRandomCard(), partOfWinningHand: true}
-                ],
+                cards: [genRandomCard(), genRandomCard()],
             },
         },
         {
@@ -339,7 +337,6 @@ export const TestGame: UiGameState = {
             stack: 425320,
             winner: true,
             bet: genRandomInt(0, 100),
-            handLabel: 'Four of a Kind',
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
@@ -350,9 +347,12 @@ export const TestGame: UiGameState = {
             stack: 323,
 
             bet: genRandomInt(0, 1000),
-            handLabel: 'Straight Flush',
+
             hand: {
-                cards: [{ hidden: true }, { hidden: true }],
+                cards: [
+                    { ...genRandomCard(), partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
+                ],
             },
         },
         // {

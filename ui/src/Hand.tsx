@@ -18,14 +18,7 @@ function Hand(props) {
     return (
         <div className={classnames(classes.root)}>
             {cards.map((c, i) => (
-                <CardSmall
-                    suit={c.suit}
-                    rank={c.rank}
-                    hidden={c.hidden}
-                    partOfWinningHand={c.partOfWinningHand}
-                    size="small"
-                    className={`ani_playerCard_${i}`}
-                />
+                <CardSmall {...c} size="small" className={`ani_playerCard_${i}`} />
             ))}
         </div>
     );
