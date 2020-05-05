@@ -22,6 +22,7 @@ function Hand(props) {
                     suit={c.suit}
                     rank={c.rank}
                     hidden={c.hidden}
+                    partOfWinningHand={c.partOfWinningHand}
                     size="small"
                     className={`ani_playerCard_${i}`}
                 />

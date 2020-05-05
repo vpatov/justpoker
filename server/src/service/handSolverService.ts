@@ -1,12 +1,8 @@
 import { Service } from 'typedi';
-import { Card, SUIT_ABBREVIATIONS } from '../../../ui/src/shared/models/cards';
+import { Card, Hand, SUIT_ABBREVIATIONS, suitLetterToSuit } from '../../../ui/src/shared/models/cards';
 import { Hand as HandSolver } from 'pokersolver';
 
 // TODO declare types for this module and make an npm package
-export declare interface Hand {
-    name: string;
-    descr: string;
-}
 
 @Service()
 export class HandSolverService {
@@ -42,5 +38,12 @@ export class HandSolverService {
             }
         }
         return combinations;
+    }
+
+    convertHandToCardArray(hand: Hand): Card[] {
+        return hand.cards.map((pokerSolverCard) => ({
+            suit: suitLetterToSuit(pokerSolverCard.suit),
+            rank: pokerSolverCard.value,
+        }));
     }
 }

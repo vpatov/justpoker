@@ -26,6 +26,10 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 'bold',
         marginTop: '12%',
     },
+    // TODO change and make aesthetically pleasing. 
+    partOfWinningHand: {
+        boxShadow: "10px 10px 15px 15px #ffffdd"
+    },
     hidden: {
         ...theme.custom.HIDDEN,
         overflow: 'hidden',
@@ -58,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className } = props;
+    const { suit, rank, hidden, className, partOfWinningHand } = props;
 
     if (hidden) {
         return (
@@ -69,7 +73,8 @@ function CardSmall(props) {
         );
     }
     return (
-        <div className={classnames(classes.root, classes[suit], className)}>
+        <div className={classnames(classes.root, classes[suit], className, 
+            {[classes.partOfWinningHand] : partOfWinningHand})}>
             <Typography className={classnames(classes.text)}>{`${rank} ${generateStringFromSuit(suit)}`}</Typography>
         </div>
     );

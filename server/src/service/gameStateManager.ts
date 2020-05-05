@@ -26,6 +26,7 @@ import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
+import { Hand, Card, cardsAreEqual } from '../../../ui/src/shared/models/cards';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -620,13 +621,20 @@ export class GameStateManager {
         });
     }
 
-    computeBestHandForPlayer(playerUUID: string) {
-        return this.getGameType() === GameType.PLOMAHA
-            ? this.handSolverService.computeBestPLOHand(this.getPlayer(playerUUID).holeCards, this.getBoard())
-            : this.handSolverService.computeBestNLEHand(this.getPlayer(playerUUID).holeCards, this.getBoard());
+    computeBestHandForPlayer(playerUUID: string): Hand {
+        const bestHand =
+            this.getGameType() === GameType.PLOMAHA
+                ? this.handSolverService.computeBestPLOHand(this.getPlayer(playerUUID).holeCards, this.getBoard())
+                : this.handSolverService.computeBestNLEHand(this.getPlayer(playerUUID).holeCards, this.getBoard());
+        this.updatePlayer(playerUUID, { bestHand });
+        return bestHand;
     }
 
-    getPlayerHandDescription(playerUUID: string) {
+    isCardInPlayersBestHand(playerUUID: string, card: Card) {
+        return this.getPlayer(playerUUID).holeCards.some((holeCard) => cardsAreEqual(holeCard, card));
+    }
+
+    getPlayerHandDescription(playerUUID: string): string {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
         return bestHand.descr;
     }
@@ -654,11 +662,18 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { betAmount: betAmount > chips ? chips : betAmount });
     }
 
+    clearWinners() {
+        this.updatePlayers((player) => ({
+            winner: false,
+        }));
+    }
+
     clearStateOfRoundInfo() {
         this.updatePlayers((player) => ({
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
             holeCards: [],
             handDescription: '',
+            bestHand: null,
             winner: false,
             betAmount: 0,
             cardsAreHidden: true,

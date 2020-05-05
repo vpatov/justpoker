@@ -16,6 +16,29 @@ export enum Suit {
   CLUBS = "CLUBS",
 }
 
+export declare interface Hand {
+  name: string;
+  descr: string;
+  cards: PokerSolverCard[];
+}
+
+export declare interface PokerSolverCard {
+  /** The string 'value' of the card i.e. 5, 7, K, Q, A, ...*/
+  value: string;
+
+  /** The string suit of the card i.e. S, C, D, H */
+  suit: string;
+
+  /** 
+   * The numeric value of the rank, i.e. 0-13. It would be more accurate if the rank and value 
+   * variable names were switched (this interface represents the pokersolver definitions)
+   */
+  rank: number;
+
+  /** Not in use by JustPoker. */
+  wildValue: string;
+}
+
 export const SUIT_ABBREVIATIONS = {
   [Suit.HEARTS]: "h",
   [Suit.DIAMONDS]: "d",
@@ -80,4 +103,18 @@ export const BASE_DECK: Card[] = [
 
 export function genRandomCard(): Card {
   return BASE_DECK[genRandomInt(0, 51)];
+}
+
+export function suitLetterToSuit(suitLetter: string): Suit {
+  switch (suitLetter.toUpperCase()){
+    case 'S': return Suit.SPADES;
+    case 'H': return Suit.HEARTS;
+    case 'C': return Suit.CLUBS;
+    case 'D': return Suit.DIAMONDS;
+    default: throw Error(`Cannot convert suitLetter: ${suitLetter} to suit enum.`);
+  }
+}
+
+export function cardsAreEqual(cardA: Card, cardB: Card): boolean {
+    return cardA.rank === cardB.rank && cardA.suit === cardB.suit;
 }

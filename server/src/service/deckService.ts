@@ -11,7 +11,7 @@ export class DeckService {
         return deck;
     }
 
-    shuffleDeck(deck: Deck) {
+    shuffleDeck(deck: Deck): void {
         let i,
             j = 0;
         let temp = null;
@@ -25,7 +25,7 @@ export class DeckService {
         }
     }
 
-    drawCard(deck: Deck) {
+    drawCard(deck: Deck): Card {
         return deck.cards.pop();
     }
 
