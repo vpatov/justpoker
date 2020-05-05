@@ -26,7 +26,7 @@ import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
-import { Hand, Card, cardsAreEqual } from '../../../ui/src/shared/models/cards';
+import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -631,7 +631,13 @@ export class GameStateManager {
     }
 
     isCardInPlayersBestHand(playerUUID: string, card: Card) {
-        return this.getPlayer(playerUUID).holeCards.some((holeCard) => cardsAreEqual(holeCard, card));
+        return convertHandToCardArray(this.getPlayerBestHand(playerUUID)).some((handCard) =>
+            cardsAreEqual(handCard, card),
+        );
+    }
+
+    getPlayerBestHand(playerUUID: string): Hand {
+        return this.getPlayer(playerUUID).bestHand;
     }
 
     getPlayerHandDescription(playerUUID: string): string {

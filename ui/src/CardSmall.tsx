@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     },
     // TODO change and make aesthetically pleasing. 
     partOfWinningHand: {
-        boxShadow: "10px 10px 15px 15px #ffffdd"
+        boxShadow: "inset 0 0px 3px 3px #000, 0 0px 8px 4px #fff"
     },
     hidden: {
         ...theme.custom.HIDDEN,
