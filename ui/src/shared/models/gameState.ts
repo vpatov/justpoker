@@ -19,11 +19,24 @@ export const enum GameStage {
     SHOW_BET_ACTION = "SHOW_BET_ACTION",
     FINISH_BETTING_ROUND = "FINISH_BETTING_ROUND",
     SHOW_WINNER = "SHOW_WINNER",
-    EJECT_STACKED_PLAYERS = "EJECT_STACKED_PLAYERS",
+    POST_HAND_CLEANUP = "EJECT_STACKED_PLAYERS",
 }
 
+export const enum ServerActionType {
+    BOOT_PLAYER = "BOOT_PLAYER"
+}
+
+// TODO consider doing something similar to messageService for queuedActionsProcessor ?
+export declare interface QueuedServerAction {
+    actionType: ServerActionType;
+    args: any[];
+}
+
+// TODO break up into gameState and serverState
 export declare interface GameState {
     gameStage: GameStage;
+
+    queuedServerActions: QueuedServerAction[];
 
     /** Sensitive field. */
     players: Readonly<{ [key: string]: Player }>;
@@ -81,11 +94,17 @@ export const enum ServerStateKey {
     CHAT = "CHAT",
 }
 
+export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerAction){
+    return a.actionType === b.actionType && a.args.length === b.args.length && 
+    a.args.every((arg, index) => arg === b.args[index]);
+}
+
 export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
 
 // TODO create partially clean game that can be used to clear state of round info.
 export const cleanGameState: GameState = {
     gameStage: GameStage.NOT_IN_PROGRESS,
+    queuedServerActions: [],
     players: {},
     board: [],
     gameParameters: {

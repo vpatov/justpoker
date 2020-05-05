@@ -10,7 +10,14 @@ import {
     instanceOfCondition,
     StageDelayMap,
 } from '../../../ui/src/shared/models/stateGraph';
-import { GameStage, GameState, ServerStateKey, ALL_STATE_KEYS } from '../../../ui/src/shared/models/gameState';
+import {
+    GameStage,
+    GameState,
+    ServerStateKey,
+    ALL_STATE_KEYS,
+    QueuedServerAction,
+    ServerActionType,
+} from '../../../ui/src/shared/models/gameState';
 import { ActionType } from '../../../ui/src/shared/models/wsaction';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
@@ -64,7 +71,7 @@ export class StateGraphManager {
     sidePotsRemainingCondition: Condition = {
         fn: () => this.gameStateManager.getPots().length >= 1,
         TRUE: GameStage.SHOW_WINNER,
-        FALSE: GameStage.EJECT_STACKED_PLAYERS,
+        FALSE: GameStage.POST_HAND_CLEANUP,
     };
 
     stateGraph: Readonly<StateGraph> = {
@@ -84,7 +91,7 @@ export class StateGraphManager {
         [GameStage.SHOW_BET_ACTION]: new Map([['TIMEOUT', this.isBettingRoundOverCondition]]),
         [GameStage.FINISH_BETTING_ROUND]: new Map([['TIMEOUT', this.isHandGamePlayOverCondition]]),
         [GameStage.SHOW_WINNER]: new Map([['TIMEOUT', this.sidePotsRemainingCondition]]),
-        [GameStage.EJECT_STACKED_PLAYERS]: new Map([['TIMEOUT', this.canContinueGameCondition]]),
+        [GameStage.POST_HAND_CLEANUP]: new Map([['TIMEOUT', this.canContinueGameCondition]]),
     };
 
     stageDelayMap: StageDelayMap = {
@@ -96,7 +103,7 @@ export class StateGraphManager {
         [GameStage.SHOW_BET_ACTION]: 200,
         [GameStage.FINISH_BETTING_ROUND]: 1200,
         [GameStage.SHOW_WINNER]: 4000,
-        [GameStage.EJECT_STACKED_PLAYERS]: 400,
+        [GameStage.POST_HAND_CLEANUP]: 400,
     };
 
     getDelay(stage: GameStage) {
@@ -167,7 +174,7 @@ export class StateGraphManager {
     // - If the event is a defined state transition path, a state transition is executed.
     processEvent(event: EventType) {
         const nextStage = this.getNextStage(event);
-        console.log('processEvent. event:', event, 'nextStage:', nextStage);
+        console.log('processEvent:', event);
 
         if (nextStage) {
             this.initializeGameStage(nextStage);
@@ -199,7 +206,7 @@ export class StateGraphManager {
     // be called)
     initializeGameStage(stage: GameStage) {
         // TODO write assertions checking for preconditions of each stage after entering stage
-        console.log('initializing gameStage: ', stage);
+        console.log(stage);
         this.gameStateManager.updateGameStage(stage);
 
         switch (stage) {
@@ -208,10 +215,10 @@ export class StateGraphManager {
                 break;
             }
             case GameStage.INITIALIZE_NEW_HAND: {
-                this.gameStateManager.clearStateOfRoundInfo();
                 break;
             }
 
+            // TODO consider renaming this to initialize new hand.
             case GameStage.SHOW_START_OF_HAND: {
                 this.gameStateManager.initializeNewDeck();
                 this.gamePlayService.initializeDealerButton();
@@ -252,17 +259,33 @@ export class StateGraphManager {
                 break;
             }
 
-            case GameStage.EJECT_STACKED_PLAYERS: {
+            case GameStage.POST_HAND_CLEANUP: {
+                this.gameStateManager.clearStateOfRoundInfo();
                 this.gamePlayService.ejectStackedPlayers();
+                this.executeQueuedServerActions();
                 break;
             }
         }
 
         const delay = this.getDelay(stage);
-        console.log('delay:', delay);
         if (delay) {
-            console.log('setting timer..');
             this.timerManager.setStateTimer(() => this.processTimeout(), delay);
         }
+    }
+
+    executeQueuedServerAction(action: QueuedServerAction) {
+        switch (action.actionType) {
+            case ServerActionType.BOOT_PLAYER: {
+                const playerUUID = [...action.args][0];
+                this.gameStateManager.bootPlayerFromGame(playerUUID);
+            }
+        }
+    }
+
+    // TODO actually check preconditions for executing queued actions and design
+    // elegant queueing / precondition check / function+argument delivery.
+    executeQueuedServerActions() {
+        this.gameStateManager.getQueuedServerActions().forEach((action) => this.executeQueuedServerAction(action));
+        this.gameStateManager.updateGameState({ queuedServerActions: [] });
     }
 }
