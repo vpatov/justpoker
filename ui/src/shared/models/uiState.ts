@@ -65,6 +65,7 @@ export declare interface UiCard {
     suit?: Suit;
     rank?: string;
     hidden?: boolean;
+    winningCard?: boolean;
 }
 
 export declare interface Table {
@@ -302,7 +303,13 @@ export const TestGame: UiGameState = {
         spots: 9,
         pot: 12000,
         fullPot: 50000,
-        communityCards: [genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard()],
+        communityCards: [
+            { suit: Suit.SPADES, rank: '1', winningCard: true },
+            genRandomCard(),
+            { suit: Suit.SPADES, rank: 'K', winningCard: true },
+            { suit: Suit.CLUBS, rank: 'Q', winningCard: true },
+            genRandomCard(),
+        ],
     },
     players: [
         {
@@ -327,7 +334,6 @@ export const TestGame: UiGameState = {
             stack: 425320,
             winner: true,
             bet: genRandomInt(0, 100),
-            handLabel: 'Four of a Kind',
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
@@ -338,9 +344,12 @@ export const TestGame: UiGameState = {
             stack: 323,
 
             bet: genRandomInt(0, 1000),
-            handLabel: 'Straight Flush',
+
             hand: {
-                cards: [{ hidden: true }, { hidden: true }],
+                cards: [
+                    { suit: Suit.DIAMONDS, rank: '4', winningCard: true },
+                    { suit: Suit.HEARTS, rank: '6', winningCard: true },
+                ],
             },
         },
         // {
