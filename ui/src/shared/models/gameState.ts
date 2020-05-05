@@ -2,6 +2,8 @@ import {
     GameParameters,
     GameType,
     BettingRoundStage,
+    BettingRoundAction,
+    BettingRoundActionType,
 } from "./game";
 
 import { Player } from "./player";
@@ -42,6 +44,8 @@ export declare interface GameState {
 
     currentPlayerToAct: Readonly<string>;
 
+    lastBettingRoundAction: BettingRoundAction;
+
     timeCurrentPlayerTurnStarted: number;
 
     pots: ReadonlyArray<Pot>;
@@ -64,11 +68,6 @@ export declare interface GameState {
 
     /** The extra amount put into the pot by an all-in that was below the min-raise. */
     partialAllInLeftOver: number;
-
-    unsetQueuedAction: boolean;
-
-
-    // bettingRoundActions: ReadonlyArray<BettingRoundAction>
 }
 
 export declare interface Pot {
@@ -84,6 +83,7 @@ export const enum ServerStateKey {
 
 export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
 
+// TODO create partially clean game that can be used to clear state of round info.
 export const cleanGameState: GameState = {
     gameStage: GameStage.NOT_IN_PROGRESS,
     players: {},
@@ -100,11 +100,10 @@ export const cleanGameState: GameState = {
     smallBlindUUID: '',
     bigBlindUUID: '',
     bettingRoundStage: BettingRoundStage.WAITING,
-    // bettingRoundActions: [],
     firstToAct: "",
     currentPlayerToAct: "",
+    lastBettingRoundAction: {type: BettingRoundActionType.NOT_IN_HAND},
     shouldDealNextHand: false,
-    unsetQueuedAction: false,
     deck: {
         cards: [],
     },

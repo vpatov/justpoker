@@ -99,12 +99,6 @@ export class GameStateManager {
         };
     }
 
-    resetSingletonState() {
-        this.updateGameState({
-            unsetQueuedAction: false,
-        });
-    }
-
     updatePlayer(playerUUID: string, updates: Partial<Player>) {
         const player = this.getPlayer(playerUUID);
 
@@ -143,10 +137,6 @@ export class GameStateManager {
             );
         }
         return clients[0].uuid;
-    }
-
-    getUnsetQueuedAction(): boolean {
-        return this.gameState.unsetQueuedAction;
     }
 
     getConnectedClients() {
@@ -632,10 +622,12 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { lastActionType });
     }
 
-    setUnsetQueuedAction() {
-        this.updateGameState({
-            unsetQueuedAction: true,
-        });
+    getLastBettingRoundAction(): BettingRoundAction {
+        return this.gameState.lastBettingRoundAction;
+    }
+
+    setLastBettingRoundAction(lastBettingRoundAction: BettingRoundAction) {
+        this.updateGameState({ lastBettingRoundAction });
     }
 
     computeBestHandForPlayer(playerUUID: string): Hand {

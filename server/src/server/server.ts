@@ -185,7 +185,6 @@ class Server {
             this.sendUpdatesToClients();
             this.audioService.reset();
             this.animationService.reset();
-            this.gsm.resetSingletonState();
         });
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {

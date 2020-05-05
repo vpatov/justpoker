@@ -7,6 +7,7 @@ import {
     heroHandLabelSelector,
     allowStraddleSelector,
     heroPlayerTimerSelector,
+    bettingRoundActionTypesToUnqueueSelector,
 } from './store/selectors';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import ControllerTimer from './ControllerTimer';
@@ -173,7 +174,6 @@ function ControllerComp(props: ControllerProps) {
     const { className } = props;
     const {
         toAct,
-        unsetQueuedAction,
         min,
         max,
         sizingButtons,
@@ -185,17 +185,19 @@ function ControllerComp(props: ControllerProps) {
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const allowStraddle = useSelector(allowStraddleSelector);
+    const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
 
     const [betAmt, setBetAmt] = useState(0);
-    const [queued, setQueued] = useState('');
+    const [queuedActionType, setQueuedActionType] = useState('');
 
     useEffect(() => {
-        if (unsetQueuedAction) {
-            setQueued('');
-            setBetAmt(0);
-            console.log('reset');
+        for (const actionType of bettingRoundActionTypesToUnqueue){
+            if (queuedActionType === actionType){
+                setQueuedActionType('');
+                setBetAmt(0);
+            }
         }
-    }, [unsetQueuedAction]);
+    }, [bettingRoundActionTypesToUnqueue]);
 
     const changeBetAmount = (newAmt) => {
         // parse string into int
@@ -214,16 +216,16 @@ function ControllerComp(props: ControllerProps) {
         if (toAct) {
             sendBettingRoundAction(betActionType);
         } else {
-            if (queued === betActionType) {
-                setQueued('');
+            if (queuedActionType === betActionType) {
+                setQueuedActionType('');
             } else {
-                setQueued(betActionType);
+                setQueuedActionType(betActionType);
             }
         }
     }
-    if (toAct && queued !== '') {
-        sendBettingRoundAction(queued);
-        setQueued('');
+    if (toAct && queuedActionType !== '') {
+        sendBettingRoundAction(queuedActionType);
+        setQueuedActionType('');
     }
 
     function sendBettingRoundAction(betActionType) {
@@ -275,7 +277,7 @@ function ControllerComp(props: ControllerProps) {
                             <Button
                                 variant="outlined"
                                 className={classnames(classes.actionButton, classes[button.action], {
-                                    [classes[`${button.action}_QUEUED`]]: button.action === queued,
+                                    [classes[`${button.action}_QUEUED`]]: button.action === queuedActionType,
                                 })}
                                 disabled={button.disabled}
                                 onClick={() => onClickActionButton(button.action)}
