@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
+
+import { playTimerWarning } from './AudioModule';
 import classnames from 'classnames';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
-import Collapse from '@material-ui/core/Collapse';
-import transitions from '@material-ui/core/styles/transitions';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -30,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: theme.palette.primary.main,
             width: '3vmin',
             marginBottom: '0.3vmin',
-            fontSize: '1.5vmin',
+            fontSize: '1.4vmin',
             textAlign: 'center',
         },
         // linearTimerRoot: {
@@ -48,13 +47,14 @@ function getPercetTimeRemaining(timeElapsed: number, timeLimit: number): number 
 
 function PlayerTimer(props) {
     const classes = useStyles();
-    const { playerTimer, className } = props;
+    const { playerTimer, hero, className } = props;
     const { timeLimit, timeElapsed } = playerTimer;
 
     const [completed, setCompleted] = useState(100.0);
     const [timer, setTimer] = useState();
     const [secondsRemaining, setSecondsRemaining] = useState(timeLimit - timeElapsed);
     const [show, setShow] = useState(false);
+    const [playedWarning, setPlayedWarning] = useState(false);
 
     useEffect(() => {
         setShow(true);
@@ -74,6 +74,11 @@ function PlayerTimer(props) {
 
     if (completed < 1) {
         clearInterval(timer);
+    }
+
+    if (hero && !playedWarning && secondsRemaining < 6) {
+        setPlayedWarning(true);
+        playTimerWarning();
     }
 
     return (

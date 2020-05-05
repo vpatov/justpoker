@@ -59,9 +59,9 @@ function Player(props) {
         setAnchorEl(null);
     };
 
-    if (winner) {
-        setTimeout(() => animateWinner(playerEl), 300);
-    }
+    // if (winner) {
+    //     setTimeout(() => animateWinner(playerEl), 300);
+    // }
 
     return (
         <div
@@ -90,7 +90,7 @@ function Player(props) {
                 <Hand hand={hand} />
             )}
             <PlayerStack toAct={toAct} name={name} stack={stack} button={button} winner={winner} />
-            <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} /> : null}</div>
+            <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} hero={hero} /> : null}</div>
         </div>
     );
 }

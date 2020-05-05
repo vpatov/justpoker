@@ -6,6 +6,7 @@ import AudioModule from './AudioModule';
 import AnimiationModule from './AnimiationModule';
 import ChatLog from './ChatLog';
 import GameMenu from './GameMenu';
+import ControllerTimer from './ControllerTimer';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -48,6 +49,7 @@ function Game(props) {
             <GameMenu />
             <div className={classes.gameTableCont}>
                 <Table className={classes.table} />
+                <ControllerTimer />
                 <Controller className={classes.controller} />
             </div>
             <ChatLog className={classes.chatlog} />

@@ -310,6 +310,11 @@ export const TestGame: UiGameState = {
             position: positions[0],
             stack: 5500,
             hero: true,
+            toAct: true,
+            playerTimer: {
+                timeElapsed: 11.5,
+                timeLimit: 30,
+            },
             handLabel: 'Set of Kings',
             bet: genRandomInt(0, 10),
             hand: {
@@ -331,11 +336,7 @@ export const TestGame: UiGameState = {
             name: 'Dean Markus',
             position: positions[2],
             stack: 323,
-            toAct: true,
-            playerTimer: {
-                timeElapsed: 7.6,
-                timeLimit: 30,
-            },
+
             bet: genRandomInt(0, 1000),
             handLabel: 'Straight Flush',
             hand: {
