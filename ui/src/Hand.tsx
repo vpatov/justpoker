@@ -5,7 +5,6 @@ import classnames from 'classnames';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        margin: '0 auto',
         display: 'flex',
         justifyContent: 'center',
     },
@@ -18,7 +17,7 @@ function Hand(props) {
     return (
         <div className={classnames(classes.root)}>
             {cards.map((c, i) => (
-                <CardSmall {...c} size="small" className={`ani_playerCard_${i}`} />
+                <CardSmall {...c} size="small" className={`ani_playerCard_${i}`} shouldFlex={cards.length > 2} />
             ))}
         </div>
     );
