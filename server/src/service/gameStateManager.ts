@@ -484,7 +484,7 @@ export class GameStateManager {
         if (client) {
             this.resetClientWebsocket(clientUUID, ws);
         } else {
-            if (!this.gameState.table.admin){
+            if (!this.gameState.table.admin) {
                 this.initAdmin(clientUUID);
             }
             const newClient = this.createConnectedClient(clientUUID, ws);
@@ -498,16 +498,16 @@ export class GameStateManager {
         }
     }
 
-    initAdmin(clientUUID: string){
+    initAdmin(clientUUID: string) {
         this.updateGameState({
             table: {
                 ...this.gameState.table,
-                admin: clientUUID
-            }
+                admin: clientUUID,
+            },
         });
     }
 
-    getAdminUUID(){
+    getAdminUUID() {
         return this.gameState.table.admin;
     }
 
@@ -539,7 +539,7 @@ export class GameStateManager {
             uuid: generateUUID(),
             activeConnections: new Map(),
             password: newGameForm.password,
-            admin: ''
+            admin: '',
         };
     }
 
