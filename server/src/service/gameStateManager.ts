@@ -484,6 +484,9 @@ export class GameStateManager {
         if (client) {
             this.resetClientWebsocket(clientUUID, ws);
         } else {
+            if (!this.gameState.table.admin) {
+                this.initAdmin(clientUUID);
+            }
             const newClient = this.createConnectedClient(clientUUID, ws);
             this.gameState = {
                 ...this.gameState,
@@ -493,6 +496,19 @@ export class GameStateManager {
                 },
             };
         }
+    }
+
+    initAdmin(clientUUID: string) {
+        this.updateGameState({
+            table: {
+                ...this.gameState.table,
+                admin: clientUUID,
+            },
+        });
+    }
+
+    getAdminUUID() {
+        return this.gameState.table.admin;
     }
 
     resetClientWebsocket(clientUUID: string, ws: WebSocket) {
@@ -523,6 +539,7 @@ export class GameStateManager {
             uuid: generateUUID(),
             activeConnections: new Map(),
             password: newGameForm.password,
+            admin: '',
         };
     }
 

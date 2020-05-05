@@ -84,7 +84,7 @@ export class StateConverter {
         const uiState: UiState = {
             game: this.gameUpdated()
                 ? {
-                      global: this.getUIGobal(clientUUID),
+                      global: this.getUIGlobal(clientUUID),
                       controller: clientPlayerIsSeated
                           ? this.getUIController(clientUUID, heroPlayerUUID)
                           : cleanController,
@@ -107,12 +107,13 @@ export class StateConverter {
         return uiState;
     }
 
-    getUIGobal(clientUUID: string): Global {
+    getUIGlobal(clientUUID: string): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
 
         const global: Global = {
             gameStarted: this.gameStateManager.isGameStarted(),
+            heroIsAdmin: this.gameStateManager.getAdminUUID() === clientUUID,
             heroIsSeated: clientPlayerIsSeated,
             bigBlind: this.gameStateManager.getBB(),
             smallBlind: this.gameStateManager.getSB(),
@@ -224,7 +225,7 @@ export class StateConverter {
     transformPlayerCards(player: Player, heroPlayerUUID: string): CardInformation {
         const isHero = heroPlayerUUID === player.uuid;
         const shouldCardsBeVisible = isHero || !player.cardsAreHidden;
-
+        const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
         const isWinner = player.winner;
 
         const cards: UiCard[] = player.holeCards.map((holeCard) => {
@@ -232,7 +233,9 @@ export class StateConverter {
                 ? {
                       ...holeCard,
                       partOfWinningHand:
-                          isWinner && this.gameStateManager.isCardInPlayersBestHand(player.uuid, holeCard),
+                          isWinner &&
+                          shouldHighlightWinningCards &&
+                          this.gameStateManager.isCardInPlayersBestHand(player.uuid, holeCard),
                   }
                 : { hidden: true };
         });
@@ -246,8 +249,9 @@ export class StateConverter {
     transformCommunityCards(): UiCard[] {
         const board = this.gameStateManager.getBoard();
         const winners = this.gameStateManager.getWinners();
+        const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
 
-        if (winners.length) {
+        if (winners.length && shouldHighlightWinningCards) {
             const winnerUUID = winners[0];
             return board.map((card) => ({
                 ...card,
