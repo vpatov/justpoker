@@ -74,7 +74,6 @@ export class StateConverter {
     transformGameStateToUIState(clientUUID: string): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
-        console.log('in stateConverter, updatedKeys:', this.gameStateManager.getUpdatedKeys());
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : '';

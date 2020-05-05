@@ -1,4 +1,9 @@
-import { ClientWsMessage, ActionType, ClientWsMessageRequest } from '../../../ui/src/shared/models/wsaction';
+import {
+    ClientWsMessage,
+    ActionType,
+    ClientWsMessageRequest,
+    BootPlayerRequest,
+} from '../../../ui/src/shared/models/wsaction';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
@@ -123,20 +128,24 @@ export class MessageService {
             updates: [ServerStateKey.GAMESTATE],
         },
         [ActionType.SETCHIPS]: {
-            validation: (_, __) => NO_ERROR,
+            validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, request) => {
-                this.validationService.ensureClientIsInGame(uuid);
                 const player = this.gameStateManager.getPlayer(request.playerUUID);
                 this.gameStateManager.setPlayerChips(player.uuid, Number(request.chipAmount));
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.SET_PLAYER_STRADDLE]: {
-            validation: (_, __) => NO_ERROR,
+        [ActionType.SETPLAYERSTRADDLE]: {
+            validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
                 this.gameStateManager.setPlayerStraddle(player.uuid, req.straddle);
             },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ActionType.BOOTPLAYER]: {
+            validation: (uuid, req: BootPlayerRequest) => this.validationService.validateBootPlayerAction(uuid, req),
+            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.bootPlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
     };

@@ -255,7 +255,7 @@ function ControllerComp(props: ControllerProps) {
 
     function onToggleStraddle() {
         WsServer.send({
-            actionType: ActionType.SET_PLAYER_STRADDLE,
+            actionType: ActionType.SETPLAYERSTRADDLE,
             request: { straddle: !straddle } as ClientWsMessageRequest,
         });
     }

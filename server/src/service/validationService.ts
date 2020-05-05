@@ -6,6 +6,7 @@ import {
     JoinTableRequest,
     ClientWsMessageRequest,
     ClientChatMessage,
+    BootPlayerRequest,
 } from '../../../ui/src/shared/models/wsaction';
 import { printObj } from '../../../ui/src/shared/util/util';
 import {
@@ -390,7 +391,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateChatMessage(uuid: string, message: ClientChatMessage): ValidationResponse {
+    validateChatMessage(clientUUID: string, message: ClientChatMessage): ValidationResponse {
         const messageLength = message.content.length;
         if (messageLength > 1000) {
             return {
@@ -401,6 +402,32 @@ export class ValidationService {
                 )}... is ${messageLength} characters, over the allowed limit of 1000.`,
             };
         }
+        return NO_ERROR;
+    }
+
+    ensureClientIsAdmin(clientUUID: string): ValidationResponse {
+        if (this.gsm.getAdminUUID() !== clientUUID) {
+            return {
+                errorType: ErrorType.NOT_ADMIN,
+                errorString: `Only admins can perform that action.`,
+            };
+        }
+        return NO_ERROR;
+    }
+
+    validateBootPlayerAction(clientUUID: string, req: BootPlayerRequest): ValidationResponse {
+        const response = this.ensureClientIsAdmin(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
+
+        if (!this.gsm.getPlayer(req.playerUUID)) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
         return NO_ERROR;
     }
 }

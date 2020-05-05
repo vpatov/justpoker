@@ -14,7 +14,8 @@ export enum ActionType {
     ADDCHIPS = 'ADDCHIPS',
     SETCHIPS = 'SETCHIPS',
     BETACTION = 'BETACTION',
-    SET_PLAYER_STRADDLE = 'SET_PLAYER_STRADDLE',
+    SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
+    BOOTPLAYER = "BOOTPLAYER"
 }
 
 export declare interface SitDownRequest {
@@ -47,6 +48,10 @@ export declare interface ClientStraddleRequest {
     straddle: boolean;
 }
 
+export declare interface BootPlayerRequest {
+    playerUUID: string;
+}
+
 export type ClientWsMessageRequest = SitDownRequest &
     JoinTableRequest &
     (SitDownRequest & JoinTableRequest) &
@@ -54,7 +59,8 @@ export type ClientWsMessageRequest = SitDownRequest &
     AddChipsRequest &
     SetChipsRequest &
     ClientStraddleRequest &
-    ClientChatMessage;
+    ClientChatMessage &
+    BootPlayerRequest;
 
 export declare interface ClientWsMessage {
     actionType: ActionType;
