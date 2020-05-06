@@ -9,15 +9,13 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             position: 'absolute',
-            top: '21%',
-            width: '45%',
-            // display: 'flex',
-            // flexWrap: 'wrap',
-            // flexDirection: 'column',
-            transition: 'translate 0.3s ease-in-out',
-        },
-        showingSidePots: {
-            transform: 'translateY(-25%)',
+            top: '0',
+            width: '40%',
+            height: '35%',
+            display: 'flex',
+            flexWrap: 'wrap',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
         },
         mainPotCont: {
             width: '100%',
@@ -31,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         awardPotCont: {
             position: 'absolute',
-            top: '0',
+            top: '10%',
             zIndex: 5,
         },
         mainPot: {
@@ -64,24 +62,30 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function TablePot(props) {
     const classes = useStyles();
-    const { activePot, fullPot, inactivePots, awardPot } = props;
+    const { activePot, fullPot, inactivePots, awardPots } = props;
     const showInactivePots = inactivePots.length >= 1;
+    const showActivePot = activePot !== 0;
+
     return (
         <>
             <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
                 <Typography className={classes.fullPot}>{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
             </Tooltip>
-            {awardPot ? (
+            {awardPots ? (
                 <div className={classes.awardPotCont}>
-                    <Bet className={classnames(classes.awardPot, 'ani_awardPot')} amount={awardPot} />
+                    {awardPots.map((pot) => (
+                        <Bet className={classnames(classes.awardPot, 'ani_awardPot')} amount={pot} />
+                    ))}
                 </div>
             ) : null}
-            <div className={classnames(classes.root, { [classes.showingSidePots]: showInactivePots })}>
-                <div className={classes.mainPotCont}>
-                    <Typography
-                        className={classnames(classes.mainPot, 'ani_mainPot')}
-                    >{`${activePot.toLocaleString()}`}</Typography>
-                </div>
+            <div className={classnames(classes.root)}>
+                {showActivePot ? (
+                    <div className={classes.mainPotCont}>
+                        <Typography
+                            className={classnames(classes.mainPot)}
+                        >{`${activePot.toLocaleString()}`}</Typography>
+                    </div>
+                ) : null}
                 {showInactivePots ? (
                     <div className={classes.sidePotsCont}>
                         {inactivePots.map((sp) => (

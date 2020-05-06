@@ -75,7 +75,7 @@ export declare interface Table {
     activePot: number;
     fullPot: number;
     inactivePots?: number[];
-    awardPot?: number;
+    awardPots?: number[];
     readonly communityCards: UiCard[];
 }
 
@@ -305,7 +305,7 @@ export const TestGame: UiGameState = {
         activePot: genRandomInt(0, 1000000),
         fullPot: genRandomInt(0, 10000),
         inactivePots: [100000, 10000].map((p) => genRandomInt(0, p)),
-        awardPot: genRandomInt(0, 100000),
+        awardPots: [genRandomInt(0, 100000)],
         communityCards: [
             { ...genRandomCard(), partOfWinningHand: true },
             { ...genRandomCard(), partOfWinningHand: true },

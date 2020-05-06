@@ -1,29 +1,23 @@
-import {
-    GameParameters,
-    GameType,
-    BettingRoundStage,
-    BettingRoundAction,
-    BettingRoundActionType,
-} from "./game";
+import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
 
-import { Player } from "./player";
-import { Table } from "./table";
-import { Card, Deck } from "./cards";
+import { Player } from './player';
+import { Table } from './table';
+import { Card, Deck } from './cards';
 
 export const enum GameStage {
-    NOT_IN_PROGRESS = "NOT_IN_PROGRESS",
-    INITIALIZE_NEW_HAND = "INITIALIZE_NEW_HAND",
-    SHOW_START_OF_HAND = "SHOW_START_OF_HAND",
-    SHOW_START_OF_BETTING_ROUND = "SHOW_START_OF_BETTING_ROUND",
-    WAITING_FOR_BET_ACTION = "WAITING_FOR_BET_ACTION",
-    SHOW_BET_ACTION = "SHOW_BET_ACTION",
-    FINISH_BETTING_ROUND = "FINISH_BETTING_ROUND",
-    SHOW_WINNER = "SHOW_WINNER",
-    POST_HAND_CLEANUP = "EJECT_STACKED_PLAYERS",
+    NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
+    INITIALIZE_NEW_HAND = 'INITIALIZE_NEW_HAND',
+    SHOW_START_OF_HAND = 'SHOW_START_OF_HAND',
+    SHOW_START_OF_BETTING_ROUND = 'SHOW_START_OF_BETTING_ROUND',
+    WAITING_FOR_BET_ACTION = 'WAITING_FOR_BET_ACTION',
+    SHOW_BET_ACTION = 'SHOW_BET_ACTION',
+    FINISH_BETTING_ROUND = 'FINISH_BETTING_ROUND',
+    SHOW_WINNER = 'SHOW_WINNER',
+    POST_HAND_CLEANUP = 'EJECT_STACKED_PLAYERS',
 }
 
 export const enum ServerActionType {
-    BOOT_PLAYER = "BOOT_PLAYER"
+    BOOT_PLAYER = 'BOOT_PLAYER',
 }
 
 // TODO consider doing something similar to messageService for queuedActionsProcessor ?
@@ -63,6 +57,8 @@ export declare interface GameState {
 
     pots: ReadonlyArray<Pot>;
 
+    awardPots?: number[];
+
     shouldDealNextHand: Readonly<boolean>;
 
     /** Sensitive field. */
@@ -89,14 +85,17 @@ export declare interface Pot {
 }
 
 export const enum ServerStateKey {
-    GAMESTATE = "GAMESTATE",
-    AUDIO = "AUDIO",
-    CHAT = "CHAT",
+    GAMESTATE = 'GAMESTATE',
+    AUDIO = 'AUDIO',
+    CHAT = 'CHAT',
 }
 
-export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerAction){
-    return a.actionType === b.actionType && a.args.length === b.args.length && 
-    a.args.every((arg, index) => arg === b.args[index]);
+export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerAction) {
+    return (
+        a.actionType === b.actionType &&
+        a.args.length === b.args.length &&
+        a.args.every((arg, index) => arg === b.args[index])
+    );
 }
 
 export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
@@ -115,23 +114,23 @@ export const cleanGameState: GameState = {
         timeToAct: 0,
         maxPlayers: 9,
     },
-    dealerUUID: "",
+    dealerUUID: '',
     smallBlindUUID: '',
     bigBlindUUID: '',
     bettingRoundStage: BettingRoundStage.WAITING,
-    firstToAct: "",
-    currentPlayerToAct: "",
-    lastBettingRoundAction: {type: BettingRoundActionType.NOT_IN_HAND},
+    firstToAct: '',
+    currentPlayerToAct: '',
+    lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
     shouldDealNextHand: false,
     deck: {
         cards: [],
     },
     pots: [],
     table: {
-        uuid: "",
+        uuid: '',
         activeConnections: new Map(),
-        password: "",
-        admin: "",
+        password: '',
+        admin: '',
     },
     timeCurrentPlayerTurnStarted: 0,
     serverTime: 0,

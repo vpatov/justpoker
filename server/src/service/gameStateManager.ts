@@ -218,6 +218,10 @@ export class GameStateManager {
     }
 
     getActivePotValue() {
+        // post showdown all pots are considered inactive
+        if (this.getGameStage() === GameStage.SHOW_WINNER) {
+            return 0;
+        }
         // get pot with least number of contestors
         const activePot = this.gameState.pots.reduce(
             (minPot, pot, i) => (i === 0 || pot.contestors.length < minPot.contestors.length ? pot : minPot),
@@ -227,6 +231,10 @@ export class GameStateManager {
     }
 
     getInactivePotsValues() {
+        // post showdown all pots are considered inactive
+        if (this.getGameStage() === GameStage.SHOW_WINNER) {
+            return this.gameState.pots.map((p) => p.value);
+        }
         const ans: number[] = [];
         let [min, minI] = [Number.POSITIVE_INFINITY, 0];
         this.gameState.pots.forEach((pot, i) => {
@@ -688,6 +696,10 @@ export class GameStateManager {
         this.updateGameState({ firstToAct: playerUUID });
     }
 
+    setAwardPots(awardPots: number[]) {
+        this.updateGameState({ awardPots: awardPots });
+    }
+
     setCurrentPlayerToAct(playerUUID: string) {
         this.updateGameState({ currentPlayerToAct: playerUUID });
     }
@@ -736,6 +748,9 @@ export class GameStateManager {
         return this.gameState.gameParameters.gameType;
     }
 
+    getAwardPots(): number[] {
+        return this.gameState.awardPots;
+    }
     // TODO
     getAllowStraddle(): boolean {
         return true;
@@ -755,10 +770,11 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { betAmount: betAmount > chips ? chips : betAmount });
     }
 
-    clearWinners() {
+    clearWinnersAndAwardPots() {
         this.updatePlayers((player) => ({
             winner: false,
         }));
+        this.setAwardPots([]);
     }
 
     clearStateOfRoundInfo() {
@@ -781,6 +797,7 @@ export class GameStateManager {
             deck: {
                 cards: [],
             },
+            awardPots: [],
         });
     }
 
