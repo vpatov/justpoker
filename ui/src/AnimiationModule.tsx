@@ -97,6 +97,7 @@ export function animateAwardPot(winnerUUID, potId) {
         easing: 'easeInOutExpo',
     });
     // setTimeout(() => a.reset(), duration);
+    return a;
 }
 
 // utility functions

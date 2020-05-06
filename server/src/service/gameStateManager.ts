@@ -219,10 +219,6 @@ export class GameStateManager {
     }
 
     getActivePotValue() {
-        // post showdown all pots are considered inactive
-        if (this.getGameStage() === GameStage.SHOW_WINNER) {
-            return 0;
-        }
         // get pot with least number of contestors
         const activePot = this.gameState.pots.reduce(
             (minPot, pot, i) => (i === 0 || pot.contestors.length < minPot.contestors.length ? pot : minPot),
@@ -232,10 +228,6 @@ export class GameStateManager {
     }
 
     getInactivePotsValues() {
-        // post showdown all pots are considered inactive
-        if (this.getGameStage() === GameStage.SHOW_WINNER) {
-            return this.gameState.pots.map((p) => p.value);
-        }
         const ans: number[] = [];
         let [min, minI] = [Number.POSITIVE_INFINITY, 0];
         this.gameState.pots.forEach((pot, i) => {

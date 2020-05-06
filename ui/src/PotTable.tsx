@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         awardPotCont: {
             position: 'absolute',
-            top: '14%',
+            top: '12%',
             zIndex: 5,
             display: 'flex',
             justifyContent: 'center',
