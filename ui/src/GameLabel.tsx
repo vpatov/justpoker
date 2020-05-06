@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         text: {
             display: 'inline-block',
+            fontSize: '2vmin',
         },
     }),
 );

@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from 'react';
-import findIndex from 'lodash/findIndex';
 import Player from './Player';
 import OpenSeat from './OpenSeat';
 import Bet from './Bet';
+import TablePot from './TablePot';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
@@ -11,9 +11,7 @@ import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
 import { WsServer } from './api/ws';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
-import { Button } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
 
 const TABLE_HEIGHT = 45;
 const TABLE_WIDTH = 75;
@@ -84,25 +82,7 @@ const useStyles = makeStyles((theme) => ({
         top: 0,
         left: 0,
     },
-    mainPot: {
-        fontSize: '2.6vmin',
-        position: 'absolute',
-        top: '22%',
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        color: 'white',
-        borderRadius: 40,
-        padding: '0.6vmin 3vmin',
-    },
-    fullPot: {
-        borderRadius: '0.5vmin',
-        zIndex: 5,
-        padding: '0.5vmin 0.8vmin',
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        color: 'white',
-        top: '-8%',
-        position: 'absolute',
-        fontSize: '1vmin',
-    },
+
     startGame: {
         zIndex: 5,
         fontSize: '4vmin',
@@ -117,7 +97,7 @@ function Table(props) {
     const classes = useStyles();
     const { className } = props;
     const { canStartGame, heroIsSeated, gameStarted } = useSelector(globalGameStateSelector);
-    const { communityCards, spots, pot, fullPot } = useSelector(tableSelector);
+    const { communityCards, spots, activePot, fullPot, inactivePots, awardPot } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
 
@@ -189,6 +169,7 @@ function Table(props) {
                 ans.push(
                     <Bet
                         style={{
+                            position: 'absolute',
                             top: `${bPos.y}vmin`,
                             left: `${bPos.x}vmin`,
                             transform: 'translateY(-50%) translateX(-50%)',
@@ -211,16 +192,7 @@ function Table(props) {
                     </Button>
                 ) : null}
                 {gameStarted ? (
-                    <>
-                        <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
-                            <Typography
-                                className={classes.fullPot}
-                            >{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
-                        </Tooltip>
-                        <Typography
-                            className={classnames(classes.mainPot, 'ani_mainPot')}
-                        >{`${pot.toLocaleString()}`}</Typography>
-                    </>
+                    <TablePot activePot={activePot} fullPot={fullPot} inactivePots={inactivePots} awardPot={awardPot} />
                 ) : null}
                 <CommunityCards communityCards={communityCards} />
             </div>

@@ -26,10 +26,8 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'wrap',
         alignItems: 'flex-start',
     },
-
     text: {
         fontSize: '2.6vmin',
-        color: 'white',
         fontWeight: 'bold',
         marginTop: '12%',
     },

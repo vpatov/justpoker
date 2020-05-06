@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1vmin',
             zIndex: 5,
             position: 'absolute',
-            top: '3vmin',
+            top: '4vmin',
             right: '0',
         },
         unread: {

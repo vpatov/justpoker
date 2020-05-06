@@ -89,8 +89,9 @@ export class StateConverter {
                           : cleanController,
                       table: {
                           spots: 9, // TODO configure
-                          pot: this.gameStateManager.getTotalPot(),
+                          activePot: this.gameStateManager.getActivePotValue(),
                           fullPot: this.gameStateManager.getFullPot(),
+                          inactivePots: this.gameStateManager.getInactivePotsValues(),
                           communityCards: this.transformCommunityCards(),
                       },
                       players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>

@@ -81,12 +81,12 @@ export function dealCards() {
 export function animateWinner(playerEl) {
     console.log(playerEl);
     if (playerEl.current) {
-        const duration = 3000;
+        const duration = 2000;
 
         const [x, y] = getCenterOfRef(playerEl.current);
 
         const a = anime({
-            targets: ['.ani_mainPot'],
+            targets: ['.ani_awardPot'],
             translateX: (target) => {
                 return x - target.getBoundingClientRect().x;
             },
@@ -95,7 +95,7 @@ export function animateWinner(playerEl) {
             },
             opacity: 0,
             duration: duration,
-            easing: 'easeInOutCirc',
+            easing: 'easeInOutExpo',
         });
         setTimeout(() => a.reset(), duration);
     }

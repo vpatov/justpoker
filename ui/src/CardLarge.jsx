@@ -16,6 +16,8 @@ const useStyles = makeStyles((theme) => ({
         width: '8.6vmin',
         margin: '0.5vmin',
         overflow: 'hidden',
+        transform: 'translateY(0)',
+        transition: 'transform 0.5s ease-in-out',
     },
     text: {
         fontWeight: 'bold',
@@ -26,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         top: '8%',
         left: '11%',
-        color: 'white',
     },
     suit: {
         fontSize: '4.8vmin',
@@ -34,11 +35,10 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         bottom: '5%',
         right: '5%',
-        color: 'white',
         opacity: 0.7,
     },
     partOfWinningHand: {
-        transform: 'translateY(-33%)',
+        transform: 'translateY(33%)',
         transition: 'transform 0.5s ease-in-out',
         ...theme.custom.WINNING_CARD,
     },

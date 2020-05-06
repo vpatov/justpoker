@@ -217,6 +217,29 @@ export class GameStateManager {
         return this.gameState.pots;
     }
 
+    getActivePotValue() {
+        // get pot with least number of contestors
+        const activePot = this.gameState.pots.reduce(
+            (minPot, pot, i) => (i === 0 || pot.contestors.length < minPot.contestors.length ? pot : minPot),
+            { contestors: [], value: 0 },
+        );
+        return activePot.value;
+    }
+
+    getInactivePotsValues() {
+        const ans: number[] = [];
+        let [min, minI] = [Number.POSITIVE_INFINITY, 0];
+        this.gameState.pots.forEach((pot, i) => {
+            if (min > pot.contestors.length) {
+                min = pot.contestors.length;
+                minI = i;
+            }
+            ans.push(pot.value);
+        });
+        ans.splice(minI, 1);
+        return ans;
+    }
+
     popPot(): Pot {
         const potsLength = this.gameState.pots.length;
         assert(potsLength > 0, 'Cannot call popPot when length of pot array is zero. This is a bug.');
