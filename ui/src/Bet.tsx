@@ -22,10 +22,11 @@ const useStyles = makeStyles((theme) => ({
 
 function Bet(props) {
     const classes = useStyles();
-    const { className, style, amount } = props;
+    const { className, style, amount, id } = props;
 
     return (
         <div
+            id={id}
             className={classnames(classes.root, className, 'ani_bet')}
             style={{
                 ...style,

@@ -29,6 +29,7 @@ import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsac
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
+import { AwardPot } from '../../../ui/src/shared/models/uiState';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -696,10 +697,6 @@ export class GameStateManager {
         this.updateGameState({ firstToAct: playerUUID });
     }
 
-    setAwardPots(awardPots: number[]) {
-        this.updateGameState({ awardPots: awardPots });
-    }
-
     setCurrentPlayerToAct(playerUUID: string) {
         this.updateGameState({ currentPlayerToAct: playerUUID });
     }
@@ -748,8 +745,14 @@ export class GameStateManager {
         return this.gameState.gameParameters.gameType;
     }
 
-    getAwardPots(): number[] {
-        return this.gameState.awardPots;
+    getAwardPots(): AwardPot[] {
+        const awardPots: AwardPot[] = [];
+        for (const [uuid, player] of Object.entries(this.getPlayers())) {
+            if (player.winner) {
+                awardPots.push({ winnerUUID: uuid, value: player.chipDelta });
+            }
+        }
+        return awardPots;
     }
     // TODO
     getAllowStraddle(): boolean {
@@ -770,11 +773,11 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { betAmount: betAmount > chips ? chips : betAmount });
     }
 
-    clearWinnersAndAwardPots() {
+    clearWinnersAndDeltas() {
         this.updatePlayers((player) => ({
             winner: false,
+            chipDelta: 0,
         }));
-        this.setAwardPots([]);
     }
 
     clearStateOfRoundInfo() {
@@ -797,7 +800,6 @@ export class GameStateManager {
             deck: {
                 cards: [],
             },
-            awardPots: [],
         });
     }
 

@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
         textShadow: `0.16vmin 0.13vmin ${theme.palette.primary.main}`,
     },
     flexTextHidden: {
-        marginLeft: '25%',
+        marginLeft: '20%',
         fontSize: '3vmin',
     },
     partOfWinningHand: {

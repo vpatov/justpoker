@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import classnames from 'classnames';
 import Hand from './Hand';
 import PlayerStack from './PlayerStack';
-import { animateWinner } from './AnimiationModule';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import blueGrey from '@material-ui/core/colors/blueGrey';
@@ -59,7 +58,6 @@ function Player(props) {
     const classes = useStyles();
     const { className, style, setHeroRotation, virtualPositon } = props;
     const { stack, hand, name, toAct, playerTimer, winner, button, folded, uuid, sittingOut, hero } = props.player;
-    const playerEl = useRef(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -70,18 +68,14 @@ function Player(props) {
         setAnchorEl(null);
     };
 
-    if (winner) {
-        setTimeout(() => animateWinner(playerEl), 300);
-    }
-
     return (
         <div
-            ref={playerEl}
             className={classnames(classes.root, className, {
                 [classes.folded]: folded || sittingOut,
                 [classes.hero]: hero,
             })}
             style={style}
+            id={uuid}
         >
             <MoreHoriz className={classes.moreIcon} onClick={handleClick} />
             <PlayerMenu
