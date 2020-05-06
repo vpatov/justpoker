@@ -43,7 +43,6 @@ function ControllerTimer(props) {
     if (timeLimit - timeElapsed < beginBelowSeconds) {
         startCompleted = ((beginBelowSeconds - timeLimit + timeElapsed) * 100) / beginBelowSeconds;
     }
-    console.log(timeLimit - timeElapsed, startCompleted);
 
     const [completed, setCompleted] = useState(startCompleted);
     const [timeRemaining, setTimeRemaining] = useState(timeLimit - timeElapsed);

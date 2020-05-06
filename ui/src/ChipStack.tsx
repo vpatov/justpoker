@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 function ChipStack(props) {
     const classes = useStyles();
-    const { amount } = props;
+    const { amount, className } = props;
 
     function generateAStackOfChips(chipSize, numChips): JSX.Element {
         const chips = [] as any;
@@ -61,7 +61,7 @@ function ChipStack(props) {
 
         return chipsStacks;
     }
-    return <div className={classes.root}>{generatesChipsStacksFromAmount(amount)}</div>;
+    return <div className={classnames(classes.root, className)}>{generatesChipsStacksFromAmount(amount)}</div>;
 }
 
 export default ChipStack;

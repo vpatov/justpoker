@@ -59,9 +59,9 @@ function Player(props) {
         setAnchorEl(null);
     };
 
-    // if (winner) {
-    //     setTimeout(() => animateWinner(playerEl), 300);
-    // }
+    if (winner) {
+        setTimeout(() => animateWinner(playerEl), 300);
+    }
 
     return (
         <div
