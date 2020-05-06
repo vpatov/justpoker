@@ -283,15 +283,6 @@ export class GameStateManager {
         return this.gameState.bettingRoundStage;
     }
 
-    getNumberPlayersSitting() {
-        return Object.entries(this.gameState.players).filter(([uuid, player]) => player.sitting).length;
-    }
-
-    getNumberPlayersSittingIn() {
-        return Object.entries(this.gameState.players).filter(([uuid, player]) => player.sitting && !player.sittingOut)
-            .length;
-    }
-
     getSeats() {
         const seats: [number, string][] = Object.values(this.gameState.players)
             .filter((player) => player.seatNumber >= 0)
@@ -355,7 +346,7 @@ export class GameStateManager {
         return this.getFullPot() + this.getPreviousRaise() * 2;
     }
 
-    isGameStarted() {
+    shouldDealNextHand() {
         return this.gameState.shouldDealNextHand;
     }
 
@@ -399,11 +390,27 @@ export class GameStateManager {
         return this.getPlayersInHand().length === 1;
     }
 
-    // TODO put into validationService
+    /**
+     * Function is executed before every transition to INITIALIZE_NEW_HAND state to see if we
+     * can conitnue playing and deal people in.
+     */
+    canDealNextHand(): boolean {
+        return this.shouldDealNextHand() && this.getPlayersReadyToPlay().length >= 2;
+    }
+
+    /**
+     * Used to toggle the appearance of the start game button on the table. This button should
+     * be visible to a player if the player is ready to play (sitting down),
+     * if the game is not currently in progress, and if there are enough players to play.
+     */
     canPlayerStartGame(playerUUID: string) {
-        const player = this.getPlayer(playerUUID);
-        if (player.sitting && this.getPlayersReadyToPlay().length >= 2 && !this.isGameStarted()) return true;
-        return false;
+        return (
+            this.isPlayerReadyToPlay(playerUUID) && this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress()
+        );
+    }
+
+    isGameInProgress() {
+        return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
     }
 
     getPlayerStraddle(playerUUID: string): boolean {
@@ -470,10 +477,6 @@ export class GameStateManager {
 
     isValidSeat(seatNumber: number) {
         return seatNumber >= 0 && seatNumber < this.gameState.gameParameters.maxPlayers;
-    }
-
-    shouldDealNextHand() {
-        return this.gameState.shouldDealNextHand;
     }
 
     // TODO deck breaks immutability

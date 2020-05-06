@@ -39,10 +39,6 @@ export class GamePlayService {
         this.gsm.updateGameState({ shouldDealNextHand: false });
     }
 
-    canContinueGame(): boolean {
-        return this.gsm.shouldDealNextHand() && this.gsm.getNumberPlayersSittingIn() >= 2;
-    }
-
     setCurrentPlayerToAct() {
         const previousPlayerToAct = this.gsm.getCurrentPlayerToAct();
 
@@ -405,7 +401,7 @@ export class GamePlayService {
         ]);
 
         // TODO see if you can make this more functional style
-        const sidePots: Pot[] = [];
+        const pots: Pot[] = [];
         while (playerBets.length > 0) {
             const minimumBet: number = playerBets.reduce(
                 (prev: number, [betAmount, uuid]) => (betAmount < prev ? betAmount : prev),
@@ -417,7 +413,7 @@ export class GamePlayService {
                 contestors: playerBets.map(([betAmount, uuid]) => uuid).sort(),
             };
 
-            sidePots.push(pot);
+            pots.push(pot);
 
             // TODO why is the cast necessary? compiler errors without it
             playerBets = playerBets
@@ -428,7 +424,7 @@ export class GamePlayService {
         // TODO can there ever be more than one uncalled bet? idts
         const gamePots: Pot[] = [];
         const uncalledBets: Pot[] = [];
-        sidePots.forEach((pot) => (pot.contestors.length === 1 ? uncalledBets.push(pot) : gamePots.push(pot)));
+        pots.forEach((pot) => (pot.contestors.length === 1 ? uncalledBets.push(pot) : gamePots.push(pot)));
 
         uncalledBets.forEach((pot) => {
             const playerUUID = pot.contestors[0];
