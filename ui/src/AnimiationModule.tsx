@@ -78,26 +78,25 @@ export function dealCards() {
     });
 }
 
-export function animateWinner(playerEl) {
-    if (playerEl.current) {
-        const duration = 3000;
+export function animateAwardPot(winnerUUID, potId) {
+    const duration = 3000;
+    const player = document.getElementById(winnerUUID);
+    const [x, y] = getCenterOfRef(player);
 
-        const [x, y] = getCenterOfRef(playerEl.current);
-
-        const a = anime({
-            targets: ['.ani_awardPot'],
-            translateX: (target) => {
-                return x - target.getBoundingClientRect().x;
-            },
-            translateY: (target) => {
-                return y - target.getBoundingClientRect().y;
-            },
-            opacity: 0,
-            duration: duration,
-            easing: 'easeInOutExpo',
-        });
-        setTimeout(() => a.reset(), duration);
-    }
+    const a = anime({
+        targets: [`#${potId}`],
+        translateX: (target) => {
+            console.log(target);
+            return x - target.getBoundingClientRect().x;
+        },
+        translateY: (target) => {
+            return y - target.getBoundingClientRect().y;
+        },
+        opacity: 0,
+        duration: duration,
+        easing: 'easeInOutExpo',
+    });
+    // setTimeout(() => a.reset(), duration);
 }
 
 // utility functions

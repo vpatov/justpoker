@@ -1,9 +1,10 @@
 import React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import Bet from './Bet';
+
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
+import PotAward from './PotAward';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,8 +30,10 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         awardPotCont: {
             position: 'absolute',
-            top: '10%',
+            top: '14%',
             zIndex: 5,
+            display: 'flex',
+            justifyContent: 'center',
         },
         mainPot: {
             display: 'inline-block',
@@ -43,9 +46,6 @@ const useStyles = makeStyles((theme: Theme) =>
         sidePot: {
             textAlign: 'center',
             fontSize: '1.9vmin',
-        },
-        awardPot: {
-            zIndex: 5,
         },
         fullPot: {
             borderRadius: '0.5vmin',
@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function TablePot(props) {
+function PotTable(props) {
     const classes = useStyles();
     const { activePot, fullPot, inactivePots, awardPots } = props;
     const showInactivePots = inactivePots.length >= 1;
@@ -73,8 +73,8 @@ function TablePot(props) {
             </Tooltip>
             {awardPots ? (
                 <div className={classes.awardPotCont}>
-                    {awardPots.map((pot) => (
-                        <Bet className={classnames(classes.awardPot, 'ani_awardPot')} amount={pot} />
+                    {awardPots.map((ap, index) => (
+                        <PotAward awardPot={ap} index={index} />
                     ))}
                 </div>
             ) : null}
@@ -98,4 +98,4 @@ function TablePot(props) {
     );
 }
 
-export default TablePot;
+export default PotTable;

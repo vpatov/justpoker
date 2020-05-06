@@ -7,6 +7,8 @@ import {
     CHECK_ACTION,
     GameType,
 } from '../../../ui/src/shared/models/game';
+import { AwardPot } from '../../../ui/src/shared/models/uiState';
+
 import { strict as assert } from 'assert';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
@@ -379,17 +381,16 @@ export class GamePlayService {
             shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
         );
 
-        this.gsm.clearWinnersAndAwardPots();
-        let awardPots: number[] = [];
+        this.gsm.clearWinnersAndDeltas();
+
         winningPlayers.forEach((playerUUID) => {
             this.audioService.playHeroWinSFX(playerUUID);
             this.gsm.updatePlayer(playerUUID, {
                 chips: this.gsm.getChips(playerUUID) + amountsWon[playerUUID],
                 winner: true,
+                chipDelta: amountsWon[playerUUID], // used to compute awardPts
             });
-            awardPots.push(amountsWon[playerUUID]);
         });
-        this.gsm.setAwardPots(awardPots);
     }
 
     ejectStackedPlayers() {

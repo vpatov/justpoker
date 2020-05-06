@@ -57,8 +57,6 @@ export declare interface GameState {
 
     pots: ReadonlyArray<Pot>;
 
-    awardPots?: number[];
-
     shouldDealNextHand: Readonly<boolean>;
 
     /** Sensitive field. */

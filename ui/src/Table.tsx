@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import Player from './Player';
 import OpenSeat from './OpenSeat';
 import Bet from './Bet';
-import TablePot from './TablePot';
+import PotTable from './PotTable';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
@@ -192,7 +192,7 @@ function Table(props) {
                     </Button>
                 ) : null}
                 {isGameInProgress ? (
-                    <TablePot
+                    <PotTable
                         activePot={activePot}
                         fullPot={fullPot}
                         inactivePots={inactivePots}

@@ -75,8 +75,13 @@ export declare interface Table {
     activePot: number;
     fullPot: number;
     inactivePots?: number[];
-    awardPots?: number[];
+    awardPots?: AwardPot[];
     readonly communityCards: UiCard[];
+}
+
+export declare interface AwardPot {
+    winnerUUID: string;
+    value: number;
 }
 
 export declare interface PlayerTimer {
@@ -305,7 +310,10 @@ export const TestGame: UiGameState = {
         activePot: genRandomInt(0, 1000000),
         fullPot: genRandomInt(0, 10000),
         inactivePots: [100000, 10000].map((p) => genRandomInt(0, p)),
-        awardPots: [genRandomInt(0, 100000)],
+        awardPots: [
+            { winnerUUID: 'TEST_UUID_1', value: genRandomInt(0, 100000) },
+            // { winnerUUID: 'TEST_UUID_2', value: genRandomInt(0, 100000) },
+        ],
         communityCards: [
             { ...genRandomCard(), partOfWinningHand: true },
             { ...genRandomCard(), partOfWinningHand: true },
@@ -336,6 +344,7 @@ export const TestGame: UiGameState = {
             position: positions[1],
             stack: 425320,
             winner: true,
+            uuid: 'TEST_UUID_1',
             bet: genRandomInt(0, 100),
             hand: {
                 cards: [{ hidden: true }, { hidden: true }, { hidden: true }, { hidden: true }],
@@ -388,6 +397,7 @@ export const TestGame: UiGameState = {
             name: 'Jimmy Dean',
             position: positions[6],
             stack: 43020,
+            uuid: 'TEST_UUID_2',
             bet: genRandomInt(0, 1000000),
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
