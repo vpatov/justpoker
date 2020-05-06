@@ -13,13 +13,23 @@ body {
 }
 
 @font-face {
-    font-family: "Avenir";
-    src: local("Avenir"), url(./fonts/Avenir.otf);
+    font-family: 'Avenir';
+    src: local('Avenir'), url(./fonts/Avenir.otf);
 }
 
 @font-face {
-    font-family: "Futura";
-    src: url(./fonts/Futura.ttc) format("truetype");
+    font-family: 'Futura';
+    src: url(./fonts/Futura.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'Futura';
+    src: url(./fonts/FuturaBold.ttf) format('truetype');
+    font-weight: bold;
+}
+@font-face {
+    font-family: 'Futura';
+    src: url(./fonts/FuturaItalic.ttf) format('truetype');
+    font-style: italic;
 }
 
 a {

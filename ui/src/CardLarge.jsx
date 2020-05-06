@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
         transition: 'transform 0.5s ease-in-out',
     },
     text: {
+        letterSpacing: '-0.5vmin',
         fontWeight: 'bold',
     },
     rank: {
@@ -66,7 +67,12 @@ function CardLarge(props) {
                 [classes.partOfWinningHand]: partOfWinningHand,
             })}
         >
-            <Typography className={classnames(classes.text, classes.rank)}>{generateStringFromRank(rank)}</Typography>
+            <Typography
+                className={classnames(classes.text, classes.rank)}
+                style={rank === 'T' ? { marginLeft: '-0.5vmin' } : {}}
+            >
+                {generateStringFromRank(rank)}
+            </Typography>
             <Typography className={classnames(classes.text, classes.suit)}>{generateStringFromSuit(suit)}</Typography>
         </div>
     );

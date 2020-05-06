@@ -28,7 +28,8 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-start',
     },
     text: {
-        fontSize: '2.5vmin',
+        letterSpacing: '-0.2vmin',
+        fontSize: '2.4vmin',
         fontWeight: 'bold',
         marginTop: '12%',
     },
@@ -37,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '0.5vmin',
         width: '100%',
         textAlign: 'left',
-        fontSize: '2vmin',
+        fontSize: '1.9vmin',
     },
     flexTextSuit: {
         marginLeft: '0.4vmin',
@@ -98,7 +99,10 @@ function CardSmall(props) {
                 [classes.flexCard]: shouldFlex,
             })}
         >
-            <Typography className={classnames(classes.text, { [classes.flexText]: shouldFlex })}>
+            <Typography
+                className={classnames(classes.text, { [classes.flexText]: shouldFlex })}
+                style={rank === 'T' ? { marginLeft: '-0.3%' } : {}}
+            >
                 {generateStringFromRank(rank)}
             </Typography>
             <Typography className={classnames(classes.text, { [classes.flexTextSuit]: shouldFlex })}>
