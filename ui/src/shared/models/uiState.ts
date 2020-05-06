@@ -24,7 +24,7 @@ export declare interface UiGameState {
 export declare interface Global {
     heroIsAdmin: boolean;
     heroIsSeated: boolean;
-    gameStarted: boolean;
+    isGameInProgress: boolean;
     bigBlind: number;
     smallBlind: number;
     allowStraddle: boolean;
@@ -193,7 +193,7 @@ export const cleanController: Controller = {
 export const cleanGlobal: Global = {
     heroIsAdmin: false,
     heroIsSeated: false,
-    gameStarted: false,
+    isGameInProgress: false,
     bigBlind: 2,
     smallBlind: 1,
     allowStraddle: false,
@@ -263,7 +263,7 @@ export const TestGame: UiGameState = {
     global: {
         heroIsSeated: true,
         heroIsAdmin: true,
-        gameStarted: true,
+        isGameInProgress: true,
         bigBlind: 2,
         smallBlind: 1,
         allowStraddle: true,
