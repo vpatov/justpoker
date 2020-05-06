@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateStringFromSuit, SUITS } from './utils';
+import { generateStringFromSuit, generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -26,8 +26,8 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '4.8vmin',
         lineHeight: '1em',
         position: 'absolute',
-        top: '8%',
-        left: '11%',
+        top: '5%',
+        left: '10%',
     },
     suit: {
         fontSize: '4.8vmin',
@@ -66,7 +66,7 @@ function CardLarge(props) {
                 [classes.partOfWinningHand]: partOfWinningHand,
             })}
         >
-            <Typography className={classnames(classes.text, classes.rank)}>{rank}</Typography>
+            <Typography className={classnames(classes.text, classes.rank)}>{generateStringFromRank(rank)}</Typography>
             <Typography className={classnames(classes.text, classes.suit)}>{generateStringFromSuit(suit)}</Typography>
         </div>
     );

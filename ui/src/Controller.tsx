@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
             float: 'right',
             height: '100%',
             display: 'flex',
-            justifyContent: 'space-evenly',
+            justifyContent: 'center',
             flexDirection: 'column',
             alignItems: 'flex-end',
         },
@@ -111,11 +111,12 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
         },
-        button: {
-            fontSize: '1.3vmin',
+        timeBankButton: {
+            margin: '0.5vmin',
+            fontSize: '1.1vmin',
         },
         checkLabel: {
-            fontSize: '1.3vmin',
+            fontSize: '1.1vmin',
         },
         incButton: {
             padding: 0,
@@ -191,8 +192,8 @@ function ControllerComp(props: ControllerProps) {
     const [queuedActionType, setQueuedActionType] = useState('');
 
     useEffect(() => {
-        for (const actionType of bettingRoundActionTypesToUnqueue){
-            if (queuedActionType === actionType){
+        for (const actionType of bettingRoundActionTypesToUnqueue) {
+            if (queuedActionType === actionType) {
                 setQueuedActionType('');
                 setBetAmt(0);
             }
@@ -340,23 +341,6 @@ function ControllerComp(props: ControllerProps) {
                 </div>
             </div>
             <div className={classes.adminButtonCont}>
-                {timeBanks !== undefined ? (
-                    <Button
-                        className={classes.button}
-                        variant="outlined"
-                        onClick={() => null}
-                        disabled={timeBanks === 0}
-                    >
-                        {`Time Bank (${timeBanks})`}
-                    </Button>
-                ) : null}
-                {allowStraddle ? (
-                    <FormControlLabel
-                        classes={{ label: classes.checkLabel }}
-                        control={<Checkbox className={classes.button} checked={straddle} onChange={onToggleStraddle} />}
-                        label="Straddle"
-                    />
-                ) : null}
                 <FormControlLabel
                     classes={{ label: classes.checkLabel }}
                     control={
@@ -368,6 +352,24 @@ function ControllerComp(props: ControllerProps) {
                     }
                     label="Sit Out Next Hand"
                 />
+                {allowStraddle ? (
+                    <FormControlLabel
+                        classes={{ label: classes.checkLabel }}
+                        control={<Checkbox className={classes.button} checked={straddle} onChange={onToggleStraddle} />}
+                        label="Straddle"
+                    />
+                ) : null}
+
+                {timeBanks !== undefined ? (
+                    <Button
+                        className={classes.timeBankButton}
+                        variant="outlined"
+                        onClick={() => null}
+                        disabled={timeBanks === 0}
+                    >
+                        {`Time Bank (${timeBanks})`}
+                    </Button>
+                ) : null}
             </div>
         </div>
     );
