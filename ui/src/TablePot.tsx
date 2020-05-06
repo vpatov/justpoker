@@ -49,16 +49,16 @@ const useStyles = makeStyles((theme: Theme) =>
         awardPot: {
             zIndex: 5,
         },
-        // fullPot: {
-        //     borderRadius: '0.5vmin',
-        //     zIndex: 5,
-        //     padding: '0.5vmin 0.8vmin',
-        //     backgroundColor: 'rgba(0,0,0,0.3)',
-        //     color: 'white',
-        //     top: '-8%',
-        //     position: 'absolute',
-        //     fontSize: '1vmin',
-        // },
+        fullPot: {
+            borderRadius: '0.5vmin',
+            zIndex: 5,
+            padding: '0.5vmin 0.8vmin',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+            color: 'white',
+            top: '-9%',
+            position: 'absolute',
+            fontSize: '1vmin',
+        },
     }),
 );
 
@@ -68,16 +68,15 @@ function TablePot(props) {
     const showInactivePots = inactivePots.length >= 1;
     return (
         <>
+            <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
+                <Typography className={classes.fullPot}>{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
+            </Tooltip>
             {awardPot ? (
                 <div className={classes.awardPotCont}>
                     <Bet className={classnames(classes.awardPot, 'ani_awardPot')} amount={awardPot} />
                 </div>
             ) : null}
             <div className={classnames(classes.root, { [classes.showingSidePots]: showInactivePots })}>
-                {/* <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
-                <Typography className={classes.fullPot}>{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
-            </Tooltip> */}
-
                 <div className={classes.mainPotCont}>
                     <Typography
                         className={classnames(classes.mainPot, 'ani_mainPot')}
