@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { generateStringFromSuit, SUITS } from './utils';
+import { generateStringFromSuit, generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -20,25 +20,31 @@ const useStyles = makeStyles((theme) => ({
         margin: '0 0.5vmin',
     },
     flexCard: {
-        width: 'unset',
-        flex: '6vmin 1 1',
+        margin: '0 -1.5vmin',
+        boxShadow: '-0.2vmin 0px 0.8vmin 0px rgba(0,0,0,0.75)',
         display: 'flex',
         flexWrap: 'wrap',
-        alignItems: 'flex-start',
+        alignContent: 'flex-start',
+        justifyContent: 'flex-start',
     },
     text: {
-        fontSize: '2.6vmin',
+        fontSize: '2.5vmin',
         fontWeight: 'bold',
         marginTop: '12%',
     },
     flexText: {
-        marginTop: '0',
-        fontSize: '2.4vmin',
+        marginTop: '0.2vmin',
+        marginLeft: '0.5vmin',
         width: '100%',
+        textAlign: 'left',
+        fontSize: '2vmin',
     },
     flexTextSuit: {
-        marginTop: '-40%',
-        fontSize: '2vmin',
+        marginLeft: '0.4vmin',
+        margin: '0',
+        width: '100%',
+        textAlign: 'left',
+        fontSize: '1.7vmin',
     },
     hidden: {
         ...theme.custom.HIDDEN,
@@ -48,10 +54,11 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 'bold',
         fontSize: '3vmin',
         color: theme.palette.primary.light,
+        textShadow: `0.16vmin 0.13vmin ${theme.palette.primary.main}`,
     },
     flexTextHidden: {
-        marginTop: '50%',
-        fontSize: '2vmin',
+        marginLeft: '25%',
+        fontSize: '3vmin',
     },
     partOfWinningHand: {
         transition: 'all 0.5s ease-in-out',
@@ -91,7 +98,9 @@ function CardSmall(props) {
                 [classes.flexCard]: shouldFlex,
             })}
         >
-            <Typography className={classnames(classes.text, { [classes.flexText]: shouldFlex })}>{rank}</Typography>
+            <Typography className={classnames(classes.text, { [classes.flexText]: shouldFlex })}>
+                {generateStringFromRank(rank)}
+            </Typography>
             <Typography className={classnames(classes.text, { [classes.flexTextSuit]: shouldFlex })}>
                 {generateStringFromSuit(suit)}
             </Typography>

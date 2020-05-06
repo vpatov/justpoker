@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
+import MoreHoriz from '@material-ui/icons/MoreHoriz';
 
 const PLAYER_WIDTH = 16;
 const PLAYER_HEIGHT = 12;
@@ -42,6 +43,16 @@ const useStyles = makeStyles((theme) => ({
     hero: {
         transform: 'translateY(-50%) translateX(-50%) scale(1.21)',
     },
+    moreIcon: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        marginRight: '0.4vmin',
+        color: 'grey',
+        '&:hover': {
+            color: 'black',
+        },
+    },
 }));
 
 function Player(props) {
@@ -50,7 +61,7 @@ function Player(props) {
     const { stack, hand, name, toAct, playerTimer, winner, button, folded, uuid, sittingOut, hero } = props.player;
     const playerEl = useRef(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
         setAnchorEl(event.currentTarget as any);
     };
@@ -71,8 +82,8 @@ function Player(props) {
                 [classes.hero]: hero,
             })}
             style={style}
-            onContextMenu={handleClick}
         >
+            <MoreHoriz className={classes.moreIcon} onClick={handleClick} />
             <PlayerMenu
                 handleClose={handleClose}
                 anchorEl={anchorEl}

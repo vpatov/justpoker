@@ -310,7 +310,7 @@ export const TestGame: UiGameState = {
             { ...genRandomCard(), partOfWinningHand: true },
             { ...genRandomCard(), partOfWinningHand: true },
             { ...genRandomCard(), partOfWinningHand: true },
-            genRandomCard(),
+            { rank: 'T', suit: Suit.CLUBS },
             genRandomCard(),
         ],
     },
