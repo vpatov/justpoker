@@ -79,9 +79,8 @@ export function dealCards() {
 }
 
 export function animateWinner(playerEl) {
-    console.log(playerEl);
     if (playerEl.current) {
-        const duration = 2000;
+        const duration = 3000;
 
         const [x, y] = getCenterOfRef(playerEl.current);
 

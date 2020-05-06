@@ -90,6 +90,7 @@ export class StateConverter {
                       table: {
                           spots: 9, // TODO configure
                           activePot: this.gameStateManager.getActivePotValue(),
+                          awardPots: this.gameStateManager.getAwardPots(),
                           fullPot: this.gameStateManager.getFullPot(),
                           inactivePots: this.gameStateManager.getInactivePotsValues(),
                           communityCards: this.transformCommunityCards(),

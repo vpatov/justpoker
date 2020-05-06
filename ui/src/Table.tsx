@@ -97,7 +97,7 @@ function Table(props) {
     const classes = useStyles();
     const { className } = props;
     const { canStartGame, heroIsSeated, isGameInProgress } = useSelector(globalGameStateSelector);
-    const { communityCards, spots, activePot, fullPot, inactivePots, awardPot } = useSelector(tableSelector);
+    const { communityCards, spots, activePot, fullPot, inactivePots, awardPots } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
 
@@ -192,7 +192,12 @@ function Table(props) {
                     </Button>
                 ) : null}
                 {isGameInProgress ? (
-                    <TablePot activePot={activePot} fullPot={fullPot} inactivePots={inactivePots} awardPot={awardPot} />
+                    <TablePot
+                        activePot={activePot}
+                        fullPot={fullPot}
+                        inactivePots={inactivePots}
+                        awardPots={awardPots}
+                    />
                 ) : null}
                 <CommunityCards communityCards={communityCards} />
             </div>

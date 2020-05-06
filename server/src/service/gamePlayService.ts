@@ -379,14 +379,17 @@ export class GamePlayService {
             shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
         );
 
-        this.gsm.clearWinners();
+        this.gsm.clearWinnersAndAwardPots();
+        let awardPots: number[] = [];
         winningPlayers.forEach((playerUUID) => {
             this.audioService.playHeroWinSFX(playerUUID);
             this.gsm.updatePlayer(playerUUID, {
                 chips: this.gsm.getChips(playerUUID) + amountsWon[playerUUID],
                 winner: true,
             });
+            awardPots.push(amountsWon[playerUUID]);
         });
+        this.gsm.setAwardPots(awardPots);
     }
 
     ejectStackedPlayers() {
