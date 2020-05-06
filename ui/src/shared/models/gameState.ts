@@ -27,6 +27,7 @@ export declare interface QueuedServerAction {
 }
 
 // TODO break up into gameState and serverState
+// TODO revisit the way immutability is implemented via readonly.
 export declare interface GameState {
     gameStage: GameStage;
 
@@ -57,8 +58,17 @@ export declare interface GameState {
 
     pots: ReadonlyArray<Pot>;
 
-    awardPots?: number[];
+    awardPots: number[];
 
+    /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
+    handWinners: Set<string>;
+
+    /** 
+     * This variable is checked before initializing a new hand. If it's true, and there are enough players, the 
+     * gameStage will proceed to INITIALIZE_NEW_HAND, the hand will be dealt, and gameplay will start. Otherwise, the 
+     * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently 
+     * in progress - that is determined by the gameStage !== NOT_IN_PROGRESS, exposed in gsm.isGameInProgress().
+     */
     shouldDealNextHand: Readonly<boolean>;
 
     /** Sensitive field. */
@@ -126,6 +136,8 @@ export const cleanGameState: GameState = {
         cards: [],
     },
     pots: [],
+    awardPots: [],
+    handWinners: new Set<string>(),
     table: {
         uuid: '',
         activeConnections: new Map(),

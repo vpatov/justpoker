@@ -18,6 +18,7 @@ import { AnimationService } from '../service/animationService';
 import { printObj, logGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
+import { LedgerService } from './ledgerService';
 
 @Service()
 export class GamePlayService {
@@ -27,7 +28,7 @@ export class GamePlayService {
         private readonly timerManager: TimerManager,
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
-
+        private readonly ledgerService: LedgerService,
         private readonly validationService: ValidationService,
     ) {}
 
@@ -300,20 +301,29 @@ export class GamePlayService {
         }
     }
 
-    dealCards() {
+    initializeBettingRound() {
         const bettingRoundStage = this.gsm.getBettingRoundStage();
 
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
                 this.animationService.animateDeal();
-                Object.keys(this.gsm.getPlayers())
-                    .filter((playerUUID) => this.gsm.isPlayerReadyToPlay(playerUUID))
-                    .forEach((playerUUID) => this.dealHoleCards(playerUUID));
+                this.gsm.forEveryPlayer((player) => {
+                    if (this.gsm.isPlayerReadyToPlay(player.uuid)) {
+                        this.dealHoleCards(player.uuid);
+                        this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(player.uuid));
+                    }
+                });
+
                 break;
             }
 
             case BettingRoundStage.FLOP: {
                 this.gsm.dealCardsToBoard(3);
+                this.gsm.forEveryPlayer((player) => {
+                    if (this.gsm.isPlayerInHand(player.uuid)) {
+                        this.ledgerService.incrementFlopsSeen(player.uuid);
+                    }
+                });
                 break;
             }
 
@@ -380,21 +390,25 @@ export class GamePlayService {
         );
 
         this.gsm.clearWinnersAndAwardPots();
-        let awardPots: number[] = [];
+        const awardPots: number[] = [];
         winningPlayers.forEach((playerUUID) => {
             this.audioService.playHeroWinSFX(playerUUID);
             this.gsm.updatePlayer(playerUUID, {
                 chips: this.gsm.getChips(playerUUID) + amountsWon[playerUUID],
                 winner: true,
             });
+            this.gsm.addHandWinner(playerUUID);
             awardPots.push(amountsWon[playerUUID]);
         });
         this.gsm.setAwardPots(awardPots);
     }
 
     ejectStackedPlayers() {
-        // TODO this duplicates gameStateManager.standUpPlayer
-        this.gsm.updatePlayers((player) => (player.chips === 0 ? { sitting: false, seatNumber: -1 } : {}));
+        this.gsm.forEveryPlayer((player) => {
+            if (player.chips === 0) {
+                this.gsm.standUpPlayer(player.uuid);
+            }
+        });
     }
 
     placeBetsInPot() {

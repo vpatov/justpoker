@@ -25,6 +25,7 @@ import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { Subject } from 'rxjs';
 import { logGameState } from '../../../ui/src/shared/util/util';
+import { LedgerService } from './ledgerService';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -34,6 +35,7 @@ export class StateGraphManager {
         private readonly gameStateManager: GameStateManager,
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
+        private readonly ledgerService: LedgerService,
     ) {}
 
     private updateEmitter: Subject<void> = new Subject();
@@ -230,7 +232,7 @@ export class StateGraphManager {
             case GameStage.SHOW_START_OF_BETTING_ROUND: {
                 this.gameStateManager.incrementBettingRoundStage();
                 this.gamePlayService.resetBettingRoundActions();
-                this.gamePlayService.dealCards();
+                this.gamePlayService.initializeBettingRound();
                 if (!this.gameStateManager.isAllInRunOut()) {
                     this.gamePlayService.setFirstToActAtStartOfBettingRound();
                 }
@@ -260,8 +262,11 @@ export class StateGraphManager {
             }
 
             case GameStage.POST_HAND_CLEANUP: {
+                this.ledgerService.incrementHandsWonForPlayers(this.gameStateManager.getHandWinners());
+
                 this.gameStateManager.clearStateOfRoundInfo();
                 this.gamePlayService.ejectStackedPlayers();
+
                 this.executeQueuedServerActions();
                 break;
             }
