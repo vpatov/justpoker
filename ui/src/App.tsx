@@ -8,6 +8,7 @@ import Game from "./Game";
 import { TestGame } from "./shared/models/uiState";
 
 import Home from "./Home";
+import Ledger from "./Ledger";
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                         render={(props) => <GameContainer useTestGame />}
                     />
                     <Route path="/game" component={GameContainer} />
+                    <Route path="/ledger" component={Ledger} />
                     <Route path="/" component={Home} />
                 </Switch>
             </Router>
