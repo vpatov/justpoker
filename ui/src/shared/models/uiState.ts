@@ -42,7 +42,7 @@ export declare interface Controller {
     adminButtons?: ActionButton[];
     dealInNextHand: boolean;
     toAct?: boolean;
-    straddle: boolean;
+    willStraddle: boolean;
     lastBettingRoundAction: BettingRoundAction;
 }
 
@@ -187,7 +187,7 @@ export const cleanController: Controller = {
     lastBettingRoundAction: NOT_IN_HAND,
     min: 0,
     max: 0,
-    straddle: false,
+    willStraddle: false,
     dealInNextHand: true,
     sizingButtons: [],
     bettingRoundActionButtons: [],
@@ -283,7 +283,7 @@ export const TestGame: UiGameState = {
         max: 43000,
         timeBanks: 2,
         dealInNextHand: false,
-        straddle: true,
+        willStraddle: true,
         sizingButtons: [
             {
                 label: '1/2',
