@@ -159,7 +159,7 @@ export class StateConverter {
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             adminButtons: this.getValidAdminButtons(clientUUID),
             dealInNextHand: !hero.sittingOut,
-            straddle: hero.straddle,
+            willStraddle: hero.willStraddle,
         };
 
         return controller;

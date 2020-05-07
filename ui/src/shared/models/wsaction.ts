@@ -45,7 +45,7 @@ export declare interface ClientChatMessage {
 }
 
 export declare interface ClientStraddleRequest {
-    straddle: boolean;
+    willStraddle: boolean;
 }
 
 export declare interface BootPlayerRequest {
