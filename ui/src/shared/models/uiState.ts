@@ -172,12 +172,13 @@ export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [5, 4],
 ];
 
-export const cleanUiChatLog: UiChatLog = {
-    messages: [],
-};
+export function getCleanUiChatLog(): UiChatLog {
+    return {messages: []};
+}
 
 /* Clean Controller for init. */
-export const cleanController: Controller = {
+export function getCleanController() : Controller  {
+    return {
     toAct: false,
     lastBettingRoundAction: NOT_IN_HAND,
     min: 0,
@@ -187,10 +188,12 @@ export const cleanController: Controller = {
     sizingButtons: [],
     bettingRoundActionButtons: [],
     adminButtons: [],
-    timeBanks: 0,
-};
+    timeBanks: 0
+    };
+}
 
-export const cleanGlobal: Global = {
+export function getCleanGlobal(): Global {
+    return {
     heroIsAdmin: false,
     heroIsSeated: false,
     isGameInProgress: false,
@@ -200,11 +203,13 @@ export const cleanGlobal: Global = {
     gameType: GameType.NLHOLDEM,
     canStartGame: false,
     unqueueAllBettingRoundActions: true,
+    };
 };
 
-export const CleanGame: UiGameState = {
-    global: cleanGlobal,
-    controller: cleanController,
+export function getCleanGame(): UiGameState {
+    return {
+    global: getCleanGlobal(),
+    controller: getCleanController(),
     table: {
         spots: 9,
         activePot: 0,
@@ -212,10 +217,11 @@ export const CleanGame: UiGameState = {
         communityCards: [],
     },
     players: [],
-};
+    };
+}
 
 export const CleanRootState: UiState = {
-    game: CleanGame,
+    game: getCleanGame(),
     audio: SoundByte.NONE,
     chat: {
         senderName: 'Vasia',

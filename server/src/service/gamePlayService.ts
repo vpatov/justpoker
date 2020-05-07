@@ -321,7 +321,7 @@ export class GamePlayService {
                 this.gsm.dealCardsToBoard(3);
                 this.gsm.forEveryPlayer((player) => {
                     if (this.gsm.isPlayerInHand(player.uuid)) {
-                        this.ledgerService.incrementFlopsSeen(player.uuid);
+                        this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(player.uuid));
                     }
                 });
                 break;

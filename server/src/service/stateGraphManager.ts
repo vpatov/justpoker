@@ -24,7 +24,7 @@ import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { Subject } from 'rxjs';
-import { logGameState } from '../../../ui/src/shared/util/util';
+import { logGameState, printObj } from '../../../ui/src/shared/util/util';
 import { LedgerService } from './ledgerService';
 
 const MAX_CONDITION_DEPTH = 3;
@@ -262,12 +262,17 @@ export class StateGraphManager {
             }
 
             case GameStage.POST_HAND_CLEANUP: {
-                this.ledgerService.incrementHandsWonForPlayers(this.gameStateManager.getHandWinners());
+                this.ledgerService.incrementHandsWonForPlayers(
+                    [...this.gameStateManager.getHandWinners()].map((playerUUID) =>
+                        this.gameStateManager.getClientByPlayerUUID(playerUUID),
+                    ),
+                );
 
                 this.gameStateManager.clearStateOfRoundInfo();
                 this.gamePlayService.ejectStackedPlayers();
 
                 this.executeQueuedServerActions();
+                printObj(this.ledgerService.getLedger());
                 break;
             }
         }
@@ -276,6 +281,17 @@ export class StateGraphManager {
         if (delay) {
             this.timerManager.setStateTimer(() => this.processTimeout(), delay);
         }
+
+        this.updateLedger();
+    }
+
+    updateLedger() {
+        this.gameStateManager.forEveryClient((client) => {
+            const player = this.gameStateManager.getPlayerByClientUUID(client.uuid);
+            if (player) {
+                this.ledgerService.setCurrentChips(client.uuid, this.gameStateManager.getChips(player.uuid));
+            }
+        });
     }
 
     executeQueuedServerAction(action: QueuedServerAction) {

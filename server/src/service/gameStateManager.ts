@@ -4,7 +4,7 @@ import WebSocket from 'ws';
 import { strict as assert } from 'assert';
 import {
     GameState,
-    cleanGameState,
+    getCleanGameState,
     ServerStateKey,
     GameStage,
     ALL_STATE_KEYS,
@@ -22,7 +22,7 @@ import {
     BettingRoundActionType,
 } from '../../../ui/src/shared/models/game';
 import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
-import { Player, cleanPlayer } from '../../../ui/src/shared/models/player';
+import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
@@ -35,7 +35,7 @@ import { LedgerService } from './ledgerService';
 
 @Service()
 export class GameStateManager {
-    private gameState: Readonly<GameState> = cleanGameState;
+    private gameState: Readonly<GameState> = getCleanGameState();
 
     // TODO place updatedKey logic into a seperate ServerStateManager file.
     updatedKeys: Set<ServerStateKey> = ALL_STATE_KEYS;
@@ -88,7 +88,7 @@ export class GameStateManager {
 
     createNewPlayer(name: string, chips: number): Player {
         return {
-            ...cleanPlayer,
+            ...getCleanPlayer(),
             uuid: generateUUID(),
             name,
             chips,
@@ -119,6 +119,10 @@ export class GameStateManager {
 
     forEveryPlayer(performFn: (player: Player) => void) {
         Object.entries(this.gameState.players).forEach(([uuid, player]) => performFn(player));
+    }
+
+    forEveryClient(performFn: (client: ConnectedClient) => void) {
+        [...this.gameState.table.activeConnections.entries()].forEach(([clientUUID, client]) => performFn(client));
     }
 
     getConnectedClient(clientUUID: string) {
@@ -568,7 +572,7 @@ export class GameStateManager {
 
     initGame(newGameForm: NewGameForm) {
         this.gameState = {
-            ...cleanGameState,
+            ...getCleanGameState(),
             table: this.initTable(newGameForm),
             gameParameters: {
                 smallBlind: Number(newGameForm.smallBlind),

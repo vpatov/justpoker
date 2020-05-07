@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { ServerLedger, cleanLedgerRow } from '../../../ui/src/shared/models/table';
+import { ServerLedger, getCleanLedgerRow } from '../../../ui/src/shared/models/ledger';
 
 @Service()
 export class LedgerService {
@@ -9,7 +9,7 @@ export class LedgerService {
     initRow(clientUUID: string) {
         if (!this.getLedgerRow(clientUUID)) {
             this.ledger[clientUUID] = {
-                ...cleanLedgerRow,
+                ...getCleanLedgerRow(),
                 clientUUID,
             };
         }
@@ -56,10 +56,14 @@ export class LedgerService {
         this.getLedgerRow(clientUUID).timeMostRecentHand = timeMostRecentHand;
     }
 
-    /** Helper method for incrementHandsWon */
-    incrementHandsWonForPlayers(playerUUIDs: Iterable<string>) {
-        for (const playerUUID of playerUUIDs) {
-            this.incrementHandsWon(playerUUID);
+    setCurrentChips(clientUUID: string, currentChips: number) {
+        this.getLedgerRow(clientUUID).currentChips = currentChips;
+    }
+
+    /** Helper method for incrementHandsWon. */
+    incrementHandsWonForPlayers(clientUUIDs: Iterable<string>) {
+        for (const clientUUID of clientUUIDs) {
+            this.incrementHandsWon(clientUUID);
         }
     }
 

@@ -111,42 +111,44 @@ export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerActi
 export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
 
 // TODO create partially clean game that can be used to clear state of round info.
-export const cleanGameState: GameState = {
-    gameStage: GameStage.NOT_IN_PROGRESS,
-    queuedServerActions: [],
-    players: {},
-    board: [],
-    gameParameters: {
-        smallBlind: 0,
-        bigBlind: 0,
-        gameType: GameType.NLHOLDEM,
-        maxBuyin: 0,
-        timeToAct: 0,
-        maxPlayers: 9,
-    },
-    dealerUUID: '',
-    smallBlindUUID: '',
-    bigBlindUUID: '',
-    bettingRoundStage: BettingRoundStage.WAITING,
-    firstToAct: '',
-    currentPlayerToAct: '',
-    lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
-    shouldDealNextHand: false,
-    deck: {
-        cards: [],
-    },
-    pots: [],
-    awardPots: [],
-    handWinners: new Set<string>(),
-    table: {
-        uuid: '',
-        activeConnections: new Map(),
-        password: '',
-        admin: '',
-    },
-    timeCurrentPlayerTurnStarted: 0,
-    serverTime: 0,
-    minRaiseDiff: 0,
-    previousRaise: 0,
-    partialAllInLeftOver: 0,
-};
+export function getCleanGameState(): GameState {
+    return {
+        gameStage: GameStage.NOT_IN_PROGRESS,
+        queuedServerActions: [],
+        players: {},
+        board: [],
+        gameParameters: {
+            smallBlind: 0,
+            bigBlind: 0,
+            gameType: GameType.NLHOLDEM,
+            maxBuyin: 0,
+            timeToAct: 0,
+            maxPlayers: 9,
+        },
+        dealerUUID: '',
+        smallBlindUUID: '',
+        bigBlindUUID: '',
+        bettingRoundStage: BettingRoundStage.WAITING,
+        firstToAct: '',
+        currentPlayerToAct: '',
+        lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
+        shouldDealNextHand: false,
+        deck: {
+            cards: [],
+        },
+        pots: [],
+        awardPots: [],
+        handWinners: new Set<string>(),
+        table: {
+            uuid: '',
+            activeConnections: new Map(),
+            password: '',
+            admin: '',
+        },
+        timeCurrentPlayerTurnStarted: 0,
+        serverTime: 0,
+        minRaiseDiff: 0,
+        previousRaise: 0,
+        partialAllInLeftOver: 0,
+    };
+}

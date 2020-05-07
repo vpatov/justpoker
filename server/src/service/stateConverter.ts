@@ -27,7 +27,7 @@ import { printObj } from '../../../ui/src/shared/util/util';
 import {
     Global,
     Controller,
-    cleanController,
+    getCleanController,
     ActionButton,
     SizingButton,
     COMMON_BB_SIZINGS,
@@ -86,7 +86,7 @@ export class StateConverter {
                       global: this.getUIGlobal(clientUUID),
                       controller: clientPlayerIsSeated
                           ? this.getUIController(clientUUID, heroPlayerUUID)
-                          : cleanController,
+                          : getCleanController(),
                       table: {
                           spots: 9, // TODO configure
                           activePot: this.gameStateManager.getActivePotValue(),

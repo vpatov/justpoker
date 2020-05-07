@@ -59,21 +59,23 @@ export declare interface Player {
     readonly chipsAtStartOfHand: number;
 }
 
-export const cleanPlayer: Player = {
-    uuid: '',
-    name: '',
-    chips: 0,
-    holeCards: [],
-    handDescription: '',
-    bestHand: null,
-    sitting: false,
-    sittingOut: false,
-    straddle: false,
-    seatNumber: -1,
-    lastActionType: BettingRoundActionType.NOT_IN_HAND,
-    winner: false,
-    betAmount: 0,
-    cardsAreHidden: true,
-    chipsAtStartOfHand: 0,
-    chipDelta: 0,
-};
+export function getCleanPlayer(): Player {
+    return {
+        uuid: '',
+        name: '',
+        chips: 0,
+        holeCards: [],
+        handDescription: '',
+        bestHand: null,
+        sitting: false,
+        sittingOut: false,
+        straddle: false,
+        seatNumber: -1,
+        lastActionType: BettingRoundActionType.NOT_IN_HAND,
+        winner: false,
+        betAmount: 0,
+        cardsAreHidden: true,
+        chipsAtStartOfHand: 0,
+        chipDelta: 0,
+    };
+}

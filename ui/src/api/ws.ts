@@ -12,6 +12,7 @@ import {
 // for correctly constructing messages.
 
 export class WsServer {
+    static clientID: string|null;
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
 
@@ -22,9 +23,9 @@ export class WsServer {
                 ? "ws://35.192.65.13:8080"
                 : "ws://localhost:8080";
 
-        const clientID = docCookies.getItem("clientID");
-        if (clientID) {
-            wsURI += `?clientID=${clientID}`;
+        WsServer.clientID = docCookies.getItem("clientID");
+        if (WsServer.clientID) {
+            wsURI += `?clientID=${WsServer.clientID}`;
         }
 
         WsServer.ws = new WebSocket(wsURI, []);

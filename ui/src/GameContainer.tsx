@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import Game from './Game';
-import { CleanGame } from './shared/models/uiState';
 import { WsServer } from './api/ws';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
