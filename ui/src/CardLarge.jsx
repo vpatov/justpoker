@@ -4,6 +4,7 @@ import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Suit from './Suit';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,12 +32,11 @@ const useStyles = makeStyles((theme) => ({
         left: '10%',
     },
     suit: {
-        fontSize: '4.8vmin',
-        lineHeight: '5vmin',
+        width: '4.8vmin',
+        height: '4.8vmin',
         position: 'absolute',
         bottom: '5%',
         right: '5%',
-        opacity: 0.7,
     },
     partOfWinningHand: {
         transform: 'translateY(33%)',
@@ -73,7 +73,7 @@ function CardLarge(props) {
             >
                 {generateStringFromRank(rank)}
             </Typography>
-            <Typography className={classnames(classes.text, classes.suit)}>{generateStringFromSuit(suit)}</Typography>
+            <Suit suit={suit} className={classes.suit} />
         </div>
     );
 }
