@@ -181,7 +181,7 @@ function ControllerComp(props: ControllerProps) {
         bettingRoundActionButtons: actionButtons,
         dealInNextHand,
         timeBanks,
-        straddle,
+        willStraddle,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
@@ -257,7 +257,7 @@ function ControllerComp(props: ControllerProps) {
     function onToggleStraddle() {
         WsServer.send({
             actionType: ActionType.SETPLAYERSTRADDLE,
-            request: { straddle: !straddle } as ClientWsMessageRequest,
+            request: { willStraddle: !willStraddle } as ClientStraddleRequest as ClientWsMessageRequest,
         });
     }
 
@@ -355,7 +355,7 @@ function ControllerComp(props: ControllerProps) {
                 {allowStraddle ? (
                     <FormControlLabel
                         classes={{ label: classes.checkLabel }}
-                        control={<Checkbox className={classes.button} checked={straddle} onChange={onToggleStraddle} />}
+                        control={<Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />}
                         label="Straddle"
                     />
                 ) : null}
