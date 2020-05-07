@@ -416,7 +416,7 @@ export class GameStateManager {
 
     getPlayerStraddle(playerUUID: string): boolean {
         const player = this.getPlayer(playerUUID);
-        return player.straddle;
+        return player.willStraddle;
     }
 
     getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
@@ -670,7 +670,7 @@ export class GameStateManager {
     }
 
     setPlayerStraddle(playerUUID: string, straddle: boolean) {
-        this.updatePlayer(playerUUID, { straddle: straddle });
+        this.updatePlayer(playerUUID, { willStraddle: straddle });
     }
 
     sitDownPlayer(playerUUID: string, seatNumber: number) {

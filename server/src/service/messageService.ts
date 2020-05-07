@@ -139,7 +139,7 @@ export class MessageService {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.setPlayerStraddle(player.uuid, req.straddle);
+                this.gameStateManager.setPlayerStraddle(player.uuid, req.willStraddle);
             },
             updates: [ServerStateKey.GAMESTATE],
         },
