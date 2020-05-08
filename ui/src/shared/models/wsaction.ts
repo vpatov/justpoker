@@ -17,6 +17,9 @@ export enum ActionType {
     SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
     BOOTPLAYER = 'BOOTPLAYER',
     LEAVETABLE = 'LEAVETABLE',
+}
+
+export enum UiActionType {
     VOLUME = 'VOLUME',
     SETTINGS = 'SETTINGS',
     ADMIN = 'ADMIN',

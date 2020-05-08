@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ActionType } from './wsaction';
+import { ActionType, UiActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
@@ -65,7 +65,7 @@ export declare interface BettingRoundActionButton {
 
 export declare interface MenuButton {
     label: string;
-    action: ActionType;
+    action: ActionType | UiActionType;
 }
 
 export declare interface UiCard {
@@ -150,33 +150,33 @@ export const RAISE_BUTTON: BettingRoundActionButton = {
     label: 'Raise',
 };
 
-export const START_GAME_BUTTON = {
+export const START_GAME_BUTTON: MenuButton = {
     action: ActionType.STARTGAME,
     label: 'Start Game',
 };
 
-export const STOP_GAME_BUTTON = {
+export const STOP_GAME_BUTTON: MenuButton = {
     action: ActionType.STOPGAME,
     label: 'Stop Game',
 };
 
-export const LEAVE_TABLE_BUTTON = {
+export const LEAVE_TABLE_BUTTON: MenuButton = {
     action: ActionType.LEAVETABLE,
     label: 'Leave Table',
 };
 
-export const VOLUME_BUTTON = {
-    action: ActionType.VOLUME,
+export const VOLUME_BUTTON: MenuButton = {
+    action: UiActionType.VOLUME,
     label: 'Volume',
 };
 
-export const SETTINGS_BUTTON = {
-    action: ActionType.SETTINGS,
+export const SETTINGS_BUTTON: MenuButton = {
+    action: UiActionType.SETTINGS,
     label: 'Settings',
 };
 
-export const ADMIN_BUTTON = {
-    action: ActionType.ADMIN,
+export const ADMIN_BUTTON: MenuButton = {
+    action: UiActionType.ADMIN,
     label: 'Admin',
 };
 

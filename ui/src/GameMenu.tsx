@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { selectMenuButtons } from './store/selectors';
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
-import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
+import { ActionType, UiActionType, ClientWsMessageRequest } from './shared/models/wsaction';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -64,9 +64,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function getIcon(action, iconClass) {
     const ACTION_TO_ICON = {
-        [ActionType.ADMIN]: <AdminIcon className={iconClass} />,
-        [ActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
-        [ActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
+        [UiActionType.ADMIN]: <AdminIcon className={iconClass} />,
+        [UiActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
+        [UiActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
         [ActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
         [ActionType.STOPGAME]: <StopIcon className={iconClass} />,
         [ActionType.STARTGAME]: <StartIcon className={iconClass} />,
@@ -89,20 +89,23 @@ function GameMenu(props) {
 
     function handleClickButton(action) {
         switch (action) {
-            case ActionType.ADMIN:
+            case UiActionType.ADMIN:
                 break;
-            case ActionType.SETTINGS:
+            case UiActionType.SETTINGS:
                 break;
-            case ActionType.VOLUME:
+            case UiActionType.VOLUME:
                 break;
             case ActionType.LEAVETABLE:
                 sendServerAction(ActionType.LEAVETABLE);
-
-            case ActionType.STOPGAME:
-                sendServerAction(ActionType.STOPGAME);
+                break;
 
             case ActionType.STARTGAME:
                 sendServerAction(ActionType.STARTGAME);
+                break;
+
+            case ActionType.STOPGAME:
+                sendServerAction(ActionType.STOPGAME);
+                break;
 
             default:
                 break;

@@ -13,9 +13,13 @@ import {
     BET_BUTTON,
     START_GAME_BUTTON,
     STOP_GAME_BUTTON,
+    ADMIN_BUTTON,
+    SETTINGS_BUTTON,
+    VOLUME_BUTTON,
     UiChatMessage,
     BettingRoundActionButton,
     UiCard,
+    MenuButton,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -103,6 +107,7 @@ export class StateConverter {
                       players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
                           this.transformPlayer(player, heroPlayerUUID),
                       ),
+                      menu: this.getValidMenuButtons(clientUUID),
                   }
                 : undefined,
             audio: this.audioUpdated() ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
@@ -119,7 +124,7 @@ export class StateConverter {
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
-            heroIsAdmin: this.gameStateManager.getAdminUUID() === clientUUID,
+            heroIsAdmin: this.gameStateManager.isPlayerAdmin(clientUUID),
             heroIsSeated: clientPlayerIsSeated,
             bigBlind: this.gameStateManager.getBB(),
             smallBlind: this.gameStateManager.getSB(),
@@ -156,7 +161,6 @@ export class StateConverter {
                       this.createPotSizeButton(numerator, denominator, potSize),
                   ),
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
-            adminButtons: this.getValidAdminButtons(clientUUID),
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
         };
@@ -198,12 +202,22 @@ export class StateConverter {
         return this.gameStateManager.getMinimumBetSizeForPlayer(heroPlayerUUID);
     }
 
-    getValidAdminButtons(clientUUID: string): ActionButton[] {
-        // TODO admin functionality
-        const client = this.gameStateManager.getConnectedClient(clientUUID);
-        const adminButtons = [];
-        adminButtons.push(this.gameStateManager.shouldDealNextHand() ? STOP_GAME_BUTTON : START_GAME_BUTTON);
-        return adminButtons;
+    getValidMenuButtons(clientUUID: string): MenuButton[] {
+        const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+
+        const menuButtons = [SETTINGS_BUTTON, VOLUME_BUTTON]; // currently these are always visible
+
+        if (this.gameStateManager.isPlayerAdmin(clientUUID)) {
+            menuButtons.push(ADMIN_BUTTON);
+            if (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) {
+                menuButtons.push(START_GAME_BUTTON);
+            } else if (this.gameStateManager.shouldDealNextHand()) {
+                menuButtons.push(STOP_GAME_BUTTON);
+            }
+        }
+
+        // TODO leave table button
+        return menuButtons;
     }
 
     transformAudioForPlayer(playerUUID: string): SoundByte {

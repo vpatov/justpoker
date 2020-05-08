@@ -823,6 +823,10 @@ export class GameStateManager {
         }, 0);
     }
 
+    isPlayerAdmin(clientUUID: string): boolean {
+        return this.getAdminUUID() === clientUUID;
+    }
+
     isPlayerAllIn(playerUUID: string): boolean {
         const player = this.getPlayer(playerUUID);
         return player.lastActionType === BettingRoundActionType.ALL_IN;
