@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { WsServer } from './api/ws';
-import { AnimationTrigger, AnimationState } from './shared/models/animationState';
+import { AnimationTrigger } from './shared/models/animationState';
 
 import anime from 'animejs/lib/anime.es.js';
 
