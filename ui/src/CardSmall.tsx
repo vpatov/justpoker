@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
     },
     rank: {
         letterSpacing: '-0.4vmin',
-
         position: 'absolute',
         fontSize: '2.8vmin',
         lineHeight: '2.8vmin',
@@ -38,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
         top: '6%',
         left: '10%',
     },
-
     suit: {
         position: 'absolute',
         width: '2.8vmin',
@@ -46,7 +44,6 @@ const useStyles = makeStyles((theme) => ({
         top: '42%',
         right: '3%',
     },
-
     sideRank: {
         fontWeight: 'bold',
         marginTop: '0.2vmin',
@@ -55,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'left',
         fontSize: '1.9vmin',
     },
-
     sideSuit: {
         marginLeft: '0.4vmin',
         textAlign: 'left',

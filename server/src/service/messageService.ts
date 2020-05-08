@@ -148,6 +148,12 @@ export class MessageService {
             perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.bootPlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
+        // TODO impement leave table
+        [ActionType.LEAVETABLE]: {
+            validation: (_, __) => NO_ERROR,
+            perform: () => null,
+            updates: [],
+        },
     };
 
     processMessage(message: ClientWsMessage, clientUUID: string) {

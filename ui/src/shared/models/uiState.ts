@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ActionType } from './wsaction';
+import { ActionType, UiActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
@@ -19,6 +19,7 @@ export declare interface UiGameState {
     controller: Controller;
     table: Table;
     players: Player[];
+    menu: MenuButton[];
 }
 
 export declare interface Global {
@@ -39,7 +40,6 @@ export declare interface Controller {
     timeBanks?: number;
     sizingButtons: SizingButton[];
     bettingRoundActionButtons: BettingRoundActionButton[];
-    adminButtons?: ActionButton[];
     dealInNextHand: boolean;
     toAct?: boolean;
     willStraddle: boolean;
@@ -61,6 +61,11 @@ export declare interface BettingRoundActionButton {
     label: string;
     action: BettingRoundActionType;
     disabled?: boolean;
+}
+
+export declare interface MenuButton {
+    label: string;
+    action: ActionType | UiActionType;
 }
 
 export declare interface UiCard {
@@ -145,19 +150,34 @@ export const RAISE_BUTTON: BettingRoundActionButton = {
     label: 'Raise',
 };
 
-export const START_GAME_BUTTON = {
+export const START_GAME_BUTTON: MenuButton = {
     action: ActionType.STARTGAME,
     label: 'Start Game',
 };
 
-export const STOP_GAME_BUTTON = {
+export const STOP_GAME_BUTTON: MenuButton = {
     action: ActionType.STOPGAME,
     label: 'Stop Game',
 };
 
-export const ADD_CHIPS_BUTTON = {
-    action: ActionType.ADDCHIPS,
-    label: 'Add Chips',
+export const LEAVE_TABLE_BUTTON: MenuButton = {
+    action: ActionType.LEAVETABLE,
+    label: 'Leave Table',
+};
+
+export const VOLUME_BUTTON: MenuButton = {
+    action: UiActionType.VOLUME,
+    label: 'Volume',
+};
+
+export const SETTINGS_BUTTON: MenuButton = {
+    action: UiActionType.SETTINGS,
+    label: 'Settings',
+};
+
+export const ADMIN_BUTTON: MenuButton = {
+    action: UiActionType.ADMIN,
+    label: 'Admin',
 };
 
 export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
@@ -165,6 +185,15 @@ export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUT
 export const FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, RAISE_BUTTON];
 
 export const ALL_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, BET_BUTTON];
+
+export const ALL_MENU_BUTTONS = [
+    START_GAME_BUTTON,
+    STOP_GAME_BUTTON,
+    LEAVE_TABLE_BUTTON,
+    VOLUME_BUTTON,
+    SETTINGS_BUTTON,
+    ADMIN_BUTTON,
+];
 
 /* Common bet sizes */
 export const COMMON_BB_SIZINGS: Array<number> = [2, 3, 4, 5];
@@ -191,7 +220,6 @@ export const cleanController: Controller = {
     dealInNextHand: true,
     sizingButtons: [],
     bettingRoundActionButtons: [],
-    adminButtons: [],
     timeBanks: 0,
 };
 
@@ -209,6 +237,7 @@ export const cleanGlobal: Global = {
 
 export const CleanGame: UiGameState = {
     global: cleanGlobal,
+    menu: [],
     controller: cleanController,
     table: {
         spots: 9,
@@ -265,6 +294,7 @@ let positions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 shuffle(positions);
 
 export const TestGame: UiGameState = {
+    menu: ALL_MENU_BUTTONS,
     global: {
         heroIsSeated: true,
         heroIsAdmin: true,
@@ -303,7 +333,6 @@ export const TestGame: UiGameState = {
             },
         ],
         bettingRoundActionButtons: ALL_ACTION_BUTTONS,
-        // adminButtons: [START_GAME_BUTTON],
     },
     table: {
         spots: 9,
