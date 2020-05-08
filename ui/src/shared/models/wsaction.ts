@@ -15,7 +15,11 @@ export enum ActionType {
     SETCHIPS = 'SETCHIPS',
     BETACTION = 'BETACTION',
     SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
-    BOOTPLAYER = "BOOTPLAYER"
+    BOOTPLAYER = 'BOOTPLAYER',
+    LEAVETABLE = 'LEAVETABLE',
+    VOLUME = 'VOLUME',
+    SETTINGS = 'SETTINGS',
+    ADMIN = 'ADMIN',
 }
 
 export declare interface SitDownRequest {

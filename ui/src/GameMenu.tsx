@@ -1,6 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
-
+import { useSelector } from 'react-redux';
+import { selectMenuButtons } from './store/selectors';
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
 import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
@@ -10,7 +11,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 import AdminIcon from '@material-ui/icons/SupervisorAccount';
-import SeatIcon from '@material-ui/icons/EventSeat';
 import QuitIcon from '@material-ui/icons/Clear';
 import StartIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
@@ -62,9 +62,22 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function Default() {
+function getIcon(action, iconClass) {
+    const ACTION_TO_ICON = {
+        [ActionType.ADMIN]: <AdminIcon className={iconClass} />,
+        [ActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
+        [ActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
+        [ActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
+        [ActionType.STOPGAME]: <StopIcon className={iconClass} />,
+        [ActionType.STARTGAME]: <StartIcon className={iconClass} />,
+    };
+    return ACTION_TO_ICON[action];
+}
+
+function GameMenu(props) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
+    const menuButtons = useSelector(selectMenuButtons);
 
     const handleOpen = () => {
         setOpen(true);
@@ -74,23 +87,26 @@ function Default() {
         setOpen(false);
     };
 
-    const actions = [
-        { icon: <StartIcon className={classes.icon} />, name: 'Start Game', onClick: onClickStartGame },
-        { icon: <StopIcon className={classes.icon} />, name: 'Stop Game', onClick: onClickStopGame },
-        { icon: <SeatIcon className={classes.icon} />, name: 'Sit Out' },
-        { icon: <QuitIcon className={classes.icon} />, name: 'Quit' },
-        { icon: <VolumeOnIcon className={classes.icon} />, name: 'Volume' },
-        { icon: <SettingsIcon className={classes.icon} />, name: 'Settings' },
-        { icon: <AdminIcon className={classes.icon} />, name: 'Admin' },
-        { icon: <FlipIcon className={classes.icon} />, name: 'Flip Table', onClick: () => flipTable() },
-    ];
+    function handleClickButton(action) {
+        switch (action) {
+            case ActionType.ADMIN:
+                break;
+            case ActionType.SETTINGS:
+                break;
+            case ActionType.VOLUME:
+                break;
+            case ActionType.LEAVETABLE:
+                sendServerAction(ActionType.LEAVETABLE);
 
-    function onClickStartGame() {
-        sendServerAction(ActionType.STARTGAME);
-    }
+            case ActionType.STOPGAME:
+                sendServerAction(ActionType.STOPGAME);
 
-    function onClickStopGame() {
-        sendServerAction(ActionType.STOPGAME);
+            case ActionType.STARTGAME:
+                sendServerAction(ActionType.STARTGAME);
+
+            default:
+                break;
+        }
     }
 
     function sendServerAction(action) {
@@ -110,10 +126,13 @@ function Default() {
                     })}
                 >
                     {open ? (
-                        actions.map((action) => (
-                            <Tooltip title={action.name} placement="right">
-                                <IconButton className={classes.iconButton} onClick={action.onClick}>
-                                    {action.icon}
+                        menuButtons.map((button) => (
+                            <Tooltip title={button.label} placement="right">
+                                <IconButton
+                                    className={classes.iconButton}
+                                    onClick={() => handleClickButton(button.action)}
+                                >
+                                    {getIcon(button.action, classes.icon)}
                                 </IconButton>
                             </Tooltip>
                         ))
@@ -128,4 +147,4 @@ function Default() {
     );
 }
 
-export default Default;
+export default GameMenu;
