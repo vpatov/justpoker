@@ -26,10 +26,8 @@ export class GamePlayService {
     constructor(
         private readonly gsm: GameStateManager,
         private readonly handSolverService: HandSolverService,
-        private readonly timerManager: TimerManager,
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
-
         private readonly validationService: ValidationService,
     ) {}
 
@@ -141,24 +139,21 @@ export class GamePlayService {
     }
 
     bet(betAmount: number, playerPlacingBlindBetUUID?: string) {
-        this.audioService.playBetSFX();
-        // TODO is playerPlacingBlindBet correct design?
-        // after all, a blind is a special case of a normal bet,
-        // so in theory it belongs in this method as a code path.
-        // However, the blinds are placed only once per hand whereas
-        // bets take place an arbitrary number of times. Perhaps then it
-        // is better to separate them.
-
-        // place the bet (or the blind)
-        const currentPlayerToAct = playerPlacingBlindBetUUID
+        const playerPlacingBet = playerPlacingBlindBetUUID
             ? playerPlacingBlindBetUUID
             : this.gsm.getCurrentPlayerToAct();
-        this.gsm.setPlayerBetAmount(currentPlayerToAct, betAmount);
-        const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
 
-        // if we're placing blinds and not all in, set the last action to waiting_to_act
+        // It is possible that this bet method is called with a betAmount greater
+        // than the amount of chips the player has (for example, player is placing
+        // a $2 BB but they only have $1). To simplify app logic this is handled here.
+        const chips = this.gsm.getChips(playerPlacingBet);
+        const actualBetAmount = betAmount > chips ? chips : betAmount;
+        this.gsm.setPlayerBetAmount(playerPlacingBet, actualBetAmount);
+        const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(playerPlacingBet);
+
+        // if we're placing blinds and not all in, set the last action to place blind
         this.gsm.setPlayerLastActionType(
-            currentPlayerToAct,
+            playerPlacingBet,
             isPlayerAllIn
                 ? BettingRoundActionType.ALL_IN
                 : playerPlacingBlindBetUUID
@@ -175,11 +170,6 @@ export class GamePlayService {
            playerCanRaise = facingRaise || waitingToAct
            facingRaise = lastAmountPutInPot > yourLastBet + minRaiseDiff ???
         */
-
-        // actualBetAmount should never differ from action.amount.
-        // TODO remove assertion
-        const actualBetAmount = this.gsm.getPlayerBetAmount(currentPlayerToAct);
-        assert(actualBetAmount === betAmount);
 
         const previousRaise = this.gsm.getPreviousRaise();
         const minRaiseDiff = betAmount - previousRaise;
@@ -199,10 +189,12 @@ export class GamePlayService {
             // If SB/BB are going all in with less than a blind preflop, if you have more than one BB
             // you cant call less then the BB, you must put in at least a BB
             this.gsm.updateGameState({
-                minRaiseDiff: playerPlacingBlindBetUUID ? this.gsm.getBB() : actualBetAmount - previousRaise,
-                previousRaise: playerPlacingBlindBetUUID ? this.gsm.getBB() : actualBetAmount,
+                minRaiseDiff: Math.max(this.gsm.getBB(), actualBetAmount - previousRaise),
+                previousRaise: Math.max(this.gsm.getBB(), actualBetAmount),
             });
         }
+
+        this.audioService.playBetSFX();
     }
 
     callBet() {
@@ -244,44 +236,43 @@ export class GamePlayService {
         const smallBlindUUID =
             numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID);
         const bigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(smallBlindUUID);
-        const postBigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+        const straddleUUID = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
 
-        const isHeadsUp = this.gsm.getPlayersReadyToPlay().length === 2;
-        const isStraddle = this.gsm.getPlayerStraddle(postBigBlindUUID); //TODO implement straddle logic
+        const willPlayerStraddle = this.gsm.willPlayerStraddle(straddleUUID);
+        const placeStraddle = willPlayerStraddle && numPlayersReadyToPlay > 2;
 
         this.bet(SB, smallBlindUUID);
         this.bet(BB, bigBlindUUID);
+        if (placeStraddle) {
+            this.bet(BB * 2, straddleUUID);
+        }
 
         this.gsm.updateGameState({
             smallBlindUUID,
             bigBlindUUID,
+            straddleUUID: placeStraddle ? straddleUUID : '',
         });
-
-        // let nextToAct;
-        // if (!isHeadsUp) {
-        //     // no straddle
-        //     nextToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
-        // } else {
-        //     // heads up
-        //     nextToAct = dealerUUID;
-        // }
-
-        assert(this.gsm.getMinRaiseDiff() === BB && this.gsm.getPreviousRaise() === BB);
     }
 
     setFirstToActAtStartOfBettingRound() {
         const bigBlindUUID = this.gsm.getBigBlindUUID();
         const dealerUUID = this.gsm.getDealerUUID();
+        const straddleUUID = this.gsm.getStraddleUUID();
+        const headsUp = this.gsm.getPlayersReadyToPlay().length === 2;
+        let firstToAct = '';
 
-        // If heads up preflop, dealer is first to act
-        const firstToAct =
-            this.gsm.getBettingRoundStage() === BettingRoundStage.PREFLOP
-                ? this.gsm.getPlayersReadyToPlay().length === 2
-                    ? dealerUUID
-                    : this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID)
-                : this.gsm.getNextPlayerInHandUUID(dealerUUID);
+        if (this.gsm.getBettingRoundStage() === BettingRoundStage.PREFLOP) {
+            if (headsUp) {
+                firstToAct = dealerUUID;
+            } else if (straddleUUID) {
+                firstToAct = this.gsm.getNextPlayerInHandUUID(straddleUUID);
+            } else {
+                firstToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+            }
+        } else {
+            firstToAct = this.gsm.getNextPlayerInHandUUID(dealerUUID);
+        }
 
-        this.gsm.clearCurrentPlayerToAct();
         this.gsm.setFirstToAct(firstToAct);
     }
 
