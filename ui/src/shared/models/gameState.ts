@@ -45,6 +45,8 @@ export declare interface GameState {
 
     bigBlindUUID: Readonly<string>;
 
+    straddleUUID: Readonly<string>;
+
     bettingRoundStage: Readonly<BettingRoundStage>;
 
     firstToAct: Readonly<string>;
@@ -115,6 +117,7 @@ export const cleanGameState: GameState = {
     dealerUUID: '',
     smallBlindUUID: '',
     bigBlindUUID: '',
+    straddleUUID: '',
     bettingRoundStage: BettingRoundStage.WAITING,
     firstToAct: '',
     currentPlayerToAct: '',

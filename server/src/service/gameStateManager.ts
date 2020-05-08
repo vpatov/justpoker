@@ -188,6 +188,10 @@ export class GameStateManager {
         return this.gameState.smallBlindUUID;
     }
 
+    getStraddleUUID() {
+        return this.gameState.straddleUUID;
+    }
+
     getBoard() {
         return this.gameState.board;
     }
@@ -414,7 +418,7 @@ export class GameStateManager {
         return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
     }
 
-    getPlayerStraddle(playerUUID: string): boolean {
+    willPlayerStraddle(playerUUID: string): boolean {
         const player = this.getPlayer(playerUUID);
         return player.willStraddle;
     }
@@ -669,8 +673,8 @@ export class GameStateManager {
         };
     }
 
-    setPlayerStraddle(playerUUID: string, straddle: boolean) {
-        this.updatePlayer(playerUUID, { willStraddle: straddle });
+    setWillPlayerStraddle(playerUUID: string, willStraddle: boolean) {
+        this.updatePlayer(playerUUID, { willStraddle });
     }
 
     sitDownPlayer(playerUUID: string, seatNumber: number) {
@@ -760,9 +764,7 @@ export class GameStateManager {
     }
 
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
-        const chips = this.getPlayer(playerUUID).chips;
-        // TODO remove this logic from the setter.
-        this.updatePlayer(playerUUID, { betAmount: betAmount > chips ? chips : betAmount });
+        this.updatePlayer(playerUUID, { betAmount });
     }
 
     clearWinnersAndDeltas() {
@@ -772,7 +774,7 @@ export class GameStateManager {
         }));
     }
 
-    clearStateOfRoundInfo() {
+    clearStateOfHandInfo() {
         this.updatePlayers((player) => ({
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
             holeCards: [],
@@ -792,6 +794,9 @@ export class GameStateManager {
             deck: {
                 cards: [],
             },
+            smallBlindUUID: '',
+            bigBlindUUID: '',
+            straddleUUID: '',
         });
     }
 
@@ -848,10 +853,6 @@ export class GameStateManager {
         return this.getChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
     }
 
-    // TODO this should go in gamePlay service
-    // TODO redesign this
-    // TODO it would probably be correct to create a PLACE_BLIND action such that
-    // you dont have to bake extra logic around WAITING_TO_ACT
     haveAllPlayersActed() {
         return this.getPlayersDealtIn().every(
             (player) =>
