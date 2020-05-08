@@ -13,7 +13,6 @@ import {
     BET_BUTTON,
     START_GAME_BUTTON,
     STOP_GAME_BUTTON,
-    ADD_CHIPS_BUTTON,
     UiChatMessage,
     BettingRoundActionButton,
     UiCard,
