@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { generateStringFromSuit, generateStringFromRank, SUITS } from './utils';
+import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Suit from './Suit';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
     },
-    flexCard: {
+    sideCard: {
         margin: '0 -1.5vmin',
         boxShadow: '-0.2vmin 0px 0.8vmin 0px rgba(0,0,0,0.75)',
         display: 'flex',
@@ -27,25 +28,39 @@ const useStyles = makeStyles((theme) => ({
         alignContent: 'flex-start',
         justifyContent: 'flex-start',
     },
-    text: {
-        letterSpacing: '-0.2vmin',
-        fontSize: '2.4vmin',
+    rank: {
+        letterSpacing: '-0.4vmin',
+
+        position: 'absolute',
+        fontSize: '2.8vmin',
+        lineHeight: '2.8vmin',
         fontWeight: 'bold',
-        marginTop: '12%',
+        top: '6%',
+        left: '10%',
     },
-    flexText: {
+
+    suit: {
+        position: 'absolute',
+        width: '2.8vmin',
+        height: '2.8vmin',
+        top: '42%',
+        right: '3%',
+    },
+
+    sideRank: {
+        fontWeight: 'bold',
         marginTop: '0.2vmin',
         marginLeft: '0.5vmin',
         width: '100%',
         textAlign: 'left',
         fontSize: '1.9vmin',
     },
-    flexTextSuit: {
+
+    sideSuit: {
         marginLeft: '0.4vmin',
-        margin: '0',
-        width: '100%',
         textAlign: 'left',
-        fontSize: '1.7vmin',
+        width: '1.7vmin',
+        height: '1.7vmin',
     },
     hidden: {
         ...theme.custom.HIDDEN,
@@ -57,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.light,
         textShadow: `0.16vmin 0.13vmin ${theme.palette.primary.main}`,
     },
-    flexTextHidden: {
+    sideTextHidden: {
         marginLeft: '20%',
         fontSize: '3vmin',
     },
@@ -85,8 +100,8 @@ function CardSmall(props) {
 
     if (hidden) {
         return (
-            <div className={classnames(classes.root, classes.hidden, { [classes.flexCard]: shouldFlex }, className)}>
-                <Typography className={classnames(classes.hiddenText, { [classes.flexTextHidden]: shouldFlex })}>
+            <div className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}>
+                <Typography className={classnames(classes.hiddenText, { [classes.sideTextHidden]: shouldFlex })}>
                     JP
                 </Typography>
             </div>
@@ -96,18 +111,16 @@ function CardSmall(props) {
         <div
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
-                [classes.flexCard]: shouldFlex,
+                [classes.sideCard]: shouldFlex,
             })}
         >
             <Typography
-                className={classnames(classes.text, { [classes.flexText]: shouldFlex })}
-                style={rank === 'T' ? { marginLeft: '-0.3%' } : {}}
+                className={shouldFlex ? classes.sideRank : classes.rank}
+                style={rank === 'T' ? { marginLeft: '-0.5%', left: '2%' } : {}}
             >
                 {generateStringFromRank(rank)}
             </Typography>
-            <Typography className={classnames(classes.text, { [classes.flexTextSuit]: shouldFlex })}>
-                {generateStringFromSuit(suit)}
-            </Typography>
+            <Suit suit={suit} className={shouldFlex ? classes.sideSuit : classes.suit} />
         </div>
     );
 }
