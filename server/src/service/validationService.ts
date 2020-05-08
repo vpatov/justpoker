@@ -285,6 +285,11 @@ export class ValidationService {
         // Blinds aren't considered a betAction, so make sure our bet matches
         // the highest bet if we are checking. This way, only the big blind and
         // those who post a blind can check.
+        // TODO Figure out: There might be a scenario where this isn't true. I've noticed in Ignition,
+        // that if you sit in out of position and opt to post a blind early, and then some
+        // other condition is met (that im not sure of at the moment), it makes you post more than
+        // the big blind. However, others do not have to call the extra amount, they can still
+        // just call the blind. It functions sort of like an ante I guess.
         if (playerBetAmt != this.gsm.getHighestBet()) {
             return {
                 errorType: ErrorType.ILLEGAL_BETTING_ACTION,
@@ -294,12 +299,10 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    // You can fold anytime. In the future, would be nice to implement
+    // You can fold anytime, that you can act. In the future, would be nice to implement
     // "Are you sure you want to fold?" prompt if user tries to fold
     // without facing a bet
     private validateFoldAction(clientUUID: string): ValidationResponse {
-        // TODO ensure that player has cards. If they do not have cards, they should never be able to
-        // perform this action unless theres a bug.
         return NO_ERROR;
     }
 
@@ -313,7 +316,6 @@ export class ValidationService {
       bet is at least the previous raice
     - player has at least X chips
     - player hasnt folded (if a player has folded, it should never be their turn to act)
-
     */
     private validateBetAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
         // TODO remove this from here and put this extra checking in a type validation layer.
@@ -365,10 +367,22 @@ export class ValidationService {
 
         return NO_ERROR;
 
-        // TODO
-        // if (!playerIsFacingRaise && !playerHasntActedYet){
-        //     cant bet
-        // }
+        // TODO - Handle unique edge case:
+        /*
+            A: 200 chips, B: 200 chips, C: 110 chips. sb/bb: 1/2
+            A places SB of 1.
+            B places BB of 2.
+            C is first to act, bets 50.
+            A raises to 100.
+            B calls 100.
+            C goes all-in for 110.
+            C's all in is NOT considered a raise, becaues it less than the minimum legal raise amount (150).
+            Therefore, when the action comes back to A, he can only call or fold, but cannot raise.
+
+            Instead of crafting extra conditions and special cases for CALL and BET bettingRoundActionTypes, it
+            might be simpler to create a new enum member, ALL_IN_NOT_RAISE, set it appropriately for player C in
+            the scenario above, and check for that type in the validateCall/Bet/Check actions.
+        */
     }
 
     // Preconditions
