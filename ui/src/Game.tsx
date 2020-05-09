@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         position: 'relative',
         flex: '1 1 100%',
+        overflow: 'hidden',
     },
     table: {
         height: '85%',

@@ -22,11 +22,12 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'column',
-            paddingLeft: '1.2vmin',
+
             width: '15%',
             ...theme.custom.CHAT,
         },
         chatLog: {
+            paddingTop: '1vh',
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
@@ -49,12 +50,12 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         messageTextField: {
             flexGrow: 1,
-            marginRight: '1vmin',
-            marginBottom: '1vmin',
+            margin: '0.2vh 0.4vw',
+
             marginTop: 0,
         },
         chatMessage: {
-            margin: '0.5vmin 0.2vmin',
+            margin: '0.2vh 0.4vw',
             fontSize: '1.4vmin',
         },
         senderName: {
@@ -136,7 +137,7 @@ function ChatLog(props: ChatLogProps) {
                     setUnreadChats(false);
                     setHideChat(!hideChat);
                 }}
-                style={hideChat ? {} : { right: '17%' }}
+                style={hideChat ? {} : { right: 'calc(15% + 15px)' }}
             >
                 {`${hideChat ? 'Show' : 'Hide'} Chat`}
             </Button>

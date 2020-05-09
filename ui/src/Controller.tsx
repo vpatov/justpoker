@@ -112,7 +112,7 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.1vmin',
         },
         checkLabel: {
-            fontSize: '1.1vmin',
+            fontSize: '1.4vmin',
         },
         incButton: {
             padding: 0,
@@ -133,11 +133,11 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         handLabel: {
             marginTop: '2vmin',
-            fontSize: '1.2vw',
+            fontSize: '1.6vmin',
             color: theme.palette.primary.main,
         },
         toActLabel: {
-            fontSize: '1.2vw',
+            fontSize: '1.6vmin',
             color: theme.palette.primary.main,
             animation: '$blinking 1.3s linear infinite;',
         },
