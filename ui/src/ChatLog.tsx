@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
             zIndex: 5,
             height: '100%',
             display: 'flex',
+            flexShrink: '0',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'column',
@@ -67,12 +68,11 @@ const useStyles = makeStyles((theme: Theme) =>
             color: 'rgb(220,210,230)',
         },
         hideButton: {
-            margin: '2vmin',
             fontSize: '1vmin',
             zIndex: 5,
             position: 'absolute',
-            top: '4vmin',
-            right: '0',
+            top: '5vh',
+            right: 15,
         },
         unread: {
             borderColor: theme.palette.secondary.main,
@@ -138,7 +138,7 @@ function ChatLog(props: ChatLogProps) {
                     setUnreadChats(false);
                     setHideChat(!hideChat);
                 }}
-                style={hideChat ? {} : { right: 270 }}
+                style={hideChat ? {} : { right: 330 }}
             >
                 {`${hideChat ? 'Show' : 'Hide'} Chat`}
             </Button>

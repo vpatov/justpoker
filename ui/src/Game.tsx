@@ -32,14 +32,6 @@ const useStyles = makeStyles((theme) => ({
         height: '15%',
         width: '100%',
     },
-    hideButton: {
-        margin: '2vmin',
-        fontSize: '1vmin',
-        zIndex: 5,
-        position: 'absolute',
-        top: 0,
-        right: '0',
-    },
 }));
 
 function Game(props) {

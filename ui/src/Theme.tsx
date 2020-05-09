@@ -169,10 +169,27 @@ export const CUSTOM_THEME = {
                         width: '100%',
                     },
                 },
+                minWidth: '24px',
             },
 
             outlined: {
-                // padding: "0.4vmin 0.8vmin",
+                padding: '0.6vmin 0.8vmin',
+            },
+        },
+        MuiIconButton: {
+            root: {
+                padding: '1vmin',
+            },
+        },
+        MuiSvgIcon: {
+            root: {
+                width: '2.3vmin',
+                height: '2.3vmin',
+            },
+        },
+        MuiCheckbox: {
+            root: {
+                padding: '0.8vmin',
             },
         },
     },

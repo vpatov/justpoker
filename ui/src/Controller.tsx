@@ -122,6 +122,7 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: 0,
             fontSize: '2vmin',
             fontWeight: 'bold',
+            width: '2vw',
         },
         incButtonLeft: {
             marginRight: '1vmin',
@@ -132,14 +133,15 @@ const useStyles = makeStyles((theme: Theme) =>
         sizeButton: {
             margin: 6,
             fontSize: '1vmin',
+            width: '4vw',
         },
         handLabel: {
             marginTop: '2vmin',
-            fontSize: '2vmin',
+            fontSize: '1.2vw',
             color: theme.palette.primary.main,
         },
         toActLabel: {
-            fontSize: '2vmin',
+            fontSize: '1.2vw',
             color: theme.palette.primary.main,
             animation: '$blinking 1.3s linear infinite;',
         },
@@ -257,7 +259,7 @@ function ControllerComp(props: ControllerProps) {
     function onToggleStraddle() {
         WsServer.send({
             actionType: ActionType.SETPLAYERSTRADDLE,
-            request: { willStraddle: !willStraddle } as ClientStraddleRequest as ClientWsMessageRequest,
+            request: ({ willStraddle: !willStraddle } as ClientStraddleRequest) as ClientWsMessageRequest,
         });
     }
 
@@ -355,7 +357,9 @@ function ControllerComp(props: ControllerProps) {
                 {allowStraddle ? (
                     <FormControlLabel
                         classes={{ label: classes.checkLabel }}
-                        control={<Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />}
+                        control={
+                            <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
+                        }
                         label="Straddle"
                     />
                 ) : null}
