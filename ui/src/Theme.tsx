@@ -177,7 +177,6 @@ export const CUSTOM_THEME = {
                 },
                 minWidth: '24px',
             },
-
             outlined: {
                 padding: '0.6vmin 0.8vmin',
             },

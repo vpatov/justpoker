@@ -133,11 +133,11 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         handLabel: {
             marginTop: '2vmin',
-            fontSize: '1.6vmin',
+            fontSize: '1.8vmin',
             color: theme.palette.primary.main,
         },
         toActLabel: {
-            fontSize: '1.6vmin',
+            fontSize: '1.8vmin',
             color: theme.palette.primary.main,
             animation: '$blinking 1.3s linear infinite;',
         },
