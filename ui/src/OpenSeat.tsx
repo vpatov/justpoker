@@ -10,7 +10,6 @@ import grey from '@material-ui/core/colors/grey';
 import Typography from '@material-ui/core/Typography';
 import { ClientWsMessageRequest } from './shared/models/wsaction';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
-import Slider from '@material-ui/core/Slider';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,7 +23,8 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     field: {
-        width: '30%',
+        marginTop: '2vmin',
+        width: '35%',
     },
     sit: {
         fontSize: '1.3vmin',
@@ -58,10 +58,6 @@ function OpenSeat(props) {
 
     function onChangeBuyin(event: any) {
         setBuyin(event.target.value);
-    }
-
-    function handleSliderChange(event: any, newValue: any) {
-        setBuyin(Number(newValue));
     }
 
     function invalidBuyin() {
@@ -123,7 +119,6 @@ function OpenSeat(props) {
                         value={name}
                         maxChars={24}
                     />
-                    <Slider value={buyin} onChange={handleSliderChange} min={minBuyin} max={maxBuyin} step={1} />
                     <TextFieldWrap
                         type="number"
                         className={classes.field}
@@ -135,6 +130,7 @@ function OpenSeat(props) {
                         }}
                         max={maxBuyin}
                         error={invalidBuyin()}
+                        helperText={invalidBuyin() ? `Min Buy In is ${minBuyin}` : ''}
                     />
                 </DialogContent>
                 <DialogActions>
