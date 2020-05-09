@@ -1,7 +1,7 @@
 {
     "scripts": {
         "preinstall": "cd server && npm install; cd ..; cd ui && npm install; ",
-        "server": "cd server && nodemon start",
+        "server": "cd server && npm run start",
         "ui": "cd ui && npm start",
         "start": "concurrently \"npm run server\" \"npm run ui\""
     },
