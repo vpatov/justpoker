@@ -25,9 +25,7 @@ const useStyles = makeStyles((theme) => ({
     table: {
         height: '85%',
     },
-    chatlog: {
-        width: '300px',
-    },
+    chatlog: {},
     controller: {
         height: '15%',
         width: '100%',

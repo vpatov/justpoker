@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
             flexDirection: 'column',
             paddingLeft: '1.2vmin',
+            width: '15%',
             ...theme.custom.CHAT,
         },
         chatLog: {
@@ -51,9 +52,6 @@ const useStyles = makeStyles((theme: Theme) =>
             marginRight: '1vmin',
             marginBottom: '1vmin',
             marginTop: 0,
-        },
-        messageTextFieldInput: {
-            fontSize: '1.4vmin',
         },
         chatMessage: {
             margin: '0.5vmin 0.2vmin',
@@ -138,7 +136,7 @@ function ChatLog(props: ChatLogProps) {
                     setUnreadChats(false);
                     setHideChat(!hideChat);
                 }}
-                style={hideChat ? {} : { right: 330 }}
+                style={hideChat ? {} : { right: '17%' }}
             >
                 {`${hideChat ? 'Show' : 'Hide'} Chat`}
             </Button>
@@ -159,18 +157,11 @@ function ChatLog(props: ChatLogProps) {
                 </div>
                 <div className={classes.chatInputSection}>
                     <TextFieldWrap
-                        label="Send Message"
+                        placeholder="Send Message"
                         value={draftMessage}
                         className={classes.messageTextField}
-                        margin="dense"
                         onChange={(event) => {
-                            console.log('onC', event);
                             setDraftMessage(event.target.value);
-                        }}
-                        InputProps={{
-                            classes: {
-                                input: classes.messageTextFieldInput,
-                            },
                         }}
                         onKeyPress={(event) => onTextAreaPressEnter(event)}
                         multiline={true}

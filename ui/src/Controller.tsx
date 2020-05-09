@@ -101,10 +101,6 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '5vmin',
             marginRight: '1vmin',
         },
-        betTextFieldInput: {
-            fontSize: '1.4vmin',
-            padding: '1vmin',
-        },
         actionButton: {
             height: '40%',
             width: '10vmin',
