@@ -1,8 +1,8 @@
 import brown from '@material-ui/core/colors/brown';
 import green from '@material-ui/core/colors/green';
 import blue from '@material-ui/core/colors/blue';
-import cyan from '@material-ui/core/colors/cyan';
-import lightBlue from '@material-ui/core/colors/lightBlue';
+import teal from '@material-ui/core/colors/teal';
+import yellow from '@material-ui/core/colors/yellow';
 import indigo from '@material-ui/core/colors/indigo';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import red from '@material-ui/core/colors/red';
@@ -21,6 +21,7 @@ export declare interface ThemePreferences {
 }
 
 function computeTableGradient(shade) {
+    return `radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%)`;
     const c = Color(shade[100]);
     const light = c.darken(0.62).desaturate(0.1);
     const dark = c.darken(0.83).desaturate(0.3);
@@ -29,16 +30,16 @@ function computeTableGradient(shade) {
 
 function computeBackgroundGradient(shade) {
     const c = Color(shade[100]);
-    const light = c.darken(0.65).desaturate(0.7);
-    const dark = c.darken(0.75).desaturate(0.8);
+    const light = c.darken(0.5).desaturate(0.3);
+    const dark = c.darken(0.6).desaturate(0.4);
     return `linear-gradient(360deg, ${dark.string()} 0%, ${light.string()})`;
 }
 
 export const Background = {
     blue: computeBackgroundGradient(blue),
-    cyan: computeBackgroundGradient(cyan),
     purple: computeBackgroundGradient(deepPurple),
-    'light Blue': computeBackgroundGradient(lightBlue),
+    teal: computeBackgroundGradient(teal),
+    yellow: computeBackgroundGradient(yellow),
     brown: computeBackgroundGradient(brown),
     indigo: computeBackgroundGradient(indigo),
     red: computeBackgroundGradient(red),
@@ -48,9 +49,9 @@ export const Background = {
 
 export const Table = {
     blue: computeBackgroundGradient(blue),
-    cyan: computeTableGradient(cyan),
     purple: computeTableGradient(deepPurple),
-    'light Blue': computeTableGradient(lightBlue),
+    teal: computeBackgroundGradient(teal),
+    yellow: computeBackgroundGradient(yellow),
     brown: computeTableGradient(brown),
     indigo: computeTableGradient(indigo),
     red: computeTableGradient(red),

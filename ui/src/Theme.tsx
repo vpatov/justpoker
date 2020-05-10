@@ -45,7 +45,8 @@ export const CUSTOM_THEME = {
             backgroundColor: lightGreen[900],
         },
         HIDDEN: {
-            backgroundColor: `${blueGrey[900]}`,
+            backgroundColor: `${grey[900]}`,
+            backgroundImage: ``,
         },
         FOLDED: {
             opacity: 0.8,
@@ -76,7 +77,6 @@ export const CUSTOM_THEME = {
         },
         WINNING_CARD: {
             transition: 'boxShadow 0.4s ease-in-out, transform 0.4s ease-in-out ',
-            border: '0.12vmin solid white',
             boxShadow: `0px 0px 6px 2px white`,
         },
         CONTROLLER: {
@@ -91,8 +91,8 @@ export const CUSTOM_THEME = {
         },
         CHAT: {
             backgroundColor: grey[800],
-            background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
-            boxShadow: ` 0 4px 4px 4px rgba(0,0,0,0.2)`,
+            background: `linear-gradient(360deg, rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.63) 100%);`,
+            boxShadow: ` 0 0 0.4vmin 0.4vmin rgba(30,30,30,0.5)`,
         },
         ACTION_BUTTONS: {
             FOLD: {
@@ -159,7 +159,7 @@ export const CUSTOM_THEME = {
             },
             input: {
                 padding: '1vmin',
-                fontSize: '1.5vmin',
+                fontSize: '1.3vmin',
             },
             multiline: {
                 padding: '1vmin',

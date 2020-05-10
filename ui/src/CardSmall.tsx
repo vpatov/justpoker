@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
+        boxShadow: '0vmin 0px 0.5vmin 0vmin rgba(0,0,0,0.5)',
     },
     sideCard: {
         margin: '0 -1.5vmin',
