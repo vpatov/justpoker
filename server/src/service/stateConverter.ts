@@ -131,6 +131,7 @@ export class StateConverter {
             allowStraddle: this.gameStateManager.getAllowStraddle(),
             gameType: this.gameStateManager.getGameType(),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
+            gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
             unqueueAllBettingRoundActions: this.gameStateManager.getGameStage() === GameStage.INITIALIZE_NEW_HAND,
         };
 
@@ -209,7 +210,10 @@ export class StateConverter {
 
         if (this.gameStateManager.isPlayerAdmin(clientUUID)) {
             menuButtons.push(ADMIN_BUTTON);
-            if (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) {
+            if (
+                (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) ||
+                this.gameStateManager.gameWillStopAfterHand()
+            ) {
                 menuButtons.push(START_GAME_BUTTON);
             } else if (this.gameStateManager.shouldDealNextHand()) {
                 menuButtons.push(STOP_GAME_BUTTON);

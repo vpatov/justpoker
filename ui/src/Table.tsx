@@ -85,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
 
     startGame: {
         zIndex: 5,
+        transform: 'translateY(60%)',
         fontSize: '4vmin',
     },
 }));

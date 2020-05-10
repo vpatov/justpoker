@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1vmin',
             zIndex: 5,
             position: 'absolute',
-            top: '4vmin',
+            bottom: '17%',
             right: '0',
         },
         unread: {
@@ -138,7 +138,7 @@ function ChatLog(props: ChatLogProps) {
                     setUnreadChats(false);
                     setHideChat(!hideChat);
                 }}
-                style={hideChat ? {} : { right: 270 }}
+                style={hideChat ? {} : { right: 260 }}
             >
                 {`${hideChat ? 'Show' : 'Hide'} Chat`}
             </Button>

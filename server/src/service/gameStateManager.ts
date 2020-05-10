@@ -410,8 +410,19 @@ export class GameStateManager {
      */
     canPlayerStartGame(playerUUID: string) {
         return (
-            this.isPlayerReadyToPlay(playerUUID) && this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress()
+            this.isPlayerReadyToPlay(playerUUID) &&
+            this.getPlayersReadyToPlay().length >= 2 &&
+            !this.isGameInProgress() &&
+            this.isPlayerAdmin(this.getClientByPlayerUUID(playerUUID))
         );
+    }
+
+    /**
+     * Used to toggle whether the admins menus play button is start or stop while hand is occuring.
+     * Additionally globally toggles message to all players that game will be paused after next hand.
+     */
+    gameWillStopAfterHand() {
+        return this.isGameInProgress() && this.shouldDealNextHand() === false;
     }
 
     isGameInProgress() {
