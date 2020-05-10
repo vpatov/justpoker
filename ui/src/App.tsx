@@ -12,6 +12,7 @@ import Home from './Home';
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);
     newTheme.custom.BACKGROUND.background = prefs.background;
+    newTheme.custom.TABLE.background = prefs.table;
 
     if (prefs.twoColor) {
         newTheme.custom.DIAMONDS = newTheme.custom.HEARTS as any;
@@ -22,19 +23,24 @@ function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     }
     return newTheme;
 }
-export const ThemeSetter = React.createContext({ curTheme: CUSTOM_THEME, themeSetter: (tp: ThemePreferences) => null });
+export const ThemeSetter = React.createContext({
+    curfPrefs: DEFAULT_PREFERENCES.theme,
+    themeSetter: (tp: ThemePreferences) => null,
+});
 
 const initTheme = loadPreferencesIntoTheme(CUSTOM_THEME, DEFAULT_PREFERENCES.theme);
 function App() {
     const [theme, setTheme] = useState(initTheme);
+    const [pref, setPrefs] = useState(DEFAULT_PREFERENCES.theme);
 
     function setNewTheme(tp: ThemePreferences) {
+        setPrefs(tp);
         setTheme((oldTheme) => loadPreferencesIntoTheme(oldTheme, tp));
         return null;
     }
 
     return (
-        <ThemeSetter.Provider value={{ curTheme: theme, themeSetter: setNewTheme }}>
+        <ThemeSetter.Provider value={{ curfPrefs: pref, themeSetter: setNewTheme }}>
             <ThemeProvider theme={createMuiTheme(theme)}>
                 <Router>
                     <Switch>
