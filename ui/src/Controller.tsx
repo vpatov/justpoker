@@ -245,6 +245,13 @@ function ControllerComp(props: ControllerProps) {
         return false;
     }
 
+    function onClickTimeBank(){
+        WsServer.send({
+            actionType: ActionType.USETIMEBANK,
+            request: {} as ClientWsMessageRequest
+        });
+    }
+
     function onToggleSitOutNextHand() {
         WsServer.send({
             actionType: dealInNextHand ? ActionType.SITOUT : ActionType.SITIN,
@@ -359,17 +366,16 @@ function ControllerComp(props: ControllerProps) {
                         label="Straddle"
                     />
                 ) : null}
-
-                {timeBanks !== undefined ? (
+                {
                     <Button
                         className={classes.timeBankButton}
                         variant="outlined"
-                        onClick={() => null}
+                        onClick={() => onClickTimeBank()}
                         disabled={timeBanks === 0}
                     >
                         {`Time Bank (${timeBanks})`}
                     </Button>
-                ) : null}
+                }
             </div>
         </div>
     );

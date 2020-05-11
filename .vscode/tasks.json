@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "server/",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "npm: build - server",
+			"detail": "tsc"
+		},
+		{
+			"type": "npm",
+			"script": "debug",
+			"path": "server/",
+			"problemMatcher": [],
+			"label": "npm: debug - server",
+			"detail": "npm run build && node inspect ./dist/server/server/src/server/server.js"
+		}
+	]
+}

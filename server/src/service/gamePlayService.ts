@@ -39,22 +39,34 @@ export class GamePlayService {
         this.gsm.updateGameState({ shouldDealNextHand: false });
     }
 
-    setCurrentPlayerToAct() {
+    computeAndSetCurrentPlayerToAct() {
         const previousPlayerToAct = this.gsm.getCurrentPlayerToAct();
 
         // if there is nor previous player to act, then we are starting the betting round.
         const currentPlayerToAct = previousPlayerToAct
             ? this.gsm.getNextPlayerInHandUUID(previousPlayerToAct)
             : this.gsm.getFirstToAct();
-        // const currentPlayerToAct = this.gsm.haveAllPlayersActed() ? '' : playerUUID;
+
         this.gsm.setCurrentPlayerToAct(currentPlayerToAct);
         this.audioService.playHeroTurnToActSFX(currentPlayerToAct);
+    }
 
-        // start the timer if currentPlayerToAct has been set
-        console.log(`Setting player timer for playerUUID: ${currentPlayerToAct}`);
-        this.gsm.updateGameState({
-            timeCurrentPlayerTurnStarted: Date.now(),
-        });
+    setTimeCurrentPlayerTurnStarted() {
+        if (this.gsm.getTimeBanksUsedThisAction() === 0) {
+            this.gsm.updateGameState({
+                timeCurrentPlayerTurnStarted: Date.now(),
+            });
+        }
+    }
+
+    computeTimeRemainingToAct() {
+        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const timeRemaining =
+            this.gsm.getTimeToAct() +
+            this.gsm.getSumTimeBankValueThisAction(currentPlayerToAct) -
+            this.gsm.getCurrentPlayerTurnElapsedTime();
+        console.log(timeRemaining);
+        return timeRemaining;
     }
 
     timeOutPlayer() {
@@ -96,6 +108,12 @@ export class GamePlayService {
                     : {};
             } else return {};
         });
+    }
+
+    useTimeBankAction() {
+        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        this.gsm.incrementTimeBanksUsedThisAction();
+        this.gsm.decrementTimeBanksLeft(currentPlayerToAct);
     }
 
     /* Betting Round Actions */

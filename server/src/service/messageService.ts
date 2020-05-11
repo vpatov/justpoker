@@ -150,9 +150,14 @@ export class MessageService {
         },
         // TODO impement leave table
         [ActionType.LEAVETABLE]: {
-            validation: (_, __) => NO_ERROR,
+            validation: (uuid, req) => NO_ERROR,
             perform: () => null,
             updates: [],
+        },
+        [ActionType.USETIMEBANK]: {
+            validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),
+            perform: () => this.gamePlayService.useTimeBankAction(),
+            updates: [ServerStateKey.GAMESTATE],
         },
     };
 

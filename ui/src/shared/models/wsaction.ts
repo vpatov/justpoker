@@ -17,6 +17,7 @@ export enum ActionType {
     SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
     BOOTPLAYER = 'BOOTPLAYER',
     LEAVETABLE = 'LEAVETABLE',
+    USETIMEBANK = 'USETIMEBANK',
 }
 
 export enum UiActionType {

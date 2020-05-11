@@ -22,7 +22,7 @@ import {
     BettingRoundActionType,
 } from '../../../ui/src/shared/models/game';
 import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
-import { Player, cleanPlayer } from '../../../ui/src/shared/models/player';
+import { Player, cleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
@@ -95,6 +95,7 @@ export class GameStateManager {
             uuid: generateUUID(),
             name,
             chips,
+            timeBanksLeft: TIME_BANKS_DEFAULT,
         };
     }
 
@@ -222,6 +223,36 @@ export class GameStateManager {
         return this.gameState.gameParameters.timeToAct;
     }
 
+    getTotalPlayerTimeToAct(playerUUID: string) {
+        return this.getTimeToAct() + this.getSumTimeBankValueThisAction(playerUUID);
+    }
+
+    getTimeBanksLeft(playerUUID: string) {
+        return this.getPlayer(playerUUID).timeBanksLeft;
+    }
+
+    decrementTimeBanksLeft(playerUUID: string) {
+        this.updatePlayer(playerUUID, { timeBanksLeft: this.getTimeBanksLeft(playerUUID) - 1 });
+    }
+
+    getTimeBanksUsedThisAction() {
+        return this.gameState.timeBanksUsedThisAction;
+    }
+
+    getSumTimeBankValueThisAction(playerUUID: string) {
+        return this.getTimeBanksUsedThisAction() * this.getTimeBankValue();
+    }
+
+    incrementTimeBanksUsedThisAction() {
+        this.updateGameState({
+            timeBanksUsedThisAction: this.getTimeBanksUsedThisAction() + 1,
+        });
+    }
+
+    clearTimeBanksUsedThisAction() {
+        this.updateGameState({ timeBanksUsedThisAction: 0 });
+    }
+
     getPots() {
         return this.gameState.pots;
     }
@@ -282,6 +313,10 @@ export class GameStateManager {
         return this.gameState.gameParameters.bigBlind;
     }
 
+    getTimeBankValue() {
+        return this.gameState.gameParameters.timeBankValue;
+    }
+
     getBettingRoundActionTypes() {
         return Object.values(this.gameState.players)
             .filter((player) => this.wasPlayerDealtIn(player.uuid))
@@ -336,8 +371,8 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
-    canCurrentPlayerAct() {
-        return this.gameState.currentPlayerToAct && this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
+    gameIsWaitingForBetAction() {
+        return this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
     }
 
     getMinimumBetSize() {
@@ -562,6 +597,7 @@ export class GameStateManager {
                 bigBlind: Number(newGameForm.bigBlind),
                 gameType: newGameForm.gameType || GameType.NLHOLDEM,
                 timeToAct: Number(newGameForm.timeToAct) * 1000,
+                timeBankValue: 60 * 1000, // TODO add to game form
                 maxBuyin: Number(newGameForm.maxBuyin),
                 maxPlayers: 9,
                 // consider adding timeToAct and maxPlayers to form
@@ -798,6 +834,7 @@ export class GameStateManager {
             winner: false,
             betAmount: 0,
             cardsAreHidden: true,
+            timeBanksUsedThisAction: 0,
         }));
 
         this.updateGameState({

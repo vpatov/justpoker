@@ -164,6 +164,7 @@ export class StateConverter {
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
+            timeBanks: hero.timeBanksLeft,
         };
 
         return controller;
@@ -284,25 +285,25 @@ export class StateConverter {
     }
 
     transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
-        const toAct =
+        const herosTurnToAct =
             this.gameStateManager.getCurrentPlayerToAct() === player.uuid &&
-            this.gameStateManager.canCurrentPlayerAct();
-        const newPlayer = {
+            this.gameStateManager.gameIsWaitingForBetAction();
+        const uiPlayer = {
             stack: player.chips - player.betAmount,
             uuid: player.uuid,
             ...this.transformPlayerCards(player, heroPlayerUUID),
-            playerTimer: toAct
+            playerTimer: herosTurnToAct
                 ? {
                       timeElapsed: this.gameStateManager.getCurrentPlayerTurnElapsedTime() / 1000,
 
                       // subtract one second such that the server timer ends just a little bit after
                       // the visual component of the UI indicates that the turn is over, to compensate
                       // and prevent from the vice-versa scenario (which would be way worse)
-                      timeLimit: this.gameStateManager.getTimeToAct() / 1000 - 1,
+                      timeLimit: this.gameStateManager.getTotalPlayerTimeToAct(heroPlayerUUID) / 1000 - 1,
                   }
                 : undefined,
             name: player.name,
-            toAct: toAct,
+            toAct: herosTurnToAct,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
             bet: player.betAmount,
@@ -311,8 +312,8 @@ export class StateConverter {
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
         };
-        //  as UIPlayer;
-        return newPlayer;
+        console.log(uiPlayer.playerTimer);
+        return uiPlayer;
     }
 
     getUIState(clientUUID: string): UiState {
