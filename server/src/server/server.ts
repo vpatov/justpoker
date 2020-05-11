@@ -124,6 +124,7 @@ class Server {
         }
     }
 
+    //refactor this mess of a function
     initWSSListeners() {
         this.wss.removeAllListeners();
         this.wss.on('connection', (ws: WebSocket, req) => {
@@ -174,7 +175,6 @@ class Server {
         });
     }
 
-    //refactor this mess of a function
     init() {
         this.app = express();
         this.initRoutes();
@@ -185,6 +185,7 @@ class Server {
             this.sendUpdatesToClients();
             this.audioService.reset();
             this.animationService.reset();
+            this.chatService.clearLastMessage();
         });
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {

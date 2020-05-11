@@ -160,7 +160,7 @@ export class MessageService {
         this.validationService.ensureClientExists(clientUUID);
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);
-        this.gameStateManager.updatedKeys.clear();
+        this.gameStateManager.clearUpdatedKeys();
         if (!hasError(response)) {
             console.log(
                 `clientUUID: ${clientUUID}, messagePayload: ${message.request}, actionType: ${message.actionType}`,
