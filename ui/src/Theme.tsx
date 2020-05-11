@@ -56,7 +56,7 @@ export const CUSTOM_THEME = {
             background: 'linear-gradient(360deg, rgba(50,50,63) 0%, rgb(25,25,40));',
         },
         TABLE: {
-            border: `0.5vmin solid rgba(0,0,0,0.7)`,
+            border: `0.8vmin solid rgba(0,0,0,0.5)`,
             boxShadow: '0 2px 6px 3px rgba(0,0,0,0.4)',
             background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
         },
