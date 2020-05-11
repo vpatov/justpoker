@@ -104,10 +104,7 @@ function ChatLog(props: ChatLogProps) {
     useEffect(scrollToBottom, [messages, hideChat]);
 
     useEffect(() => {
-        const succ = WsServer.openWs();
-        if (succ) {
-            WsServer.subscribe('chat', onReceiveNewChatMessage);
-        }
+        WsServer.subscribe('chat', onReceiveNewChatMessage);
     }, []);
 
     function sendMessage() {

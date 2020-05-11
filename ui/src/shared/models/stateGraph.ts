@@ -1,5 +1,5 @@
 import { GameStage } from './gameState';
-import { ActionType, ClientWsMessage } from './wsaction';
+import { ActionType, ClientWsMessage } from './dataCommunication';
 
 export declare interface Condition {
     fn: () => boolean;

@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ActionType } from './wsaction';
+import { ActionType } from './dataCommunication';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';

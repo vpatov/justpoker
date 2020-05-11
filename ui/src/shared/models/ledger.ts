@@ -1,13 +1,10 @@
 
 export declare interface BaseLedgerRow {
     /** A set of (case insensitive) aliases that the client has named their players, i.e. "Vas", "Vasia" .*/
-    aliases: Set<string>;
+    aliases: Iterable<string>;
 
     /** The list of buyins the client has completed. */
     buyins: number[];
-
-    /** Everytime the client leaves the table with some amount, that amount is pushed here. */
-    walkaways: number[];
 
     /**
      * The number of chips the client's player currently has, such that net can be calculated 
@@ -34,6 +31,12 @@ export declare interface BaseLedgerRow {
 export declare interface ServerOnlyLedgerFields {
     /** The uuid of the client. */
     clientUUID: string;
+
+    /** A set should be used for aliases on the BE, and any iterable can be used in the FE. */
+    aliases: Set<string>;
+
+    /** Everytime the client leaves the table with some amount, that amount is pushed here. */
+    walkaways: number[];
 }
 
 export declare interface LedgerComputedFields {
@@ -64,7 +67,7 @@ export declare type ServerLedger = {[clientUUID: string]: ServerLedgerRow};
  * the data.
  */
 export declare type UILedgerRow = BaseLedgerRow & LedgerComputedFields;
-export declare type UILedger = {[clientUUID: string]: UILedgerRow};
+export declare type UILedger = UILedgerRow[];
 
 
  export function getCleanLedgerRow(): ServerLedgerRow {

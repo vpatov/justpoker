@@ -7,7 +7,7 @@ import {
     ClientWsMessageRequest,
     ClientChatMessage,
     BootPlayerRequest,
-} from '../../../ui/src/shared/models/wsaction';
+} from '../../../ui/src/shared/models/dataCommunication';
 import { printObj } from '../../../ui/src/shared/util/util';
 import {
     ValidationResponse,

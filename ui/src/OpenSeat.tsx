@@ -1,14 +1,14 @@
 import React, { useState, Fragment } from "react";
 import classnames from "classnames";
 import { WsServer } from "./api/ws";
-import { ActionType } from "./shared/models/wsaction";
+import { ActionType } from "./shared/models/dataCommunication";
 import TextFieldWrap from "./reuseable/TextFieldWrap"
 
 import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
 import grey from "@material-ui/core/colors/grey";
 import Typography from "@material-ui/core/Typography";
-import { ClientWsMessageRequest } from "./shared/models/wsaction";
+import { ClientWsMessageRequest } from "./shared/models/dataCommunication";
 import {
     Dialog,
     DialogContent,

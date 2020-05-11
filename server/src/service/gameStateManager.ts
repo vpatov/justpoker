@@ -25,7 +25,7 @@ import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/tabl
 import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
-import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
+import { ActionType, JoinTableRequest, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
@@ -95,11 +95,11 @@ export class GameStateManager {
         };
     }
 
-    createConnectedClient(clientUUID: string, ws: WebSocket): ConnectedClient {
+    createConnectedClient(clientUUID: string, ws: WebSocket, endpoint: EndPoint): ConnectedClient {
         return {
             uuid: clientUUID,
             playerUUID: '',
-            ws,
+            websockets: new Map([[endpoint, ws]]),
         };
     }
 
@@ -533,15 +533,17 @@ export class GameStateManager {
     /* Initialization methods */
 
     // TODO validation around this method. Shouldn't be executed when table is not intialized.
-    initConnectedClient(clientUUID: string, ws: WebSocket) {
+    // TODO break away client logic into server state manager.
+    // TODO rename method, as it is not always initializing a client.
+    initConnectedClient(clientUUID: string, ws: WebSocket, endpoint: EndPoint) {
         const client = this.gameState.table.activeConnections.get(clientUUID);
         if (client) {
-            this.resetClientWebsocket(clientUUID, ws);
+            this.resetClientWebsocket(clientUUID, ws, endpoint);
         } else {
             if (!this.gameState.table.admin) {
                 this.initAdmin(clientUUID);
             }
-            const newClient = this.createConnectedClient(clientUUID, ws);
+            const newClient = this.createConnectedClient(clientUUID, ws, endpoint);
             this.gameState = {
                 ...this.gameState,
                 table: {
@@ -566,8 +568,8 @@ export class GameStateManager {
         return this.gameState.table.admin;
     }
 
-    resetClientWebsocket(clientUUID: string, ws: WebSocket) {
-        this.gameState.table.activeConnections.get(clientUUID).ws = ws;
+    resetClientWebsocket(clientUUID: string, ws: WebSocket, endpoint: EndPoint) {
+        this.gameState.table.activeConnections.get(clientUUID).websockets.set(endpoint, ws);
     }
 
     initGame(newGameForm: NewGameForm) {

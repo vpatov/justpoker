@@ -3,7 +3,7 @@ import classnames from 'classnames';
 
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
-import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
+import { ActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';

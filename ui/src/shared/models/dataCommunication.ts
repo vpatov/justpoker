@@ -1,4 +1,19 @@
-import { BettingRoundAction } from '../models/game';
+import { BettingRoundAction } from './game';
+
+export enum EndPoint {
+    GAME = 'game',
+    LEDGER = 'ledger',
+}
+
+export declare interface WSParams {
+    clientUUID: string;
+    gameUUID: string;
+    endpoint: EndPoint;
+}
+
+export declare interface HTTPParams {
+    gameUUID: string;
+}
 
 export enum ActionType {
     STARTGAME = 'STARTGAME',
