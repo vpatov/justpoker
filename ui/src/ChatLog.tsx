@@ -18,13 +18,16 @@ const useStyles = makeStyles((theme: Theme) =>
             zIndex: 5,
             height: '100%',
             display: 'flex',
+            flexShrink: '0',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'column',
-            paddingLeft: '1.2vmin',
+
+            width: '15%',
             ...theme.custom.CHAT,
         },
         chatLog: {
+            paddingTop: '1vh',
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
@@ -47,15 +50,12 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         messageTextField: {
             flexGrow: 1,
-            marginRight: '1vmin',
-            marginBottom: '1vmin',
+            margin: '0.2vh 0.4vw',
+
             marginTop: 0,
         },
-        messageTextFieldInput: {
-            fontSize: '1.4vmin',
-        },
         chatMessage: {
-            margin: '0.5vmin 0.2vmin',
+            margin: '0.2vh 0.4vw',
             fontSize: '1.4vmin',
         },
         senderName: {
@@ -67,12 +67,11 @@ const useStyles = makeStyles((theme: Theme) =>
             color: 'rgb(220,210,230)',
         },
         hideButton: {
-            margin: '2vmin',
             fontSize: '1vmin',
             zIndex: 5,
             position: 'absolute',
-            top: '4vmin',
-            right: '0',
+            top: '5vh',
+            right: 15,
         },
         unread: {
             borderColor: theme.palette.secondary.main,
@@ -138,7 +137,7 @@ function ChatLog(props: ChatLogProps) {
                     setUnreadChats(false);
                     setHideChat(!hideChat);
                 }}
-                style={hideChat ? {} : { right: 270 }}
+                style={hideChat ? {} : { right: 'calc(15% + 15px)' }}
             >
                 {`${hideChat ? 'Show' : 'Hide'} Chat`}
             </Button>
@@ -159,18 +158,11 @@ function ChatLog(props: ChatLogProps) {
                 </div>
                 <div className={classes.chatInputSection}>
                     <TextFieldWrap
-                        label="Send Message"
+                        placeholder="Send Message"
                         value={draftMessage}
                         className={classes.messageTextField}
-                        margin="dense"
                         onChange={(event) => {
-                            console.log('onC', event);
                             setDraftMessage(event.target.value);
-                        }}
-                        InputProps={{
-                            classes: {
-                                input: classes.messageTextFieldInput,
-                            },
                         }}
                         onKeyPress={(event) => onTextAreaPressEnter(event)}
                         multiline={true}

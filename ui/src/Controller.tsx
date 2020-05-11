@@ -101,10 +101,6 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '5vmin',
             marginRight: '1vmin',
         },
-        betTextFieldInput: {
-            fontSize: '1.4vmin',
-            padding: '1vmin',
-        },
         actionButton: {
             height: '40%',
             width: '10vmin',
@@ -116,12 +112,13 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.1vmin',
         },
         checkLabel: {
-            fontSize: '1.1vmin',
+            fontSize: '1.4vmin',
         },
         incButton: {
             padding: 0,
             fontSize: '2vmin',
             fontWeight: 'bold',
+            width: '2vw',
         },
         incButtonLeft: {
             marginRight: '1vmin',
@@ -132,14 +129,15 @@ const useStyles = makeStyles((theme: Theme) =>
         sizeButton: {
             margin: 6,
             fontSize: '1vmin',
+            width: '4vw',
         },
         handLabel: {
             marginTop: '2vmin',
-            fontSize: '2vmin',
+            fontSize: '1.8vmin',
             color: theme.palette.primary.main,
         },
         toActLabel: {
-            fontSize: '2vmin',
+            fontSize: '1.8vmin',
             color: theme.palette.primary.main,
             animation: '$blinking 1.3s linear infinite;',
         },
@@ -257,7 +255,7 @@ function ControllerComp(props: ControllerProps) {
     function onToggleStraddle() {
         WsServer.send({
             actionType: ActionType.SETPLAYERSTRADDLE,
-            request: { willStraddle: !willStraddle } as ClientStraddleRequest as ClientWsMessageRequest,
+            request: ({ willStraddle: !willStraddle } as ClientStraddleRequest) as ClientWsMessageRequest,
         });
     }
 
@@ -355,7 +353,9 @@ function ControllerComp(props: ControllerProps) {
                 {allowStraddle ? (
                     <FormControlLabel
                         classes={{ label: classes.checkLabel }}
-                        control={<Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />}
+                        control={
+                            <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
+                        }
                         label="Straddle"
                     />
                 ) : null}
