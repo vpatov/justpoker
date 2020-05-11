@@ -26,17 +26,12 @@ const useStyles = makeStyles((theme: Theme) =>
             transform: 'translateY(100%) translateX(-50%)',
         },
         secondsRemaining: {
-            color: theme.palette.primary.main,
+            color: 'black',
             width: '3vmin',
             marginBottom: '0.3vmin',
             fontSize: '1.4vmin',
             textAlign: 'center',
         },
-        // linearTimerRoot: {
-        //     flexShrink: 1,
-        //     borderRadius: '0.6vmin',
-        //     height: '0.5vmin',
-        // },
     }),
 );
 
@@ -57,7 +52,7 @@ function PlayerTimer(props) {
     const [playedWarning, setPlayedWarning] = useState(false);
 
     useEffect(() => {
-        console.log("playerTimer:", timeLimit, timeElapsed);
+        console.log('playerTimer:', timeLimit, timeElapsed);
         setShow(true);
         setCompleted(getPercentTimeRemaining(timeElapsed, timeLimit));
         const updateIntervalMs = 1000;

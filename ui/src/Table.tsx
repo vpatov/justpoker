@@ -16,14 +16,14 @@ import Button from '@material-ui/core/Button';
 const W_UNIT = 'vmin';
 const H_UNIT = 'vmin';
 
-const TABLE_HEIGHT = 45;
-const TABLE_WIDTH = 75;
+const TABLE_HEIGHT = 39;
+const TABLE_WIDTH = 71;
 
-const PLAYER_HEIGHT = 64;
-const PLAYER_WIDTH = 93;
+const PLAYER_HEIGHT = 57;
+const PLAYER_WIDTH = 91;
 
-const BET_HEIGHT = 35;
-const BET_WIDTH = 62;
+const BET_HEIGHT = 30;
+const BET_WIDTH = 60;
 
 const HERO_DEFAULT_ROTATION = 5;
 
@@ -37,7 +37,7 @@ function positionToPlacement(width, height, index, offset) {
         2: { x: width, y: yInc * 2 },
         3: { x: width, y: yInc * 4 },
         4: { x: xInc * 6.5, y: yInc * 5.75 },
-        5: { x: xInc * 4, y: yInc * 5.9 },
+        5: { x: xInc * 4, y: yInc * 6 },
         6: { x: xInc * 1.5, y: yInc * 5.75 },
         7: { x: 0, y: yInc * 4 },
         8: { x: 0, y: yInc * 2 },

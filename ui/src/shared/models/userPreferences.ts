@@ -21,10 +21,10 @@ export declare interface ThemePreferences {
     background: string;
 }
 
-function computeBackgroundGradient(color) {
+function computeBackgroundGradient(color: string) {
     const c = Color(color);
-    const light = c.darken(0.0).desaturate(0.3);
-    const dark = c.darken(0.2).desaturate(0.5);
+    const light = c.darken(0).desaturate(0.1);
+    const dark = c.darken(0.3).desaturate(0.6);
     return `linear-gradient(360deg, ${dark.string()} 0%, ${light.string()})`;
 }
 
