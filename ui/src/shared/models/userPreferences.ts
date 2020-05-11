@@ -19,15 +19,6 @@ export declare interface UserPreferences {
 export declare interface ThemePreferences {
     twoColor: boolean;
     background: string;
-    table: string;
-}
-
-function computeTableGradient(shade) {
-    return `radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%)`;
-    const c = Color(shade[100]);
-    const light = c.darken(0.62).desaturate(0.1);
-    const dark = c.darken(0.83).desaturate(0.3);
-    return `radial-gradient(circle, ${light.string()} 0%, ${dark.string()})`;
 }
 
 function computeBackgroundGradient(color) {
@@ -49,24 +40,11 @@ export const Background = {
     orange: computeBackgroundGradient(orange[600]),
 };
 
-export const Table = {
-    blue: computeTableGradient(blue[600]),
-    purple: computeTableGradient(deepPurple[700]),
-    teal: computeTableGradient(teal[700]),
-    yellow: computeTableGradient(yellow[600]),
-    grey: computeTableGradient(grey[900]),
-    indigo: computeTableGradient(indigo[900]),
-    red: computeTableGradient(red[900]),
-    green: computeTableGradient(green[700]),
-    orange: computeTableGradient(deepOrange[700]),
-};
-
 // BLUE: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(10,10,10,1) 100%)`,
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
     theme: {
         twoColor: false,
         background: Background.blue,
-        table: Table.blue,
     },
 };

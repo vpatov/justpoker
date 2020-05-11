@@ -5,14 +5,13 @@ import cloneDeep from 'lodash/cloneDeep';
 import { CUSTOM_THEME } from './Theme';
 import { ThemeProvider } from '@material-ui/core/styles';
 import GameContainer from './GameContainer';
-import { createMuiTheme, Theme } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
 
 import Home from './Home';
 
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);
     newTheme.custom.BACKGROUND.background = prefs.background;
-    newTheme.custom.TABLE.background = prefs.table;
 
     if (prefs.twoColor) {
         newTheme.custom.DIAMONDS = newTheme.custom.HEARTS as any;

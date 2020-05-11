@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { ThemePreferences, Background, Table } from './shared/models/userPreferences';
+import { ThemePreferences, Background } from './shared/models/userPreferences';
 import { ThemeSetter } from './App';
 import InputLabel from '@material-ui/core/InputLabel';
 import capitalize from 'lodash/capitalize';
@@ -39,7 +39,6 @@ function SettingsDialog(props) {
     const { open, handleClose } = props;
     const { curfPrefs, themeSetter } = useContext(ThemeSetter);
     const [background, setBackground] = useState(curfPrefs.background);
-    const [table, setTable] = useState(curfPrefs.table);
 
     const [cards, setCards] = React.useState(curfPrefs.twoColor);
 
@@ -47,7 +46,6 @@ function SettingsDialog(props) {
         const prefs = {
             twoColor: cards,
             background: background as any,
-            table: table as any,
         };
         return prefs;
     }
@@ -76,14 +74,6 @@ function SettingsDialog(props) {
                     <InputLabel>Background Color</InputLabel>
                     <Select value={background} onChange={(event) => setBackground(event.target.value as any)}>
                         {Object.entries(Background).map(([k, v]) => (
-                            <MenuItem value={v}>{capitalize(k)}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <FormControl className={classes.field}>
-                    <InputLabel>Table Color</InputLabel>
-                    <Select value={table} onChange={(event) => setTable(event.target.value as any)}>
-                        {Object.entries(Table).map(([k, v]) => (
                             <MenuItem value={v}>{capitalize(k)}</MenuItem>
                         ))}
                     </Select>
