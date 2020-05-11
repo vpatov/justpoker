@@ -48,6 +48,10 @@ export class GameStateManager {
         updatedKeys.forEach((updatedKey) => this.updatedKeys.add(updatedKey));
     }
 
+    clearUpdatedKeys() {
+        this.updatedKeys.clear();
+    }
+
     setUpdatedKeys(updatedKeys: Set<ServerStateKey>) {
         this.updatedKeys = new Set(updatedKeys);
     }

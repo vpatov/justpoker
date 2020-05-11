@@ -14,7 +14,6 @@ import {
     GameStage,
     GameState,
     ServerStateKey,
-    ALL_STATE_KEYS,
     QueuedServerAction,
     ServerActionType,
 } from '../../../ui/src/shared/models/gameState';
@@ -194,7 +193,7 @@ export class StateGraphManager {
         if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
             this.gamePlayService.timeOutPlayer();
         }
-        this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
+        this.gameStateManager.setUpdatedKeys(new Set([ServerStateKey.GAMESTATE]));
         this.processEvent('TIMEOUT');
     }
 
