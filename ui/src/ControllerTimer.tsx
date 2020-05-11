@@ -33,11 +33,12 @@ function ControllerTimer(props) {
     const classes = useStyles();
     const { className } = props;
 
-    const timer = useSelector(heroPlayerTimerSelector);
+    const playerTimer = useSelector(heroPlayerTimerSelector);
 
-    const timeElapsed = Math.ceil(timer.timeElapsed);
-    const timeLimit = timer.timeLimit;
+    const timeElapsed = Math.ceil(playerTimer.timeElapsed);
+    const timeLimit = playerTimer.timeLimit;
     const beginBelowSeconds = 10;
+    const [rTimer, setRTimer] = useState(0);
 
     let startCompleted = 0;
     if (timeLimit - timeElapsed < beginBelowSeconds) {
@@ -46,8 +47,6 @@ function ControllerTimer(props) {
 
     const [completed, setCompleted] = useState(startCompleted);
     const [timeRemaining, setTimeRemaining] = useState(timeLimit - timeElapsed);
-
-    const [rTimer, setRTimer] = useState(0);
 
     function progress() {
         setTimeRemaining((old) => {

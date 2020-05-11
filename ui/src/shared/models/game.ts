@@ -25,6 +25,7 @@ export declare interface GameParameters {
     gameType: GameType;
     maxBuyin: number;
     timeToAct: number;
+    timeBankValue: number;
     maxPlayers: number;
 }
 

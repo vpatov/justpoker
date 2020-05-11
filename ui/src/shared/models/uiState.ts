@@ -37,7 +37,7 @@ export declare interface Global {
 export declare interface Controller {
     min: number;
     max: number;
-    timeBanks?: number;
+    timeBanks: number;
     sizingButtons: SizingButton[];
     bettingRoundActionButtons: BettingRoundActionButton[];
     dealInNextHand: boolean;

@@ -57,6 +57,9 @@ export declare interface Player {
 
     /** Used to calculate chipDelta. */
     readonly chipsAtStartOfHand: number;
+
+    /** Amount of timebanks that the player has left that they can use. */
+    readonly timeBanksLeft: number;
 }
 
 export const cleanPlayer: Player = {
@@ -76,4 +79,7 @@ export const cleanPlayer: Player = {
     cardsAreHidden: true,
     chipsAtStartOfHand: 0,
     chipDelta: 0,
+    timeBanksLeft: 0,
 };
+
+export const TIME_BANKS_DEFAULT = 5;

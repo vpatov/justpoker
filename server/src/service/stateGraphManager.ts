@@ -59,13 +59,13 @@ export class StateGraphManager {
     isAllInRunOutCondition: Condition = {
         fn: () => this.gameStateManager.isAllInRunOut(),
         TRUE: this.isHandGamePlayOverCondition,
-        FALSE: GameStage.WAITING_FOR_BET_ACTION,
+        FALSE: GameStage.SET_CURRENT_PLAYER_TO_ACT,
     };
 
     isBettingRoundOverCondition: Condition = {
         fn: () => this.gameStateManager.isBettingRoundOver() || this.gameStateManager.hasEveryoneButOnePlayerFolded(),
         TRUE: GameStage.FINISH_BETTING_ROUND,
-        FALSE: GameStage.WAITING_FOR_BET_ACTION,
+        FALSE: GameStage.SET_CURRENT_PLAYER_TO_ACT,
     };
 
     sidePotsRemainingCondition: Condition = {
@@ -84,8 +84,10 @@ export class StateGraphManager {
         [GameStage.INITIALIZE_NEW_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_HAND]]),
         [GameStage.SHOW_START_OF_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_BETTING_ROUND]]),
         [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([['TIMEOUT', this.isAllInRunOutCondition]]),
+        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([['TIMEOUT', GameStage.WAITING_FOR_BET_ACTION]]),
         [GameStage.WAITING_FOR_BET_ACTION]: new Map([
             [ActionType.BETACTION, GameStage.SHOW_BET_ACTION],
+            [ActionType.USETIMEBANK, GameStage.WAITING_FOR_BET_ACTION],
             ['TIMEOUT' as any, GameStage.SHOW_BET_ACTION],
         ]),
         [GameStage.SHOW_BET_ACTION]: new Map([['TIMEOUT', this.isBettingRoundOverCondition]]),
@@ -99,6 +101,7 @@ export class StateGraphManager {
         [GameStage.INITIALIZE_NEW_HAND]: 250,
         [GameStage.SHOW_START_OF_HAND]: 400,
         [GameStage.SHOW_START_OF_BETTING_ROUND]: 750,
+        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: 50, // TODO there does not need to be a delay here.
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
         [GameStage.SHOW_BET_ACTION]: 200,
         [GameStage.FINISH_BETTING_ROUND]: 1200,
@@ -108,7 +111,7 @@ export class StateGraphManager {
 
     getDelay(stage: GameStage) {
         return stage === GameStage.WAITING_FOR_BET_ACTION
-            ? this.gameStateManager.getTimeToAct()
+            ? this.gamePlayService.computeTimeRemainingToAct()
             : this.stageDelayMap[stage];
     }
 
@@ -238,12 +241,18 @@ export class StateGraphManager {
                 break;
             }
 
+            case GameStage.SET_CURRENT_PLAYER_TO_ACT: {
+                this.gamePlayService.computeAndSetCurrentPlayerToAct();
+                break;
+            }
+
             case GameStage.WAITING_FOR_BET_ACTION: {
-                this.gamePlayService.setCurrentPlayerToAct();
+                this.gamePlayService.setTimeCurrentPlayerTurnStarted();
                 break;
             }
 
             case GameStage.SHOW_BET_ACTION: {
+                this.gameStateManager.clearTimeBanksUsedThisAction();
                 break;
             }
 
