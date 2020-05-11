@@ -163,7 +163,7 @@ class Server {
                 }
 
                 case EndPoint.LEDGER: {
-                    ws.send(JSON.stringify(this.ledgerService.convertServerLedgerToUILedger()));
+                    ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
                     break;
                 }
 
