@@ -52,9 +52,14 @@ export class WsServer {
     }
 
     private static onLedgerMessage(msg: MessageEvent){
-        const ledger = JSON.parse(get(msg, "data", {}));
-        if (ledger){
-            WsServer.subscriptions['ledger'].forEach((func) => func(ledger));
+        const jsonData = JSON.parse(get(msg, "data", {}));
+
+        if (jsonData.clientUUID) {
+            docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
+        }
+
+        if (jsonData.ledger){
+            WsServer.subscriptions['ledger'].forEach((func) => func(jsonData.ledger));
         }
     }
 

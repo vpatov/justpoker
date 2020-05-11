@@ -24,8 +24,9 @@ export class LedgerService {
                 ...getCleanLedgerRow(),
                 clientUUID,
             };
+        } else {
+            console.log(`WARNING: ledgerService.initRow was called on an already initialized client: ${clientUUID}`);
         }
-        console.log(`WARNING: ledgerService.initRow was called on an already initialized client: ${clientUUID}`);
     }
 
     getLedger() {
@@ -104,8 +105,8 @@ export class LedgerService {
         const walkaway = serverRow.walkaways.reduce((sum, walkaway) => walkaway + sum, 0) + serverRow.currentChips;
         const totalBuyin = serverRow.buyins.reduce((sum, buyin) => buyin + sum, 0);
         const row: UILedgerRow = {
-            aliases: [...serverRow.aliases],
-            buyins: [...serverRow.buyins],
+            aliases: [...serverRow.aliases].join(','),
+            buyins: serverRow.buyins.map((buyin) => String(buyin)).join(','),
             walkaway,
             currentChips: serverRow.currentChips,
             timeStartedPlaying: serverRow.timeStartedPlaying,

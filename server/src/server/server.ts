@@ -125,7 +125,7 @@ class Server {
         for (const client of this.gsm.getConnectedClients()) {
             const ws = client.websockets.get(EndPoint.LEDGER);
             if (ws) {
-                const res = this.ledgerService.convertServerLedgerToUILedger();
+                const res = { ledger: this.ledgerService.convertServerLedgerToUILedger() };
                 const jsonRes = JSON.stringify(res);
                 ws.send(jsonRes);
             }
@@ -141,7 +141,7 @@ class Server {
             const parsedQuery = queryString.parseUrl(req.url);
             const queryParams: WSParams = {
                 clientUUID: parsedQuery.query.clientUUID as string,
-                gameUUID: parsedQuery.query.gameID as string,
+                gameUUID: parsedQuery.query.gameUUID as string,
                 endpoint: parsedQuery.query.endpoint as EndPoint,
             };
 

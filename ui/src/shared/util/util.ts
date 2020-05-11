@@ -45,17 +45,9 @@ export function logGameState(gameState: GameState) {
   console.log(util.inspect(minimizedGameState, false, null, true));
 }
 
-
-export function parseHTTPParams(location: Location){
-  const queryParams = queryString.parse(location.search);
-  const endpoint = queryString.parseUrl(location.pathname);
-}
-
-export function parseWSParams(parsedQuery: queryString.ParsedUrl){
-  const queryParams: WSParams = {
-    clientUUID: parsedQuery.query.clientUUID as string,
-    gameUUID: parsedQuery.query.gameUUID as string,
-    endpoint: parsedQuery.query.endpoint as EndPoint,
+export function parseHTTPParams(parsedQuery: queryString.ParsedUrl){
+  const queryParams: HTTPParams = {
+    gameUUID: parsedQuery.query.gameUUID as string
   };
   return queryParams;
 }
