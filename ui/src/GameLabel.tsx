@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         pause: {
             fontSize: '1.3vmin',
-            color: theme.palette.error.light,
+            color: theme.palette.error.contrastText,
         },
     }),
 );
