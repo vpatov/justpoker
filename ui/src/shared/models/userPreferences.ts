@@ -40,8 +40,6 @@ export const Background = {
     orange: computeBackgroundGradient(orange[600]),
 };
 
-// BLUE: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(10,10,10,1) 100%)`,
-
 export const DEFAULT_PREFERENCES: UserPreferences = {
     theme: {
         twoColor: false,

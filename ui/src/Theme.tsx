@@ -201,19 +201,3 @@ export const CUSTOM_THEME = {
         },
     },
 };
-
-// export function getTheme(): Theme {
-//     loadPreferencesIntoTheme(DEFAULT_PREFERENCES.theme);
-
-//     const theme = createMuiTheme(CUSTOM_THEME);
-//     return theme;
-// }
-
-// function loadPreferencesIntoTheme(prefs: ThemePreferences) {
-//     CUSTOM_THEME.custom.BACKGROUND.background = prefs.background;
-
-//     if (prefs.twoColor) {
-//         CUSTOM_THEME.custom.DIAMONDS = CUSTOM_THEME.custom.HEARTS as any;
-//         CUSTOM_THEME.custom.CLUBS = CUSTOM_THEME.custom.SPADES as any;
-//     }
-// }
