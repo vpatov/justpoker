@@ -13,6 +13,9 @@ import { WsServer } from './api/ws';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 
+const W_UNIT = 'vmin';
+const H_UNIT = 'vmin';
+
 const TABLE_HEIGHT = 45;
 const TABLE_WIDTH = 75;
 
@@ -85,6 +88,7 @@ const useStyles = makeStyles((theme) => ({
 
     startGame: {
         zIndex: 5,
+        transform: 'translateY(60%)',
         fontSize: '4vmin',
     },
 }));
@@ -123,8 +127,8 @@ function Table(props) {
                             player={player}
                             className={classes.player}
                             style={{
-                                top: `${pPos.y}vmin`,
-                                left: `${pPos.x}vmin`,
+                                top: `${pPos.y}${H_UNIT}`,
+                                left: `${pPos.x}${W_UNIT}`,
                             }}
                         />
                     </Fragment>,
@@ -136,8 +140,8 @@ function Table(props) {
                         seatNumber={index}
                         className={classes.openSeat}
                         style={{
-                            top: `${pPos.y}vmin`,
-                            left: `${pPos.x}vmin`,
+                            top: `${pPos.y}${H_UNIT}`,
+                            left: `${pPos.x}${W_UNIT}`,
                         }}
                     />,
                 );
@@ -170,8 +174,8 @@ function Table(props) {
                     <Bet
                         style={{
                             position: 'absolute',
-                            top: `${bPos.y}vmin`,
-                            left: `${bPos.x}vmin`,
+                            top: `${bPos.y}${H_UNIT}`,
+                            left: `${bPos.x}${W_UNIT}`,
                             transform: 'translateY(-50%) translateX(-50%)',
                         }}
                         amount={player.bet}

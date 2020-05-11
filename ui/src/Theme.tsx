@@ -51,7 +51,7 @@ export const CUSTOM_THEME = {
             filter: 'grayscale(50%) brightness(0.4)',
         },
         BACKGROUND: {
-            background: 'linear-gradient(360deg, rgba(50,50,55) 0%, rgb(22,22,30));',
+            background: 'linear-gradient(360deg, rgba(50,50,63) 0%, rgb(25,25,40));',
         },
         TABLE: {
             border: `0.2vmin solid rgba(0,0,0,0.4)`,
@@ -89,10 +89,8 @@ export const CUSTOM_THEME = {
             backgroundColor: teal[200],
         },
         CHAT: {
-            zIndex: 10,
-            backgroundColor: 'rgba(22, 22, 32, 1)',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
             boxShadow: ` 0 4px 4px 4px rgba(0,0,0,0.2)`,
-            borderLeft: '2px solid rgba(0,0,0,0.7)',
         },
         ACTION_BUTTONS: {
             FOLD: {
@@ -157,6 +155,14 @@ export const CUSTOM_THEME = {
                     borderColor: teal['A200'],
                 },
             },
+            input: {
+                padding: '1vmin',
+                fontSize: '1.5vmin',
+            },
+            multiline: {
+                padding: '1vmin',
+                fontSize: '1.4vmin',
+            },
         },
         MuiButton: {
             root: {
@@ -169,10 +175,26 @@ export const CUSTOM_THEME = {
                         width: '100%',
                     },
                 },
+                minWidth: '24px',
             },
-
             outlined: {
-                // padding: "0.4vmin 0.8vmin",
+                padding: '0.6vmin 0.8vmin',
+            },
+        },
+        MuiIconButton: {
+            root: {
+                padding: '1vmin',
+            },
+        },
+        MuiSvgIcon: {
+            root: {
+                width: '2.3vmin',
+                height: '2.3vmin',
+            },
+        },
+        MuiCheckbox: {
+            root: {
+                padding: '0.8vmin',
             },
         },
     },

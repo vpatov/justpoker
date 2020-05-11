@@ -31,6 +31,7 @@ export declare interface Global {
     allowStraddle: boolean;
     gameType: GameType;
     canStartGame: boolean;
+    gameWillStopAfterHand: boolean;
     unqueueAllBettingRoundActions: boolean;
 }
 
@@ -232,6 +233,7 @@ export const cleanGlobal: Global = {
     allowStraddle: false,
     gameType: GameType.NLHOLDEM,
     canStartGame: false,
+    gameWillStopAfterHand: false,
     unqueueAllBettingRoundActions: true,
 };
 
@@ -304,6 +306,7 @@ export const TestGame: UiGameState = {
         allowStraddle: true,
         gameType: GameType.NLHOLDEM,
         canStartGame: false,
+        gameWillStopAfterHand: true,
         unqueueAllBettingRoundActions: true,
     },
     controller: {

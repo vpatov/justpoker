@@ -21,24 +21,15 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         position: 'relative',
         flex: '1 1 100%',
+        overflow: 'hidden',
     },
     table: {
         height: '85%',
     },
-    chatlog: {
-        width: '300px',
-    },
+    chatlog: {},
     controller: {
         height: '15%',
         width: '100%',
-    },
-    hideButton: {
-        margin: '2vmin',
-        fontSize: '1vmin',
-        zIndex: 5,
-        position: 'absolute',
-        top: 0,
-        right: '0',
     },
 }));
 

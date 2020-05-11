@@ -10,7 +10,6 @@ import grey from '@material-ui/core/colors/grey';
 import Typography from '@material-ui/core/Typography';
 import { ClientWsMessageRequest } from './shared/models/wsaction';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
-import Slider from '@material-ui/core/Slider';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,14 +23,15 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     field: {
-        width: '30%',
+        marginTop: '3vmin',
+        width: '35%',
     },
     sit: {
         fontSize: '1.3vmin',
     },
-    dialogRoot: {},
-    dialogContent: {
-        height: '20vmin',
+    dialogPaper: {
+        height: '80vh',
+        maxHeight: 360,
     },
 }));
 
@@ -58,10 +58,6 @@ function OpenSeat(props) {
 
     function onChangeBuyin(event: any) {
         setBuyin(event.target.value);
-    }
-
-    function handleSliderChange(event: any, newValue: any) {
-        setBuyin(Number(newValue));
     }
 
     function invalidBuyin() {
@@ -107,12 +103,12 @@ function OpenSeat(props) {
             </IconButton>
             <Dialog
                 open={dialogOpen}
-                className={classes.dialogRoot}
                 maxWidth="xs"
                 fullWidth
                 onKeyPress={(event) => onPressEnter(event)}
+                classes={{ paper: classes.dialogPaper }}
             >
-                <DialogContent className={classes.dialogContent}>
+                <DialogContent>
                     <TextFieldWrap
                         autoFocus
                         id="name"
@@ -121,10 +117,11 @@ function OpenSeat(props) {
                         fullWidth
                         onChange={(event) => setName(event.target.value)}
                         value={name}
+                        variant="standard"
                         maxChars={24}
                     />
-                    <Slider value={buyin} onChange={handleSliderChange} min={minBuyin} max={maxBuyin} step={1} />
                     <TextFieldWrap
+                        variant="standard"
                         type="number"
                         className={classes.field}
                         value={buyin}
@@ -135,6 +132,7 @@ function OpenSeat(props) {
                         }}
                         max={maxBuyin}
                         error={invalidBuyin()}
+                        helperText={invalidBuyin() ? `Min Buy In is ${minBuyin}` : ''}
                     />
                 </DialogContent>
                 <DialogActions>

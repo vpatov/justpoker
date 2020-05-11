@@ -7,15 +7,19 @@ import { Typography } from '@material-ui/core';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            top: 0,
-            right: 0,
+            top: 10,
+            right: 15,
             position: 'absolute',
             textAlign: 'right',
-            margin: '2vmin',
+            lineHeight: 0,
         },
         text: {
             display: 'inline-block',
             fontSize: '2vmin',
+        },
+        pause: {
+            fontSize: '1.3vmin',
+            color: theme.palette.error.light,
         },
     }),
 );
@@ -24,12 +28,13 @@ function GameLabel(props) {
     const classes = useStyles();
     const {} = props;
     const globalData = useSelector(globalGameStateSelector);
-
+    const { gameWillStopAfterHand, gameType, smallBlind, bigBlind } = globalData;
     return (
         <div className={classes.root}>
-            <Typography
-                className={classes.text}
-            >{`${globalData.gameType}  ${globalData.smallBlind}/${globalData.bigBlind}`}</Typography>
+            {gameWillStopAfterHand ? (
+                <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
+            ) : null}
+            <Typography className={classes.text}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
         </div>
     );
 }
