@@ -3,6 +3,7 @@ import { ActionType, UiActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
+import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
@@ -12,6 +13,7 @@ export declare interface UiState {
     audio: SoundByte;
     chat: UiChatMessage;
     animation: AnimationTrigger;
+    userPreferences?: UserPreferences;
 }
 
 export declare interface UiGameState {

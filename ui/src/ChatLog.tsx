@@ -50,8 +50,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         messageTextField: {
             flexGrow: 1,
-            margin: '0.2vh 0.4vw',
-
+            margin: '0.4vh 0.8vw',
             marginTop: 0,
         },
         chatMessage: {
