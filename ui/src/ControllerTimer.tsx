@@ -38,29 +38,30 @@ function ControllerTimer(props) {
     const timeElapsed = Math.ceil(playerTimer.timeElapsed);
     const timeLimit = playerTimer.timeLimit;
     const beginBelowSeconds = 10;
+
     const [rTimer, setRTimer] = useState(0);
-
-    let startCompleted = 0;
-    if (timeLimit - timeElapsed < beginBelowSeconds) {
-        startCompleted = ((beginBelowSeconds - timeLimit + timeElapsed) * 100) / beginBelowSeconds;
-    }
-
-    const [completed, setCompleted] = useState(startCompleted);
     const [timeRemaining, setTimeRemaining] = useState(timeLimit - timeElapsed);
 
+    function computeCompleted() {
+        let startCompleted = 0;
+        if (timeRemaining < beginBelowSeconds) {
+            startCompleted = ((beginBelowSeconds - timeRemaining) * 100) / beginBelowSeconds;
+        }
+        return startCompleted;
+    }
+
     function progress() {
-        setTimeRemaining((old) => {
-            if (Math.floor(old) <= beginBelowSeconds) {
-                setCompleted((old) => old + (updateIntervalS * 100) / beginBelowSeconds);
-            }
-            return old - updateIntervalS;
-        });
+        setTimeRemaining((old) => old - updateIntervalS);
     }
 
     if (!rTimer) {
         const timer = setInterval(progress, updateIntervalS * 1000);
         setRTimer(timer as any);
     }
+
+    useEffect(() => {
+        setTimeRemaining(timeLimit - timeElapsed);
+    }, [timeLimit, timeElapsed]);
 
     // clean up
     useEffect(() => {
@@ -70,6 +71,8 @@ function ControllerTimer(props) {
     if (timeRemaining < 0) {
         clearInterval(rTimer);
     }
+
+    const completed = computeCompleted();
 
     return (
         <div
