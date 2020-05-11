@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         hoverArea: {
             zIndex: 5,
-            position: 'fixed',
+            position: 'absolute',
             left: 0,
             top: 0,
             width: '7vw',
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         root: {
             zIndex: 5,
-            position: 'fixed',
+            position: 'absolute',
             left: 0,
             top: 0,
             margin: '2vmin',

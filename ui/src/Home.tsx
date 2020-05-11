@@ -7,16 +7,17 @@ import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: '100vw',
         height: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
         background: `radial-gradient(circle, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 150%)`,
+        overflow: 'auto',
     },
     title: {
         margin: 36,
+        fontSize: 'min(90px, 10vmin)',
     },
 }));
 

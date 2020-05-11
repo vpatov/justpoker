@@ -7,11 +7,11 @@ import { Typography } from '@material-ui/core';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            top: '0vmin',
-            right: 0,
+            top: 10,
+            right: 15,
             position: 'absolute',
             textAlign: 'right',
-            margin: '2vmin',
+            lineHeight: 0,
         },
         text: {
             display: 'inline-block',

@@ -193,8 +193,8 @@ export class StateConverter {
 
         const buttons = [] as BettingRoundActionButton[];
         // player can always queue a bet or fold action but we decide if it is check or call
-        buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
         buttons.push(FOLD_BUTTON);
+        buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
         buttons.push(BET_BUTTON);
         return buttons;
     }
