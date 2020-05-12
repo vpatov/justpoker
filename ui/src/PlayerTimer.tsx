@@ -26,21 +26,16 @@ const useStyles = makeStyles((theme: Theme) =>
             transform: 'translateY(100%) translateX(-50%)',
         },
         secondsRemaining: {
-            color: theme.palette.primary.main,
+            color: 'black',
             width: '3vmin',
             marginBottom: '0.3vmin',
             fontSize: '1.4vmin',
             textAlign: 'center',
         },
-        // linearTimerRoot: {
-        //     flexShrink: 1,
-        //     borderRadius: '0.6vmin',
-        //     height: '0.5vmin',
-        // },
     }),
 );
 
-function getPercetTimeRemaining(timeElapsed: number, timeLimit: number): number {
+function getPercentTimeRemaining(timeElapsed: number, timeLimit: number): number {
     const timeElapsedPercentage = (timeElapsed * 100.0) / timeLimit;
     return 100.0 - timeElapsedPercentage;
 }
@@ -57,10 +52,12 @@ function PlayerTimer(props) {
     const [playedWarning, setPlayedWarning] = useState(false);
 
     useEffect(() => {
+        console.log('playerTimer:', timeLimit, timeElapsed);
         setShow(true);
-        setCompleted(getPercetTimeRemaining(timeElapsed, timeLimit));
+        setCompleted(getPercentTimeRemaining(timeElapsed, timeLimit));
         const updateIntervalMs = 1000;
         const reduceBy = (100.0 / timeLimit) * (updateIntervalMs / 1000);
+        setSecondsRemaining(timeLimit - timeElapsed);
         function progress() {
             setCompleted((oldCompleted) => oldCompleted - reduceBy);
             setSecondsRemaining((oldSR) => Math.max(oldSR - updateIntervalMs / 1000, 0));

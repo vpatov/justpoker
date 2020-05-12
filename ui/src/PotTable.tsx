@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: '0.5vmin 0.8vmin',
             backgroundColor: 'rgba(0,0,0,0.3)',
             color: 'white',
-            top: '-9%',
+            top: '-10%',
             position: 'absolute',
             fontSize: '1vmin',
         },

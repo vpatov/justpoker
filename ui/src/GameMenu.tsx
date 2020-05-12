@@ -5,6 +5,7 @@ import { selectMenuButtons } from './store/selectors';
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
 import { ActionType, UiActionType, ClientWsMessageRequest } from './shared/models/wsaction';
+import SettingsDialog from './SettingsDialog';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -79,6 +80,16 @@ function GameMenu(props) {
     const [open, setOpen] = React.useState(false);
     const menuButtons = useSelector(selectMenuButtons);
 
+    const [settingsOpen, setSettingsOpen] = React.useState(false);
+
+    const handleSettingsOpen = () => {
+        setSettingsOpen(true);
+    };
+
+    const handleSettingsClose = () => {
+        setSettingsOpen(false);
+    };
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -92,6 +103,7 @@ function GameMenu(props) {
             case UiActionType.ADMIN:
                 break;
             case UiActionType.SETTINGS:
+                handleSettingsOpen();
                 break;
             case UiActionType.VOLUME:
                 break;
@@ -146,6 +158,7 @@ function GameMenu(props) {
                     )}
                 </Paper>
             </div>
+            <SettingsDialog handleClose={handleSettingsClose} open={settingsOpen} />
         </>
     );
 }

@@ -1,4 +1,5 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import { DEFAULT_PREFERENCES, ThemePreferences } from './shared/models/userPreferences';
+import { createMuiTheme, Theme } from '@material-ui/core/styles';
 
 import { PaletteType } from '@material-ui/core';
 import lightBlue from '@material-ui/core/colors/lightBlue';
@@ -44,7 +45,8 @@ export const CUSTOM_THEME = {
             backgroundColor: lightGreen[900],
         },
         HIDDEN: {
-            backgroundColor: `${blueGrey[900]}`,
+            backgroundColor: `${grey[900]}`,
+            backgroundImage: ``,
         },
         FOLDED: {
             opacity: 0.8,
@@ -54,9 +56,9 @@ export const CUSTOM_THEME = {
             background: 'linear-gradient(360deg, rgba(50,50,63) 0%, rgb(25,25,40));',
         },
         TABLE: {
-            border: `0.2vmin solid rgba(0,0,0,0.4)`,
-            backgroundColor: 'black',
-            background: `radial-gradient(circle, rgba(30,30,42,1) 0%, rgba(20,20,35,1) 56%, rgba(10,10,10,1) 100%);`,
+            border: `0.7vmin solid rgba(0,0,0,0.5)`,
+            boxShadow: '0 2px 6px 3px rgba(40,40,40,0.4)',
+            background: `radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%)`,
         },
         STACK: {
             color: 'black',
@@ -75,7 +77,6 @@ export const CUSTOM_THEME = {
         },
         WINNING_CARD: {
             transition: 'boxShadow 0.4s ease-in-out, transform 0.4s ease-in-out ',
-            border: '0.12vmin solid white',
             boxShadow: `0px 0px 6px 2px white`,
         },
         CONTROLLER: {
@@ -89,8 +90,9 @@ export const CUSTOM_THEME = {
             backgroundColor: teal[200],
         },
         CHAT: {
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-            boxShadow: ` 0 4px 4px 4px rgba(0,0,0,0.2)`,
+            backgroundColor: grey[800],
+            background: `linear-gradient(360deg, rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.63) 100%);`,
+            boxShadow: ` 0 0 0.4vmin 0.4vmin rgba(30,30,30,0.5)`,
         },
         ACTION_BUTTONS: {
             FOLD: {
@@ -143,6 +145,11 @@ export const CUSTOM_THEME = {
         ...CUSTOM_PALETTE,
     },
     overrides: {
+        MuiPaper: {
+            root: {
+                backgroundColor: grey[900],
+            },
+        },
         MuiTypography: {
             root: {
                 color: 'inherit',
@@ -157,7 +164,7 @@ export const CUSTOM_THEME = {
             },
             input: {
                 padding: '1vmin',
-                fontSize: '1.5vmin',
+                fontSize: '1.3vmin',
             },
             multiline: {
                 padding: '1vmin',
@@ -199,5 +206,3 @@ export const CUSTOM_THEME = {
         },
     },
 };
-
-export const Theme = createMuiTheme(CUSTOM_THEME);

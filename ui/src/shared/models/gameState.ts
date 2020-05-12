@@ -14,6 +14,7 @@ export const enum GameStage {
     FINISH_BETTING_ROUND = 'FINISH_BETTING_ROUND',
     SHOW_WINNER = 'SHOW_WINNER',
     POST_HAND_CLEANUP = 'EJECT_STACKED_PLAYERS',
+    SET_CURRENT_PLAYER_TO_ACT = "SET_PLAYER_TO_ACT"
 }
 
 export const enum ServerActionType {
@@ -57,6 +58,9 @@ export declare interface GameState {
     lastBettingRoundAction: BettingRoundAction;
 
     timeCurrentPlayerTurnStarted: number;
+
+    /** Amount of timebanks that the player has used this turn. */
+    timeBanksUsedThisAction: number;
 
     pots: ReadonlyArray<Pot>;
 
@@ -146,6 +150,7 @@ export function getCleanGameState(): GameState {
             admin: '',
         },
         timeCurrentPlayerTurnStarted: 0,
+        timeBanksUsedThisAction: 0,
         serverTime: 0,
         minRaiseDiff: 0,
         previousRaise: 0,

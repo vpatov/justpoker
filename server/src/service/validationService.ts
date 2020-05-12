@@ -136,8 +136,8 @@ export class ValidationService {
             return response;
         }
         const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
-        const canCurrentPlayerAct = this.gsm.canCurrentPlayerAct();
-        if (player.uuid !== currentPlayerToAct || !canCurrentPlayerAct) {
+        const gameIsWaitingForBetAction = this.gsm.gameIsWaitingForBetAction();
+        if (player.uuid !== currentPlayerToAct || !gameIsWaitingForBetAction) {
             return {
                 errorType: ErrorType.OUT_OF_TURN,
                 errorString: `Not your turn!\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
@@ -442,6 +442,21 @@ export class ValidationService {
             };
         }
 
+        return NO_ERROR;
+    }
+
+    validateUseTimeBankAction(clientUUID: string) {
+        const response = this.ensurePlayerCanActRightNow(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
+        if (this.gsm.getTimeBanksLeft(player.uuid) === 0) {
+            return {
+                errorType: ErrorType.NO_MORE_TIMEBANKS,
+                errorString: `Player ${player.uuid} has no more time banks left.`,
+            };
+        }
         return NO_ERROR;
     }
 }
