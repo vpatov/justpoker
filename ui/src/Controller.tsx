@@ -189,6 +189,7 @@ function ControllerComp(props: ControllerProps) {
             if (queuedActionType === actionType) {
                 setQueuedActionType('');
                 setBetAmt(0);
+                break;
             }
         }
     }, [bettingRoundActionTypesToUnqueue]);
