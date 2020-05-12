@@ -72,9 +72,6 @@ export class ChatService {
                 const response = this.validationService.validateSitDownRequest(clientUUID, { seatNumber });
                 if (!hasError(response)) {
                     this.gameStateManager.sitDownPlayer(player.uuid, seatNumber);
-                    console.log(`just sat down ${player.name} to ${seatNumber}`);
-                } else {
-                    console.log(response);
                 }
             }
         }

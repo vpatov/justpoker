@@ -13,6 +13,7 @@ import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
+import { logger } from '../server/logging';
 
 declare interface ActionProcessor {
     validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -62,7 +63,6 @@ export class MessageService {
         [ActionType.SITIN]: {
             validation: (uuid, req) => this.validationService.validateSitInAction(uuid),
             perform: (uuid, req) => {
-                console.log('hit');
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
                 this.gameStateManager.sitInPlayer(player.uuid);
             },
@@ -167,15 +167,17 @@ export class MessageService {
         const response = actionProcessor.validation(clientUUID, message.request);
         this.gameStateManager.clearUpdatedKeys();
         if (!hasError(response)) {
-            console.log(
-                `clientUUID: ${clientUUID}, messagePayload: ${message.request}, actionType: ${message.actionType}`,
+            logger.debug(
+                `MessageService.processMessage. clientUUID: ${clientUUID}, actionType: ${
+                    message.actionType
+                }, messagePayload: ${JSON.stringify(message.request)}`,
             );
             actionProcessor.perform(clientUUID, message.request);
             this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
             this.stateGraphManager.processEvent(message.actionType);
         } else {
             // TODO process error and send error to client
-            console.log(response);
+            logger.error(response);
         }
     }
 

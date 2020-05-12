@@ -6,6 +6,7 @@ import {
     ServerLedgerRow,
     UILedgerRow,
 } from '../../../ui/src/shared/models/ledger';
+import { logger } from '../server/logging';
 
 /*
     TODO:
@@ -25,7 +26,7 @@ export class LedgerService {
                 clientUUID,
             };
         } else {
-            console.log(`WARNING: ledgerService.initRow was called on an already initialized client: ${clientUUID}`);
+            logger.warning(`LedgerService.initRow was called on an already initialized client: ${clientUUID}`);
         }
     }
 

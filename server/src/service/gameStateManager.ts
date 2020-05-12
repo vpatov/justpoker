@@ -1,7 +1,6 @@
 import { Service } from 'typedi';
 import WebSocket from 'ws';
 
-import { strict as assert } from 'assert';
 import {
     GameState,
     getCleanGameState,
@@ -24,13 +23,14 @@ import {
 import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
 import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
-import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
+import { generateUUID, printObj, getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
+import { logger } from '../server/logging';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -147,11 +147,8 @@ export class GameStateManager {
         }
 
         if (clients.length !== 1) {
-            console.log(
-                `clients.length was ${clients.length} and not 1. ` +
-                    `clients: ${JSON.stringify(clients)}, playerUUID: ${playerUUID}, allClients: ${JSON.stringify(
-                        this.getConnectedClients(),
-                    )}`,
+            logger.error(
+                `clients.length was ${clients.length} and not 1. GameState: ${getLoggableGameState(this.gameState)}`,
             );
         }
         return clients[0].uuid;
@@ -221,7 +218,7 @@ export class GameStateManager {
         if (chipDifference > 0) {
             this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
         } else {
-            console.log(
+            logger.warning(
                 'gameStateManager.setPlayerChips has been called with a chip amount ' +
                     "that is less than the player's current stack. This is either a bug, or being used for development",
             );
@@ -303,13 +300,22 @@ export class GameStateManager {
 
     popPot(): Pot {
         const potsLength = this.gameState.pots.length;
-        assert(potsLength > 0, 'Cannot call popPot when length of pot array is zero. This is a bug.');
+        if (!(potsLength > 0)) {
+            throw Error(
+                `Cannot call popPot when length of pot array is zero. This is a bug. GameState: ${getLoggableGameState(
+                    this.gameState,
+                )}`,
+            );
+        }
         const poppedPot = this.gameState.pots[0];
         this.updateGameState({ pots: this.gameState.pots.filter((pot) => pot != poppedPot) });
-        assert(
-            this.gameState.pots.length === potsLength - 1,
-            'Pot array should have pot removed after calling popPot. This is a bug.',
-        );
+        if (!(this.gameState.pots.length === potsLength - 1)) {
+            throw Error(
+                `Pot array should have pot removed after calling popPot. This is a bug. GameState: ${getLoggableGameState(
+                    this.gameState,
+                )}`,
+            );
+        }
         return poppedPot;
     }
 
@@ -378,14 +384,18 @@ export class GameStateManager {
         const posA = this.getPositionRelativeToDealer(playerA);
         const posB = this.getPositionRelativeToDealer(playerB);
 
-        assert(
-            playerA !== playerB,
-            'gameStateManager.comparePositions was invoked with the same player. This is most likely a bug.',
-        );
-        assert(
-            posA !== posB,
-            'gameStateManager.getPositionRelativeToDealer returned the same position for two different players',
-        );
+        if (playerA !== playerB) {
+            throw Error(
+                `gameStateManager.comparePositions was invoked with the same player. ` +
+                    `This is most likely a bug. GameState: ${getLoggableGameState(this.gameState)}`,
+            );
+        }
+        if (!(posA !== posB)) {
+            throw Error(
+                `gameStateManager.getPositionRelativeToDealer returned ` +
+                    `the same position for two different players. GameState: ${getLoggableGameState(this.gameState)}`,
+            );
+        }
         // they cannot be equal
         return posA < posB ? -1 : 1;
     }
@@ -527,10 +537,10 @@ export class GameStateManager {
     getNextPlayerInHandUUID(currentPlayerUUID: string) {
         //TODO duplicate safeguard.
         if (this.haveAllPlayersActed()) {
-            throw Error('getNextPlayerInHandUUID shouldnt be called if all palyers have acted.');
+            throw Error('getNextPlayerInHandUUID shouldnt be called if all plalyers have acted.');
         }
         if (!currentPlayerUUID) {
-            throw Error('getNextPlayerInHandUUID shouldnt be called without a currentPalyerUUID');
+            throw Error('getNextPlayerInHandUUID shouldnt be called without a currentPlalyerUUID');
         }
         const seats = this.getSeats();
         const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
@@ -867,7 +877,13 @@ export class GameStateManager {
     }
 
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
-        assert(betAmount <= this.getChips(playerUUID));
+        if (betAmount > this.getChips(playerUUID)) {
+            throw Error(
+                `Player: ${playerUUID} betamount: ${betAmount} is larger than their number of chips: ${this.getChips(
+                    playerUUID,
+                )}.` + `GameState: ${getLoggableGameState(this.gameState)}`,
+            );
+        }
         this.updatePlayer(playerUUID, { betAmount });
     }
 
@@ -927,8 +943,11 @@ export class GameStateManager {
     }
 
     getHighestBet() {
+        // TODO this could be made more specific to be getPlayersInHand, and not getPlayersDealtIn
         const playersInHand = this.getPlayersDealtIn();
-        assert(playersInHand.length > 0, 'playersInHand.length was <= 0');
+        if (playersInHand.length <= 0) {
+            throw Error(`playersInHand.length was <= 0. GameState: ${getLoggableGameState(this.gameState)}`);
+        }
 
         return playersInHand.reduce((max, player) => {
             return player.betAmount > max ? player.betAmount : max;
@@ -983,7 +1002,11 @@ export class GameStateManager {
 
     getNextBettingRoundStage() {
         const bettingRoundStage = this.gameState.bettingRoundStage;
-        assert(bettingRoundStage !== BettingRoundStage.SHOWDOWN, 'This method shouldnt be called after showdown.');
+        if (bettingRoundStage === BettingRoundStage.SHOWDOWN) {
+            throw Error(
+                `This method shouldnt be called after showdown. GameState: ${getLoggableGameState(this.gameState)}`,
+            );
+        }
         return BETTING_ROUND_STAGES[BETTING_ROUND_STAGES.indexOf(bettingRoundStage) + 1];
     }
 

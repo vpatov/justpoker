@@ -23,7 +23,6 @@ export function genRandomInt(min: number, max: number) {
 }
 
 export function logGameState(gameState: GameState) {
-  console.log('\n\nServer game state:\n');
   const minimizedGameState = {
       ...gameState,
       // table: {
@@ -43,6 +42,23 @@ export function logGameState(gameState: GameState) {
       deck: [] as any,
   };
   console.log(util.inspect(minimizedGameState, false, null, true));
+}
+
+
+export function getLoggableGameState(gameState: GameState){
+  const activeConnections = Array.from(gameState.table.activeConnections).map(([uuid, client]) => ({
+    clientUUID: uuid,
+    playerUUID: client.playerUUID,
+    connectedTo: Array.from(client.websockets).map(([endpoint,ws]) => endpoint)  
+  }));
+  const minimizedGameState = {
+    ...gameState,
+    table: {
+      ...gameState.table,
+      activeConnections
+    }
+  }
+  return JSON.stringify(minimizedGameState);
 }
 
 export function parseHTTPParams(parsedQuery: queryString.ParsedUrl){
