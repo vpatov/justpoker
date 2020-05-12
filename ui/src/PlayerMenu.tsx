@@ -5,6 +5,8 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import AddChipDialog from './AddChipDialog';
 import { WsServer } from './api/ws';
+import { useSelector } from 'react-redux';
+import { isHeroAdminSelector, heroPlayerUUIDSelector } from './store/selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -18,6 +20,8 @@ function PlayerMenu(props) {
     const classes = useStyles();
     const { anchorEl, handleClose, stack, name, uuid, setHeroRotation, virtualPositon } = props;
     const [chipsDialog, setChipsDialog] = useState(false);
+    const isHeroAdmin = useSelector(isHeroAdminSelector);
+    const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
     const handleCloseDialog = () => {
         setChipsDialog(false);
@@ -43,8 +47,8 @@ function PlayerMenu(props) {
             anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
         >
             <AddChipDialog open={chipsDialog} handleClose={handleCloseDialog} name={name} stack={stack} uuid={uuid} />
-            <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem>
-            <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
+            {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
+            {(isHeroAdmin && heroPlayerUUID !== uuid) ? <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem> : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
             <MenuItem onClick={handleClose}>Mute</MenuItem>
         </Menu>
