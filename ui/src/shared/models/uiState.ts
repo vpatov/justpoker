@@ -211,11 +211,11 @@ export const COMMON_POT_SIZINGS: Array<[number, number]> = [
 ];
 
 export function getCleanUiChatLog(): UiChatLog {
-    return {messages: []};
+    return { messages: [] };
 }
 
 /* Clean Controller for init. */
-export function getCleanController() : Controller  {
+export function getCleanController(): Controller {
     return {
         toAct: false,
         lastBettingRoundAction: NOT_IN_HAND,
@@ -320,6 +320,7 @@ export const TestGame: UiGameState = {
         unqueueAllBettingRoundActions: true,
     },
     controller: {
+        showWarningOnFold: true,
         toAct: true,
         lastBettingRoundAction: CHECK_ACTION,
         min: 25,
@@ -346,7 +347,6 @@ export const TestGame: UiGameState = {
             },
         ],
         bettingRoundActionButtons: ALL_ACTION_BUTTONS,
-        showWarningOnFold: false,
     },
     table: {
         spots: 9,
@@ -419,7 +419,7 @@ export const TestGame: UiGameState = {
 
         {
             button: true,
-            name: 'Langus PLO',
+            name: 'Marvinminwhich Lorgrikiski',
             position: positions[4],
             stack: 323,
             bet: genRandomInt(0, 100000),

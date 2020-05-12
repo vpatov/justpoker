@@ -5,6 +5,8 @@ import PlayerStack from './PlayerStack';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import blueGrey from '@material-ui/core/colors/blueGrey';
+import grey from '@material-ui/core/colors/grey';
+
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import MoreHoriz from '@material-ui/icons/MoreHoriz';
@@ -47,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
         bottom: 0,
         right: 0,
         marginRight: '0.4vmin',
-        color: 'grey',
+        color: grey[700],
         '&:hover': {
             color: 'black',
         },
@@ -88,7 +90,7 @@ function Player(props) {
                 virtualPositon={virtualPositon}
             />
             {sittingOut ? (
-                <Typography className={classnames(classes.sittingOut, { [classes.hero]: hero })}>
+                <Typography className={classnames(classes.sittingOut)}>
                     <Typography className={classes.sittingOutText}>Sitting Out</Typography>
                 </Typography>
             ) : (

@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) =>
             zIndex: -1,
             display: 'flex',
             justifyContent: 'center',
-            backgroundColor: 'rgba(255,255,255,0.3)',
+            backgroundColor: 'rgba(255,255,255,0.5)',
             borderBottomLeftRadius: '0.6vmin',
             borderBottomRightRadius: '0.6vmin',
             position: 'absolute',
