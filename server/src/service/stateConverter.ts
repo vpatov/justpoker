@@ -2,7 +2,6 @@ import { Service } from 'typedi';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
 import { GameState, ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
-import { strict as assert } from 'assert';
 
 import {
     UiState,

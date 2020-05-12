@@ -12,7 +12,7 @@ import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateConverter } from '../service/stateConverter';
-import { generateUUID, logGameState, printObj } from '../../../ui/src/shared/util/util';
+import { generateUUID, logGameState, printObj, getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { AudioService } from '../service/audioService';
 import { AnimationService } from '../service/animationService';
 import { LedgerService } from '../service/ledgerService';
@@ -21,6 +21,7 @@ import { WSParams, EndPoint } from '../../../ui/src/shared/models/dataCommunicat
 import { ChatService } from '../service/chatService';
 import { StateGraphManager } from '../service/stateGraphManager';
 import { NewGameForm } from '../../../ui/src/shared/models/table';
+import { logger } from './logging';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -71,7 +72,7 @@ class Server {
             }
             // dont flood the console
             if (count % 10 === 0) {
-                console.log(`${snippet}: Average over ${count} samples: ${sum / count}`);
+                logger.debug(`${snippet}: Average over ${count} samples: ${sum / count}`);
             }
         });
     }
@@ -97,7 +98,7 @@ class Server {
             this.initWSSListeners();
             this.chatService.clearMessages();
             this.tableInitialized = true;
-            console.log(gameUUID);
+            logger.info(`GameUUID: ${gameUUID}`);
             res.send(JSON.stringify({ gameUUID: gameUUID }));
         });
 
@@ -146,10 +147,9 @@ class Server {
             };
 
             const clientUUID = queryParams.clientUUID || generateUUID();
-            console.log(
+            logger.info(
                 `Connected to clientUUID: ${clientUUID}, gameUUID: ${queryParams.gameUUID}, endpoint: ${queryParams.endpoint}, IP Address: ${ip}`,
             );
-
             // TODO server shouldnt be communicating with the gameStateManager, but with some
             // other intermediary that will handle WS robustness
             this.gsm.initConnectedClient(clientUUID, ws, queryParams.endpoint);
@@ -175,8 +175,7 @@ class Server {
     }
 
     private processGameMessage(ws: WebSocket, data: WebSocket.Data, clientUUID: string) {
-        console.log('Incoming data:');
-        printObj(data);
+        logger.info(`Incoming Game Message: ${data}`);
         if (typeof data === 'string') {
             try {
                 const receivedMessageTime = Date.now();
@@ -184,16 +183,15 @@ class Server {
                 this.messageService.processMessage(action, clientUUID);
                 const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
                 this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
-
                 this.logAverages();
             } catch (e) {
-                logGameState(this.gsm.getGameState());
-                throw e;
+                logger.error(`EXCEPTION: ${e} GameState:  ${getLoggableGameState(this.gsm.getGameState())}`);
+
+                // TODO should we throw an exception here?
+                // throw e;
             }
         } else {
-            const unsupportedMsg = 'Received data of unsupported type.';
-            console.log(unsupportedMsg);
-            ws.send(JSON.stringify({ error: unsupportedMsg }));
+            logger.error('Received data of an unsupported type.');
         }
     }
 
@@ -214,7 +212,7 @@ class Server {
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {
             const port = this.server.address() as AddressInfo;
-            console.log(`Server started on address ${JSON.stringify(port)} :)`);
+            logger.info(`Server started on address ${JSON.stringify(port)} :)`);
         });
     }
 }

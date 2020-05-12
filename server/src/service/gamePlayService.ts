@@ -8,7 +8,6 @@ import {
     GameType,
 } from '../../../ui/src/shared/models/game';
 
-import { strict as assert } from 'assert';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
@@ -16,10 +15,11 @@ import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
 import { AudioService } from './audioService';
 import { AnimationService } from '../service/animationService';
 
-import { printObj, logGameState } from '../../../ui/src/shared/util/util';
+import { printObj, logGameState, getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
+import { logger } from '../server/logging';
 
 @Service()
 export class GamePlayService {
@@ -66,15 +66,16 @@ export class GamePlayService {
             this.gsm.getTimeToAct() +
             this.gsm.getSumTimeBankValueThisAction(currentPlayerToAct) -
             this.gsm.getCurrentPlayerTurnElapsedTime();
-        console.log(timeRemaining);
         return timeRemaining;
     }
 
     timeOutPlayer() {
         const playerUUID = this.gsm.getCurrentPlayerToAct();
         if (!playerUUID) {
-            console.log('timeOutPlayer was called and there is no currentPlayerToAct. state:');
-            logGameState(this.gsm.getGameState());
+            logger.error(
+                `timeOutPlayer was called and there is no currentPlayerToAct. GameState:` +
+                    `${getLoggableGameState(this.gsm.getGameState())}`,
+            );
             return;
         }
         const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
@@ -199,8 +200,12 @@ export class GamePlayService {
         // In thise case, we do not update the minRaiseDiff or previousRaise, but only the
         // partialAllInLeftOver.
         if (actualBetAmount > previousRaise && actualBetAmount < previousRaise + minRaiseDiff) {
-            // TODO remove assertion
-            assert(isPlayerAllIn);
+            if (!isPlayerAllIn) {
+                throw Error(
+                    `Player is not all in, but is raising less than the minimum raise.` +
+                        ` GameState: ${getLoggableGameState(this.gsm.getGameState())}`,
+                );
+            }
             const partialAllInLeftOver = actualBetAmount - previousRaise;
             this.gsm.updateGameState({
                 partialAllInLeftOver,
@@ -352,7 +357,10 @@ export class GamePlayService {
             }
 
             default: {
-                throw Error("Shouldn't be reaching default switch path in gamePlayService.dealCards. This is a bug.");
+                throw Error(
+                    `Shouldn't be reaching default switch path in gamePlayService.dealCards.` +
+                        ` This is a bug. ${getLoggableGameState(this.gsm.getGameState())}`,
+                );
             }
         }
     }

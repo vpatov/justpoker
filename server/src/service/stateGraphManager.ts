@@ -22,7 +22,6 @@ import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { Subject } from 'rxjs';
-import { logGameState, printObj } from '../../../ui/src/shared/util/util';
 import { LedgerService } from './ledgerService';
 
 const MAX_CONDITION_DEPTH = 3;
@@ -177,12 +176,9 @@ export class StateGraphManager {
     // - If the event is a defined state transition path, a state transition is executed.
     processEvent(event: EventType) {
         const nextStage = this.getNextStage(event);
-        console.log('processEvent:', event);
-
         if (nextStage) {
             this.initializeGameStage(nextStage);
         }
-
         this.stateGraphUpdateEmitter.next();
     }
 
@@ -209,7 +205,6 @@ export class StateGraphManager {
     // be called)
     initializeGameStage(stage: GameStage) {
         // TODO write assertions checking for preconditions of each stage after entering stage
-        console.log(stage);
         this.gameStateManager.updateGameStage(stage);
 
         switch (stage) {
