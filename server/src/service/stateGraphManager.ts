@@ -12,12 +12,11 @@ import {
 } from '../../../ui/src/shared/models/stateGraph';
 import {
     GameStage,
-    GameState,
     ServerStateKey,
     QueuedServerAction,
     ServerActionType,
 } from '../../../ui/src/shared/models/gameState';
-import { ActionType } from '../../../ui/src/shared/models/wsaction';
+import { ActionType } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
@@ -37,10 +36,10 @@ export class StateGraphManager {
         private readonly ledgerService: LedgerService,
     ) {}
 
-    private updateEmitter: Subject<void> = new Subject();
+    private stateGraphUpdateEmitter: Subject<void> = new Subject();
 
-    observeUpdates() {
-        return this.updateEmitter.asObservable();
+    observeStateGraphUpdates() {
+        return this.stateGraphUpdateEmitter.asObservable();
     }
 
     canContinueGameCondition: Condition = {
@@ -184,7 +183,7 @@ export class StateGraphManager {
             this.initializeGameStage(nextStage);
         }
 
-        this.updateEmitter.next();
+        this.stateGraphUpdateEmitter.next();
     }
 
     processTimeout() {

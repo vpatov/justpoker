@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ActionType, UiActionType } from './wsaction';
+import { ActionType, UiActionType } from './dataCommunication';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
@@ -216,45 +216,45 @@ export function getCleanUiChatLog(): UiChatLog {
 /* Clean Controller for init. */
 export function getCleanController() : Controller  {
     return {
-    toAct: false,
-    lastBettingRoundAction: NOT_IN_HAND,
-    min: 0,
-    max: 0,
-    willStraddle: false,
-    dealInNextHand: true,
-    sizingButtons: [],
-    bettingRoundActionButtons: [],
-    timeBanks: 0
+        toAct: false,
+        lastBettingRoundAction: NOT_IN_HAND,
+        min: 0,
+        max: 0,
+        willStraddle: false,
+        dealInNextHand: true,
+        sizingButtons: [],
+        bettingRoundActionButtons: [],
+        timeBanks: 0,
     };
 }
 
 export function getCleanGlobal(): Global {
     return {
-    heroIsAdmin: false,
-    heroIsSeated: false,
-    isGameInProgress: false,
-    bigBlind: 2,
-    smallBlind: 1,
-    allowStraddle: false,
-    gameType: GameType.NLHOLDEM,
-    canStartGame: false,
-    gameWillStopAfterHand: false,
-    unqueueAllBettingRoundActions: true,
+        heroIsAdmin: false,
+        heroIsSeated: false,
+        isGameInProgress: false,
+        bigBlind: 2,
+        smallBlind: 1,
+        allowStraddle: false,
+        gameType: GameType.NLHOLDEM,
+        canStartGame: false,
+        gameWillStopAfterHand: false,
+        unqueueAllBettingRoundActions: true,
     };
-};
+}
 
 export function getCleanGame(): UiGameState {
     return {
-    global: getCleanGlobal(),
-    controller: getCleanController(),
-    menu: [],
-    table: {
-        spots: 9,
-        activePot: 0,
-        fullPot: 0,
-        communityCards: [],
-    },
-    players: [],
+        global: getCleanGlobal(),
+        controller: getCleanController(),
+        menu: [],
+        table: {
+            spots: 9,
+            activePot: 0,
+            fullPot: 0,
+            communityCards: [],
+        },
+        players: [],
     };
 }
 

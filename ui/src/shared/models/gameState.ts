@@ -128,6 +128,7 @@ export function getCleanGameState(): GameState {
             maxBuyin: 0,
             timeToAct: 0,
             maxPlayers: 9,
+            timeBankValue: 0,
         },
         dealerUUID: '',
         smallBlindUUID: '',

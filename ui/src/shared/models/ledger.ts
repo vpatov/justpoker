@@ -1,14 +1,5 @@
 
 export declare interface BaseLedgerRow {
-    /** A set of (case insensitive) aliases that the client has named their players, i.e. "Vas", "Vasia" .*/
-    aliases: Set<string>;
-
-    /** The list of buyins the client has completed. */
-    buyins: number[];
-
-    /** Everytime the client leaves the table with some amount, that amount is pushed here. */
-    walkaways: number[];
-
     /**
      * The number of chips the client's player currently has, such that net can be calculated 
      * at any moment.
@@ -34,6 +25,15 @@ export declare interface BaseLedgerRow {
 export declare interface ServerOnlyLedgerFields {
     /** The uuid of the client. */
     clientUUID: string;
+
+    /** A set of (case insensitive) aliases that the client has named their players, i.e. "Vas", "Vasia" .*/
+    aliases: Set<string>;
+
+    /** Everytime the client leaves the table with some amount, that amount is pushed here. */
+    walkaways: number[];
+
+    /** The list of buyins the client has completed. */
+    buyins: number[];
 }
 
 export declare interface LedgerComputedFields {
@@ -51,6 +51,14 @@ export declare interface LedgerComputedFields {
     vpip: number;
 }
 
+export declare interface ClientOnlyLedgerFields {
+    /** Flat representation of a list of aliases. */
+    aliases: string;
+
+    /** Flat representation of a list of buyins. */
+    buyins: string;
+}
+
 /**
  * A server-side representation of a ledger row. Contains the sensitive clientUUID field,
  * which will be stripped during conversion to UILedgerRow. Variables like vpip and net,
@@ -63,8 +71,8 @@ export declare type ServerLedger = {[clientUUID: string]: ServerLedgerRow};
  * Representation of a ledger row that is used in the frontend to visually present 
  * the data.
  */
-export declare type UILedgerRow = BaseLedgerRow & LedgerComputedFields;
-export declare type UILedger = {[clientUUID: string]: UILedgerRow};
+export declare type UILedgerRow = BaseLedgerRow & LedgerComputedFields & ClientOnlyLedgerFields;
+export declare type UILedger = UILedgerRow[];
 
 
  export function getCleanLedgerRow(): ServerLedgerRow {
