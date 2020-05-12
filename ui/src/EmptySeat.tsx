@@ -7,8 +7,8 @@ import IconButton from '@material-ui/core/IconButton';
 
 const useStyles = makeStyles((theme) => ({
     hoverZone: {
-        width: '15vmin',
-        height: '15vmin',
+        width: '12vmin',
+        height: '12vmin',
         borderRadius: '50%',
         display: 'flex',
         justifyContent: 'center',
@@ -18,8 +18,8 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     root: {
-        width: '8vmin',
-        height: '8vmin',
+        width: '12vmin',
+        height: '12vmin',
         visibility: 'hidden',
     },
     text: {

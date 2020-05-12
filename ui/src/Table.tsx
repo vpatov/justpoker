@@ -20,7 +20,7 @@ const H_UNIT = 'vmin';
 const TABLE_HEIGHT = 39;
 const TABLE_WIDTH = 71;
 
-const PLAYER_HEIGHT = 57;
+const PLAYER_HEIGHT = 58;
 const PLAYER_WIDTH = 91;
 
 const BET_HEIGHT = 30;
