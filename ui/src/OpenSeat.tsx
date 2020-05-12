@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
         width: '8vmin',
         height: '8vmin',
         border: `2px solid white`,
-        backgroundColor: grey[800],
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         color: 'white',
         '&:hover': {
             backgroundColor: grey[900],

@@ -15,12 +15,7 @@ import { ActionType, ClientWsMessageRequest } from './shared/models/dataCommunic
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {},
-        radioGroup: {
-            display: 'flex',
-            flexDirection: 'row',
-        },
-        field: {
-            marginTop: 24,
+        text: {
             marginBottom: 24,
         },
     }),
@@ -28,26 +23,30 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function ControllerWarningDialog(props) {
     const classes = useStyles();
-    const { open, handleClose, actionType, message } = props;
+    const { open, handleClose, onConfirm } = props;
 
-    function onSubmit() {
-        WsServer.send({
-            actionType: actionType,
-            request: {} as ClientWsMessageRequest,
-        });
-        handleClose();
+    function onPressEnter(event: any) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            onConfirm();
+        }
     }
 
     return (
-        <Dialog open={open} maxWidth="sm" fullWidth>
-            <DialogTitle>{`Confirm Action`}</DialogTitle>
+        <Dialog open={open} maxWidth="sm" fullWidth onKeyPress={(event) => onPressEnter(event)}>
+            <DialogTitle>{`Confirm Fold`}</DialogTitle>
             <DialogContent>
-                <Typography>{message}</Typography>
+                <Typography className={classes.text}>
+                    This is an unnecessary fold. Currently, you can stay in the hand at no cost by checking. The only
+                    benefit to this play is that you may intimidate your opponents by showing your total disreagrd for
+                    standard poker strategy.
+                </Typography>
+                <Typography className={classes.text}>Are you sure?</Typography>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={onSubmit} color="primary">
-                    Confirm
+                <Button onClick={onConfirm} color="primary">
+                    Fold
                 </Button>
             </DialogActions>
         </Dialog>

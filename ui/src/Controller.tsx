@@ -20,6 +20,8 @@ import { ActionType, ClientWsMessageRequest, ClientStraddleRequest } from './sha
 import { Typography } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game';
 
+import ControllerWarningDialog from './ControllerWarningDialog';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -218,7 +220,24 @@ function ControllerComp(props: ControllerProps) {
         return;
     };
 
+    function closeDialog() {
+        setWarning(false);
+    }
+
+    function onConfirmDialog() {
+        setWarning(false);
+        performBettingRoundAction(BettingRoundActionType.FOLD);
+    }
+
     function onClickActionButton(betActionType) {
+        if (betActionType === BettingRoundActionType.FOLD && showWarningOnFold) {
+            setWarning(true);
+        } else {
+            performBettingRoundAction(betActionType);
+        }
+    }
+
+    function performBettingRoundAction(betActionType) {
         if (toAct) {
             sendBettingRoundAction(betActionType);
         } else {
@@ -228,10 +247,6 @@ function ControllerComp(props: ControllerProps) {
                 setQueuedActionType(betActionType);
             }
         }
-    }
-    if (toAct && queuedActionType !== '') {
-        sendBettingRoundAction(queuedActionType);
-        setQueuedActionType('');
     }
 
     function sendBettingRoundAction(betActionType) {
@@ -271,12 +286,18 @@ function ControllerComp(props: ControllerProps) {
         });
     }
 
+    if (toAct && queuedActionType !== '') {
+        sendBettingRoundAction(queuedActionType);
+        setQueuedActionType('');
+    }
+
     return (
         <div
             className={classnames(classes.root, className, {
                 [classes.rootToAct]: toAct,
             })}
         >
+            <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
             <div className={classes.gameInfoCont}>
                 <Typography className={classes.handLabel}>{heroHandLabel}</Typography>
                 {toAct ? <Typography className={classes.toActLabel}>{'☉ Your Turn'}</Typography> : null}
