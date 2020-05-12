@@ -139,8 +139,6 @@ class Server {
         this.wss.removeAllListeners();
         this.wss.on('connection', (ws: WebSocket, req) => {
             const ip = req.connection.remoteAddress;
-            console.log('connected to ip:', ip);
-
             const parsedQuery = queryString.parseUrl(req.url);
             const queryParams: WSParams = {
                 clientUUID: parsedQuery.query.clientUUID as string,
@@ -150,7 +148,7 @@ class Server {
 
             const clientUUID = queryParams.clientUUID || generateUUID();
             console.log(
-                `Connected to clientUUID: ${clientUUID}, gameUUID: ${queryParams.gameUUID}, endpoint: ${queryParams.endpoint}`,
+                `Connected to clientUUID: ${clientUUID}, gameUUID: ${queryParams.gameUUID}, endpoint: ${queryParams.endpoint}, IP Address: ${ip}`,
             );
 
             // TODO server shouldnt be communicating with the gameStateManager, but with some
