@@ -60,7 +60,7 @@ function Ledger(props) {
     }, []);
 
     const onReceiveNewLedger = (updatedLedger: UILedger) => {
-        setLedger(() => updatedLedger);
+        setLedger(updatedLedger);
     };
 
     return LedgerTable({ledger});
@@ -90,7 +90,6 @@ function getComparator<Key extends keyof any>(
 }
   
 function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
-    console.log('stableSort: array',array);
     const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
     stabilizedThis.sort((a, b) => {
         const order = comparator(a[0], b[0]);
@@ -180,7 +179,6 @@ function LedgerTable(props) {
     const [orderBy, setOrderBy] = React.useState<keyof UILedgerRow>('aliases');
     const [selected, setSelected] = React.useState<string[]>([]);
     const ledger: UILedgerRow[] = props.ledger;
-    console.log("LedgerTable ledger:",ledger);
   
     const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
       const isAsc = orderBy === property && order === 'asc';
