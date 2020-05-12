@@ -806,6 +806,7 @@ export class GameStateManager {
     }
 
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
+        assert(betAmount <= this.getChips(playerUUID));
         this.updatePlayer(playerUUID, { betAmount });
     }
 

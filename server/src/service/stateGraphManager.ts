@@ -272,7 +272,6 @@ export class StateGraphManager {
                 this.gamePlayService.ejectStackedPlayers();
 
                 this.executeQueuedServerActions();
-                printObj(this.ledgerService.getLedger());
                 break;
             }
         }
