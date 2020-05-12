@@ -435,10 +435,19 @@ export class ValidationService {
             return response;
         }
 
-        if (!this.gsm.getPlayer(req.playerUUID)) {
+        const bootPlayer = this.gsm.getPlayer(req.playerUUID);
+        if (!bootPlayer) {
             return {
                 errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
                 errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
+        const requestingPlayer = this.gsm.getPlayerByClientUUID(clientUUID);
+        if (requestingPlayer && requestingPlayer.uuid === bootPlayer.uuid){
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Admin cannot boot themselves.`
             };
         }
 

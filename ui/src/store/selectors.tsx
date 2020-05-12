@@ -8,13 +8,18 @@ export const playersSelector = (gs: UiGameState): UiPlayer[] => gs.players;
 export const heroHandLabelSelector = (gs: UiGameState): string =>
     (gs.players.find((p) => p.hero) || {}).handLabel || '';
 
-export const bettingRoundActionTypesToUnqueueSelector: (UiGameState) => BettingRoundActionType[] = (gs: UiGameState) =>
-    gs.controller.lastBettingRoundAction.type === BettingRoundActionType.BET
-        ? [BettingRoundActionType.CHECK, BettingRoundActionType.CALL]
-        : gs.global.unqueueAllBettingRoundActions
-        ? ALL_BETTING_ROUND_ACTION_TYPES
-        : [];
+export const bettingRoundActionTypesToUnqueueSelector: (UiGameState) => BettingRoundActionType[] = (gs: UiGameState) => {
+    if (gs.global.unqueueAllBettingRoundActions){
+        return ALL_BETTING_ROUND_ACTION_TYPES;
+    }
 
+    else if (gs.controller.lastBettingRoundAction.type === BettingRoundActionType.BET){
+        return [BettingRoundActionType.CHECK, BettingRoundActionType.CALL];
+    }
+    else {
+        return [];
+    }
+}
 export const allowStraddleSelector = (gs: UiGameState): boolean => gs.global.allowStraddle;
 export const canStartGameSelector = (gs: UiGameState): boolean => gs.global.canStartGame;
 export const globalGameStateSelector = (gs: UiGameState): Global => gs.global;
