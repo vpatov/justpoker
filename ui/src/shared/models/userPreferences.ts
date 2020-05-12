@@ -30,11 +30,11 @@ function computeBackgroundGradient(color: string) {
 
 export const Background = {
     blue: computeBackgroundGradient(blue[600]),
-    purple: computeBackgroundGradient(deepPurple[700]),
-    teal: computeBackgroundGradient(teal[600]),
+    purple: computeBackgroundGradient(deepPurple[600]),
+    teal: computeBackgroundGradient(teal[500]),
     yellow: computeBackgroundGradient(yellow[600]),
     grey: computeBackgroundGradient(grey[700]),
-    indigo: computeBackgroundGradient(indigo[900]),
+    indigo: computeBackgroundGradient(indigo[800]),
     red: computeBackgroundGradient(red[700]),
     green: computeBackgroundGradient(green[700]),
     orange: computeBackgroundGradient(orange[600]),

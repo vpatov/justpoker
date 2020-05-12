@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import Player from './Player';
 import OpenSeat from './OpenSeat';
+import EmptySeat from './EmptySeat';
 import Bet from './Bet';
 import PotTable from './PotTable';
 import CommunityCards from './CommunityCards';
@@ -146,7 +147,19 @@ function Table(props) {
                     />,
                 );
             } else {
-                ans.push(null);
+                ans.push(
+                    <EmptySeat
+                        className={classes.openSeat}
+                        style={{
+                            top: `${pPos.y}${H_UNIT}`,
+                            left: `${pPos.x}${W_UNIT}`,
+                        }}
+                        setHeroRotation={(r) => {
+                            setHeroRotation(r);
+                        }}
+                        virtualPositon={mod(index + offset - 1, 9)}
+                    />,
+                );
             }
         }
         return ans;

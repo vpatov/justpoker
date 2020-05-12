@@ -13,8 +13,8 @@ import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: '7vmin',
-        height: '7vmin',
+        width: '8vmin',
+        height: '8vmin',
         border: `2px solid white`,
         backgroundColor: grey[800],
         color: 'white',

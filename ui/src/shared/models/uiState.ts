@@ -47,6 +47,7 @@ export declare interface Controller {
     toAct?: boolean;
     willStraddle: boolean;
     lastBettingRoundAction: BettingRoundAction;
+    showWarningOnFold?: boolean;
 }
 
 export declare interface SizingButton {
@@ -312,6 +313,7 @@ export const TestGame: UiGameState = {
         unqueueAllBettingRoundActions: true,
     },
     controller: {
+        showWarningOnFold: true,
         toAct: true,
         lastBettingRoundAction: CHECK_ACTION,
         min: 25,
@@ -410,7 +412,7 @@ export const TestGame: UiGameState = {
 
         {
             button: true,
-            name: 'Langus PLO',
+            name: 'Marvinminwhich Lorgrikiski',
             position: positions[4],
             stack: 323,
             bet: genRandomInt(0, 100000),

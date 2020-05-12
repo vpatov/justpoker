@@ -6,11 +6,10 @@ import {
     controllerSelector,
     heroHandLabelSelector,
     allowStraddleSelector,
-    heroPlayerTimerSelector,
     bettingRoundActionTypesToUnqueueSelector,
+    isHeroSeatedSelector,
 } from './store/selectors';
 import TextFieldWrap from './reuseable/TextFieldWrap';
-import ControllerTimer from './ControllerTimer';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -184,14 +183,18 @@ function ControllerComp(props: ControllerProps) {
         dealInNextHand,
         timeBanks,
         willStraddle,
+        showWarningOnFold,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const allowStraddle = useSelector(allowStraddleSelector);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
+    const heroSeated = useSelector(isHeroSeatedSelector);
 
     const [betAmt, setBetAmt] = useState(0);
     const [queuedActionType, setQueuedActionType] = useState('');
+
+    const [warning, setWarning] = useState(false);
 
     useEffect(() => {
         for (const actionType of bettingRoundActionTypesToUnqueue) {
@@ -239,9 +242,7 @@ function ControllerComp(props: ControllerProps) {
                 amount: Number(betAmt),
             } as ClientWsMessageRequest,
         });
-        if (betActionType === BettingRoundActionType.BET) {
-            changeBetAmount(0);
-        }
+        changeBetAmount(0);
     }
 
     function isBetValid() {
@@ -249,10 +250,10 @@ function ControllerComp(props: ControllerProps) {
         return false;
     }
 
-    function onClickTimeBank(){
+    function onClickTimeBank() {
         WsServer.send({
             actionType: ActionType.USETIMEBANK,
-            request: {} as ClientWsMessageRequest
+            request: {} as ClientWsMessageRequest,
         });
     }
 
@@ -370,7 +371,7 @@ function ControllerComp(props: ControllerProps) {
                         label="Straddle"
                     />
                 ) : null}
-                {
+                {heroSeated ? (
                     <Button
                         className={classes.timeBankButton}
                         variant="outlined"
@@ -379,7 +380,7 @@ function ControllerComp(props: ControllerProps) {
                     >
                         {`Time Bank (${timeBanks})`}
                     </Button>
-                }
+                ) : null}
             </div>
         </div>
     );

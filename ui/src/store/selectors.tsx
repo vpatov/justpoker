@@ -22,5 +22,5 @@ export const heroPlayerTimerSelector = (gs: UiGameState): PlayerTimer =>
     (gs.players.find((p) => p.hero) || {}).playerTimer || { timeElapsed: 0, timeLimit: 0 };
 export const heroPlayerToAct = (gs: UiGameState): boolean => (gs.players.find((p) => p.hero) || {}).toAct || false;
 export const isHeroAdminSelector = (gs: UiGameState): boolean => gs.global.heroIsAdmin;
-
+export const isHeroSeatedSelector = (gs: UiGameState): boolean => gs.global.heroIsSeated;
 export const selectMenuButtons = (gs: UiGameState): MenuButton[] => gs.menu;
