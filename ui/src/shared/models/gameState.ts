@@ -46,6 +46,8 @@ export declare interface GameState {
 
     bigBlindUUID: Readonly<string>;
 
+    straddleUUID: Readonly<string>;
+
     bettingRoundStage: Readonly<BettingRoundStage>;
 
     firstToAct: Readonly<string>;
@@ -57,8 +59,6 @@ export declare interface GameState {
     timeCurrentPlayerTurnStarted: number;
 
     pots: ReadonlyArray<Pot>;
-
-    awardPots: number[];
 
     /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
     handWinners: Set<string>;
@@ -128,6 +128,7 @@ export function getCleanGameState(): GameState {
         dealerUUID: '',
         smallBlindUUID: '',
         bigBlindUUID: '',
+        straddleUUID: '',
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: '',
         currentPlayerToAct: '',
@@ -137,7 +138,6 @@ export function getCleanGameState(): GameState {
             cards: [],
         },
         pots: [],
-        awardPots: [],
         handWinners: new Set<string>(),
         table: {
             uuid: '',

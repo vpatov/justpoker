@@ -139,7 +139,7 @@ export class MessageService {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.setPlayerStraddle(player.uuid, req.straddle);
+                this.gameStateManager.setWillPlayerStraddle(player.uuid, req.willStraddle);
             },
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -147,6 +147,12 @@ export class MessageService {
             validation: (uuid, req: BootPlayerRequest) => this.validationService.validateBootPlayerAction(uuid, req),
             perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.bootPlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
+        },
+        // TODO impement leave table
+        [ActionType.LEAVETABLE]: {
+            validation: (_, __) => NO_ERROR,
+            perform: () => null,
+            updates: [],
         },
     };
 

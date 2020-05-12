@@ -15,7 +15,14 @@ export enum ActionType {
     SETCHIPS = 'SETCHIPS',
     BETACTION = 'BETACTION',
     SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
-    BOOTPLAYER = "BOOTPLAYER"
+    BOOTPLAYER = 'BOOTPLAYER',
+    LEAVETABLE = 'LEAVETABLE',
+}
+
+export enum UiActionType {
+    VOLUME = 'VOLUME',
+    SETTINGS = 'SETTINGS',
+    ADMIN = 'ADMIN',
 }
 
 export declare interface SitDownRequest {
@@ -45,7 +52,7 @@ export declare interface ClientChatMessage {
 }
 
 export declare interface ClientStraddleRequest {
-    straddle: boolean;
+    willStraddle: boolean;
 }
 
 export declare interface BootPlayerRequest {

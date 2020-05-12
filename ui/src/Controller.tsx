@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
             float: 'right',
             height: '100%',
             display: 'flex',
-            justifyContent: 'space-evenly',
+            justifyContent: 'center',
             flexDirection: 'column',
             alignItems: 'flex-end',
         },
@@ -101,26 +101,24 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '5vmin',
             marginRight: '1vmin',
         },
-        betTextFieldInput: {
-            fontSize: '1.4vmin',
-            padding: '1vmin',
-        },
         actionButton: {
             height: '40%',
             width: '10vmin',
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
         },
-        button: {
-            fontSize: '1.3vmin',
+        timeBankButton: {
+            margin: '0.5vmin',
+            fontSize: '1.1vmin',
         },
         checkLabel: {
-            fontSize: '1.3vmin',
+            fontSize: '1.4vmin',
         },
         incButton: {
             padding: 0,
             fontSize: '2vmin',
             fontWeight: 'bold',
+            width: '2vw',
         },
         incButtonLeft: {
             marginRight: '1vmin',
@@ -131,14 +129,15 @@ const useStyles = makeStyles((theme: Theme) =>
         sizeButton: {
             margin: 6,
             fontSize: '1vmin',
+            width: '4vw',
         },
         handLabel: {
             marginTop: '2vmin',
-            fontSize: '2vmin',
+            fontSize: '1.8vmin',
             color: theme.palette.primary.main,
         },
         toActLabel: {
-            fontSize: '2vmin',
+            fontSize: '1.8vmin',
             color: theme.palette.primary.main,
             animation: '$blinking 1.3s linear infinite;',
         },
@@ -180,7 +179,7 @@ function ControllerComp(props: ControllerProps) {
         bettingRoundActionButtons: actionButtons,
         dealInNextHand,
         timeBanks,
-        straddle,
+        willStraddle,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
@@ -191,8 +190,8 @@ function ControllerComp(props: ControllerProps) {
     const [queuedActionType, setQueuedActionType] = useState('');
 
     useEffect(() => {
-        for (const actionType of bettingRoundActionTypesToUnqueue){
-            if (queuedActionType === actionType){
+        for (const actionType of bettingRoundActionTypesToUnqueue) {
+            if (queuedActionType === actionType) {
                 setQueuedActionType('');
                 setBetAmt(0);
             }
@@ -256,7 +255,7 @@ function ControllerComp(props: ControllerProps) {
     function onToggleStraddle() {
         WsServer.send({
             actionType: ActionType.SETPLAYERSTRADDLE,
-            request: { straddle: !straddle } as ClientWsMessageRequest,
+            request: ({ willStraddle: !willStraddle } as ClientStraddleRequest) as ClientWsMessageRequest,
         });
     }
 
@@ -340,23 +339,6 @@ function ControllerComp(props: ControllerProps) {
                 </div>
             </div>
             <div className={classes.adminButtonCont}>
-                {timeBanks !== undefined ? (
-                    <Button
-                        className={classes.button}
-                        variant="outlined"
-                        onClick={() => null}
-                        disabled={timeBanks === 0}
-                    >
-                        {`Time Bank (${timeBanks})`}
-                    </Button>
-                ) : null}
-                {allowStraddle ? (
-                    <FormControlLabel
-                        classes={{ label: classes.checkLabel }}
-                        control={<Checkbox className={classes.button} checked={straddle} onChange={onToggleStraddle} />}
-                        label="Straddle"
-                    />
-                ) : null}
                 <FormControlLabel
                     classes={{ label: classes.checkLabel }}
                     control={
@@ -368,6 +350,26 @@ function ControllerComp(props: ControllerProps) {
                     }
                     label="Sit Out Next Hand"
                 />
+                {allowStraddle ? (
+                    <FormControlLabel
+                        classes={{ label: classes.checkLabel }}
+                        control={
+                            <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
+                        }
+                        label="Straddle"
+                    />
+                ) : null}
+
+                {timeBanks !== undefined ? (
+                    <Button
+                        className={classes.timeBankButton}
+                        variant="outlined"
+                        onClick={() => null}
+                        disabled={timeBanks === 0}
+                    >
+                        {`Time Bank (${timeBanks})`}
+                    </Button>
+                ) : null}
             </div>
         </div>
     );
