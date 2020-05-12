@@ -144,13 +144,35 @@ export class StateConverter {
     // only called for the current player to act? Whatever the choice is, the usage/parameters have
     // to be made consistent with the decision, because there is some redundancy right now.
     getUIController(clientUUID: string, heroPlayerUUID: string): Controller {
+        const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
+
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
-        const potSize = this.gameStateManager.getFullPot();
+        const fullPot = this.gameStateManager.getFullPot();
+        const curBet = this.gameStateManager.getPreviousRaise();
+        const curCall = hero.betAmount;
         const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID;
-        const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
         const minBet = this.getMinimumBetSize(heroPlayerUUID);
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
+
+        const getSizingButtons = () => {
+            if (!this.gameStateManager.isGameInProgress()) {
+                return [];
+            }
+
+            const minBetButton = this.createMinBetButton(minBet);
+            const allInButton = this.createAllInButton(maxBet);
+
+            if (bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING) {
+                // normal preflop sizings
+                const bbButtons = this.createBBSizeButtons(bbValue, minBet);
+                return [minBetButton, ...bbButtons, allInButton];
+            } else {
+                const potButtons = this.createPotSizeButtons(fullPot, curBet, curCall, minBet);
+                return [minBetButton, ...potButtons, allInButton];
+            }
+        };
+
         const controller: Controller = {
             toAct,
             lastBettingRoundAction: this.gameStateManager.getLastBettingRoundAction(),
@@ -163,33 +185,6 @@ export class StateConverter {
             timeBanks: hero.timeBanksLeft,
             showWarningOnFold: !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID),
         };
-
-        function getSizingButtons() {
-            if (!this.gameStateManager.isGameInProgress()) {
-                return [];
-            }
-
-            const minBetButton = this.createMinBetButton(minBet);
-            const allInButton = this.createAllInButton(maxBet);
-
-            if (bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING) {
-                if (minBet >= bbValue * 5) {
-                    const potButtons = COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
-                        this.createPotSizeButton(numerator, denominator, potSize),
-                    );
-                    return [minBetButton, ...potButtons, allInButton];
-                } else {
-                    // normal preflop sizings
-                    const bbButtons = COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue));
-                    return [minBetButton, ...bbButtons, allInButton];
-                }
-            } else {
-                const potButtons = COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
-                    this.createPotSizeButton(numerator, denominator, potSize),
-                );
-                return [minBetButton, ...potButtons, allInButton];
-            }
-        }
 
         return controller;
     }
@@ -345,23 +340,34 @@ export class StateConverter {
         return uiState;
     }
 
-    createPotSizeButton(numerator: number, denominator: number, potSize: number): SizingButton {
-        return {
-            label: numerator === denominator ? 'POT' : `${numerator}/${denominator}`,
-            value: Math.floor((numerator / denominator) * potSize),
-        };
+    createPotSizeButtons(fullPot: number, curBet: number, curCall: number, minBet: number): SizingButton[] {
+        const buttons: SizingButton[] = [];
+        COMMON_POT_SIZINGS.forEach(([numerator, denominator]) => {
+            const fraction = numerator / denominator;
+            const betAmt = (fullPot + curBet - curCall) * fraction + curBet;
+            buttons.push({
+                label: numerator === denominator ? 'POT' : `${numerator}/${denominator}`,
+                value: Math.ceil(betAmt),
+            });
+        });
+        return buttons;
     }
 
-    createBBSizeButton(numBlinds: number, bbValue: number): SizingButton {
-        return {
-            label: `${numBlinds} BB`,
-            value: numBlinds * bbValue,
-        };
+    createBBSizeButtons(bbValue: number, minBet: number): SizingButton[] {
+        const buttons: SizingButton[] = [];
+        COMMON_BB_SIZINGS.forEach((numBlinds) => {
+            if (numBlinds * bbValue >= minBet) {
+                buttons.push({
+                    label: `${numBlinds} BB`,
+                    value: numBlinds * bbValue,
+                });
+            }
+        });
+        return buttons;
     }
-
     createMinBetButton(minBetAmt: number): SizingButton {
         return {
-            label: `Min Bet`,
+            label: `Min`,
             value: minBetAmt,
         };
     }
