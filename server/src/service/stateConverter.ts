@@ -133,7 +133,8 @@ export class StateConverter {
             gameType: this.gameStateManager.getGameType(),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
-            unqueueAllBettingRoundActions: gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.SHOW_START_OF_BETTING_ROUND,
+            unqueueAllBettingRoundActions:
+                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.SHOW_START_OF_BETTING_ROUND,
         };
 
         return global;

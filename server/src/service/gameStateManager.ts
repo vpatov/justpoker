@@ -775,6 +775,14 @@ export class GameStateManager {
         this.ledgerService.addWalkaway(clientUUID, this.getPlayer(playerUUID).chips);
     }
 
+    sitOutPlayer(playerUUID: string) {
+        this.updatePlayer(playerUUID, { sittingOut: true });
+    }
+
+    sitInPlayer(playerUUID: string) {
+        this.updatePlayer(playerUUID, { sittingOut: false });
+    }
+
     getFirstToAct() {
         return this.gameState.firstToAct;
     }

@@ -444,10 +444,10 @@ export class ValidationService {
         }
 
         const requestingPlayer = this.gsm.getPlayerByClientUUID(clientUUID);
-        if (requestingPlayer && requestingPlayer.uuid === bootPlayer.uuid){
+        if (requestingPlayer && requestingPlayer.uuid === bootPlayer.uuid) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
-                errorString: `Admin cannot boot themselves.`
+                errorString: `Admin cannot boot themselves.`,
             };
         }
 

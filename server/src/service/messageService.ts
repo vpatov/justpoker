@@ -55,7 +55,7 @@ export class MessageService {
             validation: (uuid, req) => this.validationService.validateSitOutAction(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.updatePlayer(player.uuid, { sittingOut: true });
+                this.gameStateManager.sitOutPlayer(player.uuid);
             },
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -64,7 +64,7 @@ export class MessageService {
             perform: (uuid, req) => {
                 console.log('hit');
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.updatePlayer(player.uuid, { sittingOut: false });
+                this.gameStateManager.sitInPlayer(player.uuid);
             },
             updates: [ServerStateKey.GAMESTATE],
         },
