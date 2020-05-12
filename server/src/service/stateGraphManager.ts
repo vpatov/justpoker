@@ -211,14 +211,14 @@ export class StateGraphManager {
 
         switch (stage) {
             case GameStage.NOT_IN_PROGRESS: {
-                this.gameStateManager.clearStateOfRoundInfo();
+                this.gameStateManager.clearStateOfHandInfo();
                 break;
             }
             case GameStage.INITIALIZE_NEW_HAND: {
                 break;
             }
 
-            // TODO consider renaming this to initialize new hand.
+            // TODO consider renaming this to initialize new hand, and getting rid of the extra state above.
             case GameStage.SHOW_START_OF_HAND: {
                 this.gameStateManager.initializeNewDeck();
                 this.gamePlayService.initializeDealerButton();
@@ -249,6 +249,7 @@ export class StateGraphManager {
 
             case GameStage.FINISH_BETTING_ROUND: {
                 this.gamePlayService.placeBetsInPot();
+                this.gameStateManager.clearCurrentPlayerToAct();
                 break;
             }
 
@@ -266,7 +267,7 @@ export class StateGraphManager {
                     ),
                 );
 
-                this.gameStateManager.clearStateOfRoundInfo();
+                this.gameStateManager.clearStateOfHandInfo();
                 this.gamePlayService.ejectStackedPlayers();
 
                 this.executeQueuedServerActions();

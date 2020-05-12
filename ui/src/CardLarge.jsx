@@ -1,9 +1,10 @@
 import React from 'react';
-import { generateStringFromSuit, SUITS } from './utils';
+import { generateStringFromSuit, generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Suit from './Suit';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -20,22 +21,22 @@ const useStyles = makeStyles((theme) => ({
         transition: 'transform 0.5s ease-in-out',
     },
     text: {
+        letterSpacing: '-0.5vmin',
         fontWeight: 'bold',
     },
     rank: {
         fontSize: '4.8vmin',
         lineHeight: '1em',
         position: 'absolute',
-        top: '8%',
-        left: '11%',
+        top: '5%',
+        left: '10%',
     },
     suit: {
-        fontSize: '4.8vmin',
-        lineHeight: '5vmin',
+        width: '4.8vmin',
+        height: '4.8vmin',
         position: 'absolute',
         bottom: '5%',
         right: '5%',
-        opacity: 0.7,
     },
     partOfWinningHand: {
         transform: 'translateY(33%)',
@@ -66,8 +67,13 @@ function CardLarge(props) {
                 [classes.partOfWinningHand]: partOfWinningHand,
             })}
         >
-            <Typography className={classnames(classes.text, classes.rank)}>{rank}</Typography>
-            <Typography className={classnames(classes.text, classes.suit)}>{generateStringFromSuit(suit)}</Typography>
+            <Typography
+                className={classnames(classes.text, classes.rank)}
+                style={rank === 'T' ? { marginLeft: '-0.5vmin' } : {}}
+            >
+                {generateStringFromRank(rank)}
+            </Typography>
+            <Suit suit={suit} className={classes.suit} />
         </div>
     );
 }

@@ -72,15 +72,14 @@ export class WsServer {
         }
         Object.keys(WsServer.subscriptions).forEach((key) => {
             if (jsonData[key]) {
-                WsServer.subscriptions[key].forEach((func) =>
-                    func(jsonData[key])
-                );
+                WsServer.subscriptions[key].forEach((func) => func(jsonData[key]));
             }
         });
     }
 
     // TODO make this private, and expose a helper method to each component.
     static send(message: ClientWsMessage) {
+        console.log('sending: ', message);
         WsServer.ws.send(JSON.stringify(message));
     }
 
@@ -88,16 +87,16 @@ export class WsServer {
         const chatMessage: ClientChatMessage = { content };
         const clientWsMessage: ClientWsMessage = {
             actionType: ActionType.CHAT,
-            request: chatMessage as ClientChatMessage as ClientWsMessageRequest,
+            request: (chatMessage as ClientChatMessage) as ClientWsMessageRequest,
         };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 
-    static sendBootPlayerMessage(playerUUID: string){
+    static sendBootPlayerMessage(playerUUID: string) {
         const clientWsMessage: ClientWsMessage = {
             actionType: ActionType.BOOTPLAYER,
-            request: {playerUUID} as BootPlayerRequest as ClientWsMessageRequest
-        }
+            request: ({ playerUUID } as BootPlayerRequest) as ClientWsMessageRequest,
+        };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 

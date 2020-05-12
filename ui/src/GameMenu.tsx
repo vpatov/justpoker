@@ -1,16 +1,16 @@
 import React from 'react';
 import classnames from 'classnames';
-
+import { useSelector } from 'react-redux';
+import { selectMenuButtons } from './store/selectors';
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
-import { ActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
+import { ActionType, UiActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
 import AdminIcon from '@material-ui/icons/SupervisorAccount';
-import SeatIcon from '@material-ui/icons/EventSeat';
 import QuitIcon from '@material-ui/icons/Clear';
 import StartIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         hoverArea: {
             zIndex: 5,
-            position: 'fixed',
+            position: 'absolute',
             left: 0,
             top: 0,
             width: '7vw',
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         root: {
             zIndex: 5,
-            position: 'fixed',
+            position: 'absolute',
             left: 0,
             top: 0,
             margin: '2vmin',
@@ -62,9 +62,22 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function Default() {
+function getIcon(action, iconClass) {
+    const ACTION_TO_ICON = {
+        [UiActionType.ADMIN]: <AdminIcon className={iconClass} />,
+        [UiActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
+        [UiActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
+        [ActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
+        [ActionType.STOPGAME]: <StopIcon className={iconClass} />,
+        [ActionType.STARTGAME]: <StartIcon className={iconClass} />,
+    };
+    return ACTION_TO_ICON[action];
+}
+
+function GameMenu(props) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
+    const menuButtons = useSelector(selectMenuButtons);
 
     const handleOpen = () => {
         setOpen(true);
@@ -74,23 +87,29 @@ function Default() {
         setOpen(false);
     };
 
-    const actions = [
-        { icon: <StartIcon className={classes.icon} />, name: 'Start Game', onClick: onClickStartGame },
-        { icon: <StopIcon className={classes.icon} />, name: 'Stop Game', onClick: onClickStopGame },
-        { icon: <SeatIcon className={classes.icon} />, name: 'Sit Out' },
-        { icon: <QuitIcon className={classes.icon} />, name: 'Quit' },
-        { icon: <VolumeOnIcon className={classes.icon} />, name: 'Volume' },
-        { icon: <SettingsIcon className={classes.icon} />, name: 'Settings' },
-        { icon: <AdminIcon className={classes.icon} />, name: 'Admin' },
-        { icon: <FlipIcon className={classes.icon} />, name: 'Flip Table', onClick: () => flipTable() },
-    ];
+    function handleClickButton(action) {
+        switch (action) {
+            case UiActionType.ADMIN:
+                break;
+            case UiActionType.SETTINGS:
+                break;
+            case UiActionType.VOLUME:
+                break;
+            case ActionType.LEAVETABLE:
+                sendServerAction(ActionType.LEAVETABLE);
+                break;
 
-    function onClickStartGame() {
-        sendServerAction(ActionType.STARTGAME);
-    }
+            case ActionType.STARTGAME:
+                sendServerAction(ActionType.STARTGAME);
+                break;
 
-    function onClickStopGame() {
-        sendServerAction(ActionType.STOPGAME);
+            case ActionType.STOPGAME:
+                sendServerAction(ActionType.STOPGAME);
+                break;
+
+            default:
+                break;
+        }
     }
 
     function sendServerAction(action) {
@@ -110,10 +129,13 @@ function Default() {
                     })}
                 >
                     {open ? (
-                        actions.map((action) => (
-                            <Tooltip title={action.name} placement="right">
-                                <IconButton className={classes.iconButton} onClick={action.onClick}>
-                                    {action.icon}
+                        menuButtons.map((button) => (
+                            <Tooltip title={button.label} placement="right">
+                                <IconButton
+                                    className={classes.iconButton}
+                                    onClick={() => handleClickButton(button.action)}
+                                >
+                                    {getIcon(button.action, classes.icon)}
                                 </IconButton>
                             </Tooltip>
                         ))
@@ -128,4 +150,4 @@ function Default() {
     );
 }
 
-export default Default;
+export default GameMenu;

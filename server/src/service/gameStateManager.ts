@@ -30,6 +30,7 @@ import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
+import { AwardPot } from '../../../ui/src/shared/models/uiState';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -197,6 +198,10 @@ export class GameStateManager {
         return this.gameState.smallBlindUUID;
     }
 
+    getStraddleUUID() {
+        return this.gameState.straddleUUID;
+    }
+
     getBoard() {
         return this.gameState.board;
     }
@@ -239,10 +244,6 @@ export class GameStateManager {
     }
 
     getActivePotValue() {
-        // during showdown all pots are considered inactive
-        if (this.getGameStage() === GameStage.SHOW_WINNER) {
-            return 0;
-        }
         // get pot with least number of contestors
         // TODO question: Is this guaranteed to always be the last pot in the array? If so, should simplify
         const activePot = this.gameState.pots.reduce(
@@ -253,10 +254,6 @@ export class GameStateManager {
     }
 
     getInactivePotsValues() {
-        // post showdown all pots are considered inactive
-        if (this.getGameStage() === GameStage.SHOW_WINNER) {
-            return this.gameState.pots.map((p) => p.value);
-        }
         const ans: number[] = [];
         let [min, minI] = [Number.POSITIVE_INFINITY, 0];
         this.gameState.pots.forEach((pot, i) => {
@@ -449,9 +446,9 @@ export class GameStateManager {
         return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
     }
 
-    getPlayerStraddle(playerUUID: string): boolean {
+    willPlayerStraddle(playerUUID: string): boolean {
         const player = this.getPlayer(playerUUID);
-        return player.straddle;
+        return player.willStraddle;
     }
 
     getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
@@ -714,8 +711,8 @@ export class GameStateManager {
         this.ledgerService.addBuyin(clientUUID, buyin);
     }
 
-    setPlayerStraddle(playerUUID: string, straddle: boolean) {
-        this.updatePlayer(playerUUID, { straddle: straddle });
+    setWillPlayerStraddle(playerUUID: string, willStraddle: boolean) {
+        this.updatePlayer(playerUUID, { willStraddle });
     }
 
     sitDownPlayer(playerUUID: string, seatNumber: number) {
@@ -734,10 +731,6 @@ export class GameStateManager {
 
     setFirstToAct(playerUUID: string) {
         this.updateGameState({ firstToAct: playerUUID });
-    }
-
-    setAwardPots(awardPots: number[]) {
-        this.updateGameState({ awardPots });
     }
 
     setCurrentPlayerToAct(playerUUID: string) {
@@ -793,8 +786,14 @@ export class GameStateManager {
         return this.gameState.gameParameters.gameType;
     }
 
-    getAwardPots(): number[] {
-        return this.gameState.awardPots;
+    getAwardPots(): AwardPot[] {
+        const awardPots: AwardPot[] = [];
+        for (const [uuid, player] of Object.entries(this.getPlayers())) {
+            if (player.winner) {
+                awardPots.push({ winnerUUID: uuid, value: player.chipDelta });
+            }
+        }
+        return awardPots;
     }
     // TODO
     getAllowStraddle(): boolean {
@@ -810,20 +809,17 @@ export class GameStateManager {
     }
 
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
-        const chips = this.getPlayer(playerUUID).chips;
-        // TODO remove this logic from the setter.
-        this.updatePlayer(playerUUID, { betAmount: betAmount > chips ? chips : betAmount });
+        this.updatePlayer(playerUUID, { betAmount });
     }
 
-    clearWinnersAndAwardPots() {
+    clearWinnersAndDeltas() {
         this.updatePlayers((player) => ({
             winner: false,
+            chipDelta: 0,
         }));
-        this.setAwardPots([]);
     }
 
-    clearStateOfRoundInfo() {
-        // TODO make player partial that represents a clean pre-hand player.
+    clearStateOfHandInfo() {
         this.updatePlayers((player) => ({
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
             holeCards: [],
@@ -844,8 +840,10 @@ export class GameStateManager {
             deck: {
                 cards: [],
             },
-            awardPots: [],
             handWinners: new Set<string>(),
+            smallBlindUUID: '',
+            bigBlindUUID: '',
+            straddleUUID: '',
         });
     }
 
@@ -877,6 +875,10 @@ export class GameStateManager {
         }, 0);
     }
 
+    isPlayerAdmin(clientUUID: string): boolean {
+        return this.getAdminUUID() === clientUUID;
+    }
+
     isPlayerAllIn(playerUUID: string): boolean {
         const player = this.getPlayer(playerUUID);
         return player.lastActionType === BettingRoundActionType.ALL_IN;
@@ -898,10 +900,6 @@ export class GameStateManager {
         return this.getChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
     }
 
-    // TODO this should go in gamePlay service
-    // TODO redesign this
-    // TODO it would probably be correct to create a PLACE_BLIND action such that
-    // you dont have to bake extra logic around WAITING_TO_ACT
     haveAllPlayersActed() {
         return this.getPlayersDealtIn().every(
             (player) =>

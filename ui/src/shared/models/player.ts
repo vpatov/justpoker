@@ -31,8 +31,8 @@ export declare interface Player {
     /** Player is at the table but not being dealt in. */
     readonly sittingOut: boolean;
 
-    /** Player is straddling. */
-    readonly straddle: boolean;
+    /** If this is true, player will straddle when they are in position to do so. */
+    readonly willStraddle: boolean;
 
     /** Gameplay goes from lower seat number to higher seat number and wraps around. */
     readonly seatNumber: number;
@@ -69,7 +69,7 @@ export function getCleanPlayer(): Player {
         bestHand: null,
         sitting: false,
         sittingOut: false,
-        straddle: false,
+        willStraddle: false,
         seatNumber: -1,
         lastActionType: BettingRoundActionType.NOT_IN_HAND,
         winner: false,
