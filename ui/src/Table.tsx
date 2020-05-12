@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import Player from './Player';
 import OpenSeat from './OpenSeat';
+import EmptySeat from './EmptySeat';
 import Bet from './Bet';
 import PotTable from './PotTable';
 import CommunityCards from './CommunityCards';
@@ -19,7 +20,7 @@ const H_UNIT = 'vmin';
 const TABLE_HEIGHT = 39;
 const TABLE_WIDTH = 71;
 
-const PLAYER_HEIGHT = 57;
+const PLAYER_HEIGHT = 58;
 const PLAYER_WIDTH = 91;
 
 const BET_HEIGHT = 30;
@@ -146,7 +147,19 @@ function Table(props) {
                     />,
                 );
             } else {
-                ans.push(null);
+                ans.push(
+                    <EmptySeat
+                        className={classes.openSeat}
+                        style={{
+                            top: `${pPos.y}${H_UNIT}`,
+                            left: `${pPos.x}${W_UNIT}`,
+                        }}
+                        setHeroRotation={(r) => {
+                            setHeroRotation(r);
+                        }}
+                        virtualPositon={mod(index + offset - 1, 9)}
+                    />,
+                );
             }
         }
         return ans;
@@ -191,7 +204,12 @@ function Table(props) {
         <div className={classnames(classes.root, className)}>
             <div className={classnames(classes.table, 'ani_table')}>
                 {canStartGame ? (
-                    <Button className={classes.startGame} color="primary" variant="outlined" onClick={onClickStartGame}>
+                    <Button
+                        className={classes.startGame}
+                        color="primary"
+                        variant="contained"
+                        onClick={onClickStartGame}
+                    >
                         Start Game
                     </Button>
                 ) : null}

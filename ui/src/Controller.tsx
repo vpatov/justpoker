@@ -6,11 +6,10 @@ import {
     controllerSelector,
     heroHandLabelSelector,
     allowStraddleSelector,
-    heroPlayerTimerSelector,
     bettingRoundActionTypesToUnqueueSelector,
+    isHeroSeatedSelector,
 } from './store/selectors';
 import TextFieldWrap from './reuseable/TextFieldWrap';
-import ControllerTimer from './ControllerTimer';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -20,6 +19,8 @@ import Button from '@material-ui/core/Button';
 import { ActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/dataCommunication';
 import { Typography } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game';
+
+import ControllerWarningDialog from './ControllerWarningDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -159,7 +160,6 @@ export interface ControllerProps {
 }
 
 function ControllerComp(props: ControllerProps) {
-
     const classes = useStyles();
     const { className } = props;
     const {
@@ -171,15 +171,18 @@ function ControllerComp(props: ControllerProps) {
         dealInNextHand,
         timeBanks,
         willStraddle,
-        showWarningOnFold
+        showWarningOnFold,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const allowStraddle = useSelector(allowStraddleSelector);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
+    const heroSeated = useSelector(isHeroSeatedSelector);
 
     const [betAmt, setBetAmt] = useState(0);
     const [queuedActionType, setQueuedActionType] = useState('');
+
+    const [warning, setWarning] = useState(false);
 
     useEffect(() => {
         for (const actionType of bettingRoundActionTypesToUnqueue) {
@@ -203,7 +206,24 @@ function ControllerComp(props: ControllerProps) {
         return;
     };
 
+    function closeDialog() {
+        setWarning(false);
+    }
+
+    function onConfirmDialog() {
+        setWarning(false);
+        performBettingRoundAction(BettingRoundActionType.FOLD);
+    }
+
     function onClickActionButton(betActionType) {
+        if (betActionType === BettingRoundActionType.FOLD && showWarningOnFold) {
+            setWarning(true);
+        } else {
+            performBettingRoundAction(betActionType);
+        }
+    }
+
+    function performBettingRoundAction(betActionType) {
         if (toAct) {
             sendBettingRoundAction(betActionType);
         } else {
@@ -214,10 +234,6 @@ function ControllerComp(props: ControllerProps) {
             }
         }
     }
-    if (toAct && queuedActionType !== '') {
-        sendBettingRoundAction(queuedActionType);
-        setQueuedActionType('');
-    }
 
     function sendBettingRoundAction(betActionType) {
         WsServer.send({
@@ -227,9 +243,7 @@ function ControllerComp(props: ControllerProps) {
                 amount: Number(betAmt),
             } as ClientWsMessageRequest,
         });
-        if (betActionType === BettingRoundActionType.BET) {
-            changeBetAmount(0);
-        }
+        changeBetAmount(0);
     }
 
     function isBetValid() {
@@ -237,10 +251,10 @@ function ControllerComp(props: ControllerProps) {
         return false;
     }
 
-    function onClickTimeBank(){
+    function onClickTimeBank() {
         WsServer.send({
             actionType: ActionType.USETIMEBANK,
-            request: {} as ClientWsMessageRequest
+            request: {} as ClientWsMessageRequest,
         });
     }
 
@@ -258,12 +272,18 @@ function ControllerComp(props: ControllerProps) {
         });
     }
 
+    if (toAct && queuedActionType !== '') {
+        sendBettingRoundAction(queuedActionType);
+        setQueuedActionType('');
+    }
+
     return (
         <div
             className={classnames(classes.root, className, {
                 [classes.rootToAct]: toAct,
             })}
         >
+            <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
             <div className={classes.gameInfoCont}>
                 <Typography className={classes.handLabel}>{heroHandLabel}</Typography>
                 {toAct ? <Typography className={classes.toActLabel}>{'☉ Your Turn'}</Typography> : null}
@@ -358,7 +378,7 @@ function ControllerComp(props: ControllerProps) {
                         label="Straddle"
                     />
                 ) : null}
-                {
+                {heroSeated ? (
                     <Button
                         className={classes.timeBankButton}
                         variant="outlined"
@@ -367,7 +387,7 @@ function ControllerComp(props: ControllerProps) {
                     >
                         {`Time Bank (${timeBanks})`}
                     </Button>
-                }
+                ) : null}
             </div>
         </div>
     );

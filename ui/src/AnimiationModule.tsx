@@ -86,11 +86,10 @@ export function animateAwardPot(winnerUUID, potId) {
     const a = anime({
         targets: [`#${potId}`],
         translateX: (target) => {
-            console.log(target);
-            return x - target.getBoundingClientRect().x;
+            return x - getCenterOfRef(target)[0];
         },
         translateY: (target) => {
-            return y - target.getBoundingClientRect().y;
+            return y - getCenterOfRef(target)[1];
         },
         opacity: 0,
         duration: duration,

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import get from 'lodash/get';
 import { useDispatch } from 'react-redux';
 import queryString from 'query-string';
 
@@ -17,7 +18,11 @@ const useStyles = makeStyles((theme) => ({
         ...theme.custom.BACKGROUND,
     },
     loading: {
-        // fontSize: "3vmin",
+        fontSize: '4vmin',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
     },
 }));
 
@@ -25,7 +30,8 @@ function GameContainer(props): any {
     const classes = useStyles();
     const dispatch = useDispatch();
     const [gameLoaded, setGameLoaded] = useState(false);
-    const queryParams = parseHTTPParams(queryString.parseUrl(props.location.search));
+
+    const queryParams = parseHTTPParams(queryString.parseUrl(get(props, 'location.search', '')));
 
     useEffect(() => {
         if (props.useTestGame) {
@@ -49,7 +55,7 @@ function GameContainer(props): any {
     }
 
     function renderLoading() {
-        return <Typography className={classes.loading}>Loading....</Typography>;
+        return <Typography className={classes.loading}>Loading...</Typography>;
     }
 
     if (gameLoaded) {

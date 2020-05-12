@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
+        width: '80%',
         fontSize: '1.3vmin',
     },
     stack: {
