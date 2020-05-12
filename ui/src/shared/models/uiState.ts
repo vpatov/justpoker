@@ -20,7 +20,7 @@ export declare interface UiGameState {
     global: Global;
     controller: Controller;
     table: Table;
-    players: Player[];
+    players: UiPlayer[];
     menu: MenuButton[];
 }
 
@@ -98,7 +98,7 @@ export declare interface PlayerTimer {
     timeLimit: number;
 }
 
-export declare interface Player {
+export declare interface UiPlayer {
     name: string;
     position: number;
     stack: number;

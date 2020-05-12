@@ -6,7 +6,7 @@ import { strict as assert } from 'assert';
 
 import {
     UiState,
-    Player as UIPlayer,
+    UiPlayer,
     FOLD_BUTTON,
     CHECK_BUTTON,
     CALL_BUTTON,
@@ -285,7 +285,7 @@ export class StateConverter {
         }
     }
 
-    transformPlayer(player: Player, heroPlayerUUID: string): UIPlayer {
+    transformPlayer(player: Player, heroPlayerUUID: string): UiPlayer {
         const herosTurnToAct =
             this.gameStateManager.getCurrentPlayerToAct() === player.uuid &&
             this.gameStateManager.gameIsWaitingForBetAction();
