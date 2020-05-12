@@ -120,7 +120,7 @@ export class LedgerService {
             handsDealtIn: serverRow.handsDealtIn,
             totalBuyin,
             net: walkaway - totalBuyin,
-            vpip: Math.round((serverRow.flopsSeen / serverRow.handsDealtIn) * 100),
+            vpip: serverRow.handsDealtIn && Math.round((serverRow.flopsSeen / serverRow.handsDealtIn) * 100),
         };
         return row;
     }

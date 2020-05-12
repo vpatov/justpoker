@@ -184,6 +184,11 @@ export const ADMIN_BUTTON: MenuButton = {
     label: 'Admin',
 };
 
+export const LEDGER_BUTTON: MenuButton = {
+    action: UiActionType.OPEN_LEDGER,
+    label: 'Ledger',
+}
+
 export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
 
 export const FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, RAISE_BUTTON];

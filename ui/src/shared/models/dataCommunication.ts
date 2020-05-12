@@ -39,6 +39,7 @@ export enum UiActionType {
     VOLUME = 'VOLUME',
     SETTINGS = 'SETTINGS',
     ADMIN = 'ADMIN',
+    OPEN_LEDGER = "OPEN_LEDGER"
 }
 
 export declare interface SitDownRequest {

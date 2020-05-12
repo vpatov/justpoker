@@ -1,11 +1,13 @@
 import React from 'react';
+import { parseHTTPParams } from './shared/util/util';
+import queryString from 'query-string';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
 import { selectMenuButtons } from './store/selectors';
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
 import SettingsDialog from './SettingsDialog';
-import { ActionType, UiActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
+import { ActionType, UiActionType, ClientWsMessageRequest, EndPoint } from './shared/models/dataCommunication';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -18,7 +20,9 @@ import StopIcon from '@material-ui/icons/Stop';
 import SettingsIcon from '@material-ui/icons/Settings';
 import VolumeOnIcon from '@material-ui/icons/VolumeUp';
 import MenuIcon from '@material-ui/icons/Menu';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import FlipIcon from '@material-ui/icons/FlipSharp';
+import { useLocation } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -68,6 +72,7 @@ function getIcon(action, iconClass) {
         [UiActionType.ADMIN]: <AdminIcon className={iconClass} />,
         [UiActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
         [UiActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
+        [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
         [ActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
         [ActionType.STOPGAME]: <StopIcon className={iconClass} />,
         [ActionType.STARTGAME]: <StartIcon className={iconClass} />,
@@ -79,6 +84,7 @@ function GameMenu(props) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const menuButtons = useSelector(selectMenuButtons);
+    const location = useLocation();
 
     const [settingsOpen, setSettingsOpen] = React.useState(false);
 
@@ -98,6 +104,13 @@ function GameMenu(props) {
         setOpen(false);
     };
 
+    const handleOpenLedger = () => {
+        const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
+        const gameUUID = queryParams.gameUUID || null;
+        const stringifiedUrl = queryString.stringifyUrl({url: EndPoint.LEDGER, query: {gameUUID}});
+        window.open(stringifiedUrl, "_blank");
+    }
+
     function handleClickButton(action) {
         switch (action) {
             case UiActionType.ADMIN:
@@ -107,18 +120,18 @@ function GameMenu(props) {
                 break;
             case UiActionType.VOLUME:
                 break;
+            case UiActionType.OPEN_LEDGER:
+                handleOpenLedger();
+                break;
             case ActionType.LEAVETABLE:
                 sendServerAction(ActionType.LEAVETABLE);
                 break;
-
             case ActionType.STARTGAME:
                 sendServerAction(ActionType.STARTGAME);
                 break;
-
             case ActionType.STOPGAME:
                 sendServerAction(ActionType.STOPGAME);
                 break;
-
             default:
                 break;
         }
