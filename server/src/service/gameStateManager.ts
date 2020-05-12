@@ -4,7 +4,7 @@ import WebSocket from 'ws';
 import { strict as assert } from 'assert';
 import {
     GameState,
-    cleanGameState,
+    getCleanGameState,
     ServerStateKey,
     GameStage,
     ALL_STATE_KEYS,
@@ -22,20 +22,21 @@ import {
     BettingRoundActionType,
 } from '../../../ui/src/shared/models/game';
 import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
-import { Player, cleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
+import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
-import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
+import { ActionType, JoinTableRequest, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
+import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 
 // TODO Re-organize methods in some meaningful way
 
 @Service()
 export class GameStateManager {
-    private gameState: Readonly<GameState> = cleanGameState;
+    private gameState: Readonly<GameState> = getCleanGameState();
 
     // TODO place updatedKey logic into a seperate ServerStateManager file.
     updatedKeys: Set<ServerStateKey> = ALL_STATE_KEYS;
@@ -60,6 +61,7 @@ export class GameStateManager {
         private readonly deckService: DeckService,
         private readonly handSolverService: HandSolverService,
         private readonly timerManager: TimerManager,
+        private readonly ledgerService: LedgerService,
     ) {}
 
     /* Getters */
@@ -91,7 +93,7 @@ export class GameStateManager {
 
     createNewPlayer(name: string, chips: number): Player {
         return {
-            ...cleanPlayer,
+            ...getCleanPlayer(),
             uuid: generateUUID(),
             name,
             chips,
@@ -99,11 +101,11 @@ export class GameStateManager {
         };
     }
 
-    createConnectedClient(clientUUID: string, ws: WebSocket): ConnectedClient {
+    createConnectedClient(clientUUID: string, ws: WebSocket, endpoint: EndPoint): ConnectedClient {
         return {
             uuid: clientUUID,
             playerUUID: '',
-            ws,
+            websockets: new Map([[endpoint, ws]]),
         };
     }
 
@@ -119,6 +121,14 @@ export class GameStateManager {
     }
     updatePlayers(updateFn: (player: Player) => Partial<Player>) {
         Object.entries(this.gameState.players).forEach(([uuid, player]) => this.updatePlayer(uuid, updateFn(player)));
+    }
+
+    forEveryPlayer(performFn: (player: Player) => void) {
+        Object.entries(this.gameState.players).forEach(([uuid, player]) => performFn(player));
+    }
+
+    forEveryClient(performFn: (client: ConnectedClient) => void) {
+        [...this.gameState.table.activeConnections.entries()].forEach(([clientUUID, client]) => performFn(client));
     }
 
     getConnectedClient(clientUUID: string) {
@@ -202,10 +212,21 @@ export class GameStateManager {
     }
 
     addPlayerChips(playerUUID: string, addChips: number) {
+        this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), addChips);
         this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
     }
 
     setPlayerChips(playerUUID: string, setChips: number) {
+        const chipDifference = setChips - this.getChips(playerUUID);
+        if (chipDifference > 0) {
+            this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
+        } else {
+            console.log(
+                'gameStateManager.setPlayerChips has been called with a chip amount ' +
+                    "that is less than the player's current stack. This is either a bug, or being used for development",
+            );
+        }
+
         this.updatePlayer(playerUUID, { chips: setChips });
     }
 
@@ -305,6 +326,16 @@ export class GameStateManager {
         return this.getTotalPot() + this.getAllCommitedBets();
     }
 
+    getHandWinners(): Set<string> {
+        return this.gameState.handWinners;
+    }
+
+    addHandWinner(playerUUID: string) {
+        this.updateGameState({
+            handWinners: new Set([...this.getHandWinners(), playerUUID]),
+        });
+    }
+
     getSB() {
         return this.gameState.gameParameters.smallBlind;
     }
@@ -392,10 +423,6 @@ export class GameStateManager {
 
     shouldDealNextHand() {
         return this.gameState.shouldDealNextHand;
-    }
-
-    isPlayerInGame(playerUUID: string): boolean {
-        return !!this.getPlayer(playerUUID);
     }
 
     isPlayerReadyToPlay(playerUUID: string): boolean {
@@ -552,15 +579,17 @@ export class GameStateManager {
     /* Initialization methods */
 
     // TODO validation around this method. Shouldn't be executed when table is not intialized.
-    initConnectedClient(clientUUID: string, ws: WebSocket) {
+    // TODO break away client logic into server state manager.
+    // TODO rename method, as it is not always initializing a client.
+    initConnectedClient(clientUUID: string, ws: WebSocket, endpoint: EndPoint) {
         const client = this.gameState.table.activeConnections.get(clientUUID);
         if (client) {
-            this.resetClientWebsocket(clientUUID, ws);
+            this.resetClientWebsocket(clientUUID, ws, endpoint);
         } else {
             if (!this.gameState.table.admin) {
                 this.initAdmin(clientUUID);
             }
-            const newClient = this.createConnectedClient(clientUUID, ws);
+            const newClient = this.createConnectedClient(clientUUID, ws, endpoint);
             this.gameState = {
                 ...this.gameState,
                 table: {
@@ -568,6 +597,7 @@ export class GameStateManager {
                     activeConnections: new Map([...this.gameState.table.activeConnections, [clientUUID, newClient]]),
                 },
             };
+            this.ledgerService.initRow(clientUUID);
         }
     }
 
@@ -584,13 +614,13 @@ export class GameStateManager {
         return this.gameState.table.admin;
     }
 
-    resetClientWebsocket(clientUUID: string, ws: WebSocket) {
-        this.gameState.table.activeConnections.get(clientUUID).ws = ws;
+    resetClientWebsocket(clientUUID: string, ws: WebSocket, endpoint: EndPoint) {
+        this.gameState.table.activeConnections.get(clientUUID).websockets.set(endpoint, ws);
     }
 
     initGame(newGameForm: NewGameForm) {
         this.gameState = {
-            ...cleanGameState,
+            ...getCleanGameState(),
             table: this.initTable(newGameForm),
             gameParameters: {
                 smallBlind: Number(newGameForm.smallBlind),
@@ -667,6 +697,10 @@ export class GameStateManager {
     }
 
     removePlayerFromPlayers(playerUUID: string) {
+        const player = this.getPlayer(playerUUID);
+        if (player.sitting) {
+            this.standUpPlayer(playerUUID);
+        }
         this.updateGameState({
             players: Object.fromEntries(
                 Object.entries(this.getPlayers()).filter(([uuid, player]) => uuid !== playerUUID),
@@ -722,6 +756,9 @@ export class GameStateManager {
                 ]),
             },
         };
+
+        this.ledgerService.addAlias(clientUUID, name);
+        this.ledgerService.addBuyin(clientUUID, buyin);
     }
 
     setWillPlayerStraddle(playerUUID: string, willStraddle: boolean) {
@@ -734,6 +771,8 @@ export class GameStateManager {
 
     standUpPlayer(playerUUID: string) {
         this.updatePlayer(playerUUID, { sitting: false, sittingOut: false, seatNumber: -1 });
+        const clientUUID = this.getClientByPlayerUUID(playerUUID);
+        this.ledgerService.addWalkaway(clientUUID, this.getPlayer(playerUUID).chips);
     }
 
     getFirstToAct() {
@@ -754,6 +793,11 @@ export class GameStateManager {
 
     setPlayerLastActionType(playerUUID: string, lastActionType: BettingRoundActionType) {
         this.updatePlayer(playerUUID, { lastActionType });
+    }
+
+    changePlayerName(playerUUID: string, name: string) {
+        this.updatePlayer(playerUUID, { name });
+        this.ledgerService.addAlias(this.getClientByPlayerUUID(playerUUID), name);
     }
 
     getLastBettingRoundAction(): BettingRoundAction {
@@ -815,6 +859,7 @@ export class GameStateManager {
     }
 
     setPlayerBetAmount(playerUUID: string, betAmount: number) {
+        assert(betAmount <= this.getChips(playerUUID));
         this.updatePlayer(playerUUID, { betAmount });
     }
 
@@ -837,6 +882,7 @@ export class GameStateManager {
             timeBanksUsedThisAction: 0,
         }));
 
+        // TODO make gameState partial that represents a clean pre-hand state.
         this.updateGameState({
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
@@ -846,6 +892,7 @@ export class GameStateManager {
             deck: {
                 cards: [],
             },
+            handWinners: new Set<string>(),
             smallBlindUUID: '',
             bigBlindUUID: '',
             straddleUUID: '',

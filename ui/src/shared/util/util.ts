@@ -1,5 +1,8 @@
 import util from "util";
+import Location from 'history';
 import { GameState } from "../models/gameState";
+import { WSParams, EndPoint, HTTPParams } from "../models/dataCommunication";
+import queryString from "query-string";
 
 export function generateUUID(): string {
   return (
@@ -40,4 +43,11 @@ export function logGameState(gameState: GameState) {
       deck: [] as any,
   };
   console.log(util.inspect(minimizedGameState, false, null, true));
+}
+
+export function parseHTTPParams(parsedQuery: queryString.ParsedUrl){
+  const queryParams: HTTPParams = {
+    gameUUID: parsedQuery.query.gameUUID as string
+  };
+  return queryParams;
 }

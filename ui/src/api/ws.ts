@@ -1,39 +1,74 @@
-import get from 'lodash/get';
-import docCookies from '../Cookies';
+import get from "lodash/get";
+import docCookies from "../Cookies";
+import queryString, { ParsedQuery } from "query-string";
 import {
     ClientWsMessage,
     ClientChatMessage,
     ActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
-} from '../shared/models/wsaction';
+    EndPoint,
+    WSParams,
+} from "../shared/models/dataCommunication";
 
-// TODO create stricter api for sending messages to server. DOM node source shouldnt be responsible
-// for correctly constructing messages.
+const clientUUID = "clientUUID";
+const ONE_DAY = 60 * 60 * 24;
+const DEFAULT_WS_PORT = 8080;
 
 export class WsServer {
+    static clientUUID: string|null;
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
 
-    static openWs() {
-        console.log('opening ws...');
-        let wsURI = process.env.NODE_ENV === 'production' ? 'ws://35.192.65.13:8080' : 'ws://localhost:8080';
+    static openWs(gameUUID: string, endpoint: EndPoint) {
+        console.log("opening ws...");
+        const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
+        const wsURI = {
+            url: wsURL,
+            query: {
+                clientUUID: docCookies.getItem(clientUUID) || null,
+                gameUUID: gameUUID || null,
+                endpoint: endpoint || null
+            } as ParsedQuery
+        };
 
-        const clientID = docCookies.getItem('clientID');
-        if (clientID) {
-            wsURI += `?clientID=${clientID}`;
+        WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
+        WsServer.ws.onmessage = WsServer.onGameMessage;
+        switch (endpoint){
+            case EndPoint.GAME: {
+                WsServer.ws.onmessage = WsServer.onGameMessage;
+                break;
+            }
+
+            case EndPoint.LEDGER: {
+                WsServer.ws.onmessage = WsServer.onLedgerMessage;
+                break;
+            }
+            default: {
+                throw Error(`Endpoint ${endpoint} is not available.`);
+            }
         }
-
-        WsServer.ws = new WebSocket(wsURI, []);
-        WsServer.ws.onmessage = WsServer.onMessage;
         return true;
     }
 
-    private static onMessage(msg: MessageEvent) {
-        const jsonData = JSON.parse(get(msg, 'data', {}));
-        console.log('Data from sever:\n', jsonData);
-        if (jsonData.clientID) {
-            docCookies.setItem('clientID', jsonData.clientID, 60 * 60 * 24); // one day expire
+    private static onLedgerMessage(msg: MessageEvent){
+        const jsonData = JSON.parse(get(msg, "data", {}));
+
+        if (jsonData.clientUUID) {
+            docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
+        }
+
+        if (jsonData.ledger){
+            WsServer.subscriptions['ledger'].forEach((func) => func(jsonData.ledger));
+        }
+    }
+
+    // TODO redesign dataCommunications and create general websocket data object so we
+    // can add types here.
+    private static onGameMessage(msg: MessageEvent) {
+        const jsonData = JSON.parse(get(msg, "data", {}));
+        if (jsonData.clientUUID) {
+            docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
         }
         Object.keys(WsServer.subscriptions).forEach((key) => {
             if (jsonData[key]) {
@@ -42,6 +77,7 @@ export class WsServer {
         });
     }
 
+    // TODO make this private, and expose a helper method to each component.
     static send(message: ClientWsMessage) {
         console.log('sending: ', message);
         WsServer.ws.send(JSON.stringify(message));
@@ -72,9 +108,4 @@ export class WsServer {
             WsServer.subscriptions[key] = [onMessage];
         }
     }
-
-    // TODO
-    static reopenWebsocket() {}
-
-    static lintTest() {}
 }

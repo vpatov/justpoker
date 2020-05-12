@@ -8,7 +8,7 @@ import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
 import { tableSelector, playersSelector, globalGameStateSelector } from './store/selectors';
-import { ActionType, ClientWsMessageRequest } from './shared/models/wsaction';
+import { ActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
 import { WsServer } from './api/ws';
 
 import { makeStyles } from '@material-ui/core/styles';

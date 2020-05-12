@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { ChatMessage, ChatLog } from '../../../ui/src/shared/models/chat';
-import { ClientChatMessage } from '../../../ui/src/shared/models/wsaction';
+import { ClientChatMessage } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ValidationService, hasError } from './validationService';
@@ -57,7 +57,7 @@ export class ChatService {
         if (nameMatch) {
             const name = nameMatch[1];
             if (player) {
-                this.gameStateManager.updatePlayer(player.uuid, { name });
+                this.gameStateManager.changePlayerName(player.uuid, name);
                 this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
             }
             return;

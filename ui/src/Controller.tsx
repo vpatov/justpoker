@@ -16,7 +16,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 
-import { ActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/wsaction';
+import { ActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/dataCommunication';
 import { Typography } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game';
 

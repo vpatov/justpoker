@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ActionType, UiActionType } from './wsaction';
+import { ActionType, UiActionType } from './dataCommunication';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
@@ -47,7 +47,7 @@ export declare interface Controller {
     toAct?: boolean;
     willStraddle: boolean;
     lastBettingRoundAction: BettingRoundAction;
-    showWarningOnFold?: boolean;
+    showWarningOnFold: boolean;
 }
 
 export declare interface SizingButton {
@@ -210,51 +210,58 @@ export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [5, 4],
 ];
 
-export const cleanUiChatLog: UiChatLog = {
-    messages: [],
-};
+export function getCleanUiChatLog(): UiChatLog {
+    return { messages: [] };
+}
 
 /* Clean Controller for init. */
-export const cleanController: Controller = {
-    toAct: false,
-    lastBettingRoundAction: NOT_IN_HAND,
-    min: 0,
-    max: 0,
-    willStraddle: false,
-    dealInNextHand: true,
-    sizingButtons: [],
-    bettingRoundActionButtons: [],
-    timeBanks: 0,
-};
+export function getCleanController(): Controller {
+    return {
+        toAct: false,
+        lastBettingRoundAction: NOT_IN_HAND,
+        min: 0,
+        max: 0,
+        willStraddle: false,
+        dealInNextHand: true,
+        sizingButtons: [],
+        bettingRoundActionButtons: [],
+        timeBanks: 0,
+        showWarningOnFold: false,
+    };
+}
 
-export const cleanGlobal: Global = {
-    heroIsAdmin: false,
-    heroIsSeated: false,
-    isGameInProgress: false,
-    bigBlind: 2,
-    smallBlind: 1,
-    allowStraddle: false,
-    gameType: GameType.NLHOLDEM,
-    canStartGame: false,
-    gameWillStopAfterHand: false,
-    unqueueAllBettingRoundActions: true,
-};
+export function getCleanGlobal(): Global {
+    return {
+        heroIsAdmin: false,
+        heroIsSeated: false,
+        isGameInProgress: false,
+        bigBlind: 2,
+        smallBlind: 1,
+        allowStraddle: false,
+        gameType: GameType.NLHOLDEM,
+        canStartGame: false,
+        gameWillStopAfterHand: false,
+        unqueueAllBettingRoundActions: true,
+    };
+}
 
-export const CleanGame: UiGameState = {
-    global: cleanGlobal,
-    menu: [],
-    controller: cleanController,
-    table: {
-        spots: 9,
-        activePot: 0,
-        fullPot: 0,
-        communityCards: [],
-    },
-    players: [],
-};
+export function getCleanGame(): UiGameState {
+    return {
+        global: getCleanGlobal(),
+        controller: getCleanController(),
+        menu: [],
+        table: {
+            spots: 9,
+            activePot: 0,
+            fullPot: 0,
+            communityCards: [],
+        },
+        players: [],
+    };
+}
 
 export const CleanRootState: UiState = {
-    game: CleanGame,
+    game: getCleanGame(),
     audio: SoundByte.NONE,
     chat: {
         senderName: 'Vasia',

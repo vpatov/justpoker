@@ -12,18 +12,18 @@ import {
 } from '../../../ui/src/shared/models/stateGraph';
 import {
     GameStage,
-    GameState,
     ServerStateKey,
     QueuedServerAction,
     ServerActionType,
 } from '../../../ui/src/shared/models/gameState';
-import { ActionType } from '../../../ui/src/shared/models/wsaction';
+import { ActionType } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { Subject } from 'rxjs';
-import { logGameState } from '../../../ui/src/shared/util/util';
+import { logGameState, printObj } from '../../../ui/src/shared/util/util';
+import { LedgerService } from './ledgerService';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -33,12 +33,13 @@ export class StateGraphManager {
         private readonly gameStateManager: GameStateManager,
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
+        private readonly ledgerService: LedgerService,
     ) {}
 
-    private updateEmitter: Subject<void> = new Subject();
+    private stateGraphUpdateEmitter: Subject<void> = new Subject();
 
-    observeUpdates() {
-        return this.updateEmitter.asObservable();
+    observeStateGraphUpdates() {
+        return this.stateGraphUpdateEmitter.asObservable();
     }
 
     canContinueGameCondition: Condition = {
@@ -182,7 +183,7 @@ export class StateGraphManager {
             this.initializeGameStage(nextStage);
         }
 
-        this.updateEmitter.next();
+        this.stateGraphUpdateEmitter.next();
     }
 
     processTimeout() {
@@ -232,7 +233,7 @@ export class StateGraphManager {
             case GameStage.SHOW_START_OF_BETTING_ROUND: {
                 this.gameStateManager.incrementBettingRoundStage();
                 this.gamePlayService.resetBettingRoundActions();
-                this.gamePlayService.dealCards();
+                this.gamePlayService.initializeBettingRound();
                 if (!this.gameStateManager.isAllInRunOut()) {
                     this.gamePlayService.setFirstToActAtStartOfBettingRound();
                 }
@@ -269,8 +270,14 @@ export class StateGraphManager {
             }
 
             case GameStage.POST_HAND_CLEANUP: {
+                this.ledgerService.incrementHandsWonForPlayers(
+                    [...this.gameStateManager.getHandWinners()].map((playerUUID) =>
+                        this.gameStateManager.getClientByPlayerUUID(playerUUID),
+                    ),
+                );
                 this.gameStateManager.clearStateOfHandInfo();
                 this.gamePlayService.ejectStackedPlayers();
+
                 this.executeQueuedServerActions();
                 break;
             }
@@ -280,6 +287,17 @@ export class StateGraphManager {
         if (delay) {
             this.timerManager.setStateTimer(() => this.processTimeout(), delay);
         }
+
+        this.updateLedger();
+    }
+
+    updateLedger() {
+        this.gameStateManager.forEveryClient((client) => {
+            const player = this.gameStateManager.getPlayerByClientUUID(client.uuid);
+            if (player) {
+                this.ledgerService.setCurrentChips(client.uuid, this.gameStateManager.getChips(player.uuid));
+            }
+        });
     }
 
     executeQueuedServerAction(action: QueuedServerAction) {

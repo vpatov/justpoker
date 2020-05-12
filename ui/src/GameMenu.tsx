@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux';
 import { selectMenuButtons } from './store/selectors';
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
-import { ActionType, UiActionType, ClientWsMessageRequest } from './shared/models/wsaction';
 import SettingsDialog from './SettingsDialog';
+import { ActionType, UiActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';

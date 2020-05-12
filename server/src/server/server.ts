@@ -6,17 +6,17 @@ import * as http from 'http';
 import * as WebSocket from 'ws';
 import express from 'express';
 import bodyParser from 'body-parser';
-import request from 'request';
-import cookie from 'cookie';
+import queryString from 'query-string';
 
 import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
-import { GameState, ServerStateKey, ALL_STATE_KEYS } from '../../../ui/src/shared/models/gameState';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateConverter } from '../service/stateConverter';
 import { generateUUID, logGameState, printObj } from '../../../ui/src/shared/util/util';
 import { AudioService } from '../service/audioService';
 import { AnimationService } from '../service/animationService';
+import { LedgerService } from '../service/ledgerService';
+import { WSParams, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
 
 import { ChatService } from '../service/chatService';
 import { StateGraphManager } from '../service/stateGraphManager';
@@ -56,6 +56,7 @@ class Server {
         private readonly chatService: ChatService,
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
+        private readonly ledgerService: LedgerService,
     ) {}
 
     updateSnippet(snippet: ExecutionSnippet, ms: number) {
@@ -91,12 +92,13 @@ class Server {
                 password: req.body.password,
                 timeToAct: req.body.timeToAct,
             };
-            const tableId = this.gsm.initGame(newGameForm);
+            const gameUUID = this.gsm.initGame(newGameForm);
+            this.ledgerService.clearLedger();
             this.initWSSListeners();
             this.chatService.clearMessages();
             this.tableInitialized = true;
-            console.log(tableId);
-            res.send(JSON.stringify({ tableId: tableId }));
+            console.log(gameUUID);
+            res.send(JSON.stringify({ gameUUID: gameUUID }));
         });
 
         this.app.use(bodyParser.json());
@@ -109,18 +111,25 @@ class Server {
         this.app.use('/', router);
     }
 
-    sendUpdatesToClients() {
+    sendGameUpdatesToClients() {
         for (const client of this.gsm.getConnectedClients()) {
-            const res = this.stateConverter.getUIState(client.uuid);
-            const jsonRes = JSON.stringify(res);
-            client.ws.send(jsonRes);
+            const ws = client.websockets.get(EndPoint.GAME);
+            if (ws) {
+                const res = this.stateConverter.getUIState(client.uuid);
+                const jsonRes = JSON.stringify(res);
+                ws.send(jsonRes);
+            }
+        }
+    }
 
-            continue;
-            /* Debug Logging */
-            const playerName = client.playerUUID ? this.gsm.getPlayer(client.playerUUID).name : 'Anonymous Client';
-            console.log(`\n\nServer is sending following ui state to ${playerName} ${client.uuid}:\n'`);
-            console.log(util.inspect(res, false, null, true));
-            /* -------------- */
+    sendLedgerUpdatesToClients() {
+        for (const client of this.gsm.getConnectedClients()) {
+            const ws = client.websockets.get(EndPoint.LEDGER);
+            if (ws) {
+                const res = { ledger: this.ledgerService.convertServerLedgerToUILedger() };
+                const jsonRes = JSON.stringify(res);
+                ws.send(jsonRes);
+            }
         }
     }
 
@@ -131,58 +140,75 @@ class Server {
             const ip = req.connection.remoteAddress;
             console.log('connected to ip:', ip);
 
-            let clientID = '';
-            // try to get clientID from url (frontend)
-            if (!clientID) {
-                const regEx = /clientID\=(\w+)/g;
-                clientID = Array.from(req.url.matchAll(regEx), (m) => m[1])[0];
-            }
-            if (!clientID) {
-                clientID = generateUUID();
-            }
+            const parsedQuery = queryString.parseUrl(req.url);
+            const queryParams: WSParams = {
+                clientUUID: parsedQuery.query.clientUUID as string,
+                gameUUID: parsedQuery.query.gameUUID as string,
+                endpoint: parsedQuery.query.endpoint as EndPoint,
+            };
 
-            console.log('clientID: ', clientID);
+            const clientUUID = queryParams.clientUUID || generateUUID();
+            console.log(
+                `Connected to clientUUID: ${clientUUID}, gameUUID: ${queryParams.gameUUID}, endpoint: ${queryParams.endpoint}`,
+            );
 
             // TODO server shouldnt be communicating with the gameStateManager, but with some
             // other intermediary that will handle WS robustness
-            this.gsm.initConnectedClient(clientID, ws);
+            this.gsm.initConnectedClient(clientUUID, ws, queryParams.endpoint);
+            ws.send(JSON.stringify({ clientUUID: clientUUID }));
 
-            ws.send(JSON.stringify({ clientID }));
-            ws.send(JSON.stringify(this.stateConverter.getUIState(clientID)));
-
-            ws.on('message', (data: WebSocket.Data) => {
-                console.log('Incoming data:');
-                printObj(data);
-                if (typeof data === 'string') {
-                    try {
-                        const receivedMessageTime = Date.now();
-                        const action = JSON.parse(data);
-                        this.messageService.processMessage(action, clientID);
-                        const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
-                        this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
-
-                        this.logAverages();
-                    } catch (e) {
-                        logGameState(this.gsm.getGameState());
-                        throw e;
-                    }
-                } else {
-                    const unsupportedMsg = 'Received data of unsupported type.';
-                    console.log(unsupportedMsg);
-                    ws.send(JSON.stringify({ error: unsupportedMsg }));
+            switch (queryParams.endpoint) {
+                case EndPoint.GAME: {
+                    ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID)));
+                    ws.on('message', (data: WebSocket.Data) => this.processGameMessage(ws, data, clientUUID));
+                    break;
                 }
-            });
+
+                case EndPoint.LEDGER: {
+                    ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
+                    break;
+                }
+
+                default: {
+                    throw Error(`Endpoint ${queryParams.endpoint} is not available.`);
+                }
+            }
         });
     }
 
+    private processGameMessage(ws: WebSocket, data: WebSocket.Data, clientUUID: string) {
+        console.log('Incoming data:');
+        printObj(data);
+        if (typeof data === 'string') {
+            try {
+                const receivedMessageTime = Date.now();
+                const action = JSON.parse(data);
+                this.messageService.processMessage(action, clientUUID);
+                const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
+                this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
+
+                this.logAverages();
+            } catch (e) {
+                logGameState(this.gsm.getGameState());
+                throw e;
+            }
+        } else {
+            const unsupportedMsg = 'Received data of unsupported type.';
+            console.log(unsupportedMsg);
+            ws.send(JSON.stringify({ error: unsupportedMsg }));
+        }
+    }
+
+    //refactor this mess of a function
     init() {
         this.app = express();
         this.initRoutes();
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ server: this.server });
 
-        this.stateGraphManager.observeUpdates().subscribe(() => {
-            this.sendUpdatesToClients();
+        this.stateGraphManager.observeStateGraphUpdates().subscribe(() => {
+            this.sendGameUpdatesToClients();
+            this.sendLedgerUpdatesToClients();
             this.audioService.reset();
             this.animationService.reset();
             this.chatService.clearLastMessage();
