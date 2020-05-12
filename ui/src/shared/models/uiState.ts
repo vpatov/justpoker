@@ -3,6 +3,7 @@ import { ActionType, UiActionType } from './wsaction';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
+import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
@@ -12,6 +13,7 @@ export declare interface UiState {
     audio: SoundByte;
     chat: UiChatMessage;
     animation: AnimationTrigger;
+    userPreferences?: UserPreferences;
 }
 
 export declare interface UiGameState {
@@ -31,13 +33,14 @@ export declare interface Global {
     allowStraddle: boolean;
     gameType: GameType;
     canStartGame: boolean;
+    gameWillStopAfterHand: boolean;
     unqueueAllBettingRoundActions: boolean;
 }
 
 export declare interface Controller {
     min: number;
     max: number;
-    timeBanks?: number;
+    timeBanks: number;
     sizingButtons: SizingButton[];
     bettingRoundActionButtons: BettingRoundActionButton[];
     dealInNextHand: boolean;
@@ -235,6 +238,7 @@ export function getCleanGlobal(): Global {
     allowStraddle: false,
     gameType: GameType.NLHOLDEM,
     canStartGame: false,
+    gameWillStopAfterHand: false,
     unqueueAllBettingRoundActions: true,
     };
 };
@@ -310,6 +314,7 @@ export const TestGame: UiGameState = {
         allowStraddle: true,
         gameType: GameType.NLHOLDEM,
         canStartGame: false,
+        gameWillStopAfterHand: true,
         unqueueAllBettingRoundActions: true,
     },
     controller: {

@@ -9,8 +9,11 @@ import TextFieldWrap from './reuseable/TextFieldWrap';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
+import EmojiPicker from './EmojiPicker';
+
 import { WsServer } from './api/ws';
 import { UiChatMessage } from './shared/models/uiState';
+import { Popper } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -22,7 +25,6 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'column',
-
             width: '15%',
             ...theme.custom.CHAT,
         },
@@ -42,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
             width: '100%',
             paddingTop: '2vmin',
-            paddingBottom: '1vmin',
+            overflow: 'hidden',
         },
         sendButton: {
             fontSize: '1vmin',
@@ -50,9 +52,19 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         messageTextField: {
             flexGrow: 1,
-            margin: '0.2vh 0.4vw',
-
+            margin: '-0.15vh -0.15vw',
             marginTop: 0,
+        },
+        messageInput: {
+            paddingLeft: '1.2vmin',
+            paddingRight: '1.2vmin',
+            paddingTop: '1vmin',
+            paddingBottom: '1.2vmin',
+            width: '82%',
+        },
+        emojiPicker: {
+            position: 'absolute',
+            right: '0.25vw',
         },
         chatMessage: {
             margin: '0.2vh 0.4vw',
@@ -70,7 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1vmin',
             zIndex: 5,
             position: 'absolute',
-            top: '5vh',
+            bottom: '18%',
             right: 15,
         },
         unread: {
@@ -143,6 +155,9 @@ function ChatLog(props: ChatLogProps) {
             </Button>
         );
     }
+    const addEmoji = (emoji) => {
+        setDraftMessage(draftMessage + emoji.native);
+    };
 
     function renderChat() {
         return (
@@ -164,10 +179,39 @@ function ChatLog(props: ChatLogProps) {
                         onChange={(event) => {
                             setDraftMessage(event.target.value);
                         }}
+                        InputProps={{ classes: { input: classes.messageInput } }}
                         onKeyPress={(event) => onTextAreaPressEnter(event)}
                         multiline={true}
                         rowsMax={7}
                         maxChars={300}
+                    />
+
+                    <EmojiPicker
+                        className={classes.emojiPicker}
+                        onSelect={addEmoji}
+                        recent={[
+                            'sweat_smile',
+                            'joy',
+                            'expressionless',
+                            'face_with_sumbols_on_mouth',
+                            'man_faceplaming',
+                            'bomb',
+                            'moneybag',
+                            'honey_pot',
+                            'cookie',
+                            '100',
+                            'pray',
+                            'skull_and_crossbones',
+                            'interrobang',
+                            'ok',
+                            'cool',
+                            'spades',
+                            'hearts',
+                            'diamonds',
+                            'clubs',
+                            'black_joker',
+                        ]}
+                        useButton={false}
                     />
                 </div>
                 {renderHideChatButton()}

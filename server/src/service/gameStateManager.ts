@@ -22,7 +22,7 @@ import {
     BettingRoundActionType,
 } from '../../../ui/src/shared/models/game';
 import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
-import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
+import { Player, cleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, printObj } from '../../../ui/src/shared/util/util';
 import { ActionType, JoinTableRequest } from '../../../ui/src/shared/models/wsaction';
@@ -47,6 +47,10 @@ export class GameStateManager {
 
     addUpdatedKeys(...updatedKeys: ServerStateKey[]) {
         updatedKeys.forEach((updatedKey) => this.updatedKeys.add(updatedKey));
+    }
+
+    clearUpdatedKeys() {
+        this.updatedKeys.clear();
     }
 
     setUpdatedKeys(updatedKeys: Set<ServerStateKey>) {
@@ -93,6 +97,7 @@ export class GameStateManager {
             uuid: generateUUID(),
             name,
             chips,
+            timeBanksLeft: TIME_BANKS_DEFAULT,
         };
     }
 
@@ -239,6 +244,36 @@ export class GameStateManager {
         return this.gameState.gameParameters.timeToAct;
     }
 
+    getTotalPlayerTimeToAct(playerUUID: string) {
+        return this.getTimeToAct() + this.getSumTimeBankValueThisAction(playerUUID);
+    }
+
+    getTimeBanksLeft(playerUUID: string) {
+        return this.getPlayer(playerUUID).timeBanksLeft;
+    }
+
+    decrementTimeBanksLeft(playerUUID: string) {
+        this.updatePlayer(playerUUID, { timeBanksLeft: this.getTimeBanksLeft(playerUUID) - 1 });
+    }
+
+    getTimeBanksUsedThisAction() {
+        return this.gameState.timeBanksUsedThisAction;
+    }
+
+    getSumTimeBankValueThisAction(playerUUID: string) {
+        return this.getTimeBanksUsedThisAction() * this.getTimeBankValue();
+    }
+
+    incrementTimeBanksUsedThisAction() {
+        this.updateGameState({
+            timeBanksUsedThisAction: this.getTimeBanksUsedThisAction() + 1,
+        });
+    }
+
+    clearTimeBanksUsedThisAction() {
+        this.updateGameState({ timeBanksUsedThisAction: 0 });
+    }
+
     getPots() {
         return this.gameState.pots;
     }
@@ -309,6 +344,10 @@ export class GameStateManager {
         return this.gameState.gameParameters.bigBlind;
     }
 
+    getTimeBankValue() {
+        return this.gameState.gameParameters.timeBankValue;
+    }
+
     getBettingRoundActionTypes() {
         return Object.values(this.gameState.players)
             .filter((player) => this.wasPlayerDealtIn(player.uuid))
@@ -363,8 +402,8 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
-    canCurrentPlayerAct() {
-        return this.gameState.currentPlayerToAct && this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
+    gameIsWaitingForBetAction() {
+        return this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
     }
 
     getMinimumBetSize() {
@@ -437,8 +476,19 @@ export class GameStateManager {
      */
     canPlayerStartGame(playerUUID: string) {
         return (
-            this.isPlayerReadyToPlay(playerUUID) && this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress()
+            this.isPlayerReadyToPlay(playerUUID) &&
+            this.getPlayersReadyToPlay().length >= 2 &&
+            !this.isGameInProgress() &&
+            this.isPlayerAdmin(this.getClientByPlayerUUID(playerUUID))
         );
+    }
+
+    /**
+     * Used to toggle whether the admins menus play button is start or stop while hand is occuring.
+     * Additionally globally toggles message to all players that game will be paused after next hand.
+     */
+    gameWillStopAfterHand() {
+        return this.isGameInProgress() && this.shouldDealNextHand() === false;
     }
 
     isGameInProgress() {
@@ -575,6 +625,7 @@ export class GameStateManager {
                 bigBlind: Number(newGameForm.bigBlind),
                 gameType: newGameForm.gameType || GameType.NLHOLDEM,
                 timeToAct: Number(newGameForm.timeToAct) * 1000,
+                timeBankValue: 60 * 1000, // TODO add to game form
                 maxBuyin: Number(newGameForm.maxBuyin),
                 maxPlayers: 9,
                 // consider adding timeToAct and maxPlayers to form
@@ -826,6 +877,7 @@ export class GameStateManager {
             winner: false,
             betAmount: 0,
             cardsAreHidden: true,
+            timeBanksUsedThisAction: 0,
         }));
 
         // TODO make gameState partial that represents a clean pre-hand state.

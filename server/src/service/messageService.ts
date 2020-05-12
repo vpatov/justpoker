@@ -150,9 +150,14 @@ export class MessageService {
         },
         // TODO impement leave table
         [ActionType.LEAVETABLE]: {
-            validation: (_, __) => NO_ERROR,
+            validation: (uuid, req) => NO_ERROR,
             perform: () => null,
             updates: [],
+        },
+        [ActionType.USETIMEBANK]: {
+            validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),
+            perform: () => this.gamePlayService.useTimeBankAction(),
+            updates: [ServerStateKey.GAMESTATE],
         },
     };
 
@@ -160,7 +165,7 @@ export class MessageService {
         this.validationService.ensureClientExists(clientUUID);
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);
-        this.gameStateManager.updatedKeys.clear();
+        this.gameStateManager.clearUpdatedKeys();
         if (!hasError(response)) {
             console.log(
                 `clientUUID: ${clientUUID}, messagePayload: ${message.request}, actionType: ${message.actionType}`,
