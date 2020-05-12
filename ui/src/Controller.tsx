@@ -159,21 +159,7 @@ export interface ControllerProps {
     className?: string;
 }
 
-// conflicting with chat
-// TODO either get rid of hotkeys and ensure
-// chat isnt in focus..
-/*
-const KEY_ACTION_MAP = {
-    [ActionType.BET]: "B",
-    [ActionType.CHECK]: "K",
-    [ActionType.CALL]: "A",
-    [ActionType.FOLD]: "F",
-};
-*/
-
 function ControllerComp(props: ControllerProps) {
-    console.log('render controller');
-
     const classes = useStyles();
     const { className } = props;
     const {
