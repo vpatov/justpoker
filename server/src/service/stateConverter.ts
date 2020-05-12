@@ -148,25 +148,47 @@ export class StateConverter {
         const potSize = this.gameStateManager.getFullPot();
         const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID;
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
+        const minBet = this.getMinimumBetSize(heroPlayerUUID);
+        const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
         const controller: Controller = {
             toAct,
             lastBettingRoundAction: this.gameStateManager.getLastBettingRoundAction(),
-            min: this.getMinimumBetSize(heroPlayerUUID),
-            max: this.getMaxBetSizeForPlayer(heroPlayerUUID),
-            // TODO break out into sizing buttons function
-            sizingButtons: !this.gameStateManager.isGameInProgress()
-                ? []
-                : bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING
-                ? COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue))
-                : COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
-                      this.createPotSizeButton(numerator, denominator, potSize),
-                  ),
+            min: minBet,
+            max: maxBet,
+            sizingButtons: getSizingButtons(),
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
             timeBanks: hero.timeBanksLeft,
             showWarningOnFold: !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID),
         };
+
+        function getSizingButtons() {
+            if (!this.gameStateManager.isGameInProgress()) {
+                return [];
+            }
+
+            const minBetButton = this.createMinBetButton(minBet);
+            const allInButton = this.createAllInButton(maxBet);
+
+            if (bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING) {
+                if (minBet >= bbValue * 5) {
+                    const potButtons = COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
+                        this.createPotSizeButton(numerator, denominator, potSize),
+                    );
+                    return [minBetButton, ...potButtons, allInButton];
+                } else {
+                    // normal preflop sizings
+                    const bbButtons = COMMON_BB_SIZINGS.map((numBlinds) => this.createBBSizeButton(numBlinds, bbValue));
+                    return [minBetButton, ...bbButtons, allInButton];
+                }
+            } else {
+                const potButtons = COMMON_POT_SIZINGS.map(([numerator, denominator]) =>
+                    this.createPotSizeButton(numerator, denominator, potSize),
+                );
+                return [minBetButton, ...potButtons, allInButton];
+            }
+        }
 
         return controller;
     }
@@ -313,7 +335,6 @@ export class StateConverter {
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
         };
-        console.log(uiPlayer.playerTimer);
         return uiPlayer;
     }
 
@@ -325,8 +346,7 @@ export class StateConverter {
 
     createPotSizeButton(numerator: number, denominator: number, potSize: number): SizingButton {
         return {
-            label:
-                numerator > denominator ? 'Overbet' : numerator === denominator ? 'POT' : `${numerator}/${denominator}`,
+            label: numerator === denominator ? 'POT' : `${numerator}/${denominator}`,
             value: Math.floor((numerator / denominator) * potSize),
         };
     }
@@ -335,6 +355,20 @@ export class StateConverter {
         return {
             label: `${numBlinds} BB`,
             value: numBlinds * bbValue,
+        };
+    }
+
+    createMinBetButton(minBetAmt: number): SizingButton {
+        return {
+            label: `Min Bet`,
+            value: minBetAmt,
+        };
+    }
+
+    createAllInButton(allInAmt: number): SizingButton {
+        return {
+            label: `All In`,
+            value: allInAmt,
         };
     }
 }

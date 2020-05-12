@@ -200,14 +200,13 @@ export const ALL_MENU_BUTTONS = [
 ];
 
 /* Common bet sizes */
-export const COMMON_BB_SIZINGS: Array<number> = [2, 3, 4, 5];
+export const COMMON_BB_SIZINGS: Array<number> = [3, 4, 5];
 
 export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [1, 3],
     [1, 2],
     [2, 3],
     [1, 1],
-    [5, 4],
 ];
 
 export function getCleanUiChatLog(): UiChatLog {
