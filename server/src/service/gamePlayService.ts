@@ -7,7 +7,6 @@ import {
     CHECK_ACTION,
     GameType,
 } from '../../../ui/src/shared/models/game';
-import { AwardPot } from '../../../ui/src/shared/models/uiState';
 
 import { strict as assert } from 'assert';
 import { HandSolverService } from './handSolverService';
@@ -383,7 +382,6 @@ export class GamePlayService {
             shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
         );
 
-        const awardPots: number[] = [];
         this.gsm.clearWinnersAndDeltas();
 
         winningPlayers.forEach((playerUUID) => {
@@ -394,7 +392,6 @@ export class GamePlayService {
                 chipDelta: amountsWon[playerUUID], // used to compute awardPts
             });
             this.gsm.addHandWinner(playerUUID);
-            awardPots.push(amountsWon[playerUUID]);
         });
     }
 
