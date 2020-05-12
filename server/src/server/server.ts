@@ -21,6 +21,7 @@ import { WSParams, EndPoint } from '../../../ui/src/shared/models/dataCommunicat
 import { ChatService } from '../service/chatService';
 import { StateGraphManager } from '../service/stateGraphManager';
 import { NewGameForm } from '../../../ui/src/shared/models/table';
+import { logger } from './logging';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -71,7 +72,7 @@ class Server {
             }
             // dont flood the console
             if (count % 10 === 0) {
-                console.log(`${snippet}: Average over ${count} samples: ${sum / count}`);
+                logger.debug(`${snippet}: Average over ${count} samples: ${sum / count}`)
             }
         });
     }
@@ -97,7 +98,7 @@ class Server {
             this.initWSSListeners();
             this.chatService.clearMessages();
             this.tableInitialized = true;
-            console.log(gameUUID);
+            logger.info(`GameUUID: ${gameUUID}`);
             res.send(JSON.stringify({ gameUUID: gameUUID }));
         });
 
