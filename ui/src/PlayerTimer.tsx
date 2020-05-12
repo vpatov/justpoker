@@ -52,7 +52,6 @@ function PlayerTimer(props) {
     const [playedWarning, setPlayedWarning] = useState(false);
 
     useEffect(() => {
-        console.log('playerTimer:', timeLimit, timeElapsed);
         setShow(true);
         setCompleted(getPercentTimeRemaining(timeElapsed, timeLimit));
         const updateIntervalMs = 1000;
