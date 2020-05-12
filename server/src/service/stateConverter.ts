@@ -20,12 +20,11 @@ import {
     BettingRoundActionButton,
     UiCard,
     MenuButton,
+    LEDGER_BUTTON,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
 import { AudioService } from './audioService';
-
-import { printObj } from '../../../ui/src/shared/util/util';
 
 import {
     Global,
@@ -121,6 +120,7 @@ export class StateConverter {
     getUIGlobal(clientUUID: string): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
+        const gameStage = this.gameStateManager.getGameStage();
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
@@ -132,7 +132,8 @@ export class StateConverter {
             gameType: this.gameStateManager.getGameType(),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
-            unqueueAllBettingRoundActions: this.gameStateManager.getGameStage() === GameStage.INITIALIZE_NEW_HAND,
+            unqueueAllBettingRoundActions:
+                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.SHOW_START_OF_BETTING_ROUND,
         };
 
         return global;
@@ -230,7 +231,7 @@ export class StateConverter {
     getValidMenuButtons(clientUUID: string): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        const menuButtons = [SETTINGS_BUTTON, VOLUME_BUTTON]; // currently these are always visible
+        const menuButtons = [SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
 
         if (this.gameStateManager.isPlayerAdmin(clientUUID)) {
             menuButtons.push(ADMIN_BUTTON);
