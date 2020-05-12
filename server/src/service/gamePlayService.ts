@@ -7,7 +7,6 @@ import {
     CHECK_ACTION,
     GameType,
 } from '../../../ui/src/shared/models/game';
-import { AwardPot } from '../../../ui/src/shared/models/uiState';
 
 import { strict as assert } from 'assert';
 import { HandSolverService } from './handSolverService';
@@ -20,6 +19,7 @@ import { AnimationService } from '../service/animationService';
 import { printObj, logGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
+import { LedgerService } from './ledgerService';
 
 @Service()
 export class GamePlayService {
@@ -28,6 +28,7 @@ export class GamePlayService {
         private readonly handSolverService: HandSolverService,
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
+        private readonly ledgerService: LedgerService,
         private readonly validationService: ValidationService,
     ) {}
 
@@ -221,7 +222,9 @@ export class GamePlayService {
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
         // TODO find the cleanest way to do this. Should that logic be handled in setPlayerBetAmount, or here?
-        this.gsm.setPlayerBetAmount(currentPlayerToAct, this.gsm.getPreviousRaise());
+        const chips = this.gsm.getChips(currentPlayerToAct);
+        const callAmount = this.gsm.getPreviousRaise() > chips ? chips : this.gsm.getPreviousRaise();
+        this.gsm.setPlayerBetAmount(currentPlayerToAct, callAmount);
 
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
         this.gsm.setPlayerLastActionType(
@@ -311,20 +314,29 @@ export class GamePlayService {
         }
     }
 
-    dealCards() {
+    initializeBettingRound() {
         const bettingRoundStage = this.gsm.getBettingRoundStage();
 
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
                 this.animationService.animateDeal();
-                Object.keys(this.gsm.getPlayers())
-                    .filter((playerUUID) => this.gsm.isPlayerReadyToPlay(playerUUID))
-                    .forEach((playerUUID) => this.dealHoleCards(playerUUID));
+                this.gsm.forEveryPlayer((player) => {
+                    if (this.gsm.isPlayerReadyToPlay(player.uuid)) {
+                        this.dealHoleCards(player.uuid);
+                        this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(player.uuid));
+                    }
+                });
+
                 break;
             }
 
             case BettingRoundStage.FLOP: {
                 this.gsm.dealCardsToBoard(3);
+                this.gsm.forEveryPlayer((player) => {
+                    if (this.gsm.isPlayerInHand(player.uuid)) {
+                        this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(player.uuid));
+                    }
+                });
                 break;
             }
 
@@ -399,12 +411,16 @@ export class GamePlayService {
                 winner: true,
                 chipDelta: amountsWon[playerUUID], // used to compute awardPts
             });
+            this.gsm.addHandWinner(playerUUID);
         });
     }
 
     ejectStackedPlayers() {
-        // TODO this duplicates gameStateManager.standUpPlayer
-        this.gsm.updatePlayers((player) => (player.chips === 0 ? { sitting: false, seatNumber: -1 } : {}));
+        this.gsm.forEveryPlayer((player) => {
+            if (player.chips === 0) {
+                this.gsm.standUpPlayer(player.uuid);
+            }
+        });
     }
 
     placeBetsInPot() {

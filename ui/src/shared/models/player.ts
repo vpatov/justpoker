@@ -62,24 +62,24 @@ export declare interface Player {
     readonly timeBanksLeft: number;
 }
 
-export const cleanPlayer: Player = {
-    uuid: '',
-    name: '',
-    chips: 0,
-    holeCards: [],
-    handDescription: '',
-    bestHand: null,
-    sitting: false,
-    sittingOut: false,
-    willStraddle: false,
-    seatNumber: -1,
-    lastActionType: BettingRoundActionType.NOT_IN_HAND,
-    winner: false,
-    betAmount: 0,
-    cardsAreHidden: true,
-    chipsAtStartOfHand: 0,
-    chipDelta: 0,
-    timeBanksLeft: 0,
-};
-
-export const TIME_BANKS_DEFAULT = 5;
+export function getCleanPlayer(): Player {
+    return {
+        uuid: '',
+        name: '',
+        chips: 0,
+        holeCards: [],
+        handDescription: '',
+        bestHand: null,
+        sitting: false,
+        sittingOut: false,
+        willStraddle: false,
+        seatNumber: -1,
+        lastActionType: BettingRoundActionType.NOT_IN_HAND,
+        winner: false,
+        betAmount: 0,
+        cardsAreHidden: true,
+        chipsAtStartOfHand: 0,
+        chipDelta: 0,
+        timeBanksLeft: 0,
+    };   
+}

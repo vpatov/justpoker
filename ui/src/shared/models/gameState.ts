@@ -28,6 +28,7 @@ export declare interface QueuedServerAction {
 }
 
 // TODO break up into gameState and serverState
+// TODO revisit the way immutability is implemented via readonly.
 export declare interface GameState {
     gameStage: GameStage;
 
@@ -63,6 +64,15 @@ export declare interface GameState {
 
     pots: ReadonlyArray<Pot>;
 
+    /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
+    handWinners: Set<string>;
+
+    /** 
+     * This variable is checked before initializing a new hand. If it's true, and there are enough players, the 
+     * gameStage will proceed to INITIALIZE_NEW_HAND, the hand will be dealt, and gameplay will start. Otherwise, the 
+     * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently 
+     * in progress - that is determined by the gameStage !== NOT_IN_PROGRESS, exposed in gsm.isGameInProgress().
+     */
     shouldDealNextHand: Readonly<boolean>;
 
     /** Sensitive field. */
@@ -105,43 +115,45 @@ export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerActi
 export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
 
 // TODO create partially clean game that can be used to clear state of round info.
-export const cleanGameState: GameState = {
-    gameStage: GameStage.NOT_IN_PROGRESS,
-    queuedServerActions: [],
-    players: {},
-    board: [],
-    gameParameters: {
-        smallBlind: 0,
-        bigBlind: 0,
-        gameType: GameType.NLHOLDEM,
-        maxBuyin: 0,
-        timeToAct: 0,
-        timeBankValue: 0,
-        maxPlayers: 9,
-    },
-    dealerUUID: '',
-    smallBlindUUID: '',
-    bigBlindUUID: '',
-    straddleUUID: '',
-    bettingRoundStage: BettingRoundStage.WAITING,
-    firstToAct: '',
-    currentPlayerToAct: '',
-    lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
-    shouldDealNextHand: false,
-    deck: {
-        cards: [],
-    },
-    pots: [],
-    table: {
-        uuid: '',
-        activeConnections: new Map(),
-        password: '',
-        admin: '',
-    },
-    timeCurrentPlayerTurnStarted: 0,
-    timeBanksUsedThisAction: 0,
-    serverTime: 0,
-    minRaiseDiff: 0,
-    previousRaise: 0,
-    partialAllInLeftOver: 0,
-};
+export function getCleanGameState(): GameState {
+    return {
+        gameStage: GameStage.NOT_IN_PROGRESS,
+        queuedServerActions: [],
+        players: {},
+        board: [],
+        gameParameters: {
+            smallBlind: 0,
+            bigBlind: 0,
+            gameType: GameType.NLHOLDEM,
+            maxBuyin: 0,
+            timeToAct: 0,
+            maxPlayers: 9,
+        },
+        dealerUUID: '',
+        smallBlindUUID: '',
+        bigBlindUUID: '',
+        straddleUUID: '',
+        bettingRoundStage: BettingRoundStage.WAITING,
+        firstToAct: '',
+        currentPlayerToAct: '',
+        lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
+        shouldDealNextHand: false,
+        deck: {
+            cards: [],
+        },
+        pots: [],
+        handWinners: new Set<string>(),
+        table: {
+            uuid: '',
+            activeConnections: new Map(),
+            password: '',
+            admin: '',
+        },
+        timeCurrentPlayerTurnStarted: 0,
+        timeBanksUsedThisAction: 0,
+        serverTime: 0,
+        minRaiseDiff: 0,
+        previousRaise: 0,
+        partialAllInLeftOver: 0,
+    };
+}

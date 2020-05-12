@@ -7,7 +7,8 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import GameContainer from './GameContainer';
 import { createMuiTheme } from '@material-ui/core/styles';
 
-import Home from './Home';
+import Home from "./Home";
+import Ledger from "./Ledger";
 
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);
@@ -45,6 +46,7 @@ function App() {
                     <Switch>
                         <Route exact path="/game/test" render={(props) => <GameContainer useTestGame />} />
                         <Route path="/game" component={GameContainer} />
+                        <Route path="/ledger" component={Ledger} />
                         <Route path="/" component={Home} />
                     </Switch>
                 </Router>

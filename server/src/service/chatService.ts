@@ -57,7 +57,7 @@ export class ChatService {
         if (nameMatch) {
             const name = nameMatch[1];
             if (player) {
-                this.gameStateManager.updatePlayer(player.uuid, { name });
+                this.gameStateManager.changePlayerName(player.uuid, name);
                 this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
             }
             return;
