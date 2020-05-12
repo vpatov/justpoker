@@ -82,6 +82,7 @@ export class GamePlayService {
             this.check();
         } else {
             this.fold();
+            this.gsm.sitOutPlayer(playerUUID);
         }
     }
 
