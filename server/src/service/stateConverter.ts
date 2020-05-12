@@ -165,6 +165,7 @@ export class StateConverter {
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
             timeBanks: hero.timeBanksLeft,
+            showWarningOnFold: false,
         };
 
         return controller;

@@ -47,6 +47,7 @@ export declare interface Controller {
     toAct?: boolean;
     willStraddle: boolean;
     lastBettingRoundAction: BettingRoundAction;
+    showWarningOnFold: boolean;
 }
 
 export declare interface SizingButton {
@@ -225,6 +226,7 @@ export function getCleanController() : Controller  {
         sizingButtons: [],
         bettingRoundActionButtons: [],
         timeBanks: 0,
+        showWarningOnFold: false,
     };
 }
 
@@ -344,6 +346,7 @@ export const TestGame: UiGameState = {
             },
         ],
         bettingRoundActionButtons: ALL_ACTION_BUTTONS,
+        showWarningOnFold: false,
     },
     table: {
         spots: 9,
