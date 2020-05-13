@@ -132,7 +132,7 @@ export class StateConverter {
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
             unqueueAllBettingRoundActions:
-                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.SHOW_START_OF_BETTING_ROUND,
+                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
         };
 
         return global;
@@ -150,7 +150,8 @@ export class StateConverter {
         const fullPot = this.gameStateManager.getFullPot();
         const curBet = this.gameStateManager.getPreviousRaise();
         const curCall = hero.betAmount;
-        const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID;
+        const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID &&
+            this.gameStateManager.gameIsWaitingForBetAction();
         const minBet = this.getMinimumBetSize(heroPlayerUUID);
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
 
