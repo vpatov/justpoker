@@ -177,7 +177,7 @@ export class MessageService {
             this.stateGraphManager.processEvent(message.actionType);
         } else {
             // TODO process error and send error to client
-            logger.error(response);
+            logger.error(JSON.stringify(response));
         }
     }
 
