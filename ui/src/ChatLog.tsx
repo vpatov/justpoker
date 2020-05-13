@@ -14,6 +14,7 @@ import EmojiPicker from './EmojiPicker';
 import { WsServer } from './api/ws';
 import { UiChatMessage } from './shared/models/uiState';
 import { Popper } from '@material-ui/core';
+import { pickRandomColor } from './shared/models/userPreferences';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -92,6 +93,16 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+declare interface PlayerNameColors {
+    colorMap:    {[playerUUID: string]: string};
+    usedColors: Set<string>;
+}
+
+const cleanColorMap = {
+    colorMap: {},
+    usedColors: new Set<string>()
+};
+
 interface ChatLogProps {
     className?: string;
 }
@@ -103,6 +114,7 @@ function ChatLog(props: ChatLogProps) {
 
     const [hideChat, setHideChat] = useState(false);
     const [messages, setMessages] = useState([] as any);
+    const [playerNameColors, setPlayerNameColors] = useState(cleanColorMap);
     const [draftMessage, setDraftMessage] = useState('');
     const [unreadChats, setUnreadChats] = useState(false);
 
@@ -119,8 +131,11 @@ function ChatLog(props: ChatLogProps) {
     }, []);
 
     function sendMessage() {
-        WsServer.sendChatMessage(draftMessage);
-        setDraftMessage('');
+        const trimmedMessage = draftMessage.trim();
+        if (trimmedMessage){
+            WsServer.sendChatMessage(trimmedMessage);
+            setDraftMessage('');
+        }
     }
 
     function onTextAreaPressEnter(event: any) {
@@ -130,7 +145,19 @@ function ChatLog(props: ChatLogProps) {
         }
     }
 
+    function updatePlayerNameColors(playerUUID: string){
+        setPlayerNameColors((playerNameColors: PlayerNameColors) => {
+            let color = pickRandomColor();
+            if (playerNameColors.usedColors.size)
+        })
+
+    }
+
+
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
+        if (chatMessage.playerUUID && !playerNameColors.colorMap[chatMessage.playerUUID]){
+            updatePlayerNameColors(chatMessage.playerUUID);
+        }
         setUnreadChats(true);
         setMessages((oldMessages) => [...oldMessages, chatMessage]);
     }
