@@ -540,7 +540,7 @@ export class GameStateManager {
             throw Error('getNextPlayerInHandUUID shouldnt be called if all plalyers have acted.');
         }
         if (!currentPlayerUUID) {
-            throw Error('getNextPlayerInHandUUID shouldnt be called without a currentPlalyerUUID');
+            throw Error('getNextPlayerInHandUUID shouldnt be called without a currentPlayerUUID');
         }
         const seats = this.getSeats();
         const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
