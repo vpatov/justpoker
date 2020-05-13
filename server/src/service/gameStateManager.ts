@@ -384,13 +384,13 @@ export class GameStateManager {
         const posA = this.getPositionRelativeToDealer(playerA);
         const posB = this.getPositionRelativeToDealer(playerB);
 
-        if (playerA !== playerB) {
+        if (playerA === playerB) {
             throw Error(
                 `gameStateManager.comparePositions was invoked with the same player. ` +
                     `This is most likely a bug. GameState: ${getLoggableGameState(this.gameState)}`,
             );
         }
-        if (!(posA !== posB)) {
+        if (posA === posB) {
             throw Error(
                 `gameStateManager.getPositionRelativeToDealer returned ` +
                     `the same position for two different players. GameState: ${getLoggableGameState(this.gameState)}`,
