@@ -241,6 +241,7 @@ export class StateConverter {
             senderName: chatMessage.senderName,
             playerUUID: chatMessage.playerUUID,
             timestamp: Date.now(),
+            seatNumber: chatMessage.seatNumber,
         };
         return uiChatMessage;
     }

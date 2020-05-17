@@ -8,4 +8,5 @@ export declare interface ChatMessage {
     senderName: string;
     playerUUID: string;
     clientUUID: string;
+    seatNumber: number;
 }

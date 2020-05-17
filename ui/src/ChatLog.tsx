@@ -14,7 +14,9 @@ import EmojiPicker from './EmojiPicker';
 import { WsServer } from './api/ws';
 import { UiChatMessage } from './shared/models/uiState';
 import { Popper } from '@material-ui/core';
-import { pickRandomColor } from './shared/models/userPreferences';
+import { getPlayerNameColor } from './shared/models/userPreferences';
+import { playerListSelector } from './store/selectors';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -73,7 +75,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         senderName: {
             fontWeight: 'bold',
-            color: 'rgb(255, 163, 97)',
+            // color: 'rgb(255, 163, 97)',
             marginRight: '8px',
         },
         messageContent: {
@@ -93,16 +95,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-declare interface PlayerNameColors {
-    colorMap:    {[playerUUID: string]: string};
-    usedColors: Set<string>;
-}
-
-const cleanColorMap = {
-    colorMap: {},
-    usedColors: new Set<string>()
-};
-
 interface ChatLogProps {
     className?: string;
 }
@@ -114,9 +106,9 @@ function ChatLog(props: ChatLogProps) {
 
     const [hideChat, setHideChat] = useState(false);
     const [messages, setMessages] = useState([] as any);
-    const [playerNameColors, setPlayerNameColors] = useState(cleanColorMap);
     const [draftMessage, setDraftMessage] = useState('');
     const [unreadChats, setUnreadChats] = useState(false);
+    const playerList = useSelector(playerListSelector);
 
     const messagesRef = useRef(null);
 
@@ -145,19 +137,7 @@ function ChatLog(props: ChatLogProps) {
         }
     }
 
-    function updatePlayerNameColors(playerUUID: string){
-        setPlayerNameColors((playerNameColors: PlayerNameColors) => {
-            let color = pickRandomColor();
-            if (playerNameColors.usedColors.size)
-        })
-
-    }
-
-
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
-        if (chatMessage.playerUUID && !playerNameColors.colorMap[chatMessage.playerUUID]){
-            updatePlayerNameColors(chatMessage.playerUUID);
-        }
         setUnreadChats(true);
         setMessages((oldMessages) => [...oldMessages, chatMessage]);
     }
@@ -189,7 +169,12 @@ function ChatLog(props: ChatLogProps) {
                 <div className={classes.chatLog}>
                     {messages.map((message) => (
                         <Typography key={message.timestamp} className={classes.chatMessage}>
-                            <span className={classes.senderName}>{message.senderName}:</span>
+                            <span 
+                                className={classes.senderName}
+                                style={{color:getPlayerNameColor(message.seatNumber)}}
+                            >
+                                {message.senderName}:
+                            </span>
                             <span className={classes.messageContent}>{message.content}</span>
                         </Typography>
                     ))}

@@ -159,15 +159,18 @@ class Server {
                 case EndPoint.GAME: {
                     ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID)));
                     ws.on('message', (data: WebSocket.Data) => this.processGameMessage(ws, data, clientUUID));
+                    logger.info(`Sent initial GAME message to client: ${clientUUID}`);
                     break;
                 }
 
                 case EndPoint.LEDGER: {
                     ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
+                    logger.info(`Sent initial LEDGER message to client: ${clientUUID}`);
                     break;
                 }
 
                 default: {
+                    logger.error(`Endpoint ${queryParams.endpoint} is not available.`);
                     throw Error(`Endpoint ${queryParams.endpoint} is not available.`);
                 }
             }

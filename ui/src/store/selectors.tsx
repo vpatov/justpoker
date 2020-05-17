@@ -26,6 +26,7 @@ export const globalGameStateSelector = (gs: UiGameState): Global => gs.global;
 export const heroPlayerTimerSelector = (gs: UiGameState): PlayerTimer =>
     (gs.players.find((p) => p.hero) || {}).playerTimer || { timeElapsed: 0, timeLimit: 0 };
 export const heroPlayerUUIDSelector = (gs: UiGameState): string => gs.players.find((p) => p.hero)?.uuid || '';
+export const playerListSelector = (gs: UiGameState): UiPlayer[] => gs.players;
 export const heroPlayerToAct = (gs: UiGameState): boolean => (gs.players.find((p) => p.hero) || {}).toAct || false;
 export const isHeroAdminSelector = (gs: UiGameState): boolean => gs.global.heroIsAdmin;
 export const isHeroSeatedSelector = (gs: UiGameState): boolean => gs.global.heroIsSeated;

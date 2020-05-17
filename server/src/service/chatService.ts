@@ -46,6 +46,7 @@ export class ChatService {
             senderName: player ? player.name : 'Anonymous',
             playerUUID: player ? player.uuid : undefined,
             clientUUID,
+            seatNumber: player.seatNumber,
         };
 
         this.chatLog.messages.push(this.lastMessage);
