@@ -116,7 +116,7 @@ class Server {
         for (const client of this.gsm.getConnectedClients()) {
             const ws = client.websockets.get(EndPoint.GAME);
             if (ws) {
-                const res = this.stateConverter.getUIState(client.uuid);
+                const res = this.stateConverter.getUIState(client.uuid, false);
                 const jsonRes = JSON.stringify(res);
                 ws.send(jsonRes);
             }
@@ -157,17 +157,20 @@ class Server {
 
             switch (queryParams.endpoint) {
                 case EndPoint.GAME: {
-                    ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID)));
+                    ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
                     ws.on('message', (data: WebSocket.Data) => this.processGameMessage(ws, data, clientUUID));
+                    logger.info(`Sent initial GAME message to client: ${clientUUID}`);
                     break;
                 }
 
                 case EndPoint.LEDGER: {
                     ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
+                    logger.info(`Sent initial LEDGER message to client: ${clientUUID}`);
                     break;
                 }
 
                 default: {
+                    logger.error(`Endpoint ${queryParams.endpoint} is not available.`);
                     throw Error(`Endpoint ${queryParams.endpoint} is not available.`);
                 }
             }

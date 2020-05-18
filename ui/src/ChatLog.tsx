@@ -14,6 +14,9 @@ import EmojiPicker from './EmojiPicker';
 import { WsServer } from './api/ws';
 import { UiChatMessage } from './shared/models/uiState';
 import { Popper } from '@material-ui/core';
+import { getPlayerNameColor } from './shared/models/userPreferences';
+import { playerListSelector } from './store/selectors';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -72,7 +75,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         senderName: {
             fontWeight: 'bold',
-            color: 'rgb(255, 163, 97)',
+            // color: 'rgb(255, 163, 97)',
             marginRight: '8px',
         },
         messageContent: {
@@ -105,6 +108,7 @@ function ChatLog(props: ChatLogProps) {
     const [messages, setMessages] = useState([] as any);
     const [draftMessage, setDraftMessage] = useState('');
     const [unreadChats, setUnreadChats] = useState(false);
+    const playerList = useSelector(playerListSelector);
 
     const messagesRef = useRef(null);
 
@@ -119,8 +123,11 @@ function ChatLog(props: ChatLogProps) {
     }, []);
 
     function sendMessage() {
-        WsServer.sendChatMessage(draftMessage);
-        setDraftMessage('');
+        const trimmedMessage = draftMessage.trim();
+        if (trimmedMessage){
+            WsServer.sendChatMessage(trimmedMessage);
+            setDraftMessage('');
+        }
     }
 
     function onTextAreaPressEnter(event: any) {
@@ -162,7 +169,12 @@ function ChatLog(props: ChatLogProps) {
                 <div className={classes.chatLog}>
                     {messages.map((message) => (
                         <Typography key={message.timestamp} className={classes.chatMessage}>
-                            <span className={classes.senderName}>{message.senderName}:</span>
+                            <span 
+                                className={classes.senderName}
+                                style={{color:getPlayerNameColor(message.seatNumber)}}
+                            >
+                                {message.senderName}:
+                            </span>
                             <span className={classes.messageContent}>{message.content}</span>
                         </Typography>
                     ))}

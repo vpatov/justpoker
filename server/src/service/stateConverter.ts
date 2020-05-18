@@ -72,7 +72,7 @@ export class StateConverter {
     }
 
     // Hero refers to the player who is receiving this particular UiState.
-    transformGameStateToUIState(clientUUID: string): UiState {
+    transformGameStateToUIState(clientUUID: string, sendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
@@ -82,36 +82,37 @@ export class StateConverter {
 
         // TODO put each key into its own function
         const uiState: UiState = {
-            game: this.gameUpdated()
-                ? {
-                      global: this.getUIGlobal(clientUUID),
-                      controller: clientPlayerIsSeated
-                          ? this.getUIController(clientUUID, heroPlayerUUID)
-                          : getCleanController(),
-                      table: {
-                          spots: 9, // TODO configure
-                          activePot:
-                              this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
-                                  ? 0
-                                  : this.gameStateManager.getActivePotValue(),
-                          awardPots: this.gameStateManager.getAwardPots(),
-                          fullPot: this.gameStateManager.getFullPot(),
-                          inactivePots:
-                              this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
-                                  ? []
-                                  : this.gameStateManager.getInactivePotsValues(),
-                          communityCards: this.transformCommunityCards(),
-                      },
-                      players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
-                          this.transformPlayer(player, heroPlayerUUID),
-                      ),
-                      menu: this.getValidMenuButtons(clientUUID),
-                  }
-                : undefined,
-            audio: this.audioUpdated() ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
+            game:
+                this.gameUpdated() || sendAll
+                    ? {
+                          global: this.getUIGlobal(clientUUID),
+                          controller: clientPlayerIsSeated
+                              ? this.getUIController(clientUUID, heroPlayerUUID)
+                              : getCleanController(),
+                          table: {
+                              spots: 9, // TODO configure
+                              activePot:
+                                  this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
+                                      ? 0
+                                      : this.gameStateManager.getActivePotValue(),
+                              awardPots: this.gameStateManager.getAwardPots(),
+                              fullPot: this.gameStateManager.getFullPot(),
+                              inactivePots:
+                                  this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
+                                      ? []
+                                      : this.gameStateManager.getInactivePotsValues(),
+                              communityCards: this.transformCommunityCards(),
+                          },
+                          players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
+                              this.transformPlayer(player, heroPlayerUUID),
+                          ),
+                          menu: this.getValidMenuButtons(clientUUID),
+                      }
+                    : undefined,
+            audio: this.audioUpdated() || sendAll ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
             animation: this.animationService.getAnimationTrigger(),
             // TODO refactor to send entire chatlog on init.
-            chat: this.chatUpdated() ? this.transformChatMessage() : undefined,
+            chat: this.chatUpdated() || sendAll ? this.transformChatMessage() : undefined,
         };
         return uiState;
     }
@@ -150,7 +151,8 @@ export class StateConverter {
         const fullPot = this.gameStateManager.getFullPot();
         const curBet = this.gameStateManager.getPreviousRaise();
         const curCall = hero.betAmount;
-        const toAct = this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID &&
+        const toAct =
+            this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID &&
             this.gameStateManager.gameIsWaitingForBetAction();
         const minBet = this.getMinimumBetSize(heroPlayerUUID);
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
@@ -259,6 +261,7 @@ export class StateConverter {
             senderName: chatMessage.senderName,
             playerUUID: chatMessage.playerUUID,
             timestamp: Date.now(),
+            seatNumber: chatMessage.seatNumber,
         };
         return uiChatMessage;
     }
@@ -334,9 +337,9 @@ export class StateConverter {
         return uiPlayer;
     }
 
-    getUIState(clientUUID: string): UiState {
+    getUIState(clientUUID: string, sendAll: boolean): UiState {
         // TODO document the usage of updatedKeys and consider a refactor/redesign if too complex
-        const uiState = this.transformGameStateToUIState(clientUUID);
+        const uiState = this.transformGameStateToUIState(clientUUID, sendAll);
         return uiState;
     }
 

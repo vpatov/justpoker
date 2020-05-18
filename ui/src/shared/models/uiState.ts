@@ -121,7 +121,8 @@ export declare interface UiChatMessage {
     timestamp: number;
     content: string;
     senderName: string;
-    playerUUID?: string;
+    playerUUID: string;
+    seatNumber: number;
 }
 
 export declare interface UiChatLog {
@@ -264,14 +265,20 @@ export function getCleanGame(): UiGameState {
     };
 }
 
+export function getCleanChatMessage(): UiChatMessage {
+    return  {
+        senderName: '',
+        content: '',
+        timestamp: 0,
+        playerUUID: '',
+        seatNumber: 0,
+    };
+}
+
 export const CleanRootState: UiState = {
     game: getCleanGame(),
     audio: SoundByte.NONE,
-    chat: {
-        senderName: 'Vasia',
-        content: 'Message in the chat log.',
-        timestamp: 0,
-    },
+    chat: getCleanChatMessage(),
     animation: AnimationTrigger.NONE,
 };
 
@@ -281,16 +288,22 @@ export const testUiChatLog: UiChatLog = {
             senderName: 'Vasia',
             content: 'Message in the chat log.',
             timestamp: 0,
+            playerUUID: '123',
+            seatNumber: 0,
         },
         {
             senderName: 'Jules',
             content: 'witty response to something clever.',
             timestamp: 0,
+            playerUUID: '234',
+            seatNumber: 1,
         },
         {
             senderName: 'ShaemusGoatmaster',
             content: 'Message in the chataaaasssssssssss sadasdasd asdasd lots of words lorem ipsum lorel sdfsdf log.',
             timestamp: 0,
+            playerUUID: '345',
+            seatNumber: 2,
         },
     ],
 };
