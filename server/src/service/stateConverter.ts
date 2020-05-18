@@ -52,10 +52,8 @@ declare interface CardInformation {
 export class StateConverter {
     constructor(
         private readonly gameStateManager: GameStateManager,
-        private readonly validationService: ValidationService,
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
-        private readonly messageService: MessageService,
         private readonly chatService: ChatService,
     ) {}
 

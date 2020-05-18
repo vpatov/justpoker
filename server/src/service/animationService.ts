@@ -4,6 +4,11 @@ import { AnimationState, AnimationTrigger, getCleanAnimationState } from '../../
 @Service()
 export class AnimationService {
     private animationState: AnimationState = getCleanAnimationState();
+
+    loadAnimationState(as: AnimationState) {
+        this.animationState = as;
+    }
+
     private setTrigger(trigger: AnimationTrigger) {
         return (this.animationState.trigger = trigger);
     }
