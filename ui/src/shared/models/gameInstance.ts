@@ -8,7 +8,7 @@ export declare interface GameInstance {
     audioQueue: AudioQueue;
     animationState: AnimationState;
     chatLog: ChatLog;
-    clients: Set<string>;
+    clientUUIDs: Set<string>;
 }
 
 export function getCleanGameInstance(): GameInstance {
@@ -17,6 +17,6 @@ export function getCleanGameInstance(): GameInstance {
         audioQueue: getCleanAudioQueue(),
         animationState: getCleanAnimationState(),
         chatLog: getCleanChatLog(),
-        clients: new Set(),
+        clientUUIDs: new Set(),
     };
 }

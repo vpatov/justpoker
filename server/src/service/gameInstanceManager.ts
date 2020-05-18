@@ -5,14 +5,14 @@ import { AnimationService } from './animationService';
 import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
 
-export interface ServerGames {
+export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
 }
 
 @Service()
 export class GameInstanceManager {
-    private games: ServerGames = {};
-    private activeGame: string = '';
+    private gameInstances: GameInstances = {};
+    private activeGameInstanceUUID: string = '';
 
     constructor(
         private readonly gameStateManager: GameStateManager,
@@ -21,16 +21,16 @@ export class GameInstanceManager {
         private readonly chatService: ChatService,
     ) {}
 
-    createNewGame(gameInstanceUUID: string) {
-        this.games[gameInstanceUUID] = getCleanGameInstance();
+    createNewGameInstance(gameInstanceUUID: string) {
+        this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
     }
 
     getGameInstance(gameInstanceUUID: string): GameInstance | undefined {
-        return this.games[gameInstanceUUID];
+        return this.gameInstances[gameInstanceUUID];
     }
 
     getActiveGameInstance(): GameInstance | undefined {
-        return this.games[this.activeGame];
+        return this.gameInstances[this.activeGameInstanceUUID];
     }
 
     loadGameInstance(gameInstanceUUID: string) {
@@ -40,7 +40,7 @@ export class GameInstanceManager {
             // TODO error path
         }
 
-        this.activeGame = gameInstanceUUID;
+        this.activeGameInstanceUUID = gameInstanceUUID;
         this.gameStateManager.loadGameState(gi.gameState);
         this.chatService.loadChatState(gi.chatLog);
         this.audioService.loadAudioState(gi.audioQueue);
