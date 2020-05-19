@@ -120,10 +120,7 @@ class Server {
         this.connectedClientManager.sendStateToEachInGroup(activeGameInstanceUUID);
     }
 
-    // we need to rethink this, ledger updates should only go out to players who are viewing the ledger rather then sending to the whole WS group
-    // we also need to support opening ledger in new tab, would we need two session ids for this
-    // do we have to matain seperate WS and groups for the ledger?
-    // possibly coule be more easily handled by http
+    // we need to rethink this i think,  see comment on PR
 
     // sendLedgerUpdatesToClients() {
     //     for (const client of this.gsm.getConnectedClients()) {
@@ -188,6 +185,7 @@ class Server {
 
     onConnectionToGame(ws: WebSocket, gameUUID: string, clientUUID: string) {
         // if game is not in instanceManager then send 404
+        // TODO implement FE for this
         if (!this.gameInstanceManager.doesGameExist(gameUUID)) {
             ws.send(JSON.stringify(getDefaultGame404()));
         }

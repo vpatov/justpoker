@@ -36,8 +36,6 @@ export class ConnectedClientManager {
     // would be good to refactor this so there isnt a direct dependency on stateConverter
     sendStateToEachInGroup(key: string) {
         Object.entries(this.ClientGroups[key]).forEach(([clientUUID, websocket]) => {
-            console.log(clientUUID, websocket);
-
             const newState = this.stateConverter.getUIState(clientUUID, false);
             const jsonRes = JSON.stringify(newState);
             websocket.send(jsonRes);

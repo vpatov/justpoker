@@ -3,7 +3,7 @@ import {
     ActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
-    NewEvent,
+    Event,
     ClientAction,
     ServerAction,
     GeneralAction,
@@ -177,7 +177,7 @@ export class MessageService {
         },
     };
 
-    processMessage(message: NewEvent, gameInstanceUUID: string, clientUUID: string) {
+    processMessage(message: Event, gameInstanceUUID: string, clientUUID: string) {
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
         if (clientUUID !== 'SERVER') {
             this.validationService.ensureClientExists(clientUUID);

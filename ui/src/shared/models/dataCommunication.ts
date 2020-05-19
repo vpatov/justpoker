@@ -1,6 +1,6 @@
 import { BettingRoundAction } from './game';
 
-export declare interface NewEvent {
+export declare interface Event {
     actionType: GeneralAction;
     request: any;
     gameInstanceUUID: string;
