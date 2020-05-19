@@ -3,7 +3,7 @@ import { StateConverter } from '../service/stateConverter';
 import * as WebSocket from 'ws';
 
 export interface ClientGroups {
-    [gameInstanceUUID: string]: { websocket: WebSocket; clientUUID: string }[];
+    [gameInstanceUUID: string]: { [clientUUID: string]: WebSocket };
 }
 
 @Service()
@@ -13,25 +13,25 @@ export class ConnectedClientManager {
     constructor(private stateConverter: StateConverter) {}
 
     addToGroup(key: string, clientUUID: string, ws: WebSocket) {
+        // create group and add client if there is none
         if (!this.ClientGroups[key]) {
-            this.ClientGroups[key] = [{ websocket: ws, clientUUID: clientUUID }];
+            this.ClientGroups[key] = { [clientUUID]: ws };
+        } else {
+            // otherwise add client to group and assign ws
+            // this will also replace broken ws for existing clients
+            this.ClientGroups[key][clientUUID] = ws;
         }
-        this.ClientGroups[key].push({ websocket: ws, clientUUID: clientUUID });
+        console.log(this.ClientGroups);
     }
 
-    sendToGroup(key: string, data: any, transformer: (data: any, clientUUID: string) => any) {
-        this.ClientGroups[key].forEach((c) => {
-            const newState = transformer(data, c.clientUUID);
-            c.websocket.send(newState);
-        });
-    }
-
+    // would be good to refactor this so there isnt a direct dependency on stateConverter
     sendStateToEachInGroup(key: string) {
-        this.ClientGroups[key].forEach((client) => {
-            const newState = this.stateConverter.getUIState(client.clientUUID, false);
-            const jsonRes = JSON.stringify(newState);
+        Object.entries(this.ClientGroups[key]).forEach(([clientUUID, websocket]) => {
+            console.log(clientUUID, websocket);
 
-            client.websocket.send(jsonRes);
+            const newState = this.stateConverter.getUIState(clientUUID, false);
+            const jsonRes = JSON.stringify(newState);
+            websocket.send(jsonRes);
         });
     }
 }

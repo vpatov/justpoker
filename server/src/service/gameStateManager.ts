@@ -596,19 +596,20 @@ export class GameStateManager {
     // TODO rename method, as it is not always initializing a client.
     initConnectedClient(clientUUID: string) {
         const client = this.gameState.table.activeConnections.get(clientUUID);
-
-        if (!this.gameState.table.admin) {
-            this.initAdmin(clientUUID);
+        if (!client) {
+            if (!this.gameState.table.admin) {
+                this.initAdmin(clientUUID);
+            }
+            const newClient = this.createConnectedClient(clientUUID);
+            this.gameState = {
+                ...this.gameState,
+                table: {
+                    ...this.gameState.table,
+                    activeConnections: new Map([...this.gameState.table.activeConnections, [clientUUID, newClient]]),
+                },
+            };
+            this.ledgerService.initRow(clientUUID);
         }
-        const newClient = this.createConnectedClient(clientUUID);
-        this.gameState = {
-            ...this.gameState,
-            table: {
-                ...this.gameState.table,
-                activeConnections: new Map([...this.gameState.table.activeConnections, [clientUUID, newClient]]),
-            },
-        };
-        this.ledgerService.initRow(clientUUID);
     }
 
     initAdmin(clientUUID: string) {
