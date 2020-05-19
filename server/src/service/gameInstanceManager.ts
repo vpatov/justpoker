@@ -8,6 +8,7 @@ import { AnimationService } from './animationService';
 import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
 import { LedgerService } from './ledgerService';
+import { TimerManager } from './timerManager';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -24,6 +25,7 @@ export class GameInstanceManager {
         private readonly animationService: AnimationService,
         private readonly chatService: ChatService,
         private readonly ledgerService: LedgerService,
+        private readonly timerManager: TimerManager,
     ) {}
 
     createNewGameInstance(newGameForm: NewGameForm) {
@@ -63,6 +65,7 @@ export class GameInstanceManager {
             animationState: this.animationService.getAnimationState(),
             clientUUIDs: new Set<string>(),
             ledger: this.ledgerService.getLedger(),
+            stateTimer: this.timerManager.getStateTimer(),
         };
         this.gameInstances[this.activeGameInstanceUUID] = activeGameInstance;
     }
@@ -82,6 +85,7 @@ export class GameInstanceManager {
         this.audioService.loadAudioState(gi.audioQueue);
         this.animationService.loadAnimationState(gi.animationState);
         this.ledgerService.loadLedger(gi.ledger);
+        this.timerManager.loadStateTimer(gi.stateTimer);
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 }

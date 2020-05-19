@@ -22,6 +22,8 @@ import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { Subject } from 'rxjs';
 import { LedgerService } from './ledgerService';
+import { MessageService } from './messageService';
+import { GameInstanceManager } from './gameInstanceManager';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -32,6 +34,8 @@ export class StateGraphManager {
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
+        private readonly messageService: MessageService,
+        private readonly gameInstanceManager: GameInstanceManager,
     ) {}
 
     private stateGraphUpdateEmitter: Subject<void> = new Subject();
@@ -181,7 +185,7 @@ export class StateGraphManager {
         this.stateGraphUpdateEmitter.next();
     }
 
-    processTimeout() {
+    processTimeout(gameInstanceUUID: string) {
         // If the timer runs out and we are in the waiting for bet action stage, that means that
         // the player time has run out. This is the only case where it is necessary to perform
         // an action manually before transitioning to the next stage, and so this is the only case
@@ -189,6 +193,7 @@ export class StateGraphManager {
         // a timeout could map to, but that's not ideal because its a more verbose solution,
         // and transitioning from that intermediary stage to SHOW_BET_ACTION would require a
         // no-op delay, which also breaks the pattern
+        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
         if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
             this.gamePlayService.timeOutPlayer();
         }
@@ -279,7 +284,8 @@ export class StateGraphManager {
 
         const delay = this.getDelay(stage);
         if (delay) {
-            this.timerManager.setStateTimer(() => this.processTimeout(), delay);
+            const gameInstanceUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
+            this.timerManager.setStateTimer(() => this.processTimeout(gameInstanceUUID), delay);
         }
 
         this.updateLedger();

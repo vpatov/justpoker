@@ -13,7 +13,7 @@ import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
 import { GamePlayService } from './gamePlayService';
 import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
-import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
 import { GameInstanceManager } from '../service/gameInstanceManager';
@@ -168,14 +168,20 @@ export class MessageService {
         },
         [ServerAction.TIMEOUT]: {
             validation: (uuid, req) => NO_ERROR,
-            perform: () => null,
-            updates: [],
+            perform: () => {
+                if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
+                    this.gamePlayService.timeOutPlayer();
+                }
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
     };
 
     processMessage(message: NewEvent, gameInstanceUUID: string, clientUUID: string) {
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
-        this.validationService.ensureClientExists(clientUUID);
+        if (clientUUID !== 'SERVER') {
+            this.validationService.ensureClientExists(clientUUID);
+        }
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);
         this.gameStateManager.clearUpdatedKeys();

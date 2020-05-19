@@ -30,7 +30,6 @@ export class ConnectedClientManager {
         this.ClientGroups[key].forEach((client) => {
             const newState = this.stateConverter.getUIState(client.clientUUID, false);
             const jsonRes = JSON.stringify(newState);
-            console.log('sending state to ', client.clientUUID, newState);
 
             client.websocket.send(jsonRes);
         });
