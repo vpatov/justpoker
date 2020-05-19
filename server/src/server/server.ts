@@ -16,12 +16,15 @@ import { generateUUID, logGameState, printObj, getLoggableGameState } from '../.
 import { AudioService } from '../service/audioService';
 import { AnimationService } from '../service/animationService';
 import { LedgerService } from '../service/ledgerService';
+import { GameInstanceManager } from '../service/gameInstanceManager';
+
 import { WSParams, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
 
 import { ChatService } from '../service/chatService';
 import { StateGraphManager } from '../service/stateGraphManager';
 import { NewGameForm } from '../../../ui/src/shared/models/table';
 import { logger } from './logging';
+import { ConnectedClientManager } from './connectedClientManager';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -40,7 +43,6 @@ class Server {
     server: http.Server;
     defaultPort = 8080;
     wss: WebSocket.Server;
-    tableInitialized = false;
     performanceMetrics: PerformanceMetrics = {
         snippets: {
             MESSAGE_SERVICE_PROCESS_MESSAGE: [0, 0],
@@ -58,6 +60,8 @@ class Server {
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
         private readonly ledgerService: LedgerService,
+        private readonly gameInstanceManager: GameInstanceManager,
+        private readonly connectedClientManager: ConnectedClientManager,
     ) {}
 
     updateSnippet(snippet: ExecutionSnippet, ms: number) {
@@ -93,12 +97,9 @@ class Server {
                 password: req.body.password,
                 timeToAct: req.body.timeToAct,
             };
-            const gameUUID = this.gsm.initGame(newGameForm);
+            const gameUUID = this.gameInstanceManager.createNewGameInstance(newGameForm);
             this.ledgerService.clearLedger();
-            this.initWSSListeners();
-            this.chatService.clearMessages();
-            this.tableInitialized = true;
-            logger.info(`GameUUID: ${gameUUID}`);
+            logger.info(`gameUUID: ${gameUUID}`);
             res.send(JSON.stringify({ gameUUID: gameUUID }));
         });
 
@@ -113,26 +114,20 @@ class Server {
     }
 
     sendGameUpdatesToClients() {
-        for (const client of this.gsm.getConnectedClients()) {
-            const ws = client.websockets.get(EndPoint.GAME);
-            if (ws) {
-                const res = this.stateConverter.getUIState(client.uuid, false);
-                const jsonRes = JSON.stringify(res);
-                ws.send(jsonRes);
-            }
-        }
+        const activeGIUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
+        this.connectedClientManager.sendStateToEachInGroup(activeGIUUID);
     }
 
-    sendLedgerUpdatesToClients() {
-        for (const client of this.gsm.getConnectedClients()) {
-            const ws = client.websockets.get(EndPoint.LEDGER);
-            if (ws) {
-                const res = { ledger: this.ledgerService.convertServerLedgerToUILedger() };
-                const jsonRes = JSON.stringify(res);
-                ws.send(jsonRes);
-            }
-        }
-    }
+    // sendLedgerUpdatesToClients() {
+    //     for (const client of this.gsm.getConnectedClients()) {
+    //         const ws = client.websockets.get(EndPoint.LEDGER);
+    //         if (ws) {
+    //             const res = { ledger: this.ledgerService.convertServerLedgerToUILedger() };
+    //             const jsonRes = JSON.stringify(res);
+    //             ws.send(jsonRes);
+    //         }
+    //     }
+    // }
 
     //refactor this mess of a function
     initWSSListeners() {
@@ -150,15 +145,19 @@ class Server {
             logger.info(
                 `Connected to clientUUID: ${clientUUID}, gameUUID: ${queryParams.gameUUID}, endpoint: ${queryParams.endpoint}, IP Address: ${ip}`,
             );
+
+            this.gameInstanceManager.addClientToGameInstance(queryParams.gameUUID, clientUUID);
+            this.connectedClientManager.addToGroup(queryParams.gameUUID, clientUUID, ws);
             // TODO server shouldnt be communicating with the gameStateManager, but with some
             // other intermediary that will handle WS robustness
-            this.gsm.initConnectedClient(clientUUID, ws, queryParams.endpoint);
             ws.send(JSON.stringify({ clientUUID: clientUUID }));
 
             switch (queryParams.endpoint) {
                 case EndPoint.GAME: {
                     ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
-                    ws.on('message', (data: WebSocket.Data) => this.processGameMessage(ws, data, clientUUID));
+                    ws.on('message', (data: WebSocket.Data) =>
+                        this.processGameMessage(data, clientUUID, queryParams.gameUUID),
+                    );
                     logger.info(`Sent initial GAME message to client: ${clientUUID}`);
                     break;
                 }
@@ -177,13 +176,13 @@ class Server {
         });
     }
 
-    private processGameMessage(ws: WebSocket, data: WebSocket.Data, clientUUID: string) {
+    private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
         logger.info(`Incoming Game Message: ${data}`);
         if (typeof data === 'string') {
             try {
                 const receivedMessageTime = Date.now();
                 const action = JSON.parse(data);
-                this.messageService.processMessage(action, clientUUID);
+                this.messageService.processMessage(action, gameInstanceUUID, clientUUID);
                 const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
                 this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
                 this.logAverages();
@@ -204,10 +203,10 @@ class Server {
         this.initRoutes();
         this.server = http.createServer(this.app);
         this.wss = new WebSocket.Server({ server: this.server });
-
+        this.initWSSListeners();
         this.stateGraphManager.observeStateGraphUpdates().subscribe(() => {
             this.sendGameUpdatesToClients();
-            this.sendLedgerUpdatesToClients();
+            // this.sendLedgerUpdatesToClients();
             this.audioService.reset();
             this.animationService.reset();
             this.chatService.clearLastMessage();

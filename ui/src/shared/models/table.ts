@@ -1,15 +1,10 @@
-import { GameType } from "./game";
-import { PlayerUUID } from "./player";
-import WebSocket from "ws";
-import { EndPoint } from "./dataCommunication";
+import { GameType } from './game';
+import { PlayerUUID } from './player';
 
 export declare type ClientUUID = string;
-export declare type TableUUID = string;
 
 export declare interface Table {
-    readonly uuid: TableUUID;
     readonly activeConnections: Map<ClientUUID, ConnectedClient>;
-    readonly password: string;
     readonly admin: string;
 }
 
@@ -18,7 +13,6 @@ export declare interface Table {
 export declare interface ConnectedClient {
     readonly uuid: ClientUUID;
     readonly playerUUID: PlayerUUID;
-    readonly websockets: Map<EndPoint, WebSocket>;
 }
 
 export declare interface NewGameForm {

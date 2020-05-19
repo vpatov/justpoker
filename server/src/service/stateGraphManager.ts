@@ -4,7 +4,6 @@ import {
     StateGraph,
     Action,
     Timeout,
-    EventType,
     GraphNode,
     GraphEdge,
     instanceOfCondition,
@@ -16,7 +15,7 @@ import {
     QueuedServerAction,
     ServerActionType,
 } from '../../../ui/src/shared/models/gameState';
-import { ActionType } from '../../../ui/src/shared/models/dataCommunication';
+import { ActionType, GeneralAction, ServerAction, ClientAction } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
@@ -75,24 +74,24 @@ export class StateGraphManager {
 
     stateGraph: Readonly<StateGraph> = {
         [GameStage.NOT_IN_PROGRESS]: new Map([
-            [ActionType.STARTGAME, this.canContinueGameCondition],
-            [ActionType.SITDOWN, this.canContinueGameCondition],
-            [ActionType.SITIN, this.canContinueGameCondition],
-            [ActionType.JOINTABLEANDSITDOWN, this.canContinueGameCondition],
+            [ClientAction.STARTGAME, this.canContinueGameCondition],
+            [ClientAction.SITDOWN, this.canContinueGameCondition],
+            [ClientAction.SITIN, this.canContinueGameCondition],
+            [ClientAction.JOINTABLEANDSITDOWN, this.canContinueGameCondition],
         ]),
-        [GameStage.INITIALIZE_NEW_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_HAND]]),
-        [GameStage.SHOW_START_OF_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_BETTING_ROUND]]),
-        [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([['TIMEOUT', this.isAllInRunOutCondition]]),
-        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([['TIMEOUT', GameStage.WAITING_FOR_BET_ACTION]]),
+        [GameStage.INITIALIZE_NEW_HAND]: new Map([[ServerAction.TIMEOUT, GameStage.SHOW_START_OF_HAND]]),
+        [GameStage.SHOW_START_OF_HAND]: new Map([[ServerAction.TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND]]),
+        [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([[ServerAction.TIMEOUT, this.isAllInRunOutCondition]]),
+        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([[ServerAction.TIMEOUT, GameStage.WAITING_FOR_BET_ACTION]]),
         [GameStage.WAITING_FOR_BET_ACTION]: new Map([
-            [ActionType.BETACTION, GameStage.SHOW_BET_ACTION],
-            [ActionType.USETIMEBANK, GameStage.WAITING_FOR_BET_ACTION],
-            ['TIMEOUT' as any, GameStage.SHOW_BET_ACTION],
+            [ClientAction.BETACTION, GameStage.SHOW_BET_ACTION],
+            [ClientAction.USETIMEBANK, GameStage.WAITING_FOR_BET_ACTION],
+            [ServerAction.TIMEOUT as any, GameStage.SHOW_BET_ACTION],
         ]),
-        [GameStage.SHOW_BET_ACTION]: new Map([['TIMEOUT', this.isBettingRoundOverCondition]]),
-        [GameStage.FINISH_BETTING_ROUND]: new Map([['TIMEOUT', this.isHandGamePlayOverCondition]]),
-        [GameStage.SHOW_WINNER]: new Map([['TIMEOUT', this.sidePotsRemainingCondition]]),
-        [GameStage.POST_HAND_CLEANUP]: new Map([['TIMEOUT', this.canContinueGameCondition]]),
+        [GameStage.SHOW_BET_ACTION]: new Map([[ServerAction.TIMEOUT, this.isBettingRoundOverCondition]]),
+        [GameStage.FINISH_BETTING_ROUND]: new Map([[ServerAction.TIMEOUT, this.isHandGamePlayOverCondition]]),
+        [GameStage.SHOW_WINNER]: new Map([[ServerAction.TIMEOUT, this.sidePotsRemainingCondition]]),
+        [GameStage.POST_HAND_CLEANUP]: new Map([[ServerAction.TIMEOUT, this.canContinueGameCondition]]),
     };
 
     stageDelayMap: StageDelayMap = {
@@ -115,13 +114,13 @@ export class StateGraphManager {
     }
 
     /**
-     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
+     * @param GeneralAction The type of the event that just occured. Either an ActionType or TIMEOUT.
      * @returns The graph edge that represents the state transition if the transition is defined,
      * null otherwise.
      */
-    getEdge(eventType: EventType): GraphEdge {
+    getEdge(ga: GeneralAction): GraphEdge {
         const gameStage = this.gameStateManager.getGameStage();
-        const edge = this.stateGraph[gameStage].get(eventType);
+        const edge = this.stateGraph[gameStage].get(ga);
 
         if (!!edge) {
             /* 
@@ -138,12 +137,12 @@ export class StateGraphManager {
     }
 
     /**
-     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
+     * @param GeneralAction The type of the event that just occured. Either an ActionType or TIMEOUT.
      * @returns The next stage to transition to if the event/current stage represent a defined
      * state transition. Returns null otherwise.
      */
-    getNextStage(eventType: EventType): GraphNode {
-        let edge = this.getEdge(eventType);
+    getNextStage(GeneralAction: GeneralAction): GraphNode {
+        let edge = this.getEdge(GeneralAction);
         let conditionDepth = 0;
         if (!edge) {
             return null;
@@ -174,7 +173,7 @@ export class StateGraphManager {
     // - MessageService executes the action if valid.
     // - After executing the action, messageService calls this processEvent method.
     // - If the event is a defined state transition path, a state transition is executed.
-    processEvent(event: EventType) {
+    processEvent(event: GeneralAction) {
         const nextStage = this.getNextStage(event);
         if (nextStage) {
             this.initializeGameStage(nextStage);
@@ -194,7 +193,7 @@ export class StateGraphManager {
             this.gamePlayService.timeOutPlayer();
         }
         this.gameStateManager.setUpdatedKeys(new Set([ServerStateKey.GAMESTATE]));
-        this.processEvent('TIMEOUT');
+        this.processEvent(ServerAction.TIMEOUT);
     }
 
     // The changes executed while entering a game stage should be general and applicable no matter

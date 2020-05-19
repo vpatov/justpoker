@@ -14,7 +14,7 @@ export const enum GameStage {
     FINISH_BETTING_ROUND = 'FINISH_BETTING_ROUND',
     SHOW_WINNER = 'SHOW_WINNER',
     POST_HAND_CLEANUP = 'EJECT_STACKED_PLAYERS',
-    SET_CURRENT_PLAYER_TO_ACT = "SET_PLAYER_TO_ACT"
+    SET_CURRENT_PLAYER_TO_ACT = 'SET_PLAYER_TO_ACT',
 }
 
 export const enum ServerActionType {
@@ -67,10 +67,10 @@ export declare interface GameState {
     /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
     handWinners: Set<string>;
 
-    /** 
-     * This variable is checked before initializing a new hand. If it's true, and there are enough players, the 
-     * gameStage will proceed to INITIALIZE_NEW_HAND, the hand will be dealt, and gameplay will start. Otherwise, the 
-     * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently 
+    /**
+     * This variable is checked before initializing a new hand. If it's true, and there are enough players, the
+     * gameStage will proceed to INITIALIZE_NEW_HAND, the hand will be dealt, and gameplay will start. Otherwise, the
+     * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently
      * in progress - that is determined by the gameStage !== NOT_IN_PROGRESS, exposed in gsm.isGameInProgress().
      */
     shouldDealNextHand: Readonly<boolean>;
@@ -145,9 +145,7 @@ export function getCleanGameState(): GameState {
         pots: [],
         handWinners: new Set<string>(),
         table: {
-            uuid: '',
             activeConnections: new Map(),
-            password: '',
             admin: '',
         },
         timeCurrentPlayerTurnStarted: 0,

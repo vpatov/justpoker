@@ -3,6 +3,10 @@ import {
     ActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
+    NewEvent,
+    ClientAction,
+    ServerAction,
+    GeneralAction,
 } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
@@ -12,7 +16,7 @@ import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/s
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
-import { BettingRoundStage } from '../../../ui/src/shared/models/game';
+import { GameInstanceManager } from '../service/gameInstanceManager';
 import { logger } from '../server/logging';
 
 declare interface ActionProcessor {
@@ -21,7 +25,9 @@ declare interface ActionProcessor {
     updates: ServerStateKey[];
 }
 
-declare type MessageProcessor = { [key in ActionType]: ActionProcessor };
+declare type MessageProcessor = {
+    [key in GeneralAction]: ActionProcessor;
+};
 
 @Service()
 export class MessageService {
@@ -31,6 +37,7 @@ export class MessageService {
         private readonly gamePlayService: GamePlayService,
         private readonly chatService: ChatService,
         private readonly stateGraphManager: StateGraphManager,
+        private readonly gameInstanceManager: GameInstanceManager,
     ) {}
 
     messageProcessor: MessageProcessor = {
@@ -159,9 +166,15 @@ export class MessageService {
             perform: () => this.gamePlayService.useTimeBankAction(),
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ServerAction.TIMEOUT]: {
+            validation: (uuid, req) => NO_ERROR,
+            perform: () => null,
+            updates: [],
+        },
     };
 
-    processMessage(message: ClientWsMessage, clientUUID: string) {
+    processMessage(message: NewEvent, gameInstanceUUID: string, clientUUID: string) {
+        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
         this.validationService.ensureClientExists(clientUUID);
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);

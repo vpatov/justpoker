@@ -26,6 +26,10 @@ export class ChatService {
         this.chatLog = cs;
     }
 
+    getChatState(): ChatLog {
+        return this.chatLog;
+    }
+
     getMessage() {
         return this.lastMessage;
     }

@@ -9,6 +9,9 @@ export class AnimationService {
         this.animationState = as;
     }
 
+    getAnimationState(): AnimationState {
+        return this.animationState;
+    }
     private setTrigger(trigger: AnimationTrigger) {
         return (this.animationState.trigger = trigger);
     }

@@ -105,11 +105,10 @@ export class GameStateManager {
         };
     }
 
-    createConnectedClient(clientUUID: string, ws: WebSocket, endpoint: EndPoint): ConnectedClient {
+    createConnectedClient(clientUUID: string): ConnectedClient {
         return {
             uuid: clientUUID,
             playerUUID: '',
-            websockets: new Map([[endpoint, ws]]),
         };
     }
 
@@ -595,24 +594,21 @@ export class GameStateManager {
     // TODO validation around this method. Shouldn't be executed when table is not intialized.
     // TODO break away client logic into server state manager.
     // TODO rename method, as it is not always initializing a client.
-    initConnectedClient(clientUUID: string, ws: WebSocket, endpoint: EndPoint) {
+    initConnectedClient(clientUUID: string) {
         const client = this.gameState.table.activeConnections.get(clientUUID);
-        if (client) {
-            this.resetClientWebsocket(clientUUID, ws, endpoint);
-        } else {
-            if (!this.gameState.table.admin) {
-                this.initAdmin(clientUUID);
-            }
-            const newClient = this.createConnectedClient(clientUUID, ws, endpoint);
-            this.gameState = {
-                ...this.gameState,
-                table: {
-                    ...this.gameState.table,
-                    activeConnections: new Map([...this.gameState.table.activeConnections, [clientUUID, newClient]]),
-                },
-            };
-            this.ledgerService.initRow(clientUUID);
+
+        if (!this.gameState.table.admin) {
+            this.initAdmin(clientUUID);
         }
+        const newClient = this.createConnectedClient(clientUUID);
+        this.gameState = {
+            ...this.gameState,
+            table: {
+                ...this.gameState.table,
+                activeConnections: new Map([...this.gameState.table.activeConnections, [clientUUID, newClient]]),
+            },
+        };
+        this.ledgerService.initRow(clientUUID);
     }
 
     initAdmin(clientUUID: string) {
@@ -628,14 +624,10 @@ export class GameStateManager {
         return this.gameState.table.admin;
     }
 
-    resetClientWebsocket(clientUUID: string, ws: WebSocket, endpoint: EndPoint) {
-        this.gameState.table.activeConnections.get(clientUUID).websockets.set(endpoint, ws);
-    }
-
     initGame(newGameForm: NewGameForm) {
-        this.gameState = {
+        const newGame = {
             ...getCleanGameState(),
-            table: this.initTable(newGameForm),
+            table: this.initTable(),
             gameParameters: {
                 smallBlind: Number(newGameForm.smallBlind),
                 bigBlind: Number(newGameForm.bigBlind),
@@ -648,15 +640,13 @@ export class GameStateManager {
             },
         };
         this.timerManager.cancelStateTimer();
-        return this.gameState.table.uuid;
+        this.gameState = { ...newGame };
     }
 
-    initTable(newGameForm: NewGameForm) {
+    initTable() {
         // oH nO a pLaiNtEXt pAssW0Rd!!
         return {
-            uuid: generateUUID(),
             activeConnections: new Map(),
-            password: newGameForm.password,
             admin: '',
         };
     }

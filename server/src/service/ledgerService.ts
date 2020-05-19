@@ -38,6 +38,10 @@ export class LedgerService {
         return this.ledger;
     }
 
+    loadLedger(ledger: ServerLedger) {
+        this.ledger = ledger;
+    }
+
     private getLedgerRow(clientUUID: string): ServerLedgerRow {
         return this.ledger[clientUUID];
     }

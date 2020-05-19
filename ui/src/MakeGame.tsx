@@ -60,7 +60,7 @@ function MakeGame(props) {
     }
 
     const createSuccess = (response) => {
-        const gameUUID = get(response, "data.gameUUID");
+        const gameUUID = get(response, 'data.gameUUID');
         history.push(`/game?gameUUID=${gameUUID}`);
     };
 

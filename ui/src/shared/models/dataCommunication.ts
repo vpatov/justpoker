@@ -1,5 +1,13 @@
 import { BettingRoundAction } from './game';
 
+export declare interface NewEvent {
+    actionType: GeneralAction;
+    request: any;
+    gameInstanceUUID: string;
+}
+
+export declare type GeneralAction = ClientAction | ServerAction;
+
 export enum EndPoint {
     GAME = 'game',
     LEDGER = 'ledger',
@@ -35,11 +43,35 @@ export enum ActionType {
     USETIMEBANK = 'USETIMEBANK',
 }
 
+export enum ClientAction {
+    STARTGAME = 'STARTGAME',
+    STOPGAME = 'STOPGAME',
+    SITDOWN = 'SITDOWN',
+    STANDUP = 'STANDUP',
+    SITIN = 'SITIN',
+    SITOUT = 'SITOUT',
+    JOINTABLE = 'JOINTABLE',
+    JOINTABLEANDSITDOWN = 'JOINTABLEANDSITDOWN',
+    PINGSTATE = 'PINGSTATE',
+    CHAT = 'CHAT',
+    ADDCHIPS = 'ADDCHIPS',
+    SETCHIPS = 'SETCHIPS',
+    BETACTION = 'BETACTION',
+    SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
+    BOOTPLAYER = 'BOOTPLAYER',
+    LEAVETABLE = 'LEAVETABLE',
+    USETIMEBANK = 'USETIMEBANK',
+}
+
+export enum ServerAction {
+    TIMEOUT = 'TIMEOUT',
+}
+
 export enum UiActionType {
     VOLUME = 'VOLUME',
     SETTINGS = 'SETTINGS',
     ADMIN = 'ADMIN',
-    OPEN_LEDGER = "OPEN_LEDGER"
+    OPEN_LEDGER = 'OPEN_LEDGER',
 }
 
 export declare interface SitDownRequest {
