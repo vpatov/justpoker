@@ -25,6 +25,7 @@ import { StateGraphManager } from '../service/stateGraphManager';
 import { NewGameForm } from '../../../ui/src/shared/models/table';
 import { logger } from './logging';
 import { ConnectedClientManager } from './connectedClientManager';
+import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -81,7 +82,7 @@ class Server {
         });
     }
 
-    private initRoutes(): void {
+    private initHTTPRoutes(): void {
         const router = express.Router();
 
         router.get('/', (req, res) => {
@@ -98,6 +99,7 @@ class Server {
                 timeToAct: req.body.timeToAct,
             };
             const gameUUID = this.gameInstanceManager.createNewGameInstance(newGameForm);
+            this.connectedClientManager.createNewClientGroup(gameUUID);
             this.ledgerService.clearLedger();
             logger.info(`gameUUID: ${gameUUID}`);
             res.send(JSON.stringify({ gameUUID: gameUUID }));
@@ -114,9 +116,14 @@ class Server {
     }
 
     sendGameUpdatesToClients() {
-        const activeGIUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
-        this.connectedClientManager.sendStateToEachInGroup(activeGIUUID);
+        const activeGameInstanceUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
+        this.connectedClientManager.sendStateToEachInGroup(activeGameInstanceUUID);
     }
+
+    // we need to rethink this, ledger updates should only go out to players who are viewing the ledger rather then sending to the whole WS group
+    // we also need to support opening ledger in new tab, would we need two session ids for this
+    // do we have to matain seperate WS and groups for the ledger?
+    // possibly coule be more easily handled by http
 
     // sendLedgerUpdatesToClients() {
     //     for (const client of this.gsm.getConnectedClients()) {
@@ -128,53 +135,6 @@ class Server {
     //         }
     //     }
     // }
-
-    //refactor this mess of a function
-    initWSSListeners() {
-        this.wss.removeAllListeners();
-        this.wss.on('connection', (ws: WebSocket, req) => {
-            const ip = req.connection.remoteAddress;
-            const parsedQuery = queryString.parseUrl(req.url);
-            const queryParams: WSParams = {
-                clientUUID: parsedQuery.query.clientUUID as string,
-                gameUUID: parsedQuery.query.gameUUID as string,
-                endpoint: parsedQuery.query.endpoint as EndPoint,
-            };
-
-            const clientUUID = queryParams.clientUUID || generateUUID();
-            logger.info(
-                `Connected to clientUUID: ${clientUUID}, gameUUID: ${queryParams.gameUUID}, endpoint: ${queryParams.endpoint}, IP Address: ${ip}`,
-            );
-
-            this.gameInstanceManager.addClientToGameInstance(queryParams.gameUUID, clientUUID);
-            this.connectedClientManager.addToGroup(queryParams.gameUUID, clientUUID, ws);
-            // TODO server shouldnt be communicating with the gameStateManager, but with some
-            // other intermediary that will handle WS robustness
-            ws.send(JSON.stringify({ clientUUID: clientUUID }));
-
-            switch (queryParams.endpoint) {
-                case EndPoint.GAME: {
-                    ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
-                    ws.on('message', (data: WebSocket.Data) =>
-                        this.processGameMessage(data, clientUUID, queryParams.gameUUID),
-                    );
-                    logger.info(`Sent initial GAME message to client: ${clientUUID}`);
-                    break;
-                }
-
-                case EndPoint.LEDGER: {
-                    ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
-                    logger.info(`Sent initial LEDGER message to client: ${clientUUID}`);
-                    break;
-                }
-
-                default: {
-                    logger.error(`Endpoint ${queryParams.endpoint} is not available.`);
-                    throw Error(`Endpoint ${queryParams.endpoint} is not available.`);
-                }
-            }
-        });
-    }
 
     private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
         logger.info(`Incoming Game Message: ${data}`);
@@ -197,13 +157,72 @@ class Server {
         }
     }
 
+    initGameWSS() {
+        this.wss = new WebSocket.Server({ server: this.server });
+        this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
+            const ip = req.connection.remoteAddress;
+            logger.info(`ws connection req from ${ip}`);
+
+            const parsedQuery = queryString.parseUrl(req.url);
+            const clientUUID = parsedQuery.query.clientUUID as string;
+            const gameUUID = parsedQuery.query.gameUUID as string;
+            const endpoint = parsedQuery.query.endpoint as string;
+
+            // TODO, I dont we should pass the endpoint in the body, rather match across the actual url
+            switch (endpoint) {
+                case EndPoint.GAME: {
+                    this.onConnectionToGame(ws, gameUUID, clientUUID);
+                    return;
+                }
+                case EndPoint.LEDGER: {
+                    this.onConnectionToLedger(ws, gameUUID, clientUUID);
+                    return;
+                }
+                default: {
+                    logger.info(`no websocket interaction at url`);
+                    ws.close(404, `no websocket interaction at url`);
+                }
+            }
+        });
+    }
+
+    onConnectionToGame(ws: WebSocket, gameUUID: string, clientUUID: string) {
+        // if game is not in instanceManager then send 404
+        if (!this.gameInstanceManager.doesGameExist(gameUUID)) {
+            ws.send(JSON.stringify(getDefaultGame404()));
+        }
+        // if a uuid was not sent by client (that is there is no session) then create one
+        if (!clientUUID) {
+            clientUUID = this.connectedClientManager.createClientSessionInGroup(gameUUID, ws);
+        } else {
+            // if there is a session replace old websocket
+            this.connectedClientManager.updateClientSessionInGroup(gameUUID, clientUUID, ws);
+        }
+        logger.info(`Connected to clientUUID: ${clientUUID}, gameUUID: ${gameUUID}`);
+
+        // add client to game instance
+        this.gameInstanceManager.loadGameInstance(gameUUID);
+        this.gameInstanceManager.addClientToGameInstance(gameUUID, clientUUID);
+
+        //s end init state to newly connected client
+        ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
+
+        // maybe this should be done else where?
+        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameUUID));
+    }
+
+    onConnectionToLedger(ws: WebSocket, gameUUID: string, clientUUID: string) {
+        // todo only allow certian people to see ledger
+        // must be in game? admin? have been in game?
+        ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
+    }
+
     //refactor this mess of a function
     init() {
         this.app = express();
-        this.initRoutes();
+        this.initHTTPRoutes();
         this.server = http.createServer(this.app);
-        this.wss = new WebSocket.Server({ server: this.server });
-        this.initWSSListeners();
+        this.initGameWSS();
         this.stateGraphManager.observeStateGraphUpdates().subscribe(() => {
             this.sendGameUpdatesToClients();
             // this.sendLedgerUpdatesToClients();

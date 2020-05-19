@@ -8,6 +8,19 @@ import { UserPreferences } from './userPreferences';
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
 
+export declare interface Page404 {
+    notFound: boolean;
+    message?: string;
+    redirect?: string;
+}
+
+export function getDefaultGame404(): Page404 {
+    return {
+        notFound: true,
+        message: 'No game exists at this url',
+        redirect: '/',
+    };
+}
 export declare interface UiState {
     game: UiGameState;
     audio: SoundByte;
@@ -188,7 +201,7 @@ export const ADMIN_BUTTON: MenuButton = {
 export const LEDGER_BUTTON: MenuButton = {
     action: UiActionType.OPEN_LEDGER,
     label: 'Ledger',
-}
+};
 
 export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
 
@@ -266,7 +279,7 @@ export function getCleanGame(): UiGameState {
 }
 
 export function getCleanChatMessage(): UiChatMessage {
-    return  {
+    return {
         senderName: '',
         content: '',
         timestamp: 0,

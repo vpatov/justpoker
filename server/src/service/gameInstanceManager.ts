@@ -36,11 +36,13 @@ export class GameInstanceManager {
         return gameInstanceUUID;
     }
 
+    doesGameExist(gameInstanceUUID: string): boolean {
+        if (this.gameInstances[gameInstanceUUID]) return true;
+        return false;
+    }
+
     addClientToGameInstance(gameInstanceUUID: string, clientUUID: string) {
         this.gameInstances[gameInstanceUUID].clientUUIDs.add(clientUUID);
-
-        // must load here
-        this.loadGameInstance(gameInstanceUUID);
         this.gameStateManager.initConnectedClient(clientUUID);
     }
 

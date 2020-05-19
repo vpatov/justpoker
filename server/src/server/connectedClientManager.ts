@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import { StateConverter } from '../service/stateConverter';
 import * as WebSocket from 'ws';
+import { generateUUID } from '../../../ui/src/shared/util/util';
 
 export interface ClientGroups {
     [gameInstanceUUID: string]: { [clientUUID: string]: WebSocket };
@@ -12,16 +13,24 @@ export class ConnectedClientManager {
 
     constructor(private stateConverter: StateConverter) {}
 
-    addToGroup(key: string, clientUUID: string, ws: WebSocket) {
-        // create group and add client if there is none
-        if (!this.ClientGroups[key]) {
-            this.ClientGroups[key] = { [clientUUID]: ws };
+    createClientSessionInGroup(groupKey: string, ws: WebSocket): string {
+        const clientUUID = generateUUID();
+        if (!this.ClientGroups[groupKey]) {
+            // create group if doesnt exist
+            this.ClientGroups[groupKey] = { [clientUUID]: ws };
         } else {
-            // otherwise add client to group and assign ws
-            // this will also replace broken ws for existing clients
-            this.ClientGroups[key][clientUUID] = ws;
+            // add to group if exists
+            this.ClientGroups[groupKey] = { ...this.ClientGroups[groupKey], [clientUUID]: ws };
         }
-        console.log(this.ClientGroups);
+        return clientUUID;
+    }
+
+    createNewClientGroup(groupKey: string) {
+        this.ClientGroups[groupKey] = {};
+    }
+
+    updateClientSessionInGroup(groupKey: string, clientUUID: string, ws: WebSocket) {
+        this.ClientGroups[groupKey][clientUUID] = ws;
     }
 
     // would be good to refactor this so there isnt a direct dependency on stateConverter
