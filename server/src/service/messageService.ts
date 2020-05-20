@@ -13,7 +13,7 @@ import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
 import { GamePlayService } from './gamePlayService';
 import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
-import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey, GameStage, ServerActionType } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
 import { GameInstanceManager } from '../service/gameInstanceManager';
@@ -177,6 +177,9 @@ export class MessageService {
         },
     };
 
+    // After Event / ClientAction types have been refactored, this should be refactored
+    // into three functions: processEvent, processServerAction, and processClientAction
+    // processEvent would call the other two functions
     processMessage(message: Event, gameInstanceUUID: string, clientUUID: string) {
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
         this.validationService.ensureClientExists(clientUUID);
@@ -191,7 +194,22 @@ export class MessageService {
             );
             actionProcessor.perform(clientUUID, message.request);
             this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
-            this.stateGraphManager.processEvent(message.actionType);
+            this.stateGraphManager.processEvent(message.actionType, () => {
+                /*
+                    TODO
+                    clientUUID is going to be refactored to be part of clientAction?
+                    this anon function should be made cleaner once types are finalized
+                */
+                this.processMessage(
+                    {
+                        gameInstanceUUID,
+                        actionType: ServerAction.TIMEOUT,
+                        request: {},
+                    },
+                    gameInstanceUUID,
+                    '',
+                );
+            });
         } else {
             // TODO process error and send error to client
             logger.error(JSON.stringify(response));

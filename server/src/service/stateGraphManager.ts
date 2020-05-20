@@ -175,28 +175,16 @@ export class StateGraphManager {
     // - MessageService executes the action if valid.
     // - After executing the action, messageService calls this processEvent method.
     // - If the event is a defined state transition path, a state transition is executed.
-    processEvent(event: GeneralAction) {
+    processEvent(event: GeneralAction, timeoutCallback: () => void) {
         const nextStage = this.getNextStage(event);
         if (nextStage) {
             this.initializeGameStage(nextStage);
+            const delay = this.getDelay(nextStage);
+            if (delay) {
+                this.timerManager.setStateTimer(() => timeoutCallback(), delay);
+            }
         }
         this.stateGraphUpdateEmitter.next();
-    }
-
-    processTimeout(gameInstanceUUID: string) {
-        // If the timer runs out and we are in the waiting for bet action stage, that means that
-        // the player time has run out. This is the only case where it is necessary to perform
-        // an action manually before transitioning to the next stage, and so this is the only case
-        // that slightly breaks the pattern. The alternative is to create an extra GameStage that
-        // a timeout could map to, but that's not ideal because its a more verbose solution,
-        // and transitioning from that intermediary stage to SHOW_BET_ACTION would require a
-        // no-op delay, which also breaks the pattern
-        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
-        if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
-            this.gamePlayService.timeOutPlayer();
-        }
-        this.gameStateManager.setUpdatedKeys(new Set([ServerStateKey.GAMESTATE]));
-        this.processEvent(ServerAction.TIMEOUT);
     }
 
     // The changes executed while entering a game stage should be general and applicable no matter
@@ -279,13 +267,6 @@ export class StateGraphManager {
                 break;
             }
         }
-
-        const delay = this.getDelay(stage);
-        if (delay) {
-            const gameInstanceUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
-            this.timerManager.setStateTimer(() => this.processTimeout(gameInstanceUUID), delay);
-        }
-
         this.updateLedger();
     }
 
