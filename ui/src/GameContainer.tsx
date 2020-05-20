@@ -39,7 +39,7 @@ function GameContainer(props): any {
             dispatch({ type: 'SET_TEST_GAME' });
             if (!gameLoaded) setGameLoaded(true);
         } else {
-            const succ = WsServer.openWs(queryParams.gameUUID, EndPoint.GAME);
+            const succ = WsServer.openWs(queryParams.gameInstanceUUID, EndPoint.GAME);
             if (succ) {
                 WsServer.subscribe('game', onReceiveNewGame);
                 WsServer.subscribe('error', onReceiveError);

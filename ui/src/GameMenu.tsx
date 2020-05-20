@@ -106,10 +106,10 @@ function GameMenu(props) {
 
     const handleOpenLedger = () => {
         const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
-        const gameUUID = queryParams.gameUUID || null;
-        const stringifiedUrl = queryString.stringifyUrl({url: EndPoint.LEDGER, query: {gameUUID}});
-        window.open(stringifiedUrl, "_blank");
-    }
+        const gameInstanceUUID = queryParams.gameInstanceUUID || null;
+        const stringifiedUrl = queryString.stringifyUrl({ url: EndPoint.LEDGER, query: { gameInstanceUUID } });
+        window.open(stringifiedUrl, '_blank');
+    };
 
     function handleClickButton(action) {
         switch (action) {

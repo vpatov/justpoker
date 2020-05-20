@@ -58,7 +58,7 @@ export function getLoggableGameState(gameState: GameState) {
 
 export function parseHTTPParams(parsedQuery: queryString.ParsedUrl) {
     const queryParams: HTTPParams = {
-        gameUUID: parsedQuery.query.gameUUID as string,
+        gameInstanceUUID: parsedQuery.query.gameInstanceUUID as string,
     };
     return queryParams;
 }

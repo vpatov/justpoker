@@ -98,11 +98,11 @@ class Server {
                 password: req.body.password,
                 timeToAct: req.body.timeToAct,
             };
-            const gameUUID = this.gameInstanceManager.createNewGameInstance(newGameForm);
-            this.connectedClientManager.createNewClientGroup(gameUUID);
+            const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(newGameForm);
+            this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
             this.ledgerService.clearLedger();
-            logger.info(`gameUUID: ${gameUUID}`);
-            res.send(JSON.stringify({ gameUUID: gameUUID }));
+            logger.info(`gameInstanceUUID: ${gameInstanceUUID}`);
+            res.send(JSON.stringify({ gameInstanceUUID: gameInstanceUUID }));
         });
 
         this.app.use(bodyParser.json());
@@ -162,17 +162,17 @@ class Server {
 
             const parsedQuery = queryString.parseUrl(req.url);
             const clientUUID = parsedQuery.query.clientUUID as string;
-            const gameUUID = parsedQuery.query.gameUUID as string;
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
             const endpoint = parsedQuery.query.endpoint as string;
 
             // TODO, I dont we should pass the endpoint in the body, rather match across the actual url
             switch (endpoint) {
                 case EndPoint.GAME: {
-                    this.onConnectionToGame(ws, gameUUID, clientUUID);
+                    this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
                     return;
                 }
                 case EndPoint.LEDGER: {
-                    this.onConnectionToLedger(ws, gameUUID, clientUUID);
+                    this.onConnectionToLedger(ws, gameInstanceUUID, clientUUID);
                     return;
                 }
                 default: {
@@ -183,34 +183,34 @@ class Server {
         });
     }
 
-    onConnectionToGame(ws: WebSocket, gameUUID: string, clientUUID: string) {
+    onConnectionToGame(ws: WebSocket, gameInstanceUUID: string, clientUUID: string) {
         // if game is not in instanceManager then send 404
         // TODO implement FE for this
-        if (!this.gameInstanceManager.doesGameExist(gameUUID)) {
+        if (!this.gameInstanceManager.doesGameExist(gameInstanceUUID)) {
             ws.send(JSON.stringify(getDefaultGame404()));
             return;
         }
         // if a uuid was not sent by client (that is there is no session) then create one
         if (!clientUUID) {
-            clientUUID = this.connectedClientManager.createClientSessionInGroup(gameUUID, ws);
+            clientUUID = this.connectedClientManager.createClientSessionInGroup(gameInstanceUUID, ws);
         } else {
             // if there is a session replace old websocket
-            this.connectedClientManager.updateClientSessionInGroup(gameUUID, clientUUID, ws);
+            this.connectedClientManager.updateClientSessionInGroup(gameInstanceUUID, clientUUID, ws);
         }
-        logger.info(`Connected to clientUUID: ${clientUUID}, gameUUID: ${gameUUID}`);
+        logger.info(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
 
         // add client to game instance
-        this.gameInstanceManager.loadGameInstance(gameUUID);
-        this.gameInstanceManager.addClientToGameInstance(gameUUID, clientUUID);
+        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
+        this.gameInstanceManager.addClientToGameInstance(gameInstanceUUID, clientUUID);
 
         //s end init state to newly connected client
         ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
 
         // maybe this should be done else where?
-        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameUUID));
+        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameInstanceUUID));
     }
 
-    onConnectionToLedger(ws: WebSocket, gameUUID: string, clientUUID: string) {
+    onConnectionToLedger(ws: WebSocket, gameInstanceUUID: string, clientUUID: string) {
         // todo only allow certian people to see ledger
         // must be in game? admin? have been in game?
         ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));

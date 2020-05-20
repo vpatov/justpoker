@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { } from "./utils";
-import { withRouter } from "react-router-dom";
-import queryString from "query-string";
+import React, { useState, useEffect } from 'react';
+import {} from './utils';
+import { withRouter } from 'react-router-dom';
+import queryString from 'query-string';
 
-
-import { makeStyles } from "@material-ui/core/styles";
-import { WsServer } from "./api/ws";
-import { UILedger, UILedgerRow } from "./shared/models/ledger";
-import { EndPoint } from "./shared/models/dataCommunication";
-import { parseHTTPParams } from "./shared/util/util";
+import { makeStyles } from '@material-ui/core/styles';
+import { WsServer } from './api/ws';
+import { UILedger, UILedgerRow } from './shared/models/ledger';
+import { EndPoint } from './shared/models/dataCommunication';
+import { parseHTTPParams } from './shared/util/util';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -20,7 +19,6 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
-
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -46,14 +44,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
 function Ledger(props) {
     const [ledger, setLedger] = useState<UILedger>([]);
     const queryParams = parseHTTPParams(queryString.parseUrl(props.location.search));
 
     useEffect(() => {
         document.title = 'Ledger';
-        const succ = WsServer.openWs(queryParams.gameUUID, EndPoint.LEDGER);
+        const succ = WsServer.openWs(queryParams.gameInstanceUUID, EndPoint.LEDGER);
         if (succ) {
             WsServer.subscribe('ledger', onReceiveNewLedger);
         }
@@ -63,10 +60,8 @@ function Ledger(props) {
         setLedger(updatedLedger);
     };
 
-    return LedgerTable({ledger});
+    return LedgerTable({ ledger });
 }
-
-
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -77,9 +72,9 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     }
     return 0;
 }
-  
+
 type Order = 'asc' | 'desc';
-  
+
 function getComparator<Key extends keyof any>(
     order: Order,
     orderBy: Key,
@@ -88,7 +83,7 @@ function getComparator<Key extends keyof any>(
         ? (a, b) => descendingComparator(a, b, orderBy)
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
-  
+
 function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
     const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
     stabilizedThis.sort((a, b) => {
@@ -98,14 +93,14 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
     });
     return stabilizedThis.map((el) => el[0]);
 }
-  
+
 interface HeadCell {
     disablePadding: boolean;
     id: keyof UILedgerRow;
     label: string;
     numeric: boolean;
 }
-  
+
 const headCells: HeadCell[] = [
     { id: 'aliases', numeric: false, disablePadding: true, label: 'Name/Aliases' },
     { id: 'buyins', numeric: false, disablePadding: false, label: 'Buy-Ins' },
@@ -120,7 +115,7 @@ const headCells: HeadCell[] = [
     { id: 'timeStartedPlaying', numeric: true, disablePadding: false, label: 'Time Started Playing' },
     { id: 'timeMostRecentHand', numeric: true, disablePadding: false, label: 'Time Last Played' },
 ];
-  
+
 interface LedgerTableProps {
     classes: ReturnType<typeof useStyles>;
     numSelected: number;
@@ -130,167 +125,157 @@ interface LedgerTableProps {
     orderBy: string;
     rowCount: number;
 }
-  
+
 function LedgerTableHead(props: LedgerTableProps) {
     const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
     const createSortHandler = (property: keyof UILedgerRow) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
+        onRequestSort(event, property);
     };
-  
+
     return (
-      <TableHead>
-        <TableRow>
-          <TableCell padding="checkbox">
-            <Checkbox
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={rowCount > 0 && numSelected === rowCount}
-              onChange={() => onSelectAllClick}
-            />
-          </TableCell>
-          {headCells.map((headCell) => (
-            <TableCell
-              key={headCell.id}
-              align={headCell.numeric ? 'right' : 'left'}
-              padding={headCell.disablePadding ? 'none' : 'default'}
-              sortDirection={orderBy === headCell.id ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
-                onClick={() => createSortHandler(headCell.id)}
-              >
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                  <span className={classes.visuallyHidden}>
-                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                  </span>
-                ) : null}
-              </TableSortLabel>
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
+        <TableHead>
+            <TableRow>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        indeterminate={numSelected > 0 && numSelected < rowCount}
+                        checked={rowCount > 0 && numSelected === rowCount}
+                        onChange={() => onSelectAllClick}
+                    />
+                </TableCell>
+                {headCells.map((headCell) => (
+                    <TableCell
+                        key={headCell.id}
+                        align={headCell.numeric ? 'right' : 'left'}
+                        padding={headCell.disablePadding ? 'none' : 'default'}
+                        sortDirection={orderBy === headCell.id ? order : false}
+                    >
+                        <TableSortLabel
+                            active={orderBy === headCell.id}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={() => createSortHandler(headCell.id)}
+                        >
+                            {headCell.label}
+                            {orderBy === headCell.id ? (
+                                <span className={classes.visuallyHidden}>
+                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                </span>
+                            ) : null}
+                        </TableSortLabel>
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
     );
 }
-  
+
 function LedgerTable(props) {
     const classes = useStyles();
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState<keyof UILedgerRow>('aliases');
     const [selected, setSelected] = React.useState<string[]>([]);
     const ledger: UILedgerRow[] = props.ledger;
-  
+
     const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
-      const isAsc = orderBy === property && order === 'asc';
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(property as keyof UILedgerRow);
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property as keyof UILedgerRow);
     };
-  
+
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.checked) {
-        const newSelecteds = ledger.map((n) => n.aliases);
-        setSelected(newSelecteds);
-        return;
-      }
-      setSelected([]);
+        if (event.target.checked) {
+            const newSelecteds = ledger.map((n) => n.aliases);
+            setSelected(newSelecteds);
+            return;
+        }
+        setSelected([]);
     };
-  
+
     const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-      const selectedIndex = selected.indexOf(name);
-      let newSelected: string[] = [];
-  
-      if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selected, name);
-      } else if (selectedIndex === 0) {
-        newSelected = newSelected.concat(selected.slice(1));
-      } else if (selectedIndex === selected.length - 1) {
-        newSelected = newSelected.concat(selected.slice(0, -1));
-      } else if (selectedIndex > 0) {
-        newSelected = newSelected.concat(
-          selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1),
-        );
-      }
-      setSelected(newSelected);
+        const selectedIndex = selected.indexOf(name);
+        let newSelected: string[] = [];
+
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selected, name);
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
+        }
+        setSelected(newSelected);
     };
-  
+
     const isSelected = (name: string) => selected.indexOf(name) !== -1;
-  
+
     return (
-      <div className={classes.root}>
-        <Paper className={classes.paper}>
-          <TableContainer>
-            <Table
-              className={classes.table}
-              aria-labelledby="tableTitle"
-              size={'medium'}
-              aria-label="enhanced table"
-            >
-              <LedgerTableHead
-                classes={classes}
-                numSelected={selected.length}
-                order={order}
-                orderBy={orderBy}
-                onSelectAllClick={(event) => handleSelectAllClick(event)}
-                onRequestSort={(event, property) => handleRequestSort(event, property)}
-                rowCount={ledger.length}
-              />
-              <TableBody>
-                {stableSort(ledger, getComparator(order, orderBy))
-                  .map((row, index) => {
-                    const isItemSelected = isSelected(row.aliases);
-                    const labelId = `enhanced-table-checkbox-${index}`;
-  
-                    return (
-                      <TableRow
-                        hover
-                        onClick={(event) => handleClick(event, row.aliases)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.aliases}
-                        selected={isItemSelected}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isItemSelected}
-                            inputProps={{ 'aria-labelledby': labelId }}
-                          />
-                        </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.aliases}
-                        </TableCell>
-                        <TableCell align="right">{row.buyins}</TableCell>
-                        <TableCell align="right">{row.totalBuyin}</TableCell>
-                        <TableCell align="right">{row.walkaway}</TableCell>
-                        <TableCell align="right">{row.net}</TableCell>
-                        <TableCell align="right">{row.currentChips}</TableCell>
-                        <TableCell align="right">{row.handsDealtIn}</TableCell>
-                        <TableCell align="right">{row.handsWon}</TableCell>
-                        <TableCell align="right">{row.flopsSeen}</TableCell>
-                        <TableCell align="right">{row.vpip}</TableCell>
-                        <TableCell align="right">{row.timeStartedPlaying}</TableCell>
-                        <TableCell align="right">{row.timeMostRecentHand}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                {
-                  <TableRow style={{ height: 53}}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                }
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      </div>
+        <div className={classes.root}>
+            <Paper className={classes.paper}>
+                <TableContainer>
+                    <Table
+                        className={classes.table}
+                        aria-labelledby="tableTitle"
+                        size={'medium'}
+                        aria-label="enhanced table"
+                    >
+                        <LedgerTableHead
+                            classes={classes}
+                            numSelected={selected.length}
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={(event) => handleSelectAllClick(event)}
+                            onRequestSort={(event, property) => handleRequestSort(event, property)}
+                            rowCount={ledger.length}
+                        />
+                        <TableBody>
+                            {stableSort(ledger, getComparator(order, orderBy)).map((row, index) => {
+                                const isItemSelected = isSelected(row.aliases);
+                                const labelId = `enhanced-table-checkbox-${index}`;
+
+                                return (
+                                    <TableRow
+                                        hover
+                                        onClick={(event) => handleClick(event, row.aliases)}
+                                        role="checkbox"
+                                        aria-checked={isItemSelected}
+                                        tabIndex={-1}
+                                        key={row.aliases}
+                                        selected={isItemSelected}
+                                    >
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                checked={isItemSelected}
+                                                inputProps={{ 'aria-labelledby': labelId }}
+                                            />
+                                        </TableCell>
+                                        <TableCell component="th" id={labelId} scope="row" padding="none">
+                                            {row.aliases}
+                                        </TableCell>
+                                        <TableCell align="right">{row.buyins}</TableCell>
+                                        <TableCell align="right">{row.totalBuyin}</TableCell>
+                                        <TableCell align="right">{row.walkaway}</TableCell>
+                                        <TableCell align="right">{row.net}</TableCell>
+                                        <TableCell align="right">{row.currentChips}</TableCell>
+                                        <TableCell align="right">{row.handsDealtIn}</TableCell>
+                                        <TableCell align="right">{row.handsWon}</TableCell>
+                                        <TableCell align="right">{row.flopsSeen}</TableCell>
+                                        <TableCell align="right">{row.vpip}</TableCell>
+                                        <TableCell align="right">{row.timeStartedPlaying}</TableCell>
+                                        <TableCell align="right">{row.timeMostRecentHand}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                            {
+                                <TableRow style={{ height: 53 }}>
+                                    <TableCell colSpan={6} />
+                                </TableRow>
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        </div>
     );
 }
-  
-
 
 export default Ledger;
-
-
-
-

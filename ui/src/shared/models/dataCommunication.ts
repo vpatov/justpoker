@@ -15,12 +15,12 @@ export enum EndPoint {
 
 export declare interface WSParams {
     clientUUID: string;
-    gameUUID: string;
+    gameInstanceUUID: string;
     endpoint: EndPoint;
 }
 
 export declare interface HTTPParams {
-    gameUUID: string;
+    gameInstanceUUID: string;
 }
 
 export enum ActionType {

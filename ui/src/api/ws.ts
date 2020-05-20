@@ -20,14 +20,14 @@ export class WsServer {
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
 
-    static openWs(gameUUID: string, endpoint: EndPoint) {
+    static openWs(gameInstanceUUID: string, endpoint: EndPoint) {
         console.log('opening ws...');
         const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
         const wsURI = {
             url: wsURL,
             query: {
                 clientUUID: docCookies.getItem(clientUUID) || null,
-                gameUUID: gameUUID || null,
+                gameInstanceUUID: gameInstanceUUID || null,
                 endpoint: endpoint || null,
             } as ParsedQuery,
         };
