@@ -179,9 +179,7 @@ export class MessageService {
 
     processMessage(message: Event, gameInstanceUUID: string, clientUUID: string) {
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
-        if (clientUUID !== 'SERVER') {
-            this.validationService.ensureClientExists(clientUUID);
-        }
+        this.validationService.ensureClientExists(clientUUID);
         const actionProcessor = this.messageProcessor[message.actionType];
         const response = actionProcessor.validation(clientUUID, message.request);
         this.gameStateManager.clearUpdatedKeys();
