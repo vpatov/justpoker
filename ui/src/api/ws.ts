@@ -1,6 +1,6 @@
-import get from "lodash/get";
-import docCookies from "../Cookies";
-import queryString, { ParsedQuery } from "query-string";
+import get from 'lodash/get';
+import docCookies from '../Cookies';
+import queryString, { ParsedQuery } from 'query-string';
 import {
     ClientWsMessage,
     ClientChatMessage,
@@ -9,32 +9,32 @@ import {
     BootPlayerRequest,
     EndPoint,
     WSParams,
-} from "../shared/models/dataCommunication";
+} from '../shared/models/dataCommunication';
 
-const clientUUID = "clientUUID";
+const clientUUID = 'clientUUID';
 const ONE_DAY = 60 * 60 * 24;
 const DEFAULT_WS_PORT = 8080;
 
 export class WsServer {
-    static clientUUID: string|null;
+    static clientUUID: string | null;
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
 
     static openWs(gameUUID: string, endpoint: EndPoint) {
-        console.log("opening ws...");
+        console.log('opening ws...');
         const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
         const wsURI = {
             url: wsURL,
             query: {
                 clientUUID: docCookies.getItem(clientUUID) || null,
                 gameUUID: gameUUID || null,
-                endpoint: endpoint || null
-            } as ParsedQuery
+                endpoint: endpoint || null,
+            } as ParsedQuery,
         };
 
         WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
         WsServer.ws.onmessage = WsServer.onGameMessage;
-        switch (endpoint){
+        switch (endpoint) {
             case EndPoint.GAME: {
                 WsServer.ws.onmessage = WsServer.onGameMessage;
                 break;
@@ -51,14 +51,14 @@ export class WsServer {
         return true;
     }
 
-    private static onLedgerMessage(msg: MessageEvent){
-        const jsonData = JSON.parse(get(msg, "data", {}));
+    private static onLedgerMessage(msg: MessageEvent) {
+        const jsonData = JSON.parse(get(msg, 'data', {}));
 
         if (jsonData.clientUUID) {
             docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
         }
 
-        if (jsonData.ledger){
+        if (jsonData.ledger) {
             WsServer.subscriptions['ledger'].forEach((func) => func(jsonData.ledger));
         }
     }
@@ -66,7 +66,8 @@ export class WsServer {
     // TODO redesign dataCommunications and create general websocket data object so we
     // can add types here.
     private static onGameMessage(msg: MessageEvent) {
-        const jsonData = JSON.parse(get(msg, "data", {}));
+        const jsonData = JSON.parse(get(msg, 'data', {}));
+        console.log(jsonData);
         if (jsonData.clientUUID) {
             docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
         }

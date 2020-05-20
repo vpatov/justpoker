@@ -14,11 +14,17 @@ export declare interface Page404 {
     redirect?: string;
 }
 
-export function getDefaultGame404(): Page404 {
+export declare interface Error {
+    error: Page404;
+}
+
+export function getDefaultGame404(): Error {
     return {
-        notFound: true,
-        message: 'No game exists at this url',
-        redirect: '/',
+        error: {
+            notFound: true,
+            message: 'No game exists at this url',
+            redirect: '/',
+        },
     };
 }
 export declare interface UiState {

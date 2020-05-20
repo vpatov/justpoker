@@ -30,7 +30,10 @@ export class ConnectedClientManager {
     }
 
     updateClientSessionInGroup(groupKey: string, clientUUID: string, ws: WebSocket) {
-        this.ClientGroups[groupKey][clientUUID] = ws;
+        if (this.ClientGroups[groupKey]) {
+            this.ClientGroups[groupKey][clientUUID] = ws;
+        }
+        // TODO error, there is no group
     }
 
     // would be good to refactor this so there isnt a direct dependency on stateConverter

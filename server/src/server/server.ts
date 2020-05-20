@@ -188,6 +188,7 @@ class Server {
         // TODO implement FE for this
         if (!this.gameInstanceManager.doesGameExist(gameUUID)) {
             ws.send(JSON.stringify(getDefaultGame404()));
+            return;
         }
         // if a uuid was not sent by client (that is there is no session) then create one
         if (!clientUUID) {

@@ -30,6 +30,7 @@ function GameContainer(props): any {
     const classes = useStyles();
     const dispatch = useDispatch();
     const [gameLoaded, setGameLoaded] = useState(false);
+    const [error, setError] = useState(false);
 
     const queryParams = parseHTTPParams(queryString.parseUrl(get(props, 'location.search', '')));
 
@@ -41,14 +42,24 @@ function GameContainer(props): any {
             const succ = WsServer.openWs(queryParams.gameUUID, EndPoint.GAME);
             if (succ) {
                 WsServer.subscribe('game', onReceiveNewGame);
+                WsServer.subscribe('error', onReceiveError);
             }
         }
     }, []);
+
+    const onReceiveError = (error: any) => {
+        console.log('got error', error);
+        setError(error);
+    };
 
     const onReceiveNewGame = (game: any) => {
         dispatch({ type: 'SET_GAME_STATE', game: game });
         if (!gameLoaded) setGameLoaded(true);
     };
+
+    function renderError() {
+        return JSON.stringify(error);
+    }
 
     function renderGame() {
         return <Game />;
@@ -58,7 +69,9 @@ function GameContainer(props): any {
         return <Typography className={classes.loading}>Loading...</Typography>;
     }
 
-    if (gameLoaded) {
+    if (error !== false) {
+        return <div className={classes.root}>{renderError()}</div>;
+    } else if (gameLoaded) {
         return <div className={classes.root}>{renderGame()}</div>;
     } else {
         return <div className={classes.root}>{renderLoading()}</div>;
