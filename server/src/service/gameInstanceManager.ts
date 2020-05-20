@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { GameInstance, getCleanGameInstance } from '../../../ui/src/shared/models/gameInstance';
-import { NewGameForm } from '../../../ui/src/shared/models/table';
+import { NewGameForm } from '../../../ui/src/shared/models/dataCommunication';
 import { generateUUID } from '../../../ui/src/shared/util/util';
 
 import { AudioService } from './audioService';

@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { Service, Container } from 'typedi';
 
-import util from 'util';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import express from 'express';
@@ -12,17 +11,16 @@ import { AddressInfo } from 'net';
 import { MessageService } from '../service/messageService';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateConverter } from '../service/stateConverter';
-import { generateUUID, logGameState, printObj, getLoggableGameState } from '../../../ui/src/shared/util/util';
+import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { AudioService } from '../service/audioService';
 import { AnimationService } from '../service/animationService';
 import { LedgerService } from '../service/ledgerService';
 import { GameInstanceManager } from '../service/gameInstanceManager';
 
-import { WSParams, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
+import { NewGameForm, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
 
 import { ChatService } from '../service/chatService';
 import { StateGraphManager } from '../service/stateGraphManager';
-import { NewGameForm } from '../../../ui/src/shared/models/table';
 import { logger } from './logging';
 import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';

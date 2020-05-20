@@ -1,4 +1,4 @@
-import { BettingRoundAction } from './game';
+import { BettingRoundAction, GameType } from './game';
 
 export declare interface Event {
     actionType: GeneralAction;
@@ -121,4 +121,14 @@ export type ClientWsMessageRequest = SitDownRequest &
 export declare interface ClientWsMessage {
     actionType: ActionType;
     request: ClientWsMessageRequest;
+}
+
+export declare interface NewGameForm {
+    gameType: GameType;
+    smallBlind: number;
+    bigBlind: number;
+    maxBuyin: number;
+    timeToAct: number;
+    password?: string;
+    adminOptions?: any;
 }

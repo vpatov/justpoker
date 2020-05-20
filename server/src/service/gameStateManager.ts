@@ -1,5 +1,4 @@
 import { Service } from 'typedi';
-import WebSocket from 'ws';
 
 import {
     GameState,
@@ -10,9 +9,9 @@ import {
     Pot,
     QueuedServerAction,
     ServerActionType,
+    ConnectedClient,
 } from '../../../ui/src/shared/models/gameState';
 import {
-    StraddleType,
     GameType,
     GameParameters,
     BETTING_ROUND_STAGES,
@@ -20,11 +19,10 @@ import {
     BettingRoundAction,
     BettingRoundActionType,
 } from '../../../ui/src/shared/models/game';
-import { NewGameForm, ConnectedClient } from '../../../ui/src/shared/models/table';
 import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
-import { generateUUID, printObj, getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { ActionType, JoinTableRequest, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
+import { generateUUID, getLoggableGameState } from '../../../ui/src/shared/util/util';
+import { NewGameForm, JoinTableRequest } from '../../../ui/src/shared/models/dataCommunication';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
@@ -131,11 +129,11 @@ export class GameStateManager {
     }
 
     forEveryClient(performFn: (client: ConnectedClient) => void) {
-        [...this.gameState.table.activeConnections.entries()].forEach(([clientUUID, client]) => performFn(client));
+        [...this.gameState.activeConnections.entries()].forEach(([clientUUID, client]) => performFn(client));
     }
 
     getConnectedClient(clientUUID: string) {
-        return this.gameState.table.activeConnections.get(clientUUID);
+        return this.gameState.activeConnections.get(clientUUID);
     }
 
     getClientByPlayerUUID(playerUUID: string): string {
@@ -158,7 +156,7 @@ export class GameStateManager {
     }
 
     getConnectedClients() {
-        return this.gameState.table.activeConnections.values();
+        return this.gameState.activeConnections.values();
     }
 
     getPlayerByClientUUID(clientUUID: string): Player {
@@ -595,18 +593,15 @@ export class GameStateManager {
     // TODO break away client logic into server state manager.
     // TODO rename method, as it is not always initializing a client.
     initConnectedClient(clientUUID: string) {
-        const client = this.gameState.table.activeConnections.get(clientUUID);
+        const client = this.gameState.activeConnections.get(clientUUID);
         if (!client) {
-            if (!this.gameState.table.admin) {
+            if (!this.gameState.admin) {
                 this.initAdmin(clientUUID);
             }
             const newClient = this.createConnectedClient(clientUUID);
             this.gameState = {
                 ...this.gameState,
-                table: {
-                    ...this.gameState.table,
-                    activeConnections: new Map([...this.gameState.table.activeConnections, [clientUUID, newClient]]),
-                },
+                activeConnections: new Map([...this.gameState.activeConnections, [clientUUID, newClient]]),
             };
             this.ledgerService.initRow(clientUUID);
         }
@@ -614,15 +609,12 @@ export class GameStateManager {
 
     initAdmin(clientUUID: string) {
         this.updateGameState({
-            table: {
-                ...this.gameState.table,
-                admin: clientUUID,
-            },
+            admin: clientUUID,
         });
     }
 
     getAdminUUID() {
-        return this.gameState.table.admin;
+        return this.gameState.admin;
     }
 
     initGame(newGameForm: NewGameForm) {
@@ -720,18 +712,15 @@ export class GameStateManager {
             throw Error('deassociateClientAndPlayer called with a player that doesnt have a client.');
         }
         this.updateGameState({
-            table: {
-                ...this.gameState.table,
-                activeConnections: new Map(
-                    [...this.gameState.table.activeConnections].map(([clientUUID, client]) => [
-                        clientUUID,
-                        {
-                            ...client,
-                            playerUUID: clientUUID === playerClientUUID ? '' : client.playerUUID,
-                        },
-                    ]),
-                ),
-            },
+            activeConnections: new Map(
+                [...this.gameState.activeConnections].map(([clientUUID, client]) => [
+                    clientUUID,
+                    {
+                        ...client,
+                        playerUUID: clientUUID === playerClientUUID ? '' : client.playerUUID,
+                    },
+                ]),
+            ),
         });
     }
 
@@ -753,13 +742,10 @@ export class GameStateManager {
         this.gameState = {
             ...this.gameState,
             players: { ...this.gameState.players, [player.uuid]: player },
-            table: {
-                ...this.gameState.table,
-                activeConnections: new Map([
-                    ...this.gameState.table.activeConnections,
-                    [associatedClient.uuid, associatedClient],
-                ]),
-            },
+            activeConnections: new Map([
+                ...this.gameState.activeConnections,
+                [associatedClient.uuid, associatedClient],
+            ]),
         };
 
         this.ledgerService.addAlias(clientUUID, name);

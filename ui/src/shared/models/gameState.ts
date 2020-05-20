@@ -1,8 +1,8 @@
 import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
-
-import { Player } from './player';
-import { Table } from './table';
+import { Player, PlayerUUID } from './player';
 import { Card, Deck } from './cards';
+
+export declare type ClientUUID = string;
 
 export const enum GameStage {
     NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
@@ -79,7 +79,10 @@ export declare interface GameState {
     deck: Readonly<Deck>;
 
     /** Sensitive field. */
-    table: Readonly<Table>;
+    admin: ClientUUID;
+
+    /** Sensitive field. */
+    activeConnections: Map<ClientUUID, ConnectedClient>;
 
     serverTime: Readonly<number>;
 
@@ -91,6 +94,11 @@ export declare interface GameState {
 
     /** The extra amount put into the pot by an all-in that was below the min-raise. */
     partialAllInLeftOver: number;
+}
+
+export declare interface ConnectedClient {
+    readonly uuid: ClientUUID;
+    readonly playerUUID: PlayerUUID;
 }
 
 export declare interface Pot {
@@ -136,18 +144,16 @@ export function getCleanGameState(): GameState {
         straddleUUID: '',
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: '',
+        admin: '',
         currentPlayerToAct: '',
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,
+        activeConnections: new Map(),
         deck: {
             cards: [],
         },
         pots: [],
         handWinners: new Set<string>(),
-        table: {
-            activeConnections: new Map(),
-            admin: '',
-        },
         timeCurrentPlayerTurnStarted: 0,
         timeBanksUsedThisAction: 0,
         serverTime: 0,

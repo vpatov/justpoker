@@ -31,7 +31,6 @@ export function logGameState(gameState: GameState) {
         //         },
         //     ]),
         // },
-        table: undefined as any,
         board: undefined as any,
         // gameParameters: undefined as string,
         // board: undefined as string,
@@ -42,16 +41,8 @@ export function logGameState(gameState: GameState) {
 }
 
 export function getLoggableGameState(gameState: GameState) {
-    const activeConnections = Array.from(gameState.table.activeConnections).map(([uuid, client]) => ({
-        clientUUID: uuid,
-        playerUUID: client.playerUUID,
-    }));
     const minimizedGameState = {
         ...gameState,
-        table: {
-            ...gameState.table,
-            activeConnections,
-        },
     };
     return JSON.stringify(minimizedGameState);
 }
