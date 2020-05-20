@@ -42,7 +42,6 @@ export class GameInstanceManager {
     }
 
     addClientToGameInstance(gameInstanceUUID: string, clientUUID: string) {
-        this.gameInstances[gameInstanceUUID].clientUUIDs.add(clientUUID);
         this.gameStateManager.initConnectedClient(clientUUID);
     }
 
@@ -65,7 +64,6 @@ export class GameInstanceManager {
             chatLog: this.chatService.getChatState(),
             audioQueue: this.audioService.getAudioQueue(),
             animationState: this.animationService.getAnimationState(),
-            clientUUIDs: new Set<string>(),
             ledger: this.ledgerService.getLedger(),
             stateTimer: this.timerManager.getStateTimer(),
         };
