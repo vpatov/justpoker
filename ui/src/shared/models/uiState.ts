@@ -21,7 +21,7 @@ export function getDefaultGame404(): Error {
     return {
         error: {
             message: 'No game exists at this url.',
-            redirect: { url: '/', text: '⇽ Create Game' },
+            redirect: { url: '/', text: 'Create Game' },
         },
     };
 }
