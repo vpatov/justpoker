@@ -1,12 +1,20 @@
 import { BettingRoundAction, GameType } from './game';
 
-export declare interface Event {
-    actionType: GeneralAction;
-    request: any;
+export declare interface ClientAction {
+    actionType: ClientActionType;
+    clientUUID: string;
     gameInstanceUUID: string;
+    request: any;
 }
 
-export declare type GeneralAction = ClientAction | ServerAction;
+export declare interface ServerAction {
+    actionType: ServerActionType;
+    gameInstanceUUID: string;
+    request: any;
+}
+
+export declare type Event = ClientAction | ServerAction;
+export declare type EventType = ClientActionType | ServerActionType;
 
 export enum EndPoint {
     GAME = 'game',
@@ -23,7 +31,7 @@ export declare interface HTTPParams {
     gameInstanceUUID: string;
 }
 
-export enum ActionType {
+export enum ClientActionType {
     STARTGAME = 'STARTGAME',
     STOPGAME = 'STOPGAME',
     SITDOWN = 'SITDOWN',
@@ -43,27 +51,7 @@ export enum ActionType {
     USETIMEBANK = 'USETIMEBANK',
 }
 
-export enum ClientAction {
-    STARTGAME = 'STARTGAME',
-    STOPGAME = 'STOPGAME',
-    SITDOWN = 'SITDOWN',
-    STANDUP = 'STANDUP',
-    SITIN = 'SITIN',
-    SITOUT = 'SITOUT',
-    JOINTABLE = 'JOINTABLE',
-    JOINTABLEANDSITDOWN = 'JOINTABLEANDSITDOWN',
-    PINGSTATE = 'PINGSTATE',
-    CHAT = 'CHAT',
-    ADDCHIPS = 'ADDCHIPS',
-    SETCHIPS = 'SETCHIPS',
-    BETACTION = 'BETACTION',
-    SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
-    BOOTPLAYER = 'BOOTPLAYER',
-    LEAVETABLE = 'LEAVETABLE',
-    USETIMEBANK = 'USETIMEBANK',
-}
-
-export enum ServerAction {
+export enum ServerActionType {
     TIMEOUT = 'TIMEOUT',
 }
 
@@ -119,7 +107,7 @@ export type ClientWsMessageRequest = SitDownRequest &
     BootPlayerRequest;
 
 export declare interface ClientWsMessage {
-    actionType: ActionType;
+    actionType: ClientActionType;
     request: ClientWsMessageRequest;
 }
 

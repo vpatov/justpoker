@@ -1,6 +1,7 @@
 import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
 import { Player, PlayerUUID } from './player';
 import { Card, Deck } from './cards';
+import { ClientActionType } from './dataCommunication';
 
 export declare type ClientUUID = string;
 
@@ -17,13 +18,9 @@ export const enum GameStage {
     SET_CURRENT_PLAYER_TO_ACT = 'SET_PLAYER_TO_ACT',
 }
 
-export const enum ServerActionType {
-    BOOT_PLAYER = 'BOOT_PLAYER',
-}
-
 // TODO consider doing something similar to messageService for queuedActionsProcessor ?
 export declare interface QueuedServerAction {
-    actionType: ServerActionType;
+    actionType: ClientActionType;
     args: any[];
 }
 

@@ -16,7 +16,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 
-import { ActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/dataCommunication';
+import { ClientActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/dataCommunication';
 import { Typography } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game';
 
@@ -238,7 +238,7 @@ function ControllerComp(props: ControllerProps) {
 
     function sendBettingRoundAction(betActionType) {
         WsServer.send({
-            actionType: ActionType.BETACTION,
+            actionType: ClientActionType.BETACTION,
             request: {
                 type: betActionType,
                 amount: Number(betAmt),
@@ -254,21 +254,21 @@ function ControllerComp(props: ControllerProps) {
 
     function onClickTimeBank() {
         WsServer.send({
-            actionType: ActionType.USETIMEBANK,
+            actionType: ClientActionType.USETIMEBANK,
             request: {} as ClientWsMessageRequest,
         });
     }
 
     function onToggleSitOutNextHand() {
         WsServer.send({
-            actionType: dealInNextHand ? ActionType.SITOUT : ActionType.SITIN,
+            actionType: dealInNextHand ? ClientActionType.SITOUT : ClientActionType.SITIN,
             request: {} as ClientWsMessageRequest,
         });
     }
 
     function onToggleStraddle() {
         WsServer.send({
-            actionType: ActionType.SETPLAYERSTRADDLE,
+            actionType: ClientActionType.SETPLAYERSTRADDLE,
             request: ({ willStraddle: !willStraddle } as ClientStraddleRequest) as ClientWsMessageRequest,
         });
     }

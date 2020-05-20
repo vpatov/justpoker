@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ActionType, UiActionType } from './dataCommunication';
+import { ClientActionType, UiActionType } from './dataCommunication';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
@@ -76,7 +76,7 @@ export declare interface SizingButton {
 
 export declare interface ActionButton {
     label: string;
-    action: ActionType;
+    action: ClientActionType;
     disabled?: boolean;
 }
 
@@ -88,7 +88,7 @@ export declare interface BettingRoundActionButton {
 
 export declare interface MenuButton {
     label: string;
-    action: ActionType | UiActionType;
+    action: ClientActionType | UiActionType;
 }
 
 export declare interface UiCard {
@@ -175,17 +175,17 @@ export const RAISE_BUTTON: BettingRoundActionButton = {
 };
 
 export const START_GAME_BUTTON: MenuButton = {
-    action: ActionType.STARTGAME,
+    action: ClientActionType.STARTGAME,
     label: 'Start Game',
 };
 
 export const STOP_GAME_BUTTON: MenuButton = {
-    action: ActionType.STOPGAME,
+    action: ClientActionType.STOPGAME,
     label: 'Stop Game',
 };
 
 export const LEAVE_TABLE_BUTTON: MenuButton = {
-    action: ActionType.LEAVETABLE,
+    action: ClientActionType.LEAVETABLE,
     label: 'Leave Table',
 };
 

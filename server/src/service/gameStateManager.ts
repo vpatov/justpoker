@@ -8,7 +8,6 @@ import {
     ALL_STATE_KEYS,
     Pot,
     QueuedServerAction,
-    ServerActionType,
     ConnectedClient,
 } from '../../../ui/src/shared/models/gameState';
 import {
@@ -22,7 +21,7 @@ import {
 import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { generateUUID, getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { NewGameForm, JoinTableRequest } from '../../../ui/src/shared/models/dataCommunication';
+import { NewGameForm, JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/dataCommunication';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
@@ -682,7 +681,7 @@ export class GameStateManager {
     bootPlayerFromGame(playerUUID: string) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
-                actionType: ServerActionType.BOOT_PLAYER,
+                actionType: ClientActionType.BOOTPLAYER,
                 args: [playerUUID],
             });
         } else {

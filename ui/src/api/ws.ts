@@ -4,7 +4,7 @@ import queryString, { ParsedQuery } from 'query-string';
 import {
     ClientWsMessage,
     ClientChatMessage,
-    ActionType,
+    ClientActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
     EndPoint,
@@ -87,7 +87,7 @@ export class WsServer {
     static sendChatMessage(content: string) {
         const chatMessage: ClientChatMessage = { content };
         const clientWsMessage: ClientWsMessage = {
-            actionType: ActionType.CHAT,
+            actionType: ClientActionType.CHAT,
             request: (chatMessage as ClientChatMessage) as ClientWsMessageRequest,
         };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
@@ -95,7 +95,7 @@ export class WsServer {
 
     static sendBootPlayerMessage(playerUUID: string) {
         const clientWsMessage: ClientWsMessage = {
-            actionType: ActionType.BOOTPLAYER,
+            actionType: ClientActionType.BOOTPLAYER,
             request: ({ playerUUID } as BootPlayerRequest) as ClientWsMessageRequest,
         };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
