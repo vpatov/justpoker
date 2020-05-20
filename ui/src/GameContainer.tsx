@@ -3,12 +3,14 @@ import get from 'lodash/get';
 import { useDispatch } from 'react-redux';
 import queryString from 'query-string';
 
+import ErrorMessage from './ErrorMessage';
 import Game from './Game';
 import { WsServer } from './api/ws';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { EndPoint } from './shared/models/dataCommunication';
 import { parseHTTPParams } from './shared/util/util';
+import { ErrorDisplay } from './shared/models/uiState';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,7 +50,6 @@ function GameContainer(props): any {
     }, []);
 
     const onReceiveError = (error: any) => {
-        console.log('got error', error);
         setError(error);
     };
 
@@ -58,7 +59,7 @@ function GameContainer(props): any {
     };
 
     function renderError() {
-        return JSON.stringify(error);
+        return <ErrorMessage errorDisplay={error as ErrorDisplay} />;
     }
 
     function renderGame() {

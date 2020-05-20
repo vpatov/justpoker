@@ -8,22 +8,20 @@ import { UserPreferences } from './userPreferences';
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
 
-export declare interface Page404 {
-    notFound: boolean;
+export declare interface ErrorDisplay {
     message?: string;
-    redirect?: string;
+    redirect?: { url: string; text: string };
 }
 
 export declare interface Error {
-    error: Page404;
+    error: ErrorDisplay;
 }
 
 export function getDefaultGame404(): Error {
     return {
         error: {
-            notFound: true,
-            message: 'No game exists at this url',
-            redirect: '/',
+            message: 'No game exists at this url.',
+            redirect: { url: '/', text: '⇽ Create Game' },
         },
     };
 }
