@@ -10,6 +10,7 @@ import { GameStateManager } from './gameStateManager';
 import { LedgerService } from './ledgerService';
 import { TimerManager } from './timerManager';
 import { logger } from '../server/logging';
+import { ServerLedger, UILedger } from '../../../ui/src/shared/models/ledger';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -94,5 +95,11 @@ export class GameInstanceManager {
         this.audioService.reset();
         this.animationService.reset();
         this.chatService.clearLastMessage();
+    }
+
+    // no need to load entire game instance as no update
+    getLedgerForGameInstance(gameInstanceUUID: string): UILedger | undefined {
+        const ledgerState = this.gameInstances[gameInstanceUUID].ledger;
+        return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
     }
 }

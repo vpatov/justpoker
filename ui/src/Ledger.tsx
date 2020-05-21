@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {} from './utils';
-import { withRouter } from 'react-router-dom';
 import queryString from 'query-string';
+import get from 'lodash/get';
+import { getLedger } from './api/http';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { WsServer } from './api/ws';
 import { UILedger, UILedgerRow } from './shared/models/ledger';
-import { EndPoint } from './shared/models/dataCommunication';
 import { parseHTTPParams } from './shared/util/util';
 
 import Table from '@material-ui/core/Table';
@@ -50,17 +48,20 @@ function Ledger(props) {
 
     useEffect(() => {
         document.title = 'Ledger';
-        const succ = WsServer.openWs(queryParams.gameInstanceUUID, EndPoint.LEDGER);
-        if (succ) {
-            WsServer.subscribe('ledger', onReceiveNewLedger);
-        }
+        getLedger(queryParams.gameInstanceUUID, onFetchLedgerSuccess, onFetchLedgerFailure);
     }, []);
 
-    const onReceiveNewLedger = (updatedLedger: UILedger) => {
-        setLedger(updatedLedger);
+    const onFetchLedgerSuccess = (response) => {
+        console.log(response);
+        const ledger = get(response, 'data.ledger');
+        setLedger(ledger);
     };
 
-    return LedgerTable({ ledger });
+    const onFetchLedgerFailure = (err) => {
+        console.log(err);
+    };
+
+    return <LedgerTable ledger={ledger} />;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -208,6 +209,7 @@ function LedgerTable(props) {
 
     const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
+    console.log(ledger);
     return (
         <div className={classes.root}>
             <Paper className={classes.paper}>

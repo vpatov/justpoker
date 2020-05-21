@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import {} from './utils';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { createGame } from './api/http';

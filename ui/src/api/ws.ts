@@ -34,33 +34,8 @@ export class WsServer {
 
         WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
         WsServer.ws.onmessage = WsServer.onGameMessage;
-        switch (endpoint) {
-            case EndPoint.GAME: {
-                WsServer.ws.onmessage = WsServer.onGameMessage;
-                break;
-            }
 
-            case EndPoint.LEDGER: {
-                WsServer.ws.onmessage = WsServer.onLedgerMessage;
-                break;
-            }
-            default: {
-                throw Error(`Endpoint ${endpoint} is not available.`);
-            }
-        }
         return true;
-    }
-
-    private static onLedgerMessage(msg: MessageEvent) {
-        const jsonData = JSON.parse(get(msg, 'data', {}));
-
-        if (jsonData.clientUUID) {
-            docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
-        }
-
-        if (jsonData.ledger) {
-            WsServer.subscriptions['ledger'].forEach((func) => func(jsonData.ledger));
-        }
     }
 
     // TODO redesign dataCommunications and create general websocket data object so we

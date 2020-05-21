@@ -97,8 +97,15 @@ class Server {
             res.send(JSON.stringify({ gameInstanceUUID: gameInstanceUUID }));
         });
 
-        this.app.use(bodyParser.json());
+        router.get('/ledger', (req, res) => {
+            const parsedQuery = queryString.parseUrl(req.url);
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
+            const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
 
+            res.send({ ledger: ledger });
+        });
+
+        this.app.use(bodyParser.json());
         this.app.use(
             bodyParser.urlencoded({
                 extended: true,
@@ -147,20 +154,9 @@ class Server {
             const parsedQuery = queryString.parseUrl(req.url);
             const clientUUID = parsedQuery.query.clientUUID as string;
             const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
-            const endpoint = parsedQuery.query.endpoint as string;
 
-            // TODO, I don't think we should pass the endpoint in the body, rather match across the actual url
-            switch (endpoint) {
-                case EndPoint.GAME: {
-                    this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
-                    return;
-                }
-                default: {
-                    const errorMessage = `No websocket interaction at url: ${req.url}`;
-                    logger.error(errorMessage);
-                    ws.close(404, errorMessage);
-                }
-            }
+            this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
+            return;
         });
     }
 
