@@ -168,6 +168,8 @@ export class MessageService {
             updates: [ServerStateKey.GAMESTATE],
         },
         [ServerActionType.TIMEOUT]: {
+            // TODO validation should ensure that the gameInstanceUUID of the
+            // ServerAction.TIMEOUT refers to an existing game.
             validation: (uuid, req) => NO_ERROR,
             perform: () => {
                 if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
@@ -195,7 +197,7 @@ export class MessageService {
             );
             actionProcessor.perform(clientUUID, event.request);
             this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
-            this.stateGraphManager.processEvent(event.actionType, () => {
+            this.stateGraphManager.processStateTransitions(event.actionType, () => {
                 /*
                     TODO
                     clientUUID is going to be refactored to be part of clientAction?
