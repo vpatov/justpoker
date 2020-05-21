@@ -176,6 +176,7 @@ class Server {
             clientUUID = this.connectedClientManager.createClientSessionInGroup(gameInstanceUUID, ws);
         } else {
             // if there is a session replace old websocket
+            // TODO define app behavior in scenario when user accesses same game in two browser tabs.
             this.connectedClientManager.updateClientSessionInGroup(gameInstanceUUID, clientUUID, ws);
         }
         logger.info(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
