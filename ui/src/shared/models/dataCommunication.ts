@@ -1,17 +1,17 @@
 import { BettingRoundAction, GameType } from './game';
 
-export declare interface ClientAction {
-    actionType: ClientActionType;
-    clientUUID: string;
+export declare interface BaseAction {
+    actionType: EventType;
     gameInstanceUUID: string;
     request: any;
 }
 
-export declare interface ServerAction {
-    actionType: ServerActionType;
-    gameInstanceUUID: string;
-    request: any;
+export declare interface ClientAction extends BaseAction {
+    actionType: ClientActionType;
+    clientUUID: string;
 }
+
+export declare interface ServerAction extends BaseAction {}
 
 export declare type Event = ClientAction | ServerAction;
 export declare type EventType = ClientActionType | ServerActionType;

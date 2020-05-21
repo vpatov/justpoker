@@ -170,7 +170,7 @@ export class StateGraphManager {
     // - MessageService executes the action if valid.
     // - After executing the action, messageService calls this processEvent method.
     // - If the event is a defined state transition path, a state transition is executed.
-    processEvent(event: EventType, timeoutCallback: () => void) {
+    processStateTransitions(event: EventType, timeoutCallback: () => void) {
         const nextStage = this.getNextStage(event);
         if (nextStage) {
             this.initializeGameStage(nextStage);
