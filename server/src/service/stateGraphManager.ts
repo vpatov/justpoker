@@ -8,15 +8,12 @@ import {
     StageDelayMap,
 } from '../../../ui/src/shared/models/stateGraph';
 import { GameStage, QueuedServerAction } from '../../../ui/src/shared/models/gameState';
-import { ClientActionType, ServerActionType, EventType } from '../../../ui/src/shared/models/dataCommunication';
+import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
-import { Subject } from 'rxjs';
 import { LedgerService } from './ledgerService';
-import { EventProcessorService } from './messageService';
-import { GameInstanceManager } from './gameInstanceManager';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -27,15 +24,7 @@ export class StateGraphManager {
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
-        private readonly messageService: EventProcessorService,
-        private readonly gameInstanceManager: GameInstanceManager,
     ) {}
-
-    private stateGraphUpdateEmitter: Subject<void> = new Subject();
-
-    observeStateGraphUpdates() {
-        return this.stateGraphUpdateEmitter.asObservable();
-    }
 
     canContinueGameCondition: Condition = {
         fn: () => this.gameStateManager.canDealNextHand(),
@@ -111,13 +100,12 @@ export class StateGraphManager {
     }
 
     /**
-     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
      * @returns The graph edge that represents the state transition if the transition is defined,
      * null otherwise.
      */
-    getEdge(eventType: EventType): GraphEdge {
+    getEdge(actionType: ActionType): GraphEdge {
         const gameStage = this.gameStateManager.getGameStage();
-        const edge = this.stateGraph[gameStage].get(eventType);
+        const edge = this.stateGraph[gameStage].get(actionType);
 
         if (!!edge) {
             /* 
@@ -134,12 +122,11 @@ export class StateGraphManager {
     }
 
     /**
-     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
      * @returns The next stage to transition to if the event/current stage represent a defined
      * state transition. Returns null otherwise.
      */
-    getNextStage(eventType: EventType): GraphNode {
-        let edge = this.getEdge(eventType);
+    getNextStage(actionType: ActionType): GraphNode {
+        let edge = this.getEdge(actionType);
         let conditionDepth = 0;
         if (!edge) {
             return null;
@@ -170,7 +157,7 @@ export class StateGraphManager {
     // - MessageService executes the action if valid.
     // - After executing the action, messageService calls this processEvent method.
     // - If the event is a defined state transition path, a state transition is executed.
-    processStateTransitions(event: EventType, timeoutCallback: () => void) {
+    processStateTransitions(event: ActionType, timeoutCallback: () => void) {
         const nextStage = this.getNextStage(event);
         if (nextStage) {
             this.initializeGameStage(nextStage);
@@ -179,7 +166,6 @@ export class StateGraphManager {
                 this.timerManager.setStateTimer(() => timeoutCallback(), delay);
             }
         }
-        this.stateGraphUpdateEmitter.next();
     }
 
     // The changes executed while entering a game stage should be general and applicable no matter

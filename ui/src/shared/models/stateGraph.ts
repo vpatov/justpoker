@@ -1,5 +1,5 @@
 import { GameStage } from './gameState';
-import { EventType } from './dataCommunication';
+import { ActionType } from './dataCommunication';
 
 export declare interface Condition {
     fn: () => boolean;
@@ -11,7 +11,7 @@ export declare interface Condition {
 export declare type GraphNode = GameStage;
 export declare type GraphEdge = Condition | GraphNode;
 
-export declare type StateGraph = { [key in GraphNode]: Map<EventType, GraphEdge> };
+export declare type StateGraph = { [key in GraphNode]: Map<ActionType, GraphEdge> };
 export declare type StageDelayMap = { [key in GraphNode]: number };
 
 export function instanceOfCondition(edge: GraphEdge): edge is Condition {

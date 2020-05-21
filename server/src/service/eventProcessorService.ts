@@ -1,5 +1,4 @@
 import {
-    ClientWsMessage,
     ClientActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
@@ -8,6 +7,7 @@ import {
     ServerAction,
     EventType,
     ServerActionType,
+    createTimeoutEvent,
 } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
@@ -17,8 +17,9 @@ import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/s
 import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
-import { GameInstanceManager } from '../service/gameInstanceManager';
+import { GameInstanceManager } from './gameInstanceManager';
 import { logger } from '../server/logging';
+import { ConnectedClientManager } from '..//server/connectedClientManager';
 
 declare interface ActionProcessor {
     validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -27,7 +28,7 @@ declare interface ActionProcessor {
 }
 
 declare type EventProcessor = {
-    [key in EventType]: ActionProcessor;
+    [key in ClientActionType]: ActionProcessor;
 };
 
 @Service()
@@ -39,6 +40,7 @@ export class EventProcessorService {
         private readonly chatService: ChatService,
         private readonly stateGraphManager: StateGraphManager,
         private readonly gameInstanceManager: GameInstanceManager,
+        private readonly connectedClientManager: ConnectedClientManager,
     ) {}
 
     eventProcessor: EventProcessor = {
@@ -167,60 +169,67 @@ export class EventProcessorService {
             perform: () => this.gamePlayService.useTimeBankAction(),
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ServerActionType.TIMEOUT]: {
-            // TODO validation should ensure that the gameInstanceUUID of the
-            // ServerAction.TIMEOUT refers to an existing game.
-            validation: (uuid, req) => NO_ERROR,
-            perform: () => {
+    };
+
+    processServerAction(serverAction: ServerAction) {
+        switch (serverAction.actionType) {
+            case ServerActionType.TIMEOUT: {
                 if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
                     this.gamePlayService.timeOutPlayer();
                 }
-            },
-            updates: [ServerStateKey.GAMESTATE],
-        },
-    };
-
-    // After Event / ClientAction types have been refactored, this should be refactored
-    // into three functions: processEvent, processServerAction, and processClientAction
-    // processEvent would call the other two functions
-    processEvent(event: Event, gameInstanceUUID: string, clientUUID: string) {
-        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
-        this.validationService.ensureClientExists(clientUUID);
-        const actionProcessor = this.eventProcessor[event.actionType];
-        const response = actionProcessor.validation(clientUUID, event.request);
-        this.gameStateManager.clearUpdatedKeys();
-        if (!hasError(response)) {
-            logger.debug(
-                `MessageService.processMessage. clientUUID: ${clientUUID}, actionType: ${
-                    event.actionType
-                }, messagePayload: ${JSON.stringify(event.request)}`,
-            );
-            actionProcessor.perform(clientUUID, event.request);
-            this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
-            this.stateGraphManager.processStateTransitions(event.actionType, () => {
-                /*
-                    TODO
-                    clientUUID is going to be refactored to be part of clientAction?
-                    this anon function should be made cleaner once types are finalized
-                */
-                this.processEvent(
-                    {
-                        gameInstanceUUID,
-                        actionType: ServerActionType.TIMEOUT,
-                        request: {},
-                    },
-                    gameInstanceUUID,
-                    '',
-                );
-            });
-        } else {
-            // TODO process error and send error to client
-            logger.error(JSON.stringify(response));
+                break;
+            }
         }
+        this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }
 
-    // TODO should sitdown, standup, jointable, chat, add chips, be put into their own service?
-    // something like room service? or administrative service? how to name the aspects of gameplay
-    // that are not directly related to gameplay, and that can be done out of turn
-    // i.e. (sitting down, buying chips, talking)
+    processClientAction(clientAction: ClientAction) {
+        const { clientUUID, actionType, request } = clientAction;
+
+        let response = this.validationService.ensureClientExists(clientUUID);
+        if (hasError(response)) {
+            logger.error(JSON.stringify(response));
+            return;
+        }
+
+        const actionProcessor = this.eventProcessor[actionType];
+        response = actionProcessor.validation(clientUUID, request);
+
+        if (hasError(response)) {
+            logger.error(JSON.stringify(response));
+            return;
+        }
+
+        this.gameStateManager.clearUpdatedKeys();
+        actionProcessor.perform(clientUUID, clientAction.request);
+        this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
+    }
+
+    processEvent(event: Event) {
+        const { gameInstanceUUID, actionType } = event.body;
+
+        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
+        logger.debug(
+            `EventProcessorService.processEvent. gameInstanceUUID: ${gameInstanceUUID} ` +
+                `eventType: ${event.eventType}`,
+        );
+
+        switch (event.eventType) {
+            case EventType.SERVER_ACTION: {
+                this.processServerAction(event.body as ServerAction);
+                break;
+            }
+
+            case EventType.CLIENT_ACTION: {
+                this.processClientAction(event.body as ClientAction);
+                break;
+            }
+        }
+        this.stateGraphManager.processStateTransitions(actionType, () => {
+            this.processEvent(createTimeoutEvent(gameInstanceUUID));
+        });
+
+        this.connectedClientManager.sendStateToEachInGameInstance(gameInstanceUUID);
+        this.gameInstanceManager.resetEphemeralStates();
+    }
 }

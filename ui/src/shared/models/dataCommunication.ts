@@ -1,20 +1,29 @@
 import { BettingRoundAction, GameType } from './game';
 
-export declare interface BaseAction {
-    actionType: EventType;
-    gameInstanceUUID: string;
-    request: any;
+export enum EventType {
+    SERVER_ACTION = 'SERVER_ACTION',
+    CLIENT_ACTION = 'CLIENT_ACTION'
 }
 
+export declare type EventBody = ClientAction | ServerAction;
+export declare interface Event {
+    eventType: EventType;
+    body: EventBody;
+}
+export declare type ActionType = ClientActionType | ServerActionType;
+export declare interface BaseAction {
+    actionType: ActionType;
+    gameInstanceUUID: string;
+}
 export declare interface ClientAction extends BaseAction {
     actionType: ClientActionType;
     clientUUID: string;
+    request: ClientWsMessageRequest;
+}
+export declare interface ServerAction extends BaseAction {
+    actionType: ServerActionType;
 }
 
-export declare interface ServerAction extends BaseAction {}
-
-export declare type Event = ClientAction | ServerAction;
-export declare type EventType = ClientActionType | ServerActionType;
 
 export enum EndPoint {
     GAME = 'game',
@@ -119,4 +128,14 @@ export declare interface NewGameForm {
     timeToAct: number;
     password?: string;
     adminOptions?: any;
+}
+
+export function createTimeoutEvent(gameInstanceUUID: string): Event{
+    return  {
+        eventType: EventType.SERVER_ACTION,
+        body: {
+            actionType: ServerActionType.TIMEOUT,
+            gameInstanceUUID
+        } as ServerAction
+    };
 }

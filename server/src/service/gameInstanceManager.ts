@@ -9,6 +9,7 @@ import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
 import { LedgerService } from './ledgerService';
 import { TimerManager } from './timerManager';
+import { logger } from '../server/logging';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -41,6 +42,7 @@ export class GameInstanceManager {
         return false;
     }
 
+    // TODO decouple clients from games
     addClientToGameInstance(gameInstanceUUID: string, clientUUID: string) {
         this.gameStateManager.initConnectedClient(clientUUID);
     }
@@ -57,7 +59,6 @@ export class GameInstanceManager {
         return this.activeGameInstanceUUID;
     }
 
-    // needed due to immunability, another reason to move away from immuability
     saveActiveGameInstance() {
         const activeGameInstance = {
             gameState: this.gameStateManager.getGameState(),
@@ -75,7 +76,7 @@ export class GameInstanceManager {
             this.saveActiveGameInstance();
         }
         const gi = this.getGameInstance(gameInstanceUUID);
-        console.log('context switching to ', gameInstanceUUID, gi);
+        logger.info(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
 
         if (!gi) {
             // TODO error path
@@ -87,5 +88,11 @@ export class GameInstanceManager {
         this.ledgerService.loadLedger(gi.ledger);
         this.timerManager.loadStateTimer(gi.stateTimer);
         this.activeGameInstanceUUID = gameInstanceUUID;
+    }
+
+    resetEphemeralStates() {
+        this.audioService.reset();
+        this.animationService.reset();
+        this.chatService.clearLastMessage();
     }
 }

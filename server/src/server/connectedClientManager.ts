@@ -36,6 +36,12 @@ export class ConnectedClientManager {
         // TODO error, there is no group
     }
 
+    // If groups can be something other than gameInstances, it might be helpful to have typed
+    // helper methods for each group type. (different UUID types will have actual unique types in future)
+    sendStateToEachInGameInstance(gameInstanceUUID: string) {
+        this.sendStateToEachInGroup(gameInstanceUUID);
+    }
+
     // would be good to refactor this so there isnt a direct dependency on stateConverter
     sendStateToEachInGroup(key: string) {
         Object.entries(this.ClientGroups[key]).forEach(([clientUUID, websocket]) => {

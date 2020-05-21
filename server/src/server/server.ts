@@ -8,19 +8,19 @@ import bodyParser from 'body-parser';
 import queryString from 'query-string';
 
 import { AddressInfo } from 'net';
-import { EventProcessorService } from '../service/messageService';
-import { GameStateManager } from '../service/gameStateManager';
+import { EventProcessorService } from '../service/eventProcessorService';
 import { StateConverter } from '../service/stateConverter';
-import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { AudioService } from '../service/audioService';
-import { AnimationService } from '../service/animationService';
-import { LedgerService } from '../service/ledgerService';
 import { GameInstanceManager } from '../service/gameInstanceManager';
 
-import { NewGameForm, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
+import {
+    NewGameForm,
+    EndPoint,
+    ClientAction,
+    Event,
+    EventType,
+    ClientWsMessage,
+} from '../../../ui/src/shared/models/dataCommunication';
 
-import { ChatService } from '../service/chatService';
-import { StateGraphManager } from '../service/stateGraphManager';
 import { logger } from './logging';
 import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
@@ -51,14 +51,8 @@ class Server {
     };
 
     constructor(
-        private messageService: EventProcessorService,
-        private gsm: GameStateManager,
+        private eventProcessorService: EventProcessorService,
         private stateConverter: StateConverter,
-        private stateGraphManager: StateGraphManager,
-        private readonly chatService: ChatService,
-        private readonly audioService: AudioService,
-        private readonly animationService: AnimationService,
-        private readonly ledgerService: LedgerService,
         private readonly gameInstanceManager: GameInstanceManager,
         private readonly connectedClientManager: ConnectedClientManager,
     ) {}
@@ -98,8 +92,8 @@ class Server {
             };
             const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(newGameForm);
             this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
-            this.ledgerService.clearLedger();
-            logger.info(`gameInstanceUUID: ${gameInstanceUUID}`);
+
+            logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
             res.send(JSON.stringify({ gameInstanceUUID: gameInstanceUUID }));
         });
 
@@ -118,34 +112,26 @@ class Server {
         this.connectedClientManager.sendStateToEachInGroup(activeGameInstanceUUID);
     }
 
-    // we need to rethink this i think,  see comment on PR
-
-    // sendLedgerUpdatesToClients() {
-    //     for (const client of this.gsm.getConnectedClients()) {
-    //         const ws = client.websockets.get(EndPoint.LEDGER);
-    //         if (ws) {
-    //             const res = { ledger: this.ledgerService.convertServerLedgerToUILedger() };
-    //             const jsonRes = JSON.stringify(res);
-    //             ws.send(jsonRes);
-    //         }
-    //     }
-    // }
-
     private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
         logger.info(`Incoming Game Message: ${data}`);
+
+        // TODO typeof check seems not the best way to do this
         if (typeof data === 'string') {
             try {
-                const receivedMessageTime = Date.now();
-                const action = JSON.parse(data);
-                this.messageService.processEvent(action, gameInstanceUUID, clientUUID);
-                const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
-                this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
-                this.logAverages();
-            } catch (e) {
-                logger.error(`EXCEPTION: ${e} GameState:  ${getLoggableGameState(this.gsm.getGameState())}`);
+                const wsMessage: ClientWsMessage = JSON.parse(data);
+                const event: Event = {
+                    eventType: EventType.CLIENT_ACTION,
+                    body: {
+                        gameInstanceUUID,
+                        clientUUID,
+                        actionType: wsMessage.actionType,
+                        request: wsMessage.request,
+                    } as ClientAction,
+                };
 
-                // TODO should we throw an exception here?
-                // throw e;
+                this.eventProcessorService.processEvent(event);
+            } catch (e) {
+                logger.error(e);
             }
         } else {
             logger.error('Received data of an unsupported type.');
@@ -156,26 +142,23 @@ class Server {
         this.wss = new WebSocket.Server({ server: this.server });
         this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             const ip = req.connection.remoteAddress;
-            logger.info(`ws connection req from ${ip}`);
+            logger.info(`WS connection request from: ${ip}`);
 
             const parsedQuery = queryString.parseUrl(req.url);
             const clientUUID = parsedQuery.query.clientUUID as string;
             const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
             const endpoint = parsedQuery.query.endpoint as string;
 
-            // TODO, I dont we should pass the endpoint in the body, rather match across the actual url
+            // TODO, I don't think we should pass the endpoint in the body, rather match across the actual url
             switch (endpoint) {
                 case EndPoint.GAME: {
                     this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
                     return;
                 }
-                case EndPoint.LEDGER: {
-                    this.onConnectionToLedger(ws, gameInstanceUUID, clientUUID);
-                    return;
-                }
                 default: {
-                    logger.info(`no websocket interaction at url`);
-                    ws.close(404, `no websocket interaction at url`);
+                    const errorMessage = `No websocket interaction at url: ${req.url}`;
+                    logger.error(errorMessage);
+                    ws.close(404, errorMessage);
                 }
             }
         });
@@ -201,17 +184,13 @@ class Server {
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
         this.gameInstanceManager.addClientToGameInstance(gameInstanceUUID, clientUUID);
 
-        //s end init state to newly connected client
+        // send init state to newly connected client
+        // TODO can remove server's dependency on stateConverter by processing an event here,
+        // the event being a server action like GAME_INIT or something.
         ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
 
         // maybe this should be done else where?
         ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameInstanceUUID));
-    }
-
-    onConnectionToLedger(ws: WebSocket, gameInstanceUUID: string, clientUUID: string) {
-        // todo only allow certian people to see ledger
-        // must be in game? admin? have been in game?
-        ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
     }
 
     //refactor this mess of a function
@@ -220,13 +199,6 @@ class Server {
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
         this.initGameWSS();
-        this.stateGraphManager.observeStateGraphUpdates().subscribe(() => {
-            this.sendGameUpdatesToClients();
-            // this.sendLedgerUpdatesToClients();
-            this.audioService.reset();
-            this.animationService.reset();
-            this.chatService.clearLastMessage();
-        });
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {
             const port = this.server.address() as AddressInfo;
