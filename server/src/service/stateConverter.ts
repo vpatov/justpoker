@@ -36,7 +36,7 @@ import {
 } from '../../../ui/src/shared/models/uiState';
 import { ValidationService, hasError } from './validationService';
 import { AudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
-import { MessageService } from './messageService';
+import { EventProcessorService } from './messageService';
 import { AnimationService } from './animationService';
 
 import { ChatService } from './chatService';

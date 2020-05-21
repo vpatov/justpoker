@@ -15,7 +15,7 @@ import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { Subject } from 'rxjs';
 import { LedgerService } from './ledgerService';
-import { MessageService } from './messageService';
+import { EventProcessorService } from './messageService';
 import { GameInstanceManager } from './gameInstanceManager';
 
 const MAX_CONDITION_DEPTH = 3;
@@ -27,7 +27,7 @@ export class StateGraphManager {
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
-        private readonly messageService: MessageService,
+        private readonly messageService: EventProcessorService,
         private readonly gameInstanceManager: GameInstanceManager,
     ) {}
 

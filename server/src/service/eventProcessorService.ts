@@ -26,12 +26,12 @@ declare interface ActionProcessor {
     updates: ServerStateKey[];
 }
 
-declare type MessageProcessor = {
+declare type EventProcessor = {
     [key in EventType]: ActionProcessor;
 };
 
 @Service()
-export class MessageService {
+export class EventProcessorService {
     constructor(
         private readonly gameStateManager: GameStateManager,
         private readonly validationService: ValidationService,
@@ -41,7 +41,7 @@ export class MessageService {
         private readonly gameInstanceManager: GameInstanceManager,
     ) {}
 
-    messageProcessor: MessageProcessor = {
+    eventProcessor: EventProcessor = {
         [ClientActionType.STARTGAME]: {
             validation: (uuid, req) => this.validationService.validateStartGameRequest(uuid),
             perform: (uuid, req) => this.gamePlayService.startGame(),
@@ -183,10 +183,10 @@ export class MessageService {
     // After Event / ClientAction types have been refactored, this should be refactored
     // into three functions: processEvent, processServerAction, and processClientAction
     // processEvent would call the other two functions
-    processMessage(event: Event, gameInstanceUUID: string, clientUUID: string) {
+    processEvent(event: Event, gameInstanceUUID: string, clientUUID: string) {
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
         this.validationService.ensureClientExists(clientUUID);
-        const actionProcessor = this.messageProcessor[event.actionType];
+        const actionProcessor = this.eventProcessor[event.actionType];
         const response = actionProcessor.validation(clientUUID, event.request);
         this.gameStateManager.clearUpdatedKeys();
         if (!hasError(response)) {
@@ -203,7 +203,7 @@ export class MessageService {
                     clientUUID is going to be refactored to be part of clientAction?
                     this anon function should be made cleaner once types are finalized
                 */
-                this.processMessage(
+                this.processEvent(
                     {
                         gameInstanceUUID,
                         actionType: ServerActionType.TIMEOUT,

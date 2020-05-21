@@ -8,7 +8,7 @@ import bodyParser from 'body-parser';
 import queryString from 'query-string';
 
 import { AddressInfo } from 'net';
-import { MessageService } from '../service/messageService';
+import { EventProcessorService } from '../service/messageService';
 import { GameStateManager } from '../service/gameStateManager';
 import { StateConverter } from '../service/stateConverter';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
@@ -51,7 +51,7 @@ class Server {
     };
 
     constructor(
-        private messageService: MessageService,
+        private messageService: EventProcessorService,
         private gsm: GameStateManager,
         private stateConverter: StateConverter,
         private stateGraphManager: StateGraphManager,
@@ -137,7 +137,7 @@ class Server {
             try {
                 const receivedMessageTime = Date.now();
                 const action = JSON.parse(data);
-                this.messageService.processMessage(action, gameInstanceUUID, clientUUID);
+                this.messageService.processEvent(action, gameInstanceUUID, clientUUID);
                 const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
                 this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
                 this.logAverages();
