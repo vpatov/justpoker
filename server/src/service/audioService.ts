@@ -9,6 +9,10 @@ export class AudioService {
 
     constructor(private readonly gameStateManager: GameStateManager) {}
 
+    loadAudioState(as: AudioQueue) {
+        this.audioQueue = as;
+    }
+
     // TODO we most likely dont need "global" and "personal",
     // because it seems like there will only be one sound per client per wsmessage
     private setGlobalSound(soundByte: SoundByte) {

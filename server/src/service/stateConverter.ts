@@ -36,7 +36,7 @@ import {
 } from '../../../ui/src/shared/models/uiState';
 import { ValidationService, hasError } from './validationService';
 import { AudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
-import { MessageService } from './messageService';
+import { EventProcessorService } from './eventProcessorService';
 import { AnimationService } from './animationService';
 
 import { ChatService } from './chatService';
@@ -48,14 +48,18 @@ declare interface CardInformation {
     handLabel: string;
 }
 
+// TODO idea for refactoring StateConverter: create new directory called "stateConverter". Every source file is responsible for different
+// update key of the UiState (game, chat, audio, etc)
+// the main stateConverter will aggregate the conversions from each of the other files, depending on updated keys.
+// all actual conversion logic will be inside of those other files.
+// The game conversion part is still the most complex, but we should be able to reduce the size of this file by about half this way.
+
 @Service()
 export class StateConverter {
     constructor(
         private readonly gameStateManager: GameStateManager,
-        private readonly validationService: ValidationService,
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
-        private readonly messageService: MessageService,
         private readonly chatService: ChatService,
     ) {}
 

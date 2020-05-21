@@ -1,7 +1,6 @@
-
 export declare interface BaseLedgerRow {
     /**
-     * The number of chips the client's player currently has, such that net can be calculated 
+     * The number of chips the client's player currently has, such that net can be calculated
      * at any moment.
      */
     currentChips: number;
@@ -65,17 +64,20 @@ export declare interface ClientOnlyLedgerFields {
  * which depend only on properties in the row, will be calculated during conversion.
  */
 export declare type ServerLedgerRow = BaseLedgerRow & ServerOnlyLedgerFields;
-export declare type ServerLedger = {[clientUUID: string]: ServerLedgerRow};
+export declare type ServerLedger = { [clientUUID: string]: ServerLedgerRow };
 
-/** 
- * Representation of a ledger row that is used in the frontend to visually present 
+/**
+ * Representation of a ledger row that is used in the frontend to visually present
  * the data.
  */
 export declare type UILedgerRow = BaseLedgerRow & LedgerComputedFields & ClientOnlyLedgerFields;
 export declare type UILedger = UILedgerRow[];
 
+export function getCleanLedger(): ServerLedger {
+    return {};
+}
 
- export function getCleanLedgerRow(): ServerLedgerRow {
+export function getCleanLedgerRow(): ServerLedgerRow {
     return {
         clientUUID: '',
         aliases: new Set<string>(),
@@ -86,6 +88,6 @@ export declare type UILedger = UILedgerRow[];
         timeMostRecentHand: 0,
         handsWon: 0,
         flopsSeen: 0,
-        handsDealtIn: 0
+        handsDealtIn: 0,
     };
 }

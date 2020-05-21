@@ -2,26 +2,17 @@ import { Service } from 'typedi';
 import {
     Condition,
     StateGraph,
-    Action,
-    Timeout,
-    EventType,
     GraphNode,
     GraphEdge,
     instanceOfCondition,
     StageDelayMap,
 } from '../../../ui/src/shared/models/stateGraph';
-import {
-    GameStage,
-    ServerStateKey,
-    QueuedServerAction,
-    ServerActionType,
-} from '../../../ui/src/shared/models/gameState';
-import { ActionType } from '../../../ui/src/shared/models/dataCommunication';
+import { GameStage, QueuedServerAction } from '../../../ui/src/shared/models/gameState';
+import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
-import { Subject } from 'rxjs';
 import { LedgerService } from './ledgerService';
 
 const MAX_CONDITION_DEPTH = 3;
@@ -34,12 +25,6 @@ export class StateGraphManager {
         private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
     ) {}
-
-    private stateGraphUpdateEmitter: Subject<void> = new Subject();
-
-    observeStateGraphUpdates() {
-        return this.stateGraphUpdateEmitter.asObservable();
-    }
 
     canContinueGameCondition: Condition = {
         fn: () => this.gameStateManager.canDealNextHand(),
@@ -75,24 +60,24 @@ export class StateGraphManager {
 
     stateGraph: Readonly<StateGraph> = {
         [GameStage.NOT_IN_PROGRESS]: new Map([
-            [ActionType.STARTGAME, this.canContinueGameCondition],
-            [ActionType.SITDOWN, this.canContinueGameCondition],
-            [ActionType.SITIN, this.canContinueGameCondition],
-            [ActionType.JOINTABLEANDSITDOWN, this.canContinueGameCondition],
+            [ClientActionType.STARTGAME, this.canContinueGameCondition],
+            [ClientActionType.SITDOWN, this.canContinueGameCondition],
+            [ClientActionType.SITIN, this.canContinueGameCondition],
+            [ClientActionType.JOINTABLEANDSITDOWN, this.canContinueGameCondition],
         ]),
-        [GameStage.INITIALIZE_NEW_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_HAND]]),
-        [GameStage.SHOW_START_OF_HAND]: new Map([['TIMEOUT', GameStage.SHOW_START_OF_BETTING_ROUND]]),
-        [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([['TIMEOUT', this.isAllInRunOutCondition]]),
-        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([['TIMEOUT', GameStage.WAITING_FOR_BET_ACTION]]),
+        [GameStage.INITIALIZE_NEW_HAND]: new Map([[ServerActionType.TIMEOUT, GameStage.SHOW_START_OF_HAND]]),
+        [GameStage.SHOW_START_OF_HAND]: new Map([[ServerActionType.TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND]]),
+        [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([[ServerActionType.TIMEOUT, this.isAllInRunOutCondition]]),
+        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([[ServerActionType.TIMEOUT, GameStage.WAITING_FOR_BET_ACTION]]),
         [GameStage.WAITING_FOR_BET_ACTION]: new Map([
-            [ActionType.BETACTION, GameStage.SHOW_BET_ACTION],
-            [ActionType.USETIMEBANK, GameStage.WAITING_FOR_BET_ACTION],
-            ['TIMEOUT' as any, GameStage.SHOW_BET_ACTION],
+            [ClientActionType.BETACTION, GameStage.SHOW_BET_ACTION],
+            [ClientActionType.USETIMEBANK, GameStage.WAITING_FOR_BET_ACTION],
+            [ServerActionType.TIMEOUT as any, GameStage.SHOW_BET_ACTION],
         ]),
-        [GameStage.SHOW_BET_ACTION]: new Map([['TIMEOUT', this.isBettingRoundOverCondition]]),
-        [GameStage.FINISH_BETTING_ROUND]: new Map([['TIMEOUT', this.isHandGamePlayOverCondition]]),
-        [GameStage.SHOW_WINNER]: new Map([['TIMEOUT', this.sidePotsRemainingCondition]]),
-        [GameStage.POST_HAND_CLEANUP]: new Map([['TIMEOUT', this.canContinueGameCondition]]),
+        [GameStage.SHOW_BET_ACTION]: new Map([[ServerActionType.TIMEOUT, this.isBettingRoundOverCondition]]),
+        [GameStage.FINISH_BETTING_ROUND]: new Map([[ServerActionType.TIMEOUT, this.isHandGamePlayOverCondition]]),
+        [GameStage.SHOW_WINNER]: new Map([[ServerActionType.TIMEOUT, this.sidePotsRemainingCondition]]),
+        [GameStage.POST_HAND_CLEANUP]: new Map([[ServerActionType.TIMEOUT, this.canContinueGameCondition]]),
     };
 
     stageDelayMap: StageDelayMap = {
@@ -115,13 +100,12 @@ export class StateGraphManager {
     }
 
     /**
-     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
      * @returns The graph edge that represents the state transition if the transition is defined,
      * null otherwise.
      */
-    getEdge(eventType: EventType): GraphEdge {
+    getEdge(actionType: ActionType): GraphEdge {
         const gameStage = this.gameStateManager.getGameStage();
-        const edge = this.stateGraph[gameStage].get(eventType);
+        const edge = this.stateGraph[gameStage].get(actionType);
 
         if (!!edge) {
             /* 
@@ -138,12 +122,11 @@ export class StateGraphManager {
     }
 
     /**
-     * @param eventType The type of the event that just occured. Either an ActionType or TIMEOUT.
      * @returns The next stage to transition to if the event/current stage represent a defined
      * state transition. Returns null otherwise.
      */
-    getNextStage(eventType: EventType): GraphNode {
-        let edge = this.getEdge(eventType);
+    getNextStage(actionType: ActionType): GraphNode {
+        let edge = this.getEdge(actionType);
         let conditionDepth = 0;
         if (!edge) {
             return null;
@@ -174,27 +157,15 @@ export class StateGraphManager {
     // - MessageService executes the action if valid.
     // - After executing the action, messageService calls this processEvent method.
     // - If the event is a defined state transition path, a state transition is executed.
-    processEvent(event: EventType) {
+    processStateTransitions(event: ActionType, timeoutCallback: () => void) {
         const nextStage = this.getNextStage(event);
         if (nextStage) {
             this.initializeGameStage(nextStage);
+            const delay = this.getDelay(nextStage);
+            if (delay) {
+                this.timerManager.setStateTimer(() => timeoutCallback(), delay);
+            }
         }
-        this.stateGraphUpdateEmitter.next();
-    }
-
-    processTimeout() {
-        // If the timer runs out and we are in the waiting for bet action stage, that means that
-        // the player time has run out. This is the only case where it is necessary to perform
-        // an action manually before transitioning to the next stage, and so this is the only case
-        // that slightly breaks the pattern. The alternative is to create an extra GameStage that
-        // a timeout could map to, but that's not ideal because its a more verbose solution,
-        // and transitioning from that intermediary stage to SHOW_BET_ACTION would require a
-        // no-op delay, which also breaks the pattern
-        if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
-            this.gamePlayService.timeOutPlayer();
-        }
-        this.gameStateManager.setUpdatedKeys(new Set([ServerStateKey.GAMESTATE]));
-        this.processEvent('TIMEOUT');
     }
 
     // The changes executed while entering a game stage should be general and applicable no matter
@@ -277,12 +248,6 @@ export class StateGraphManager {
                 break;
             }
         }
-
-        const delay = this.getDelay(stage);
-        if (delay) {
-            this.timerManager.setStateTimer(() => this.processTimeout(), delay);
-        }
-
         this.updateLedger();
     }
 
@@ -297,7 +262,7 @@ export class StateGraphManager {
 
     executeQueuedServerAction(action: QueuedServerAction) {
         switch (action.actionType) {
-            case ServerActionType.BOOT_PLAYER: {
+            case ClientActionType.BOOTPLAYER: {
                 const playerUUID = [...action.args][0];
                 this.gameStateManager.bootPlayerFromGame(playerUUID);
             }

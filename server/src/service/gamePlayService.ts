@@ -13,7 +13,7 @@ import { TimerManager } from './timerManager';
 import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
 
 import { AudioService } from './audioService';
-import { AnimationService } from '../service/animationService';
+import { AnimationService } from './animationService';
 
 import { printObj, logGameState, getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';

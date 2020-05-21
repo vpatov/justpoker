@@ -1,19 +1,25 @@
 import {
-    ClientWsMessage,
-    ActionType,
+    ClientActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
+    Event,
+    ClientAction,
+    ServerAction,
+    EventType,
+    ServerActionType,
+    createTimeoutEvent,
 } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
 import { GamePlayService } from './gamePlayService';
 import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
-import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
-import { BettingRoundStage } from '../../../ui/src/shared/models/game';
+import { GameInstanceManager } from './gameInstanceManager';
 import { logger } from '../server/logging';
+import { ConnectedClientManager } from '..//server/connectedClientManager';
 
 declare interface ActionProcessor {
     validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -21,30 +27,34 @@ declare interface ActionProcessor {
     updates: ServerStateKey[];
 }
 
-declare type MessageProcessor = { [key in ActionType]: ActionProcessor };
+declare type EventProcessor = {
+    [key in ClientActionType]: ActionProcessor;
+};
 
 @Service()
-export class MessageService {
+export class EventProcessorService {
     constructor(
         private readonly gameStateManager: GameStateManager,
         private readonly validationService: ValidationService,
         private readonly gamePlayService: GamePlayService,
         private readonly chatService: ChatService,
         private readonly stateGraphManager: StateGraphManager,
+        private readonly gameInstanceManager: GameInstanceManager,
+        private readonly connectedClientManager: ConnectedClientManager,
     ) {}
 
-    messageProcessor: MessageProcessor = {
-        [ActionType.STARTGAME]: {
+    eventProcessor: EventProcessor = {
+        [ClientActionType.STARTGAME]: {
             validation: (uuid, req) => this.validationService.validateStartGameRequest(uuid),
             perform: (uuid, req) => this.gamePlayService.startGame(),
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.STOPGAME]: {
+        [ClientActionType.STOPGAME]: {
             validation: (uuid, req) => this.validationService.validateStopGameRequest(uuid),
             perform: (uuid, req) => this.gamePlayService.stopGame(),
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.SITDOWN]: {
+        [ClientActionType.SITDOWN]: {
             validation: (uuid, req) => this.validationService.validateSitDownRequest(uuid, req),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
@@ -52,7 +62,7 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.SITOUT]: {
+        [ClientActionType.SITOUT]: {
             validation: (uuid, req) => this.validationService.validateSitOutAction(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
@@ -60,7 +70,7 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.SITIN]: {
+        [ClientActionType.SITIN]: {
             validation: (uuid, req) => this.validationService.validateSitInAction(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
@@ -69,7 +79,7 @@ export class MessageService {
             updates: [ServerStateKey.GAMESTATE],
         },
 
-        [ActionType.STANDUP]: {
+        [ClientActionType.STANDUP]: {
             validation: (uuid, req) => this.validationService.validateStandUpRequest(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
@@ -77,12 +87,12 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.JOINTABLE]: {
+        [ClientActionType.JOINTABLE]: {
             validation: (uuid, req) => this.validationService.validateJoinTableRequest(uuid, req),
             perform: (uuid, req) => this.gameStateManager.addNewPlayerToGame(uuid, req),
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.JOINTABLEANDSITDOWN]: {
+        [ClientActionType.JOINTABLEANDSITDOWN]: {
             validation: (uuid, req) => {
                 const response = this.validationService.validateJoinTableRequest(uuid, req);
                 if (hasError(response)) {
@@ -101,24 +111,24 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.PINGSTATE]: {
+        [ClientActionType.PINGSTATE]: {
             validation: (uuid, req) => NO_ERROR,
             perform: (uuid, req) => {},
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.BETACTION]: {
+        [ClientActionType.BETACTION]: {
             validation: (uuid, req) => this.validationService.validateBettingRoundAction(uuid, req),
             perform: (uuid, req) => this.gamePlayService.performBettingRoundAction(req),
             updates: [ServerStateKey.GAMESTATE, ServerStateKey.AUDIO],
         },
-        [ActionType.CHAT]: {
+        [ClientActionType.CHAT]: {
             validation: (uuid, req) => this.validationService.validateChatMessage(uuid, req),
             perform: (uuid, req) => {
                 this.chatService.processChatMessage(uuid, req);
             },
             updates: [ServerStateKey.CHAT],
         },
-        [ActionType.ADDCHIPS]: {
+        [ClientActionType.ADDCHIPS]: {
             validation: (_, __) => NO_ERROR,
             perform: (uuid, request) => {
                 this.validationService.ensureClientIsInGame(uuid);
@@ -127,7 +137,7 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.SETCHIPS]: {
+        [ClientActionType.SETCHIPS]: {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, request) => {
                 const player = this.gameStateManager.getPlayer(request.playerUUID);
@@ -135,7 +145,7 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.SETPLAYERSTRADDLE]: {
+        [ClientActionType.SETPLAYERSTRADDLE]: {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, req) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
@@ -143,46 +153,83 @@ export class MessageService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ActionType.BOOTPLAYER]: {
+        [ClientActionType.BOOTPLAYER]: {
             validation: (uuid, req: BootPlayerRequest) => this.validationService.validateBootPlayerAction(uuid, req),
             perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.bootPlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
         // TODO impement leave table
-        [ActionType.LEAVETABLE]: {
+        [ClientActionType.LEAVETABLE]: {
             validation: (uuid, req) => NO_ERROR,
             perform: () => null,
             updates: [],
         },
-        [ActionType.USETIMEBANK]: {
+        [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),
             perform: () => this.gamePlayService.useTimeBankAction(),
             updates: [ServerStateKey.GAMESTATE],
         },
     };
 
-    processMessage(message: ClientWsMessage, clientUUID: string) {
-        this.validationService.ensureClientExists(clientUUID);
-        const actionProcessor = this.messageProcessor[message.actionType];
-        const response = actionProcessor.validation(clientUUID, message.request);
-        this.gameStateManager.clearUpdatedKeys();
-        if (!hasError(response)) {
-            logger.debug(
-                `MessageService.processMessage. clientUUID: ${clientUUID}, actionType: ${
-                    message.actionType
-                }, messagePayload: ${JSON.stringify(message.request)}`,
-            );
-            actionProcessor.perform(clientUUID, message.request);
-            this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
-            this.stateGraphManager.processEvent(message.actionType);
-        } else {
-            // TODO process error and send error to client
-            logger.error(JSON.stringify(response));
+    processServerAction(serverAction: ServerAction) {
+        switch (serverAction.actionType) {
+            case ServerActionType.TIMEOUT: {
+                if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
+                    this.gamePlayService.timeOutPlayer();
+                }
+                break;
+            }
         }
+        this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }
 
-    // TODO should sitdown, standup, jointable, chat, add chips, be put into their own service?
-    // something like room service? or administrative service? how to name the aspects of gameplay
-    // that are not directly related to gameplay, and that can be done out of turn
-    // i.e. (sitting down, buying chips, talking)
+    processClientAction(clientAction: ClientAction) {
+        const { clientUUID, actionType, request } = clientAction;
+
+        let response = this.validationService.ensureClientExists(clientUUID);
+        if (hasError(response)) {
+            logger.error(JSON.stringify(response));
+            return;
+        }
+
+        const actionProcessor = this.eventProcessor[actionType];
+        response = actionProcessor.validation(clientUUID, request);
+
+        if (hasError(response)) {
+            logger.error(JSON.stringify(response));
+            return;
+        }
+
+        this.gameStateManager.clearUpdatedKeys();
+        actionProcessor.perform(clientUUID, clientAction.request);
+        this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
+    }
+
+    processEvent(event: Event) {
+        const { gameInstanceUUID, actionType } = event.body;
+
+        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
+        logger.debug(
+            `EventProcessorService.processEvent. gameInstanceUUID: ${gameInstanceUUID} ` +
+                `eventType: ${event.eventType}`,
+        );
+
+        switch (event.eventType) {
+            case EventType.SERVER_ACTION: {
+                this.processServerAction(event.body as ServerAction);
+                break;
+            }
+
+            case EventType.CLIENT_ACTION: {
+                this.processClientAction(event.body as ClientAction);
+                break;
+            }
+        }
+        this.stateGraphManager.processStateTransitions(actionType, () => {
+            this.processEvent(createTimeoutEvent(gameInstanceUUID));
+        });
+
+        this.connectedClientManager.sendStateToEachInGameInstance(gameInstanceUUID);
+        this.gameInstanceManager.resetEphemeralStates();
+    }
 }

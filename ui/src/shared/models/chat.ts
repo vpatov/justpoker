@@ -10,3 +10,9 @@ export declare interface ChatMessage {
     clientUUID: string;
     seatNumber: number;
 }
+
+export function getCleanChatLog(): ChatLog {
+    return {
+        messages: [],
+    };
+}

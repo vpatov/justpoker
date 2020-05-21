@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import classnames from 'classnames';
 import { WsServer } from './api/ws';
-import { ActionType } from './shared/models/dataCommunication';
+import { ClientActionType } from './shared/models/dataCommunication';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 
 import IconButton from '@material-ui/core/IconButton';
@@ -74,7 +74,7 @@ function OpenSeat(props) {
 
     function onSubmitSitDownForm() {
         WsServer.send({
-            actionType: ActionType.JOINTABLEANDSITDOWN,
+            actionType: ClientActionType.JOINTABLEANDSITDOWN,
             request: {
                 name,
                 buyin: Number(buyin),

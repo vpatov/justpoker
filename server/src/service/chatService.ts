@@ -22,6 +22,14 @@ export class ChatService {
         private readonly validationService: ValidationService,
     ) {}
 
+    loadChatState(cs: ChatLog) {
+        this.chatLog = cs;
+    }
+
+    getChatState(): ChatLog {
+        return this.chatLog;
+    }
+
     getMessage() {
         return this.lastMessage;
     }

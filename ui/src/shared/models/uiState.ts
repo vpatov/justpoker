@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ActionType, UiActionType } from './dataCommunication';
+import { ClientActionType, UiActionType } from './dataCommunication';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
@@ -8,6 +8,23 @@ import { UserPreferences } from './userPreferences';
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
 
+export declare interface ErrorDisplay {
+    message?: string;
+    redirect?: { url: string; text: string };
+}
+
+export declare interface Error {
+    error: ErrorDisplay;
+}
+
+export function getDefaultGame404(): Error {
+    return {
+        error: {
+            message: 'No game exists at this url.',
+            redirect: { url: '/', text: 'Create Game' },
+        },
+    };
+}
 export declare interface UiState {
     game: UiGameState;
     audio: SoundByte;
@@ -57,7 +74,7 @@ export declare interface SizingButton {
 
 export declare interface ActionButton {
     label: string;
-    action: ActionType;
+    action: ClientActionType;
     disabled?: boolean;
 }
 
@@ -69,7 +86,7 @@ export declare interface BettingRoundActionButton {
 
 export declare interface MenuButton {
     label: string;
-    action: ActionType | UiActionType;
+    action: ClientActionType | UiActionType;
 }
 
 export declare interface UiCard {
@@ -156,17 +173,17 @@ export const RAISE_BUTTON: BettingRoundActionButton = {
 };
 
 export const START_GAME_BUTTON: MenuButton = {
-    action: ActionType.STARTGAME,
+    action: ClientActionType.STARTGAME,
     label: 'Start Game',
 };
 
 export const STOP_GAME_BUTTON: MenuButton = {
-    action: ActionType.STOPGAME,
+    action: ClientActionType.STOPGAME,
     label: 'Stop Game',
 };
 
 export const LEAVE_TABLE_BUTTON: MenuButton = {
-    action: ActionType.LEAVETABLE,
+    action: ClientActionType.LEAVETABLE,
     label: 'Leave Table',
 };
 
@@ -188,7 +205,7 @@ export const ADMIN_BUTTON: MenuButton = {
 export const LEDGER_BUTTON: MenuButton = {
     action: UiActionType.OPEN_LEDGER,
     label: 'Ledger',
-}
+};
 
 export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
 
@@ -266,7 +283,7 @@ export function getCleanGame(): UiGameState {
 }
 
 export function getCleanChatMessage(): UiChatMessage {
-    return  {
+    return {
         senderName: '',
         content: '',
         timestamp: 0,

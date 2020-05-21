@@ -1,8 +1,9 @@
 import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
-
-import { Player } from './player';
-import { Table } from './table';
+import { Player, PlayerUUID } from './player';
 import { Card, Deck } from './cards';
+import { ClientActionType } from './dataCommunication';
+
+export declare type ClientUUID = string;
 
 export const enum GameStage {
     NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
@@ -14,16 +15,12 @@ export const enum GameStage {
     FINISH_BETTING_ROUND = 'FINISH_BETTING_ROUND',
     SHOW_WINNER = 'SHOW_WINNER',
     POST_HAND_CLEANUP = 'EJECT_STACKED_PLAYERS',
-    SET_CURRENT_PLAYER_TO_ACT = "SET_PLAYER_TO_ACT"
-}
-
-export const enum ServerActionType {
-    BOOT_PLAYER = 'BOOT_PLAYER',
+    SET_CURRENT_PLAYER_TO_ACT = 'SET_PLAYER_TO_ACT',
 }
 
 // TODO consider doing something similar to messageService for queuedActionsProcessor ?
 export declare interface QueuedServerAction {
-    actionType: ServerActionType;
+    actionType: ClientActionType;
     args: any[];
 }
 
@@ -67,10 +64,10 @@ export declare interface GameState {
     /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
     handWinners: Set<string>;
 
-    /** 
-     * This variable is checked before initializing a new hand. If it's true, and there are enough players, the 
-     * gameStage will proceed to INITIALIZE_NEW_HAND, the hand will be dealt, and gameplay will start. Otherwise, the 
-     * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently 
+    /**
+     * This variable is checked before initializing a new hand. If it's true, and there are enough players, the
+     * gameStage will proceed to INITIALIZE_NEW_HAND, the hand will be dealt, and gameplay will start. Otherwise, the
+     * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently
      * in progress - that is determined by the gameStage !== NOT_IN_PROGRESS, exposed in gsm.isGameInProgress().
      */
     shouldDealNextHand: Readonly<boolean>;
@@ -79,7 +76,10 @@ export declare interface GameState {
     deck: Readonly<Deck>;
 
     /** Sensitive field. */
-    table: Readonly<Table>;
+    admin: ClientUUID;
+
+    /** Sensitive field. */
+    activeConnections: Map<ClientUUID, ConnectedClient>;
 
     serverTime: Readonly<number>;
 
@@ -91,6 +91,11 @@ export declare interface GameState {
 
     /** The extra amount put into the pot by an all-in that was below the min-raise. */
     partialAllInLeftOver: number;
+}
+
+export declare interface ConnectedClient {
+    readonly uuid: ClientUUID;
+    readonly playerUUID: PlayerUUID;
 }
 
 export declare interface Pot {
@@ -136,20 +141,16 @@ export function getCleanGameState(): GameState {
         straddleUUID: '',
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: '',
+        admin: '',
         currentPlayerToAct: '',
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,
+        activeConnections: new Map(),
         deck: {
             cards: [],
         },
         pots: [],
         handWinners: new Set<string>(),
-        table: {
-            uuid: '',
-            activeConnections: new Map(),
-            password: '',
-            admin: '',
-        },
         timeCurrentPlayerTurnStarted: 0,
         timeBanksUsedThisAction: 0,
         serverTime: 0,

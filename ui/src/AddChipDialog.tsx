@@ -15,7 +15,7 @@ import { MAX_VALUES } from './shared/util/consts';
 import { Typography } from '@material-ui/core';
 
 import { WsServer } from './api/ws';
-import { ActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
+import { ClientActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -46,7 +46,7 @@ function AddChipDialog(props) {
 
     function onSubmit() {
         WsServer.send({
-            actionType: ActionType.SETCHIPS,
+            actionType: ClientActionType.SETCHIPS,
             request: {
                 chipAmount: resultingChips,
                 playerUUID: uuid,

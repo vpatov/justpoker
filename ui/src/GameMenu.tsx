@@ -7,7 +7,7 @@ import { selectMenuButtons } from './store/selectors';
 import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
 import SettingsDialog from './SettingsDialog';
-import { ActionType, UiActionType, ClientWsMessageRequest, EndPoint } from './shared/models/dataCommunication';
+import { ClientActionType, UiActionType, ClientWsMessageRequest, EndPoint } from './shared/models/dataCommunication';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -73,9 +73,9 @@ function getIcon(action, iconClass) {
         [UiActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
         [UiActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
         [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
-        [ActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
-        [ActionType.STOPGAME]: <StopIcon className={iconClass} />,
-        [ActionType.STARTGAME]: <StartIcon className={iconClass} />,
+        [ClientActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
+        [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,
+        [ClientActionType.STARTGAME]: <StartIcon className={iconClass} />,
     };
     return ACTION_TO_ICON[action];
 }
@@ -106,10 +106,10 @@ function GameMenu(props) {
 
     const handleOpenLedger = () => {
         const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
-        const gameUUID = queryParams.gameUUID || null;
-        const stringifiedUrl = queryString.stringifyUrl({url: EndPoint.LEDGER, query: {gameUUID}});
-        window.open(stringifiedUrl, "_blank");
-    }
+        const gameInstanceUUID = queryParams.gameInstanceUUID || null;
+        const stringifiedUrl = queryString.stringifyUrl({ url: EndPoint.LEDGER, query: { gameInstanceUUID } });
+        window.open(stringifiedUrl, '_blank');
+    };
 
     function handleClickButton(action) {
         switch (action) {
@@ -123,14 +123,14 @@ function GameMenu(props) {
             case UiActionType.OPEN_LEDGER:
                 handleOpenLedger();
                 break;
-            case ActionType.LEAVETABLE:
-                sendServerAction(ActionType.LEAVETABLE);
+            case ClientActionType.LEAVETABLE:
+                sendServerAction(ClientActionType.LEAVETABLE);
                 break;
-            case ActionType.STARTGAME:
-                sendServerAction(ActionType.STARTGAME);
+            case ClientActionType.STARTGAME:
+                sendServerAction(ClientActionType.STARTGAME);
                 break;
-            case ActionType.STOPGAME:
-                sendServerAction(ActionType.STOPGAME);
+            case ClientActionType.STOPGAME:
+                sendServerAction(ClientActionType.STOPGAME);
                 break;
             default:
                 break;

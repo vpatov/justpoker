@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { Service, Container } from 'typedi';
 
-import util from 'util';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import express from 'express';
@@ -9,19 +8,22 @@ import bodyParser from 'body-parser';
 import queryString from 'query-string';
 
 import { AddressInfo } from 'net';
-import { MessageService } from '../service/messageService';
-import { GameStateManager } from '../service/gameStateManager';
+import { EventProcessorService } from '../service/eventProcessorService';
 import { StateConverter } from '../service/stateConverter';
-import { generateUUID, logGameState, printObj, getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { AudioService } from '../service/audioService';
-import { AnimationService } from '../service/animationService';
-import { LedgerService } from '../service/ledgerService';
-import { WSParams, EndPoint } from '../../../ui/src/shared/models/dataCommunication';
+import { GameInstanceManager } from '../service/gameInstanceManager';
 
-import { ChatService } from '../service/chatService';
-import { StateGraphManager } from '../service/stateGraphManager';
-import { NewGameForm } from '../../../ui/src/shared/models/table';
+import {
+    NewGameForm,
+    EndPoint,
+    ClientAction,
+    Event,
+    EventType,
+    ClientWsMessage,
+} from '../../../ui/src/shared/models/dataCommunication';
+
 import { logger } from './logging';
+import { ConnectedClientManager } from './connectedClientManager';
+import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -40,7 +42,6 @@ class Server {
     server: http.Server;
     defaultPort = 8080;
     wss: WebSocket.Server;
-    tableInitialized = false;
     performanceMetrics: PerformanceMetrics = {
         snippets: {
             MESSAGE_SERVICE_PROCESS_MESSAGE: [0, 0],
@@ -50,14 +51,10 @@ class Server {
     };
 
     constructor(
-        private messageService: MessageService,
-        private gsm: GameStateManager,
+        private eventProcessorService: EventProcessorService,
         private stateConverter: StateConverter,
-        private stateGraphManager: StateGraphManager,
-        private readonly chatService: ChatService,
-        private readonly audioService: AudioService,
-        private readonly animationService: AnimationService,
-        private readonly ledgerService: LedgerService,
+        private readonly gameInstanceManager: GameInstanceManager,
+        private readonly connectedClientManager: ConnectedClientManager,
     ) {}
 
     updateSnippet(snippet: ExecutionSnippet, ms: number) {
@@ -77,7 +74,7 @@ class Server {
         });
     }
 
-    private initRoutes(): void {
+    private initHTTPRoutes(): void {
         const router = express.Router();
 
         router.get('/', (req, res) => {
@@ -93,13 +90,11 @@ class Server {
                 password: req.body.password,
                 timeToAct: req.body.timeToAct,
             };
-            const gameUUID = this.gsm.initGame(newGameForm);
-            this.ledgerService.clearLedger();
-            this.initWSSListeners();
-            this.chatService.clearMessages();
-            this.tableInitialized = true;
-            logger.info(`GameUUID: ${gameUUID}`);
-            res.send(JSON.stringify({ gameUUID: gameUUID }));
+            const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(newGameForm);
+            this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
+
+            logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
+            res.send(JSON.stringify({ gameInstanceUUID: gameInstanceUUID }));
         });
 
         this.app.use(bodyParser.json());
@@ -113,105 +108,98 @@ class Server {
     }
 
     sendGameUpdatesToClients() {
-        for (const client of this.gsm.getConnectedClients()) {
-            const ws = client.websockets.get(EndPoint.GAME);
-            if (ws) {
-                const res = this.stateConverter.getUIState(client.uuid, false);
-                const jsonRes = JSON.stringify(res);
-                ws.send(jsonRes);
-            }
-        }
+        const activeGameInstanceUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
+        this.connectedClientManager.sendStateToEachInGroup(activeGameInstanceUUID);
     }
 
-    sendLedgerUpdatesToClients() {
-        for (const client of this.gsm.getConnectedClients()) {
-            const ws = client.websockets.get(EndPoint.LEDGER);
-            if (ws) {
-                const res = { ledger: this.ledgerService.convertServerLedgerToUILedger() };
-                const jsonRes = JSON.stringify(res);
-                ws.send(jsonRes);
-            }
-        }
-    }
-
-    //refactor this mess of a function
-    initWSSListeners() {
-        this.wss.removeAllListeners();
-        this.wss.on('connection', (ws: WebSocket, req) => {
-            const ip = req.connection.remoteAddress;
-            const parsedQuery = queryString.parseUrl(req.url);
-            const queryParams: WSParams = {
-                clientUUID: parsedQuery.query.clientUUID as string,
-                gameUUID: parsedQuery.query.gameUUID as string,
-                endpoint: parsedQuery.query.endpoint as EndPoint,
-            };
-
-            const clientUUID = queryParams.clientUUID || generateUUID();
-            logger.info(
-                `Connected to clientUUID: ${clientUUID}, gameUUID: ${queryParams.gameUUID}, endpoint: ${queryParams.endpoint}, IP Address: ${ip}`,
-            );
-            // TODO server shouldnt be communicating with the gameStateManager, but with some
-            // other intermediary that will handle WS robustness
-            this.gsm.initConnectedClient(clientUUID, ws, queryParams.endpoint);
-            ws.send(JSON.stringify({ clientUUID: clientUUID }));
-
-            switch (queryParams.endpoint) {
-                case EndPoint.GAME: {
-                    ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
-                    ws.on('message', (data: WebSocket.Data) => this.processGameMessage(ws, data, clientUUID));
-                    logger.info(`Sent initial GAME message to client: ${clientUUID}`);
-                    break;
-                }
-
-                case EndPoint.LEDGER: {
-                    ws.send(JSON.stringify({ ledger: this.ledgerService.convertServerLedgerToUILedger() }));
-                    logger.info(`Sent initial LEDGER message to client: ${clientUUID}`);
-                    break;
-                }
-
-                default: {
-                    logger.error(`Endpoint ${queryParams.endpoint} is not available.`);
-                    throw Error(`Endpoint ${queryParams.endpoint} is not available.`);
-                }
-            }
-        });
-    }
-
-    private processGameMessage(ws: WebSocket, data: WebSocket.Data, clientUUID: string) {
+    private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
         logger.info(`Incoming Game Message: ${data}`);
+
+        // TODO typeof check seems not the best way to do this
         if (typeof data === 'string') {
             try {
-                const receivedMessageTime = Date.now();
-                const action = JSON.parse(data);
-                this.messageService.processMessage(action, clientUUID);
-                const msgServiceProcessMsgTime = Date.now() - receivedMessageTime;
-                this.updateSnippet(ExecutionSnippet.PROCESS_MSG, msgServiceProcessMsgTime);
-                this.logAverages();
-            } catch (e) {
-                logger.error(`EXCEPTION: ${e} GameState:  ${getLoggableGameState(this.gsm.getGameState())}`);
+                const wsMessage: ClientWsMessage = JSON.parse(data);
+                const event: Event = {
+                    eventType: EventType.CLIENT_ACTION,
+                    body: {
+                        gameInstanceUUID,
+                        clientUUID,
+                        actionType: wsMessage.actionType,
+                        request: wsMessage.request,
+                    } as ClientAction,
+                };
 
-                // TODO should we throw an exception here?
-                // throw e;
+                this.eventProcessorService.processEvent(event);
+            } catch (e) {
+                logger.error(e);
             }
         } else {
             logger.error('Received data of an unsupported type.');
         }
     }
 
+    initGameWSS() {
+        this.wss = new WebSocket.Server({ server: this.server });
+        this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
+            const ip = req.connection.remoteAddress;
+            logger.info(`WS connection request from: ${ip}`);
+
+            const parsedQuery = queryString.parseUrl(req.url);
+            const clientUUID = parsedQuery.query.clientUUID as string;
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
+            const endpoint = parsedQuery.query.endpoint as string;
+
+            // TODO, I don't think we should pass the endpoint in the body, rather match across the actual url
+            switch (endpoint) {
+                case EndPoint.GAME: {
+                    this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
+                    return;
+                }
+                default: {
+                    const errorMessage = `No websocket interaction at url: ${req.url}`;
+                    logger.error(errorMessage);
+                    ws.close(404, errorMessage);
+                }
+            }
+        });
+    }
+
+    onConnectionToGame(ws: WebSocket, gameInstanceUUID: string, clientUUID: string) {
+        // if game is not in instanceManager then send 404
+        // TODO implement FE for this
+        if (!this.gameInstanceManager.doesGameExist(gameInstanceUUID)) {
+            ws.send(JSON.stringify(getDefaultGame404()));
+            return;
+        }
+        // if a uuid was not sent by client (that is there is no session) then create one
+        if (!clientUUID) {
+            clientUUID = this.connectedClientManager.createClientSessionInGroup(gameInstanceUUID, ws);
+        } else {
+            // if there is a session replace old websocket
+            // TODO define app behavior in scenario when user accesses same game in two browser tabs.
+            this.connectedClientManager.updateClientSessionInGroup(gameInstanceUUID, clientUUID, ws);
+        }
+        logger.info(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
+
+        // add client to game instance
+        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
+        this.gameInstanceManager.addClientToGameInstance(gameInstanceUUID, clientUUID);
+
+        // send init state to newly connected client
+        // TODO can remove server's dependency on stateConverter by processing an event here,
+        // the event being a server action like GAME_INIT or something.
+        ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
+
+        // maybe this should be done else where?
+        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameInstanceUUID));
+    }
+
     //refactor this mess of a function
     init() {
         this.app = express();
-        this.initRoutes();
+        this.initHTTPRoutes();
         this.server = http.createServer(this.app);
-        this.wss = new WebSocket.Server({ server: this.server });
-
-        this.stateGraphManager.observeStateGraphUpdates().subscribe(() => {
-            this.sendGameUpdatesToClients();
-            this.sendLedgerUpdatesToClients();
-            this.audioService.reset();
-            this.animationService.reset();
-            this.chatService.clearLastMessage();
-        });
+        this.initGameWSS();
 
         this.server.listen(process.env.PORT || this.defaultPort, () => {
             const port = this.server.address() as AddressInfo;
