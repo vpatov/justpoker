@@ -204,5 +204,12 @@ export const CUSTOM_THEME = {
                 padding: '0.8vmin',
             },
         },
+        MuiFormHelperText: {
+            root: {
+                position: ' absolute',
+                top: '10%',
+                right: 0,
+            },
+        },
     },
 };
