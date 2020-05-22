@@ -4,12 +4,13 @@ import CountUp from 'react-countup';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import classnames from 'classnames';
+import TablePositionIndicator from './TablePositionIndicator';
 
 const useStyles = makeStyles((theme) => ({
     stackCont: {
         width: '100%',
         marginTop: '-1vmin',
-
+        position: 'relative',
         ...theme.custom.STACK,
     },
     toAct: {
@@ -75,7 +76,15 @@ function PlayerStack(props) {
                 [classes.winner]: winner,
             })}
         >
-            {button ? <Typography className={classes.buttonR}>{'★'}</Typography> : null}
+            {button ? (
+                <TablePositionIndicator
+                    type="button"
+                    style={{
+                        position: 'absolute',
+                        transform: 'translateY(-50%) translateX(50%)',
+                    }}
+                />
+            ) : null}
             <Typography variant="h4" className={classes.stack}>
                 {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
             </Typography>

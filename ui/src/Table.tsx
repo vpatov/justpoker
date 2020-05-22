@@ -4,6 +4,7 @@ import OpenSeat from './OpenSeat';
 import EmptySeat from './EmptySeat';
 import Bet from './Bet';
 import PotTable from './PotTable';
+import TablePositionIndicator from './TablePositionIndicator';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
