@@ -59,7 +59,19 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
     const classes = useStyles();
     const { className, style, setHeroRotation, virtualPositon } = props;
-    const { stack, hand, name, toAct, playerTimer, winner, button, folded, uuid, sittingOut, hero } = props.player;
+    const {
+        stack,
+        hand,
+        name,
+        toAct,
+        playerTimer,
+        winner,
+        positionIndicator,
+        folded,
+        uuid,
+        sittingOut,
+        hero,
+    } = props.player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -96,7 +108,13 @@ function Player(props) {
             ) : (
                 <Hand hand={hand} />
             )}
-            <PlayerStack toAct={toAct} name={name} stack={stack} button={button} winner={winner} />
+            <PlayerStack
+                toAct={toAct}
+                name={name}
+                stack={stack}
+                positionIndicator={positionIndicator}
+                winner={winner}
+            />
             <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} hero={hero} /> : null}</div>
         </div>
     );

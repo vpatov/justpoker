@@ -66,7 +66,7 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, button, winner, toAct } = props;
+    const { stack, name, positionIndicator, winner, toAct } = props;
     const prevStack = usePrevious(stack);
 
     return (
@@ -76,15 +76,7 @@ function PlayerStack(props) {
                 [classes.winner]: winner,
             })}
         >
-            {button ? (
-                <TablePositionIndicator
-                    type="button"
-                    style={{
-                        position: 'absolute',
-                        transform: 'translateY(-50%) translateX(50%)',
-                    }}
-                />
-            ) : null}
+            {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <Typography variant="h4" className={classes.stack}>
                 {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
             </Typography>

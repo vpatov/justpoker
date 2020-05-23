@@ -124,7 +124,7 @@ export declare interface UiPlayer {
     sittingOut?: boolean;
     folded?: boolean;
     toAct?: boolean;
-    button?: boolean;
+    positionIndicator?: PositionIndicator;
     winner?: boolean;
     bet?: number;
     handLabel?: string;
@@ -132,6 +132,12 @@ export declare interface UiPlayer {
     hand: {
         cards: UiCard[];
     };
+}
+
+export enum PositionIndicator {
+    BUTTON = 'BUTTON',
+    BIG_BLIND = 'BIG_BLIND',
+    SMALL_BLIND = 'SMALL_BLIND',
 }
 
 export declare interface UiChatMessage {
@@ -433,6 +439,7 @@ export const TestGame: UiGameState = {
             stack: 323,
 
             bet: genRandomInt(0, 1000),
+            positionIndicator: PositionIndicator.SMALL_BLIND,
 
             hand: {
                 cards: [
@@ -452,7 +459,7 @@ export const TestGame: UiGameState = {
         // },
 
         {
-            button: true,
+            positionIndicator: PositionIndicator.BUTTON,
             name: 'Marvinminwhich Lorgrikiski',
             position: positions[4],
             stack: 323,
@@ -476,6 +483,7 @@ export const TestGame: UiGameState = {
             stack: 43020,
             uuid: 'TEST_UUID_2',
             bet: genRandomInt(0, 1000000),
+            positionIndicator: PositionIndicator.BIG_BLIND,
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
@@ -486,6 +494,7 @@ export const TestGame: UiGameState = {
             position: positions[7],
             sittingOut: true,
             bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK),
+
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },

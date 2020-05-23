@@ -20,6 +20,7 @@ import {
     UiCard,
     MenuButton,
     LEDGER_BUTTON,
+    PositionIndicator,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -333,12 +334,33 @@ export class StateConverter {
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
             bet: player.betAmount,
-            button: this.gameStateManager.getDealerUUID() === player.uuid,
+            positionIndicator: this.getPlayerPositionIndicator(player.uuid),
             winner: player.winner,
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
         };
         return uiPlayer;
+    }
+
+    getPlayerPositionIndicator(playerUUID: string): PositionIndicator | undefined {
+        if (!this.gameStateManager.isGameInProgress()) {
+            return undefined;
+        }
+        const dealer = this.gameStateManager.getDealerUUID();
+        const smallBlind = this.gameStateManager.getSmallBlindUUID();
+        const bigBlind = this.gameStateManager.getBigBlindUUID();
+
+        switch (playerUUID) {
+            case dealer:
+                return PositionIndicator.BUTTON;
+            case smallBlind:
+                return PositionIndicator.SMALL_BLIND;
+            case bigBlind:
+                return PositionIndicator.BIG_BLIND;
+            default:
+                break;
+        }
+        return undefined;
     }
 
     getUIState(clientUUID: string, sendAll: boolean): UiState {
