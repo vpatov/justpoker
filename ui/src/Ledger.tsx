@@ -5,8 +5,9 @@ import { getLedger } from './api/http';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { UILedger, UILedgerRow } from './shared/models/ledger';
+import { ErrorDisplay } from './shared/models/uiState';
 import { parseHTTPParams } from './shared/util/util';
-
+import ErrorMessage from './ErrorMessage';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -42,9 +43,20 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const useStylesLedger = makeStyles((theme) => ({
+    root: {
+        height: '100vh',
+        width: '100vw',
+        color: 'white',
+        ...theme.custom.BACKGROUND,
+    },
+}));
+
 function Ledger(props) {
+    const classes = useStylesLedger();
     const [ledger, setLedger] = useState<UILedger>([]);
     const queryParams = parseHTTPParams(queryString.parseUrl(props.location.search));
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         document.title = 'Ledger';
@@ -52,15 +64,27 @@ function Ledger(props) {
     }, []);
 
     const onFetchLedgerSuccess = (response) => {
-        const ledger = get(response, 'data.ledger');
-        setLedger(ledger);
+        const error = get(response, 'data.error', false);
+        if (error) {
+            setError(error);
+        } else {
+            const ledger = get(response, 'data.ledger', []);
+            setLedger(ledger);
+        }
     };
 
     const onFetchLedgerFailure = (err) => {
         console.log(err);
     };
 
-    return <LedgerTable ledger={ledger} />;
+    function render() {
+        if (error !== false) {
+            return <ErrorMessage errorDisplay={error as ErrorDisplay} />;
+        }
+        return <LedgerTable ledger={ledger} />;
+    }
+
+    return <div className={classes.root}>{render()}</div>;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {

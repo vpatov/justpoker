@@ -100,8 +100,12 @@ class Server {
             const parsedQuery = queryString.parseUrl(req.url);
             const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
             const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
-
-            res.send({ ledger: ledger });
+            if (!ledger) {
+                logger.info(`ledger not found for ${gameInstanceUUID}`);
+                res.send(JSON.stringify(getDefaultGame404()));
+            } else {
+                res.send({ ledger: ledger });
+            }
         });
 
         this.app.use(bodyParser.json());

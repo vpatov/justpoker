@@ -48,7 +48,10 @@ export class GameInstanceManager {
         this.gameStateManager.initConnectedClient(clientUUID);
     }
 
-    getGameInstance(gameInstanceUUID: string): GameInstance | undefined {
+    getGameInstance(gameInstanceUUID: string): GameInstance | boolean {
+        if (!this.doesGameExist(gameInstanceUUID)) {
+            return false;
+        }
         return this.gameInstances[gameInstanceUUID];
     }
 
@@ -77,17 +80,17 @@ export class GameInstanceManager {
             this.saveActiveGameInstance();
         }
         const gi = this.getGameInstance(gameInstanceUUID);
-        logger.info(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
-
         if (!gi) {
             // TODO error path
         }
-        this.gameStateManager.loadGameState(gi.gameState);
-        this.chatService.loadChatState(gi.chatLog);
-        this.audioService.loadAudioState(gi.audioQueue);
-        this.animationService.loadAnimationState(gi.animationState);
-        this.ledgerService.loadLedger(gi.ledger);
-        this.timerManager.loadStateTimer(gi.stateTimer);
+        logger.info(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
+        const gameInstance = gi as GameInstance;
+        this.gameStateManager.loadGameState(gameInstance.gameState);
+        this.chatService.loadChatState(gameInstance.chatLog);
+        this.audioService.loadAudioState(gameInstance.audioQueue);
+        this.animationService.loadAnimationState(gameInstance.animationState);
+        this.ledgerService.loadLedger(gameInstance.ledger);
+        this.timerManager.loadStateTimer(gameInstance.stateTimer);
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 
@@ -98,7 +101,10 @@ export class GameInstanceManager {
     }
 
     // no need to load entire game instance as no update
-    getLedgerForGameInstance(gameInstanceUUID: string): UILedger | undefined {
+    getLedgerForGameInstance(gameInstanceUUID: string): UILedger | boolean {
+        if (!this.doesGameExist(gameInstanceUUID)) {
+            return false;
+        }
         const ledgerState = this.gameInstances[gameInstanceUUID].ledger;
         return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
     }
