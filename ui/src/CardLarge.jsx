@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { usePrevious } from './utils';
+import { animateWinningCards } from './AnimiationModule';
 import { generateStringFromSuit, generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
@@ -40,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
     },
     partOfWinningHand: {
         transform: 'translateY(33%)',
-        transition: 'transform 0.5s ease-in-out',
         ...theme.custom.WINNING_CARD,
     },
     [SUITS.HEARTS]: {
@@ -61,10 +62,18 @@ function CardLarge(props) {
     const classes = useStyles();
     const { suit, rank, partOfWinningHand, className } = props;
 
+    const prevWinner = usePrevious(partOfWinningHand);
+    useEffect(() => {
+        if (!prevWinner && partOfWinningHand) {
+            animateWinningCards();
+        }
+    }, [prevWinner, partOfWinningHand]);
+
     return (
         <div
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
+                ['ani_notWinningCard']: !partOfWinningHand,
             })}
         >
             <Typography

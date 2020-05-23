@@ -426,7 +426,6 @@ export const TestGame: UiGameState = {
             name: 'Marty Shakus',
             position: positions[1],
             stack: 425320,
-            winner: true,
             uuid: 'TEST_UUID_1',
             bet: genRandomInt(0, 100),
             hand: {
@@ -437,10 +436,9 @@ export const TestGame: UiGameState = {
             name: 'Dean Markus',
             position: positions[2],
             stack: 323,
-
+            winner: true,
             bet: genRandomInt(0, 1000),
             positionIndicator: PositionIndicator.SMALL_BLIND,
-
             hand: {
                 cards: [
                     { ...genRandomCard(), partOfWinningHand: true },

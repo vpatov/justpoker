@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
+
 import Hand from './Hand';
 import PlayerStack from './PlayerStack';
 import { makeStyles } from '@material-ui/core/styles';

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { WsServer } from './api/ws';
 import { AnimationTrigger } from './shared/models/animationState';
+import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
 
@@ -96,6 +97,19 @@ export function animateAwardPot(winnerUUID, potId) {
         easing: 'easeInOutExpo',
     });
     // setTimeout(() => a.reset(), duration);
+    return a;
+}
+
+export function animateWinningCards() {
+    const duration = 1000;
+
+    const a = anime({
+        targets: [`.ani_notWinningCard`],
+        filter: ['brightness(1)', 'brightness(0.2)'],
+        duration: duration,
+        easing: 'easeInOutExpo',
+    });
+    // setTimeout(() => a.reset(), resetDuration);
     return a;
 }
 
