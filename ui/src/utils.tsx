@@ -32,14 +32,12 @@ export function generateStringFromRank(rank) {
     return rank;
 }
 
-export function usePrevious(value) {
-    // The ref object is a generic container whose current property is mutable ...
-    // ... and can hold any value, similar to an instance property on a class
-    const ref = useRef();
-    // Store current value in ref
+export function usePrevious<T>(value: T): T {
+    const ref = useRef<T>();
     useEffect(() => {
         ref.current = value;
-    }, [value]); // Only re-run if value changes
-    // Return previous value (happens before update in useEffect above)
-    return ref.current;
+    }, [value]);
+    return ref.current as T;
 }
+
+export default usePrevious;

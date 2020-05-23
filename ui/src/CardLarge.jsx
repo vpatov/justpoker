@@ -62,6 +62,9 @@ function CardLarge(props) {
     const classes = useStyles();
     const { suit, rank, partOfWinningHand, className } = props;
 
+    // this function could be located in many different componets
+    // we could also do it at a global level, maybe the animation module is peforming these diff?
+    // or we could do it explictly as part of the backend animation flow
     const prevWinner = usePrevious(partOfWinningHand);
     useEffect(() => {
         if (!prevWinner && partOfWinningHand) {
