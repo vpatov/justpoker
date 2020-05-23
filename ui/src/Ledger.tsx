@@ -52,7 +52,6 @@ function Ledger(props) {
     }, []);
 
     const onFetchLedgerSuccess = (response) => {
-        console.log(response);
         const ledger = get(response, 'data.ledger');
         setLedger(ledger);
     };
@@ -209,7 +208,6 @@ function LedgerTable(props) {
 
     const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
-    console.log(ledger);
     return (
         <div className={classes.root}>
             <Paper className={classes.paper}>

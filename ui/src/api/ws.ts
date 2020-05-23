@@ -7,7 +7,6 @@ import {
     ClientActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
-    EndPoint,
     WSParams,
 } from '../shared/models/dataCommunication';
 
@@ -20,7 +19,7 @@ export class WsServer {
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
 
-    static openWs(gameInstanceUUID: string, endpoint: EndPoint) {
+    static openWs(gameInstanceUUID: string) {
         console.log('opening ws...');
         const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
         const wsURI = {
@@ -28,7 +27,6 @@ export class WsServer {
             query: {
                 clientUUID: docCookies.getItem(clientUUID) || null,
                 gameInstanceUUID: gameInstanceUUID || null,
-                endpoint: endpoint || null,
             } as ParsedQuery,
         };
 

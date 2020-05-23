@@ -24,11 +24,6 @@ export declare interface ServerAction extends BaseAction {
     actionType: ServerActionType;
 }
 
-export enum EndPoint {
-    GAME = 'game',
-    LEDGER = 'ledger',
-}
-
 export declare interface WSParams {
     clientUUID: string;
     gameInstanceUUID: string;

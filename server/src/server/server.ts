@@ -14,7 +14,6 @@ import { GameInstanceManager } from '../service/gameInstanceManager';
 
 import {
     NewGameForm,
-    EndPoint,
     ClientAction,
     Event,
     EventType,
