@@ -172,7 +172,6 @@ function ControllerComp(props: ControllerProps) {
     }
 
     function performBettingRoundAction(betActionType) {
-        console.log(betActionType);
         if (toAct) {
             sendBettingRoundAction(betActionType);
         } else {
