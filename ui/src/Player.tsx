@@ -107,7 +107,7 @@ function Player(props) {
                     <Typography className={classes.sittingOutText}>Sitting Out</Typography>
                 </Typography>
             ) : (
-                <Hand hand={hand} />
+                <Hand hand={hand} folded={folded} hero={hero} />
             )}
             <PlayerStack
                 toAct={toAct}
