@@ -101,7 +101,7 @@ export function animateAwardPot(winnerUUID, potId) {
 }
 
 export function animateWinningCards() {
-    const duration = 1000;
+    const duration = 800;
 
     const a = anime({
         targets: [`.ani_notWinningCard`],

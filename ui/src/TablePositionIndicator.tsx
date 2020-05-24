@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             justifyContent: 'space-evenly',
             alignItems: 'center',
-            border: '0.4vmin dashed white',
+            border: '0.17vmin solid white',
             transform: 'translateY(-50%) translateX(50%)',
             boxShadow: '0 0 4px 1px rgba(0,0,0,0.5)',
         },
