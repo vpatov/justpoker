@@ -64,7 +64,7 @@ export function dealCards() {
     const [x, y] = getCenterOfTable();
 
     const a = anime({
-        targets: ['.ani_playerCard_0', '.ani_playerCard_1'],
+        targets: ['.ani_playerCard_0', '.ani_playerCard_1', '.ani_playerCard_2', '.ani_playerCard_3'],
         translateX: (target) => {
             return [x - target.getBoundingClientRect().x, 0];
         },
