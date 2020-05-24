@@ -22,7 +22,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import FlipIcon from '@material-ui/icons/FlipSharp';
 import { useLocation } from 'react-router';
-
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         hoverArea: {

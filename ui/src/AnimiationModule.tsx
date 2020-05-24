@@ -113,6 +113,19 @@ export function animateWinningCards() {
     return a;
 }
 
+export function animateTimeBankButton() {
+    const duration = 350;
+    const loops = 4;
+    const angle = 7;
+    const a = anime({
+        targets: [`.ani_timeBank`],
+        rotate: [angle, 0, -1 * angle, 0],
+        duration: duration,
+        loop: loops,
+        easing: 'linear',
+    });
+}
+
 // utility functions
 
 function getCenterOfRef(ref) {

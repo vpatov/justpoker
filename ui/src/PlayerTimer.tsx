@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import { playTimerWarning } from './AudioModule';
+import { animateTimeBankButton } from './AnimiationModule';
+
 import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
@@ -75,6 +77,7 @@ function PlayerTimer(props) {
     if (hero && !playedWarning && secondsRemaining < 6) {
         setPlayedWarning(true);
         playTimerWarning();
+        animateTimeBankButton();
     }
 
     return (

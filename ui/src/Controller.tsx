@@ -9,7 +9,6 @@ import {
     bettingRoundActionTypesToUnqueueSelector,
     isHeroSeatedSelector,
 } from './store/selectors';
-import TextFieldWrap from './reuseable/TextFieldWrap';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -280,7 +279,7 @@ function ControllerComp(props: ControllerProps) {
                 ) : null}
                 {heroSeated ? (
                     <Button
-                        className={classes.timeBankButton}
+                        className={classnames(classes.timeBankButton, 'ani_timeBank')}
                         variant="outlined"
                         onClick={() => onClickTimeBank()}
                         disabled={timeBanks === 0}
