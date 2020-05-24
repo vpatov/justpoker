@@ -93,7 +93,7 @@ class Server {
             this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
 
             logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
-            res.send(JSON.stringify({ gameInstanceUUID: gameInstanceUUID }));
+            res.send({ gameInstanceUUID: gameInstanceUUID });
         });
 
         router.get('/ledger', (req, res) => {
@@ -102,7 +102,7 @@ class Server {
             const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
             if (!ledger) {
                 logger.info(`ledger not found for ${gameInstanceUUID}`);
-                res.send(JSON.stringify(getDefaultGame404()));
+                res.send(getDefaultGame404());
             } else {
                 res.send({ ledger: ledger });
             }

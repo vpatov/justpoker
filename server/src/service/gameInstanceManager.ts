@@ -48,9 +48,9 @@ export class GameInstanceManager {
         this.gameStateManager.initConnectedClient(clientUUID);
     }
 
-    getGameInstance(gameInstanceUUID: string): GameInstance | boolean {
+    getGameInstance(gameInstanceUUID: string): GameInstance | undefined {
         if (!this.doesGameExist(gameInstanceUUID)) {
-            return false;
+            return undefined;
         }
         return this.gameInstances[gameInstanceUUID];
     }
@@ -101,9 +101,9 @@ export class GameInstanceManager {
     }
 
     // no need to load entire game instance as no update
-    getLedgerForGameInstance(gameInstanceUUID: string): UILedger | boolean {
+    getLedgerForGameInstance(gameInstanceUUID: string): UILedger | undefined {
         if (!this.doesGameExist(gameInstanceUUID)) {
-            return false;
+            return undefined;
         }
         const ledgerState = this.gameInstances[gameInstanceUUID].ledger;
         return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
