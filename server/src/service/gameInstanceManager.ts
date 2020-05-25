@@ -38,7 +38,7 @@ export class GameInstanceManager {
         return gameInstanceUUID;
     }
 
-    doesGameExist(gameInstanceUUID: string): boolean {
+    doesGameInstanceExist(gameInstanceUUID: string): boolean {
         if (this.gameInstances[gameInstanceUUID]) return true;
         return false;
     }
@@ -49,7 +49,7 @@ export class GameInstanceManager {
     }
 
     getGameInstance(gameInstanceUUID: string): GameInstance | undefined {
-        if (!this.doesGameExist(gameInstanceUUID)) {
+        if (!this.doesGameInstanceExist(gameInstanceUUID)) {
             return undefined;
         }
         return this.gameInstances[gameInstanceUUID];
@@ -102,7 +102,7 @@ export class GameInstanceManager {
 
     // no need to load entire game instance as no update
     getLedgerForGameInstance(gameInstanceUUID: string): UILedger | undefined {
-        if (!this.doesGameExist(gameInstanceUUID)) {
+        if (!this.doesGameInstanceExist(gameInstanceUUID)) {
             return undefined;
         }
         const ledgerState = this.gameInstances[gameInstanceUUID].ledger;

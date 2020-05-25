@@ -166,7 +166,7 @@ class Server {
     onConnectionToGame(ws: WebSocket, gameInstanceUUID: string, clientUUID: string) {
         // if game is not in instanceManager then send 404
         // TODO implement FE for this
-        if (!this.gameInstanceManager.doesGameExist(gameInstanceUUID)) {
+        if (!this.gameInstanceManager.doesGameInstanceExist(gameInstanceUUID)) {
             ws.send(JSON.stringify(getDefaultGame404()));
             return;
         }
