@@ -154,7 +154,7 @@ class Server {
         this.wss = new WebSocket.Server({ server: this.server });
         this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             const ip = req.connection.remoteAddress;
-            logger.verbose(`WS connection request from: ${ip}`);
+            logger.verbose(`WS connection request from: ${ip} on url: ${req.url}`);
 
             const parsedQuery = queryString.parseUrl(req.url);
             const clientUUID = parsedQuery.query.clientUUID as string;
@@ -175,6 +175,8 @@ class Server {
         // if a uuid was not sent by client (that is there is no session) then create one
         if (!clientUUID) {
             clientUUID = this.connectedClientManager.createClientSessionInGroup(gameInstanceUUID, ws);
+            // send back clientUUID for client to store
+            ws.send(JSON.stringify({ clientUUID: clientUUID }));
         } else {
             // if there is a session replace old websocket
             // TODO define app behavior in scenario when user accesses same game in two browser tabs.
