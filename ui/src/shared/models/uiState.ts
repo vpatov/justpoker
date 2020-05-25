@@ -235,7 +235,6 @@ export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [1, 3],
     [1, 2],
     [2, 3],
-    [1, 1],
 ];
 
 export function getCleanUiChatLog(): UiChatLog {

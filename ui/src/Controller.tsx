@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         gameInfoCont: {
             marginLeft: '2vw',
+            width: '8vw',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',

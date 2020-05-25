@@ -74,7 +74,7 @@ function PlayerTimer(props) {
         clearInterval(timer);
     }
 
-    if (hero && !playedWarning && secondsRemaining < 6) {
+    if (hero && !playedWarning && secondsRemaining < 8) {
         setPlayedWarning(true);
         playTimerWarning();
         animateTimeBankButton();
@@ -87,15 +87,6 @@ function PlayerTimer(props) {
             })}
         >
             <Typography className={classes.secondsRemaining}>{Math.floor(secondsRemaining)}</Typography>
-            {/* <LinearProgress
-                color="primary"
-                variant="determinate"
-                value={completed}
-                className={classes.linearTimer}
-                classes={{
-                    root: classes.linearTimerRoot,
-                }}
-            /> */}
         </div>
     );
 }

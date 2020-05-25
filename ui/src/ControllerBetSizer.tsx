@@ -171,7 +171,6 @@ function Default(props) {
                         className={classes.slider}
                         onChange={(e, val) => onChange(val as number)}
                         value={value}
-                        step={min}
                         min={min}
                         max={max}
                         valueLabelDisplay="off"

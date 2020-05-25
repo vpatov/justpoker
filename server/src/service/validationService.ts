@@ -341,7 +341,7 @@ export class ValidationService {
         const minimumBet = this.gsm.getMinimumBetSizeForPlayer(player.uuid);
 
         if (this.gsm.getGameType() === GameType.PLOMAHA) {
-            const maximumBetSize = this.gsm.getMaxPotLimitBetSize();
+            const maximumBetSize = this.gsm.getPotSizedBetForPlayer(player.uuid);
             if (betAmount > maximumBetSize) {
                 return {
                     errorType: ErrorType.ILLEGAL_BETTING_ACTION,
