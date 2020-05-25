@@ -18,7 +18,7 @@ import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameSta
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
 import { GameInstanceManager } from './gameInstanceManager';
-import { logger } from '../logger';
+import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '..//server/connectedClientManager';
 
 declare interface ActionProcessor {
@@ -171,6 +171,7 @@ export class EventProcessorService {
         },
     };
 
+    @debugFunc()
     processServerAction(serverAction: ServerAction) {
         switch (serverAction.actionType) {
             case ServerActionType.TIMEOUT: {
@@ -183,6 +184,7 @@ export class EventProcessorService {
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }
 
+    @debugFunc()
     processClientAction(clientAction: ClientAction) {
         const { clientUUID, actionType, request } = clientAction;
 
@@ -205,6 +207,7 @@ export class EventProcessorService {
         this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
     }
 
+    @debugFunc()
     processEvent(event: Event) {
         const { gameInstanceUUID, actionType } = event.body;
 

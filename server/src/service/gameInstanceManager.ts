@@ -29,7 +29,7 @@ export class GameInstanceManager {
         private readonly timerManager: TimerManager,
     ) {}
 
-    @debugFunc
+    @debugFunc()
     createNewGameInstance(newGameForm: NewGameForm) {
         const gameInstanceUUID = generateUUID();
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
@@ -60,7 +60,7 @@ export class GameInstanceManager {
         return this.activeGameInstanceUUID;
     }
 
-    @debugFunc
+    @debugFunc()
     saveActiveGameInstance() {
         const activeGameInstance = {
             gameState: this.gameStateManager.getGameState(),
@@ -73,7 +73,7 @@ export class GameInstanceManager {
         this.gameInstances[this.activeGameInstanceUUID] = activeGameInstance;
     }
 
-    @debugFunc
+    @debugFunc()
     loadGameInstance(gameInstanceUUID: string) {
         if (this.gameInstances[this.activeGameInstanceUUID]) {
             this.saveActiveGameInstance();
@@ -93,7 +93,7 @@ export class GameInstanceManager {
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 
-    @debugFunc
+    @debugFunc()
     resetEphemeralStates() {
         this.audioService.reset();
         this.animationService.reset();

@@ -107,13 +107,13 @@ class Server {
         this.app.use('/', router);
     }
 
-    @debugFunc
+    @debugFunc()
     sendGameUpdatesToClients() {
         const activeGameInstanceUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
         this.connectedClientManager.sendStateToEachInGroup(activeGameInstanceUUID);
     }
 
-    @debugFunc
+    @debugFunc()
     private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
         logger.verbose(`Incoming Game Message: ${data}`);
 

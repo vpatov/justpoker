@@ -37,31 +37,41 @@ const options = {
         ),
     },
 };
-// new winston.transports.File({ filename: 'error.log', level: 'error' }),
-// new winston.transports.File({ filename: 'combined.log' }),
-// new winston.transports.Console({ format: winston.format.simple() }),
 
 export const logger = winston.createLogger({
     transports: [new winston.transports.File(options.errorFile), new winston.transports.Console(options.consoleDebug)],
     exitOnError: false, // do not exit on handled exceptions
 });
 
-export function debugFunc(target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
-    const original = descriptor.value;
-    if (typeof original === 'function') {
-        descriptor.value = function (...args: any[]) {
-            logger.debug(`CALL ${String(key)} \t WITH: ${JSON.stringify(args)}`);
-            try {
-                const result = original.apply(this, args);
-                logger.debug(`RTRN: ${String(key)} \t RSLT: ${JSON.stringify(result)}`);
-                return result;
-            } catch (e) {
-                logger.debug(`RTRN: ${String(key)} \t ERRR: ${e}`);
-                throw e;
-            }
-        };
-    }
-    return descriptor;
+export interface DebugFuncParams {
+    noCall?: boolean; // supress logging of function call
+    noRtrn?: boolean; // supress logging of function return
+    noArgs?: boolean; // supress logging of function argunments
+    noRslt?: boolean; // supress logging of function result
+}
+
+export function debugFunc(params?: DebugFuncParams) {
+    return function decorator(target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
+        const original = descriptor.value;
+        if (typeof original === 'function') {
+            descriptor.value = function (...args: any[]) {
+                let startMessage = `CALL: ${String(key)}`;
+                if (!params.noArgs) startMessage += `\t ARGS: ${JSON.stringify(args)}`;
+                logger.debug(startMessage);
+                try {
+                    const result = original.apply(this, args);
+                    let finishMessage = `RTRN ${String(key)}`;
+                    if (!params.noRslt) finishMessage += `\t RSLT: ${JSON.stringify(result)}`;
+                    logger.debug(finishMessage);
+                    return result;
+                } catch (e) {
+                    logger.debug(`RTRN: ${String(key)} \t ERRR: ${e}`);
+                    throw e;
+                }
+            };
+        }
+        return descriptor;
+    };
 }
 
 export default logger;

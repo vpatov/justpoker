@@ -1,7 +1,6 @@
 import { Service } from 'typedi';
-import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
-import { GameState, ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 
 import {
     UiState,
@@ -29,17 +28,15 @@ import {
     Global,
     Controller,
     getCleanController,
-    ActionButton,
     SizingButton,
     COMMON_BB_SIZINGS,
     COMMON_POT_SIZINGS,
 } from '../../../ui/src/shared/models/uiState';
-import { ValidationService, hasError } from './validationService';
-import { AudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
-import { EventProcessorService } from './eventProcessorService';
+import { SoundByte } from '../../../ui/src/shared/models/audioQueue';
 import { AnimationService } from './animationService';
-
 import { ChatService } from './chatService';
+
+import { debugFunc } from '../logger';
 
 declare interface CardInformation {
     hand: {
@@ -76,6 +73,7 @@ export class StateConverter {
     }
 
     // Hero refers to the player who is receiving this particular UiState.
+    @debugFunc({ noRslt: true })
     transformGameStateToUIState(clientUUID: string, sendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
