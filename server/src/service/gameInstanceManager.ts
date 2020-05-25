@@ -9,8 +9,8 @@ import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
 import { LedgerService } from './ledgerService';
 import { TimerManager } from './timerManager';
-import { logger } from '../server/logging';
-import { ServerLedger, UILedger } from '../../../ui/src/shared/models/ledger';
+import { UILedger } from '../../../ui/src/shared/models/ledger';
+import { logger, debugFunc } from '../logger';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -30,6 +30,7 @@ export class GameInstanceManager {
         private readonly timerManager: TimerManager,
     ) {}
 
+    @debugFunc()
     createNewGameInstance(newGameForm: NewGameForm) {
         const gameInstanceUUID = generateUUID();
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
@@ -63,6 +64,7 @@ export class GameInstanceManager {
         return this.activeGameInstanceUUID;
     }
 
+    @debugFunc()
     saveActiveGameInstance() {
         const activeGameInstance = {
             gameState: this.gameStateManager.getGameState(),
@@ -75,11 +77,14 @@ export class GameInstanceManager {
         this.gameInstances[this.activeGameInstanceUUID] = activeGameInstance;
     }
 
+    @debugFunc()
     loadGameInstance(gameInstanceUUID: string) {
         if (this.gameInstances[this.activeGameInstanceUUID]) {
             this.saveActiveGameInstance();
         }
         const gi = this.getGameInstance(gameInstanceUUID);
+        logger.verbose(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
+
         if (!gi) {
             // TODO error path
         }
@@ -94,6 +99,7 @@ export class GameInstanceManager {
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 
+    @debugFunc()
     resetEphemeralStates() {
         this.audioService.reset();
         this.animationService.reset();

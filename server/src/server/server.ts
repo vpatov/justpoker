@@ -20,7 +20,7 @@ import {
     ClientWsMessage,
 } from '../../../ui/src/shared/models/dataCommunication';
 
-import { logger } from './logging';
+import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
 
@@ -117,13 +117,15 @@ class Server {
         this.app.use('/', router);
     }
 
+    @debugFunc()
     sendGameUpdatesToClients() {
         const activeGameInstanceUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
         this.connectedClientManager.sendStateToEachInGroup(activeGameInstanceUUID);
     }
 
+    @debugFunc()
     private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
-        logger.info(`Incoming Game Message: ${data}`);
+        logger.verbose(`Incoming Game Message: ${data}`);
 
         // TODO typeof check seems not the best way to do this
         if (typeof data === 'string') {
@@ -152,7 +154,7 @@ class Server {
         this.wss = new WebSocket.Server({ server: this.server });
         this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             const ip = req.connection.remoteAddress;
-            logger.info(`WS connection request from: ${ip}`);
+            logger.verbose(`WS connection request from: ${ip}`);
 
             const parsedQuery = queryString.parseUrl(req.url);
             const clientUUID = parsedQuery.query.clientUUID as string;
@@ -178,7 +180,7 @@ class Server {
             // TODO define app behavior in scenario when user accesses same game in two browser tabs.
             this.connectedClientManager.updateClientSessionInGroup(gameInstanceUUID, clientUUID, ws);
         }
-        logger.info(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
+        logger.verbose(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
 
         // add client to game instance
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
@@ -199,10 +201,9 @@ class Server {
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
         this.initGameWSS();
-
         this.server.listen(process.env.PORT || this.defaultPort, () => {
             const port = this.server.address() as AddressInfo;
-            logger.info(`Server started on address ${JSON.stringify(port)} :)`);
+            logger.info(`Server started on address `, port);
         });
     }
 }

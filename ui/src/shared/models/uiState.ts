@@ -124,7 +124,7 @@ export declare interface UiPlayer {
     sittingOut?: boolean;
     folded?: boolean;
     toAct?: boolean;
-    button?: boolean;
+    positionIndicator?: PositionIndicator;
     winner?: boolean;
     bet?: number;
     handLabel?: string;
@@ -132,6 +132,12 @@ export declare interface UiPlayer {
     hand: {
         cards: UiCard[];
     };
+}
+
+export enum PositionIndicator {
+    BUTTON = 'BUTTON',
+    BIG_BLIND = 'BIG_BLIND',
+    SMALL_BLIND = 'SMALL_BLIND',
 }
 
 export declare interface UiChatMessage {
@@ -229,7 +235,6 @@ export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [1, 3],
     [1, 2],
     [2, 3],
-    [1, 1],
 ];
 
 export function getCleanUiChatLog(): UiChatLog {
@@ -420,7 +425,6 @@ export const TestGame: UiGameState = {
             name: 'Marty Shakus',
             position: positions[1],
             stack: 425320,
-            winner: true,
             uuid: 'TEST_UUID_1',
             bet: genRandomInt(0, 100),
             hand: {
@@ -431,9 +435,9 @@ export const TestGame: UiGameState = {
             name: 'Dean Markus',
             position: positions[2],
             stack: 323,
-
+            winner: true,
             bet: genRandomInt(0, 1000),
-
+            positionIndicator: PositionIndicator.SMALL_BLIND,
             hand: {
                 cards: [
                     { ...genRandomCard(), partOfWinningHand: true },
@@ -452,7 +456,7 @@ export const TestGame: UiGameState = {
         // },
 
         {
-            button: true,
+            positionIndicator: PositionIndicator.BUTTON,
             name: 'Marvinminwhich Lorgrikiski',
             position: positions[4],
             stack: 323,
@@ -476,6 +480,7 @@ export const TestGame: UiGameState = {
             stack: 43020,
             uuid: 'TEST_UUID_2',
             bet: genRandomInt(0, 1000000),
+            positionIndicator: PositionIndicator.BIG_BLIND,
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
@@ -486,6 +491,7 @@ export const TestGame: UiGameState = {
             position: positions[7],
             sittingOut: true,
             bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK),
+
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },

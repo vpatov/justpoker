@@ -27,7 +27,7 @@ import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
-import { logger } from '../server/logging';
+import { logger } from '../logger';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -219,8 +219,8 @@ export class GameStateManager {
             this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
         } else {
             logger.warning(
-                'gameStateManager.setPlayerChips has been called with a chip amount ' +
-                    "that is less than the player's current stack. This is either a bug, or being used for development",
+                `gameStateManager.setPlayerChips has been called with a chip amount that is less than the player's 
+                current stack. This is either a bug, or being used for development`,
             );
         }
 
@@ -427,8 +427,9 @@ export class GameStateManager {
         return minimumBetSize > player.chips ? player.chips : minimumBetSize;
     }
 
-    getMaxPotLimitBetSize() {
-        return this.getFullPot() + this.getPreviousRaise() * 2;
+    getPotSizedBetForPlayer(playerUUID: string) {
+        const player = this.getPlayer(playerUUID);
+        return this.getFullPot() + this.getPreviousRaise() * 2 - player.betAmount;
     }
 
     shouldDealNextHand() {

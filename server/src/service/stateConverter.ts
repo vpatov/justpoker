@@ -1,7 +1,6 @@
 import { Service } from 'typedi';
-import { Card } from '../../../ui/src/shared/models/cards';
 import { Player } from '../../../ui/src/shared/models/player';
-import { GameState, ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 
 import {
     UiState,
@@ -20,6 +19,7 @@ import {
     UiCard,
     MenuButton,
     LEDGER_BUTTON,
+    PositionIndicator,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -29,17 +29,15 @@ import {
     Global,
     Controller,
     getCleanController,
-    ActionButton,
     SizingButton,
     COMMON_BB_SIZINGS,
     COMMON_POT_SIZINGS,
 } from '../../../ui/src/shared/models/uiState';
-import { ValidationService, hasError } from './validationService';
-import { AudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
-import { EventProcessorService } from './eventProcessorService';
+import { SoundByte } from '../../../ui/src/shared/models/audioQueue';
 import { AnimationService } from './animationService';
-
 import { ChatService } from './chatService';
+
+import { debugFunc } from '../logger';
 
 declare interface CardInformation {
     hand: {
@@ -76,6 +74,7 @@ export class StateConverter {
     }
 
     // Hero refers to the player who is receiving this particular UiState.
+    @debugFunc({ noResult: true })
     transformGameStateToUIState(clientUUID: string, sendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
@@ -168,14 +167,26 @@ export class StateConverter {
 
             const minBetButton = this.createMinBetButton(minBet);
             const allInButton = this.createAllInButton(maxBet);
+            const gameType = this.gameStateManager.getGameType();
+            const bbButtons = this.createBBSizeButtons(bbValue, minBet);
+            const potFractionButtons = this.createPotSizeButtons(fullPot, curBet, curCall, minBet, COMMON_POT_SIZINGS);
+            const potButton = this.createPotSizeButtons(fullPot, curBet, curCall, minBet, [[1, 1]]);
 
-            if (bettingRoundStage === BettingRoundStage.PREFLOP || bettingRoundStage === BettingRoundStage.WAITING) {
-                // normal preflop sizings
-                const bbButtons = this.createBBSizeButtons(bbValue, minBet);
-                return [minBetButton, ...bbButtons, allInButton];
-            } else {
-                const potButtons = this.createPotSizeButtons(fullPot, curBet, curCall, minBet);
-                return [minBetButton, ...potButtons, allInButton];
+            switch (gameType) {
+                case GameType.NLHOLDEM:
+                    if (
+                        bettingRoundStage === BettingRoundStage.PREFLOP ||
+                        bettingRoundStage === BettingRoundStage.WAITING
+                    ) {
+                        return [minBetButton, ...bbButtons, allInButton];
+                    } else {
+                        return [minBetButton, ...potFractionButtons, ...potButton, allInButton];
+                    }
+                    break;
+                case GameType.PLOMAHA:
+                    return [minBetButton, ...potFractionButtons, ...potButton];
+                default:
+                    return [];
             }
         };
 
@@ -197,7 +208,10 @@ export class StateConverter {
 
     getMaxBetSizeForPlayer(playerUUID: string) {
         return this.gameStateManager.getGameType() === GameType.PLOMAHA
-            ? this.gameStateManager.getMaxPotLimitBetSize()
+            ? Math.min(
+                  this.gameStateManager.getPotSizedBetForPlayer(playerUUID),
+                  this.gameStateManager.getPlayer(playerUUID).chips,
+              )
             : this.gameStateManager.getPlayer(playerUUID).chips;
     }
 
@@ -333,12 +347,33 @@ export class StateConverter {
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
             bet: player.betAmount,
-            button: this.gameStateManager.getDealerUUID() === player.uuid,
+            positionIndicator: this.getPlayerPositionIndicator(player.uuid),
             winner: player.winner,
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
         };
         return uiPlayer;
+    }
+
+    getPlayerPositionIndicator(playerUUID: string): PositionIndicator | undefined {
+        if (!this.gameStateManager.isGameInProgress()) {
+            return undefined;
+        }
+        const dealer = this.gameStateManager.getDealerUUID();
+        const smallBlind = this.gameStateManager.getSmallBlindUUID();
+        const bigBlind = this.gameStateManager.getBigBlindUUID();
+
+        switch (playerUUID) {
+            case dealer:
+                return PositionIndicator.BUTTON;
+            case smallBlind:
+                return PositionIndicator.SMALL_BLIND;
+            case bigBlind:
+                return PositionIndicator.BIG_BLIND;
+            default:
+                break;
+        }
+        return undefined;
     }
 
     getUIState(clientUUID: string, sendAll: boolean): UiState {
@@ -347,9 +382,15 @@ export class StateConverter {
         return uiState;
     }
 
-    createPotSizeButtons(fullPot: number, curBet: number, curCall: number, minBet: number): SizingButton[] {
+    createPotSizeButtons(
+        fullPot: number,
+        curBet: number,
+        curCall: number,
+        minBet: number,
+        sizings: [number, number][],
+    ): SizingButton[] {
         const buttons: SizingButton[] = [];
-        COMMON_POT_SIZINGS.forEach(([numerator, denominator]) => {
+        sizings.forEach(([numerator, denominator]) => {
             const fraction = numerator / denominator;
             const betAmt = (fullPot + curBet - curCall) * fraction + curBet;
             buttons.push({

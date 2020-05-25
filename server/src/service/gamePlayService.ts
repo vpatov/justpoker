@@ -19,7 +19,7 @@ import { printObj, logGameState, getLoggableGameState } from '../../../ui/src/sh
 import { hasError, ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
-import { logger } from '../server/logging';
+import { logger } from '../logger';
 
 @Service()
 export class GamePlayService {

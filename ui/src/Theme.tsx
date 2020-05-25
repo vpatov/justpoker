@@ -36,7 +36,7 @@ export const CUSTOM_THEME = {
             backgroundColor: red['A700'],
         },
         DIAMONDS: {
-            backgroundColor: indigo[800],
+            backgroundColor: indigo[900],
         },
         SPADES: {
             backgroundColor: grey[800],
@@ -77,7 +77,6 @@ export const CUSTOM_THEME = {
         },
         WINNING_CARD: {
             transition: 'boxShadow 0.4s ease-in-out, transform 0.4s ease-in-out ',
-            boxShadow: `0px 0px 6px 2px white`,
         },
         CONTROLLER: {
             backgroundColor: grey[900],
@@ -202,6 +201,13 @@ export const CUSTOM_THEME = {
         MuiCheckbox: {
             root: {
                 padding: '0.8vmin',
+            },
+        },
+        MuiFormHelperText: {
+            root: {
+                position: ' absolute',
+                top: '10%',
+                right: 0,
             },
         },
     },
