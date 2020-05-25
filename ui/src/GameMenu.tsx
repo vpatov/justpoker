@@ -4,7 +4,6 @@ import queryString from 'query-string';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
 import { selectMenuButtons } from './store/selectors';
-import { flipTable } from './AnimiationModule';
 import { WsServer } from './api/ws';
 import SettingsDialog from './SettingsDialog';
 import { ClientActionType, UiActionType, ClientWsMessageRequest, EndPoint } from './shared/models/dataCommunication';
@@ -23,7 +22,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import FlipIcon from '@material-ui/icons/FlipSharp';
 import { useLocation } from 'react-router';
-
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         hoverArea: {

@@ -74,7 +74,6 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '3vmin',
     },
     partOfWinningHand: {
-        transition: 'all 0.5s ease-in-out',
         ...theme.custom.WINNING_CARD,
     },
     [SUITS.HEARTS]: {
@@ -108,6 +107,7 @@ function CardSmall(props) {
         <div
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
+                ['ani_notWinningCard']: !partOfWinningHand,
                 [classes.sideCard]: shouldFlex,
             })}
         >

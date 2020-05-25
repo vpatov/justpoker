@@ -37,9 +37,7 @@ function ControllerWarningDialog(props) {
             <DialogTitle>{`Confirm Fold`}</DialogTitle>
             <DialogContent>
                 <Typography className={classes.text}>
-                    This is an unnecessary fold. Currently, you can stay in the hand at no cost by checking. The only
-                    benefit to this play is that you may intimidate your opponents by showing your total disreagrd for
-                    standard poker strategy.
+                    This is an unnecessary fold. Currently, you can stay in the hand at no cost by checking.
                 </Typography>
                 <Typography className={classes.text}>Are you sure?</Typography>
             </DialogContent>

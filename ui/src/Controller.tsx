@@ -9,7 +9,6 @@ import {
     bettingRoundActionTypesToUnqueueSelector,
     isHeroSeatedSelector,
 } from './store/selectors';
-import TextFieldWrap from './reuseable/TextFieldWrap';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -21,6 +20,7 @@ import { Typography } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game';
 
 import ControllerWarningDialog from './ControllerWarningDialog';
+import ControllerBetSizer from './ControllerBetSizer';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,14 +29,14 @@ const useStyles = makeStyles((theme: Theme) =>
             right: 0,
             bottom: 0,
             display: 'flex',
-            justifyContent: 'space-around',
+            justifyContent: 'space-between',
             alignItems: 'center',
             color: 'white',
             ...theme.custom.CONTROLLER,
         },
         gameInfoCont: {
             marginLeft: '2vw',
-            width: '20%',
+            width: '8vw',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -51,9 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
         },
         adminButtonCont: {
-            marginLeft: '2vw',
             marginRight: '2vw',
-            width: '30%',
             float: 'right',
             height: '100%',
             display: 'flex',
@@ -62,53 +60,16 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'flex-end',
         },
         betActionsCont: {
+            width: '50%',
             marginRight: '2vw',
             height: '100%',
             display: 'flex',
             justifyContent: 'space-evenly',
             alignItems: 'center',
         },
-        bettingCont: {
-            marginRight: '2vmin',
-            height: '100%',
-            width: '80%',
-            display: 'flex',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            flexDirection: 'column',
-        },
-        sizingButtonsCont: {
-            display: 'flex',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-        },
-        betInput: {
-            paddingRight: 50,
-            paddingTop: 25,
-        },
-        amounts: {
-            width: '100%',
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-evenly',
-        },
-
-        betFieldButtonCont: {
-            width: '100%',
-            display: 'flex',
-        },
-        betTextField: {
-            flexGrow: 1,
-            width: '5vmin',
-            marginRight: '1vmin',
-        },
-        betTextFieldInput: {
-            fontSize: '1.5vmin',
-        },
         actionButton: {
             height: '40%',
-            width: '10vmin',
+            width: '12vmin',
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
         },
@@ -119,22 +80,8 @@ const useStyles = makeStyles((theme: Theme) =>
         checkLabel: {
             fontSize: '1.4vmin',
         },
-        incButton: {
-            padding: 0,
-            fontSize: '2vmin',
-            fontWeight: 'bold',
-            width: '2vw',
-        },
-        incButtonLeft: {
-            marginRight: '1vmin',
-        },
         adminButton: {
             fontSize: '1.4vmin',
-        },
-        sizeButton: {
-            margin: 6,
-            fontSize: '1vmin',
-            width: '4vw',
         },
         handLabel: {
             marginTop: '2vmin',
@@ -247,11 +194,6 @@ function ControllerComp(props: ControllerProps) {
         changeBetAmount(0);
     }
 
-    function isBetValid() {
-        if (0 < betAmt && betAmt < min) return true;
-        return false;
-    }
-
     function onClickTimeBank() {
         WsServer.send({
             actionType: ClientActionType.USETIMEBANK,
@@ -306,57 +248,14 @@ function ControllerComp(props: ControllerProps) {
                         );
                     })}
                 </div>
-                <div className={classes.bettingCont}>
-                    {sizingButtons.length > 0 ? (
-                        <Fragment>
-                            <div className={classes.betFieldButtonCont}>
-                                <TextFieldWrap
-                                    className={classes.betTextField}
-                                    InputProps={{
-                                        classes: {
-                                            input: classes.betTextFieldInput,
-                                        },
-                                    }}
-                                    onChange={(event) => setBetAmt(event.target.value)}
-                                    min={0}
-                                    max={max}
-                                    value={betAmt}
-                                    type="number"
-                                    autoFocus={true}
-                                    error={isBetValid()}
-                                    helperText={isBetValid() ? `Minimum Bet is ${min}` : ''}
-                                />
-                                <div className={classes.incrementCont}>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => changeBetAmount(betAmt - min)}
-                                        className={classnames(classes.incButton, classes.incButtonLeft)}
-                                    >
-                                        -
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => changeBetAmount(betAmt + min)}
-                                        className={classnames(classes.incButton)}
-                                    >
-                                        +
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className={classes.sizingButtonsCont}>
-                                {sizingButtons.map((button) => (
-                                    <Button
-                                        variant="outlined"
-                                        className={classes.sizeButton}
-                                        onClick={(e) => changeBetAmount(button.value)}
-                                    >
-                                        {button.label}
-                                    </Button>
-                                ))}
-                            </div>
-                        </Fragment>
-                    ) : null}
-                </div>
+                <ControllerBetSizer
+                    sizingButtons={sizingButtons}
+                    min={min}
+                    max={max}
+                    value={betAmt}
+                    onChange={(val) => changeBetAmount(val)}
+                    onClickActionButton={onClickActionButton}
+                />
             </div>
             <div className={classes.adminButtonCont}>
                 <FormControlLabel
@@ -381,7 +280,7 @@ function ControllerComp(props: ControllerProps) {
                 ) : null}
                 {heroSeated ? (
                     <Button
-                        className={classes.timeBankButton}
+                        className={classnames(classes.timeBankButton, 'ani_timeBank')}
                         variant="outlined"
                         onClick={() => onClickTimeBank()}
                         disabled={timeBanks === 0}

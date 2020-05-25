@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 export const SUITS = {
     HEARTS: 'HEARTS',
     SPADES: 'SPADES',
@@ -29,3 +31,13 @@ export function generateStringFromRank(rank) {
     if (rank === 'T') return '10';
     return rank;
 }
+
+export function usePrevious<T>(value: T): T {
+    const ref = useRef<T>();
+    useEffect(() => {
+        ref.current = value;
+    }, [value]);
+    return ref.current as T;
+}
+
+export default usePrevious;
