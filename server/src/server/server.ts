@@ -21,7 +21,7 @@ import {
     ClientWsMessage,
 } from '../../../ui/src/shared/models/dataCommunication';
 
-import { logger } from '../logger';
+import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
 
@@ -107,11 +107,13 @@ class Server {
         this.app.use('/', router);
     }
 
+    @debugFunc
     sendGameUpdatesToClients() {
         const activeGameInstanceUUID = this.gameInstanceManager.getActiveGameInstanceUUID();
         this.connectedClientManager.sendStateToEachInGroup(activeGameInstanceUUID);
     }
 
+    @debugFunc
     private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
         logger.verbose(`Incoming Game Message: ${data}`);
 
