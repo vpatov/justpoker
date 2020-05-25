@@ -427,8 +427,9 @@ export class GameStateManager {
         return minimumBetSize > player.chips ? player.chips : minimumBetSize;
     }
 
-    getMaxPotLimitBetSize() {
-        return this.getFullPot() + this.getPreviousRaise() * 2;
+    getPotSizedBetForPlayer(playerUUID: string) {
+        const player = this.getPlayer(playerUUID);
+        return this.getFullPot() + this.getPreviousRaise() * 2 - player.betAmount;
     }
 
     shouldDealNextHand() {

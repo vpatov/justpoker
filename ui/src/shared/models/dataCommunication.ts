@@ -2,7 +2,7 @@ import { BettingRoundAction, GameType } from './game';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
-    CLIENT_ACTION = 'CLIENT_ACTION'
+    CLIENT_ACTION = 'CLIENT_ACTION',
 }
 
 export declare type EventBody = ClientAction | ServerAction;
@@ -23,7 +23,6 @@ export declare interface ClientAction extends BaseAction {
 export declare interface ServerAction extends BaseAction {
     actionType: ServerActionType;
 }
-
 
 export enum EndPoint {
     GAME = 'game',
@@ -130,12 +129,12 @@ export declare interface NewGameForm {
     adminOptions?: any;
 }
 
-export function createTimeoutEvent(gameInstanceUUID: string): Event{
-    return  {
+export function createTimeoutEvent(gameInstanceUUID: string): Event {
+    return {
         eventType: EventType.SERVER_ACTION,
         body: {
             actionType: ServerActionType.TIMEOUT,
-            gameInstanceUUID
-        } as ServerAction
+            gameInstanceUUID,
+        } as ServerAction,
     };
 }

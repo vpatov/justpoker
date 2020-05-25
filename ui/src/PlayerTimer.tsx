@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import { playTimerWarning } from './AudioModule';
+import { animateTimeBankButton } from './AnimiationModule';
+
 import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
@@ -72,9 +74,10 @@ function PlayerTimer(props) {
         clearInterval(timer);
     }
 
-    if (hero && !playedWarning && secondsRemaining < 6) {
+    if (hero && !playedWarning && secondsRemaining < 8) {
         setPlayedWarning(true);
         playTimerWarning();
+        animateTimeBankButton();
     }
 
     return (
@@ -84,15 +87,6 @@ function PlayerTimer(props) {
             })}
         >
             <Typography className={classes.secondsRemaining}>{Math.floor(secondsRemaining)}</Typography>
-            {/* <LinearProgress
-                color="primary"
-                variant="determinate"
-                value={completed}
-                className={classes.linearTimer}
-                classes={{
-                    root: classes.linearTimerRoot,
-                }}
-            /> */}
         </div>
     );
 }

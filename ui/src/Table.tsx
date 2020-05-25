@@ -4,6 +4,7 @@ import OpenSeat from './OpenSeat';
 import EmptySeat from './EmptySeat';
 import Bet from './Bet';
 import PotTable from './PotTable';
+import TableCopyLink from './TableCopyLink';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
@@ -89,7 +90,6 @@ const useStyles = makeStyles((theme) => ({
 
     startGame: {
         zIndex: 5,
-        transform: 'translateY(40%)',
         fontSize: '4vmin',
     },
 }));
@@ -213,15 +213,18 @@ function Table(props) {
                         Start Game
                     </Button>
                 ) : null}
-                {isGameInProgress ? (
-                    <PotTable
-                        activePot={activePot}
-                        fullPot={fullPot}
-                        inactivePots={inactivePots}
-                        awardPots={awardPots}
-                    />
-                ) : null}
-                <CommunityCards communityCards={communityCards} />
+                {isGameInProgress
+                    ? [
+                          <PotTable
+                              activePot={activePot}
+                              fullPot={fullPot}
+                              inactivePots={inactivePots}
+                              awardPots={awardPots}
+                          />,
+                          <CommunityCards communityCards={communityCards} />,
+                      ]
+                    : null}
+                {players.length < 2 && !isGameInProgress ? <TableCopyLink /> : null}
             </div>
 
             <div className={classes.playersCont}>{createSpotsAtTable()}</div>

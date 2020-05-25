@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { WsServer } from './api/ws';
 import { AnimationTrigger } from './shared/models/animationState';
+import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
 
@@ -63,7 +64,7 @@ export function dealCards() {
     const [x, y] = getCenterOfTable();
 
     const a = anime({
-        targets: ['.ani_playerCard_0', '.ani_playerCard_1'],
+        targets: ['.ani_playerCard_0', '.ani_playerCard_1', '.ani_playerCard_2', '.ani_playerCard_3'],
         translateX: (target) => {
             return [x - target.getBoundingClientRect().x, 0];
         },
@@ -97,6 +98,32 @@ export function animateAwardPot(winnerUUID, potId) {
     });
     // setTimeout(() => a.reset(), duration);
     return a;
+}
+
+export function animateWinningCards() {
+    const duration = 800;
+
+    const a = anime({
+        targets: [`.ani_notWinningCard`],
+        filter: ['brightness(1)', 'brightness(0.2)'],
+        duration: duration,
+        easing: 'easeInOutExpo',
+    });
+    // setTimeout(() => a.reset(), resetDuration);
+    return a;
+}
+
+export function animateTimeBankButton() {
+    const duration = 350;
+    const loops = 4;
+    const angle = 7;
+    const a = anime({
+        targets: [`.ani_timeBank`],
+        rotate: [angle, 0, -1 * angle, 0],
+        duration: duration,
+        loop: loops,
+        easing: 'linear',
+    });
 }
 
 // utility functions
