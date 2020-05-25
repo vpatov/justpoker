@@ -31,7 +31,7 @@ function GameContainer(props): any {
     const classes = useStyles();
     const dispatch = useDispatch();
     const [gameLoaded, setGameLoaded] = useState(false);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<ErrorDisplay | undefined>();
 
     const queryParams = parseHTTPParams(queryString.parseUrl(get(props, 'location.search', '')));
 
@@ -69,7 +69,7 @@ function GameContainer(props): any {
         return <Typography className={classes.loading}>Loading...</Typography>;
     }
 
-    if (error !== false) {
+    if (error !== undefined) {
         return <div className={classes.root}>{renderError()}</div>;
     } else if (gameLoaded) {
         return <div className={classes.root}>{renderGame()}</div>;

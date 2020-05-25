@@ -56,7 +56,7 @@ function Ledger(props) {
     const classes = useStylesLedger();
     const [ledger, setLedger] = useState<UILedger>([]);
     const queryParams = parseHTTPParams(queryString.parseUrl(props.location.search));
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<ErrorDisplay | undefined>();
 
     useEffect(() => {
         document.title = 'Ledger';
@@ -78,8 +78,8 @@ function Ledger(props) {
     };
 
     function render() {
-        if (error !== false) {
-            return <ErrorMessage errorDisplay={error as ErrorDisplay} />;
+        if (error !== undefined) {
+            return <ErrorMessage errorDisplay={error} />;
         }
         return <LedgerTable ledger={ledger} />;
     }
