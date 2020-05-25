@@ -6,7 +6,7 @@ import {
     ServerLedgerRow,
     UILedgerRow,
 } from '../../../ui/src/shared/models/ledger';
-import { logger } from '../server/logging';
+import { logger } from '../logger';
 
 /*
     TODO:
