@@ -6,9 +6,14 @@ const winston = require('winston');
 //     info: 2,     logged in production
 //     http: 3,     NO USE CASE
 //     verbose: 4,  logged in dev
-//     debug: 5,    logged when run spcifically in debug mode TODO take log level as command line argunment
+//     debug: 5,    logged when run spcifically in debug mode, npm run debug
 //     silly: 6     NO USE CASE
 //   }
+
+function getLogLevel(): string {
+    const defaultLogLevel = 'info';
+    return process.env.LOG_LEVEL || defaultLogLevel;
+}
 
 const options = {
     errorFile: {
@@ -21,7 +26,7 @@ const options = {
         colorize: false,
     },
     consoleDebug: {
-        level: 'debug',
+        level: getLogLevel(),
         handleExceptions: true,
         json: false,
         format: winston.format.combine(
@@ -50,7 +55,15 @@ export interface DebugFuncParams {
     noRslt?: boolean; // supress logging of function result
 }
 
-export function debugFunc(params?: DebugFuncParams) {
+const defaultDebugFuncParams: DebugFuncParams = {
+    noCall: false,
+    noRtrn: false,
+    noArgs: false,
+    noRslt: false,
+};
+
+export function debugFunc(paramsArg?: DebugFuncParams) {
+    const params = { ...defaultDebugFuncParams, ...paramsArg };
     return function decorator(target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
         const original = descriptor.value;
         if (typeof original === 'function') {
