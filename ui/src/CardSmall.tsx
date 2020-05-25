@@ -1,12 +1,12 @@
-import React from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { animateShowCard } from './AnimiationModule';
 import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Suit from './Suit';
-
+import { generateUUID } from './shared/util/util';
 const useStyles = makeStyles((theme) => ({
     root: {
         zIndex: -1,
@@ -92,7 +92,15 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, partOfWinningHand, shouldFlex } = props;
+    const { suit, rank, hidden, showCard, className, partOfWinningHand, shouldFlex } = props;
+
+    const [cardId, _] = useState(generateUUID());
+
+    useEffect(() => {
+        if (showCard) {
+            animateShowCard(cardId);
+        }
+    }, [showCard, cardId]);
 
     if (hidden) {
         return (
@@ -105,6 +113,7 @@ function CardSmall(props) {
     }
     return (
         <div
+            id={cardId}
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
                 ['ani_notWinningCard']: !partOfWinningHand,

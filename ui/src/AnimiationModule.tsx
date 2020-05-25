@@ -126,6 +126,24 @@ export function animateTimeBankButton() {
     });
 }
 
+export function animateShowCard(id) {
+    const duration = 1250;
+
+    const [x, y] = getCenterOfTable();
+    const scaleTowardsTable = 2;
+    const a = anime({
+        targets: [`#${id}`],
+        translateX: (target) => {
+            return (x - target.getBoundingClientRect().x) / scaleTowardsTable;
+        },
+        translateY: (target) => {
+            return (y - target.getBoundingClientRect().y) / scaleTowardsTable;
+        },
+        duration: duration,
+        rotateZ: [-360, 0],
+        easing: 'easeOutExpo',
+    });
+}
 // utility functions
 
 function getCenterOfRef(ref) {
