@@ -50,16 +50,16 @@ export const logger = winston.createLogger({
 
 export interface DebugFuncParams {
     noCall?: boolean; // supress logging of function call
-    noRtrn?: boolean; // supress logging of function return
+    noReturn?: boolean; // supress logging of function return
     noArgs?: boolean; // supress logging of function argunments
-    noRslt?: boolean; // supress logging of function result
+    noResult?: boolean; // supress logging of function result
 }
 
 const defaultDebugFuncParams: DebugFuncParams = {
     noCall: false,
-    noRtrn: false,
+    noReturn: false,
     noArgs: false,
-    noRslt: false,
+    noResult: false,
 };
 
 export function debugFunc(paramsArg?: DebugFuncParams) {
@@ -68,14 +68,18 @@ export function debugFunc(paramsArg?: DebugFuncParams) {
         const original = descriptor.value;
         if (typeof original === 'function') {
             descriptor.value = function (...args: any[]) {
-                let startMessage = `CALL: ${String(key)}`;
-                if (!params.noArgs) startMessage += `\t ARGS: ${JSON.stringify(args)}`;
-                logger.debug(startMessage);
+                if (!params.noCall) {
+                    let startMessage = `CALL: ${String(key)}`;
+                    if (!params.noArgs) startMessage += `\t ARGS: ${JSON.stringify(args)}`;
+                    logger.debug(startMessage);
+                }
                 try {
                     const result = original.apply(this, args);
-                    let finishMessage = `RTRN ${String(key)}`;
-                    if (!params.noRslt) finishMessage += `\t RSLT: ${JSON.stringify(result)}`;
-                    logger.debug(finishMessage);
+                    if (!params.noReturn) {
+                        let finishMessage = `RTRN ${String(key)}`;
+                        if (!params.noResult) finishMessage += `\t RSLT: ${JSON.stringify(result)}`;
+                        logger.debug(finishMessage);
+                    }
                     return result;
                 } catch (e) {
                     logger.debug(`RTRN: ${String(key)} \t ERRR: ${e}`);
@@ -86,5 +90,3 @@ export function debugFunc(paramsArg?: DebugFuncParams) {
         return descriptor;
     };
 }
-
-export default logger;

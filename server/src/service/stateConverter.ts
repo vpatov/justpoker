@@ -74,7 +74,7 @@ export class StateConverter {
     }
 
     // Hero refers to the player who is receiving this particular UiState.
-    @debugFunc({ noRslt: true })
+    @debugFunc({ noResult: true })
     transformGameStateToUIState(clientUUID: string, sendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored

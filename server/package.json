@@ -12,7 +12,8 @@
         "build": "tsc",
         "prestart": "npm run build",
         "start": "node ./dist/server/server/src/server/server.js",
-        "debug": "npm run build && LOG_LEVEL=debug node ./dist/server/server/src/server/server.js",
+        "debug": "npm run build && node inspect ./dist/server/server/src/server/server.js",
+        "startdebug": "npm run build && LOG_LEVEL=debug node ./dist/server/server/src/server/server.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
