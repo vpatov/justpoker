@@ -9,7 +9,7 @@ import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
 import { LedgerService } from './ledgerService';
 import { TimerManager } from './timerManager';
-import { logger } from '../server/logging';
+import { logger } from '../logger';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -76,7 +76,7 @@ export class GameInstanceManager {
             this.saveActiveGameInstance();
         }
         const gi = this.getGameInstance(gameInstanceUUID);
-        logger.info(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
+        logger.verbose(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
 
         if (!gi) {
             // TODO error path

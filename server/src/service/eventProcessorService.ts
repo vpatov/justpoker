@@ -18,7 +18,7 @@ import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameSta
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
 import { GameInstanceManager } from './gameInstanceManager';
-import { logger } from '../server/logging';
+import { logger } from '../logger';
 import { ConnectedClientManager } from '..//server/connectedClientManager';
 
 declare interface ActionProcessor {
