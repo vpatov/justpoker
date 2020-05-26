@@ -1,12 +1,12 @@
 {
-    "scripts": {
-        "preinstall": "cd server && npm install; cd ..; cd ui && npm install; ",
-        "server": "cd server && npm run start",
-        "ui": "cd ui && npm start",
-        "start": "concurrently \"npm run server\" \"npm run ui\""
-    },
-    "devDependencies": {
-        "@types/config": "0.0.36",
-        "concurrently": "^1.0.0"
-    }
+  "scripts": {
+    "preinstall": "cd server && npm install; cd ..; cd ui && npm install; ",
+    "server": "cd server && npm run start",
+    "ui": "cd ui && npm start",
+    "start": "concurrently \"npm run server\" \"npm run ui\""
+  },
+  "devDependencies": {
+    "@types/config": "0.0.36",
+    "concurrently": "^1.0.0"
+  }
 }

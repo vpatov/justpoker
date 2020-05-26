@@ -1,3 +1,4 @@
+import { inspect } from 'util'; // or directly
 const winston = require('winston');
 
 // LOG LEVEL BEST PRACTICES
@@ -37,7 +38,7 @@ const options = {
             winston.format.printf((info: any) => {
                 const { timestamp, level, message, ...args } = info;
                 const ts = timestamp.slice(0, 19).replace('T', ' ');
-                return `${ts} [${level}]: ${message} ${Object.keys(args).length ? JSON.stringify(args) : ''}`;
+                return `${ts} [${level}]: ${message} ${Object.keys(args).length ? inspect(args) : ''}`;
             }),
         ),
     },
@@ -70,14 +71,14 @@ export function debugFunc(paramsArg?: DebugFuncParams) {
             descriptor.value = function (...args: any[]) {
                 if (!params.noCall) {
                     let startMessage = `CALL: ${String(key)}`;
-                    if (!params.noArgs) startMessage += `\t ARGS: ${JSON.stringify(args)}`;
+                    if (!params.noArgs) startMessage += `\t ARGS: ${inspect(args)}`;
                     logger.debug(startMessage);
                 }
                 try {
                     const result = original.apply(this, args);
                     if (!params.noReturn) {
                         let finishMessage = `RTRN ${String(key)}`;
-                        if (!params.noResult) finishMessage += `\t RSLT: ${JSON.stringify(result)}`;
+                        if (!params.noResult) finishMessage += `\t RSLT: ${inspect(result)}`;
                         logger.debug(finishMessage);
                     }
                     return result;

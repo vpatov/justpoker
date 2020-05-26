@@ -7,7 +7,6 @@ import {
     ClientActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
-    EndPoint,
     WSParams,
 } from '../shared/models/dataCommunication';
 
@@ -20,7 +19,7 @@ export class WsServer {
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
 
-    static openWs(gameInstanceUUID: string, endpoint: EndPoint) {
+    static openWs(gameInstanceUUID: string) {
         console.log('opening ws...');
         const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
         const wsURI = {
@@ -28,39 +27,13 @@ export class WsServer {
             query: {
                 clientUUID: docCookies.getItem(clientUUID) || null,
                 gameInstanceUUID: gameInstanceUUID || null,
-                endpoint: endpoint || null,
             } as ParsedQuery,
         };
 
         WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
         WsServer.ws.onmessage = WsServer.onGameMessage;
-        switch (endpoint) {
-            case EndPoint.GAME: {
-                WsServer.ws.onmessage = WsServer.onGameMessage;
-                break;
-            }
 
-            case EndPoint.LEDGER: {
-                WsServer.ws.onmessage = WsServer.onLedgerMessage;
-                break;
-            }
-            default: {
-                throw Error(`Endpoint ${endpoint} is not available.`);
-            }
-        }
         return true;
-    }
-
-    private static onLedgerMessage(msg: MessageEvent) {
-        const jsonData = JSON.parse(get(msg, 'data', {}));
-
-        if (jsonData.clientUUID) {
-            docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
-        }
-
-        if (jsonData.ledger) {
-            WsServer.subscriptions['ledger'].forEach((func) => func(jsonData.ledger));
-        }
     }
 
     // TODO redesign dataCommunications and create general websocket data object so we

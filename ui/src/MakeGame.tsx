@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import {} from './utils';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { createGame } from './api/http';
@@ -134,6 +133,7 @@ function MakeGame(props) {
                     <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
                 </Select>
                 <Button
+                    id={'ID_CreateGameButton'}
                     className={classes.button}
                     variant="contained"
                     color="primary"

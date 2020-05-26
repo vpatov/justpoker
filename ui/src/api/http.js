@@ -1,12 +1,17 @@
-import axios from "axios";
+import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "", // for local dev currenly handled by proxy in package.json
+    baseURL: '', // for local dev currenly handled by proxy in package.json
 });
 
 // onSuccess = (response) => {}
 // onError = (err) => {}
 export const createGame = (data, onSuccess, onError) => {
-  const url = "/createGame";
-  return api.post(url, data).then(onSuccess).catch(onError);
+    const url = '/createGame';
+    return api.post(url, data).then(onSuccess).catch(onError);
+};
+
+export const getLedger = (gameInstanceUUID, onSuccess, onError) => {
+    const url = `/ledger?gameInstanceUUID=${gameInstanceUUID}`;
+    return api.get(url).then(onSuccess).catch(onError);
 };

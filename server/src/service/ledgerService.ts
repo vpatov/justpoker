@@ -130,8 +130,8 @@ export class LedgerService {
         return row;
     }
 
-    convertServerLedgerToUILedger(): UILedger {
-        const uiLedger: UILedger = Object.entries(this.getLedger()).map(([clientUUID, serverLedgerRow]) =>
+    convertServerLedgerToUILedger(ledger: ServerLedger): UILedger {
+        const uiLedger: UILedger = Object.entries(ledger).map(([clientUUID, serverLedgerRow]) =>
             this.convertServerLedgerRowToUILedgerRow(serverLedgerRow),
         );
         return uiLedger;
