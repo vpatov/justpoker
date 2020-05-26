@@ -1,7 +1,7 @@
 import util from 'util';
 import Location from 'history';
 import { GameState } from '../models/gameState';
-import { WSParams, EndPoint, HTTPParams } from '../models/dataCommunication';
+import { WSParams, HTTPParams } from '../models/dataCommunication';
 import queryString from 'query-string';
 
 export function generateUUID(): string {

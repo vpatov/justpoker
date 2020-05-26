@@ -9,6 +9,7 @@ import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
 import { LedgerService } from './ledgerService';
 import { TimerManager } from './timerManager';
+import { UILedger } from '../../../ui/src/shared/models/ledger';
 import { logger, debugFunc } from '../logger';
 
 export interface GameInstances {
@@ -38,7 +39,7 @@ export class GameInstanceManager {
         return gameInstanceUUID;
     }
 
-    doesGameExist(gameInstanceUUID: string): boolean {
+    doesGameInstanceExist(gameInstanceUUID: string): boolean {
         if (this.gameInstances[gameInstanceUUID]) return true;
         return false;
     }
@@ -49,6 +50,9 @@ export class GameInstanceManager {
     }
 
     getGameInstance(gameInstanceUUID: string): GameInstance | undefined {
+        if (!this.doesGameInstanceExist(gameInstanceUUID)) {
+            return undefined;
+        }
         return this.gameInstances[gameInstanceUUID];
     }
 
@@ -84,12 +88,14 @@ export class GameInstanceManager {
         if (!gi) {
             // TODO error path
         }
-        this.gameStateManager.loadGameState(gi.gameState);
-        this.chatService.loadChatState(gi.chatLog);
-        this.audioService.loadAudioState(gi.audioQueue);
-        this.animationService.loadAnimationState(gi.animationState);
-        this.ledgerService.loadLedger(gi.ledger);
-        this.timerManager.loadStateTimer(gi.stateTimer);
+        logger.info(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
+        const gameInstance = gi as GameInstance;
+        this.gameStateManager.loadGameState(gameInstance.gameState);
+        this.chatService.loadChatState(gameInstance.chatLog);
+        this.audioService.loadAudioState(gameInstance.audioQueue);
+        this.animationService.loadAnimationState(gameInstance.animationState);
+        this.ledgerService.loadLedger(gameInstance.ledger);
+        this.timerManager.loadStateTimer(gameInstance.stateTimer);
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 
@@ -98,5 +104,14 @@ export class GameInstanceManager {
         this.audioService.reset();
         this.animationService.reset();
         this.chatService.clearLastMessage();
+    }
+
+    // no need to load entire game instance as no update
+    getLedgerForGameInstance(gameInstanceUUID: string): UILedger | undefined {
+        if (!this.doesGameInstanceExist(gameInstanceUUID)) {
+            return undefined;
+        }
+        const ledgerState = this.gameInstances[gameInstanceUUID].ledger;
+        return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
     }
 }

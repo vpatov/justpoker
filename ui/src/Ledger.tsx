@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {} from './utils';
-import { withRouter } from 'react-router-dom';
 import queryString from 'query-string';
+import get from 'lodash/get';
+import { getLedger } from './api/http';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { WsServer } from './api/ws';
 import { UILedger, UILedgerRow } from './shared/models/ledger';
-import { EndPoint } from './shared/models/dataCommunication';
+import { ErrorDisplay } from './shared/models/uiState';
 import { parseHTTPParams } from './shared/util/util';
-
+import ErrorMessage from './ErrorMessage';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -44,23 +43,48 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const useStylesLedger = makeStyles((theme) => ({
+    root: {
+        height: '100vh',
+        width: '100vw',
+        color: 'white',
+        ...theme.custom.BACKGROUND,
+    },
+}));
+
 function Ledger(props) {
+    const classes = useStylesLedger();
     const [ledger, setLedger] = useState<UILedger>([]);
     const queryParams = parseHTTPParams(queryString.parseUrl(props.location.search));
+    const [error, setError] = useState<ErrorDisplay | undefined>();
 
     useEffect(() => {
         document.title = 'Ledger';
-        const succ = WsServer.openWs(queryParams.gameInstanceUUID, EndPoint.LEDGER);
-        if (succ) {
-            WsServer.subscribe('ledger', onReceiveNewLedger);
-        }
+        getLedger(queryParams.gameInstanceUUID, onFetchLedgerSuccess, onFetchLedgerFailure);
     }, []);
 
-    const onReceiveNewLedger = (updatedLedger: UILedger) => {
-        setLedger(updatedLedger);
+    const onFetchLedgerSuccess = (response) => {
+        const error = get(response, 'data.error', false);
+        if (error) {
+            setError(error);
+        } else {
+            const ledger = get(response, 'data.ledger', []);
+            setLedger(ledger);
+        }
     };
 
-    return LedgerTable({ ledger });
+    const onFetchLedgerFailure = (err) => {
+        console.log(err);
+    };
+
+    function render() {
+        if (error !== undefined) {
+            return <ErrorMessage errorDisplay={error} />;
+        }
+        return <LedgerTable ledger={ledger} />;
+    }
+
+    return <div className={classes.root}>{render()}</div>;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {

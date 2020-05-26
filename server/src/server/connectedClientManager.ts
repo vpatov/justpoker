@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { StateConverter } from '../service/stateConverter';
 import * as WebSocket from 'ws';
 import { generateUUID } from '../../../ui/src/shared/util/util';
+import { logger, debugFunc } from '../logger';
 
 export interface ClientGroups {
     [gameInstanceUUID: string]: { [clientUUID: string]: WebSocket };
@@ -13,6 +14,7 @@ export class ConnectedClientManager {
 
     constructor(private stateConverter: StateConverter) {}
 
+    @debugFunc({ noArgs: true })
     createClientSessionInGroup(groupKey: string, ws: WebSocket): string {
         const clientUUID = generateUUID();
         if (!this.ClientGroups[groupKey]) {
@@ -29,6 +31,7 @@ export class ConnectedClientManager {
         this.ClientGroups[groupKey] = {};
     }
 
+    @debugFunc({ noArgs: true })
     updateClientSessionInGroup(groupKey: string, clientUUID: string, ws: WebSocket) {
         if (this.ClientGroups[groupKey]) {
             this.ClientGroups[groupKey][clientUUID] = ws;

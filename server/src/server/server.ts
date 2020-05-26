@@ -16,7 +16,6 @@ import {
     NewGameForm,
     ClientAction,
     Event,
-    EndPoint,
     EventType,
     ClientWsMessage,
 } from '../../../ui/src/shared/models/dataCommunication';
@@ -94,11 +93,22 @@ class Server {
             this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
 
             logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
-            res.send(JSON.stringify({ gameInstanceUUID: gameInstanceUUID }));
+            res.send({ gameInstanceUUID: gameInstanceUUID });
+        });
+
+        router.get('/ledger', (req, res) => {
+            const parsedQuery = queryString.parseUrl(req.url);
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
+            const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
+            if (!ledger) {
+                logger.info(`ledger not found for ${gameInstanceUUID}`);
+                res.send(getDefaultGame404());
+            } else {
+                res.send({ ledger: ledger });
+            }
         });
 
         this.app.use(bodyParser.json());
-
         this.app.use(
             bodyParser.urlencoded({
                 extended: true,
@@ -144,38 +154,29 @@ class Server {
         this.wss = new WebSocket.Server({ server: this.server });
         this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             const ip = req.connection.remoteAddress;
-            logger.verbose(`WS connection request from: ${ip}`);
+            logger.verbose(`WS connection request from: ${ip} on url: ${req.url}`);
 
             const parsedQuery = queryString.parseUrl(req.url);
             const clientUUID = parsedQuery.query.clientUUID as string;
             const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
-            const endpoint = parsedQuery.query.endpoint as string;
 
-            // TODO, I don't think we should pass the endpoint in the body, rather match across the actual url
-            switch (endpoint) {
-                case EndPoint.GAME: {
-                    this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
-                    return;
-                }
-                default: {
-                    const errorMessage = `No websocket interaction at url: ${req.url}`;
-                    logger.error(errorMessage);
-                    ws.close(404, errorMessage);
-                }
-            }
+            this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
+            return;
         });
     }
 
     onConnectionToGame(ws: WebSocket, gameInstanceUUID: string, clientUUID: string) {
         // if game is not in instanceManager then send 404
         // TODO implement FE for this
-        if (!this.gameInstanceManager.doesGameExist(gameInstanceUUID)) {
+        if (!this.gameInstanceManager.doesGameInstanceExist(gameInstanceUUID)) {
             ws.send(JSON.stringify(getDefaultGame404()));
             return;
         }
         // if a uuid was not sent by client (that is there is no session) then create one
         if (!clientUUID) {
             clientUUID = this.connectedClientManager.createClientSessionInGroup(gameInstanceUUID, ws);
+            // send back clientUUID for client to store
+            ws.send(JSON.stringify({ clientUUID: clientUUID }));
         } else {
             // if there is a session replace old websocket
             // TODO define app behavior in scenario when user accesses same game in two browser tabs.

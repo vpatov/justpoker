@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
     title: {
         margin: 36,
         fontSize: 'min(90px, 10vmin)',
+        color: 'black',
     },
 }));
 

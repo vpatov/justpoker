@@ -8,7 +8,6 @@ import Game from './Game';
 import { WsServer } from './api/ws';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { EndPoint } from './shared/models/dataCommunication';
 import { parseHTTPParams } from './shared/util/util';
 import { ErrorDisplay } from './shared/models/uiState';
 
@@ -32,7 +31,7 @@ function GameContainer(props): any {
     const classes = useStyles();
     const dispatch = useDispatch();
     const [gameLoaded, setGameLoaded] = useState(false);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<ErrorDisplay | undefined>();
 
     const queryParams = parseHTTPParams(queryString.parseUrl(get(props, 'location.search', '')));
 
@@ -41,7 +40,7 @@ function GameContainer(props): any {
             dispatch({ type: 'SET_TEST_GAME' });
             if (!gameLoaded) setGameLoaded(true);
         } else {
-            const succ = WsServer.openWs(queryParams.gameInstanceUUID, EndPoint.GAME);
+            const succ = WsServer.openWs(queryParams.gameInstanceUUID);
             if (succ) {
                 WsServer.subscribe('game', onReceiveNewGame);
                 WsServer.subscribe('error', onReceiveError);
@@ -70,7 +69,7 @@ function GameContainer(props): any {
         return <Typography className={classes.loading}>Loading...</Typography>;
     }
 
-    if (error !== false) {
+    if (error !== undefined) {
         return <div className={classes.root}>{renderError()}</div>;
     } else if (gameLoaded) {
         return <div className={classes.root}>{renderGame()}</div>;
