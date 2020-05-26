@@ -205,6 +205,7 @@ function Table(props) {
             <div className={classnames(classes.table, 'ani_table')}>
                 {canStartGame ? (
                     <Button
+                        id={'ID_StartGameButton'}
                         className={classes.startGame}
                         color="primary"
                         variant="contained"
