@@ -60,6 +60,7 @@ export declare interface Controller {
     timeBanks: number;
     sizingButtons: SizingButton[];
     bettingRoundActionButtons: BettingRoundActionButton[];
+    showCardButtons?: ShowCardButton[];
     dealInNextHand: boolean;
     toAct?: boolean;
     willStraddle: boolean;
@@ -87,6 +88,12 @@ export declare interface BettingRoundActionButton {
 export declare interface MenuButton {
     label: string;
     action: ClientActionType | UiActionType;
+}
+
+export declare interface ShowCardButton {
+    suit: Suit;
+    rank: string;
+    disabled?: boolean;
 }
 
 export declare interface UiCard {
@@ -234,7 +241,6 @@ export const COMMON_BB_SIZINGS: Array<number> = [3, 4, 5];
 
 export const COMMON_POT_SIZINGS: Array<[number, number]> = [
     [1, 3],
-    [1, 2],
     [2, 3],
 ];
 
@@ -367,14 +373,24 @@ export const TestGame: UiGameState = {
         max: 43000,
         timeBanks: 2,
         dealInNextHand: false,
+        showCardButtons: [
+            { rank: genRandomCard().rank, suit: genRandomCard().suit },
+            { rank: genRandomCard().rank, suit: genRandomCard().suit, disabled: true },
+            { rank: genRandomCard().rank, suit: genRandomCard().suit },
+            { rank: genRandomCard().rank, suit: genRandomCard().suit, disabled: true },
+        ],
         willStraddle: true,
         sizingButtons: [
             {
-                label: '1/2',
+                label: 'Min',
+                value: 25,
+            },
+            {
+                label: '1/3',
                 value: 6000,
             },
             {
-                label: '3/4',
+                label: '2/3',
                 value: 9000,
             },
             {

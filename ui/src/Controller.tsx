@@ -21,6 +21,7 @@ import { BettingRoundActionType } from './shared/models/game';
 
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
+import ControllerShowCard from './ControllerShowCard';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -50,10 +51,11 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-evenly',
             alignItems: 'center',
         },
-        adminButtonCont: {
+        additionalGamePlayCont: {
+            display: 'flex',
             marginRight: '2vw',
-            float: 'right',
-            height: '100%',
+        },
+        addGamePlaySectionRight: {
             display: 'flex',
             justifyContent: 'center',
             flexDirection: 'column',
@@ -115,6 +117,7 @@ function ControllerComp(props: ControllerProps) {
         max,
         sizingButtons,
         bettingRoundActionButtons: actionButtons,
+        showCardButtons,
         dealInNextHand,
         timeBanks,
         willStraddle,
@@ -263,37 +266,46 @@ function ControllerComp(props: ControllerProps) {
                     onClickActionButton={onClickActionButton}
                 />
             </div>
-            <div className={classes.adminButtonCont}>
-                <FormControlLabel
-                    classes={{ label: classes.checkLabel }}
-                    control={
-                        <Checkbox
-                            className={classes.button}
-                            checked={!dealInNextHand}
-                            onChange={onToggleSitOutNextHand}
-                        />
-                    }
-                    label="Sit Out Next Hand"
-                />
-                {allowStraddle ? (
+            <div className={classes.additionalGamePlayCont}>
+                {showCardButtons ? <ControllerShowCard showCardButtons={showCardButtons} /> : null}
+
+                <div className={classes.addGamePlaySectionRight}>
                     <FormControlLabel
                         classes={{ label: classes.checkLabel }}
                         control={
-                            <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
+                            <Checkbox
+                                className={classes.button}
+                                checked={!dealInNextHand}
+                                onChange={onToggleSitOutNextHand}
+                            />
                         }
-                        label="Straddle"
+                        label="Sit Out Next Hand"
                     />
-                ) : null}
-                {heroSeated ? (
-                    <Button
-                        className={classnames(classes.timeBankButton, 'ani_timeBank')}
-                        variant="outlined"
-                        onClick={() => onClickTimeBank()}
-                        disabled={timeBanks === 0}
-                    >
-                        {`Time Bank (${timeBanks})`}
-                    </Button>
-                ) : null}
+                    {allowStraddle ? (
+                        <FormControlLabel
+                            classes={{ label: classes.checkLabel }}
+                            control={
+                                <Checkbox
+                                    className={classes.button}
+                                    checked={willStraddle}
+                                    onChange={onToggleStraddle}
+                                />
+                            }
+                            label="Straddle"
+                        />
+                    ) : null}
+
+                    {heroSeated ? (
+                        <Button
+                            className={classnames(classes.timeBankButton, 'ani_timeBank')}
+                            variant="outlined"
+                            onClick={() => onClickTimeBank()}
+                            disabled={timeBanks === 0}
+                        >
+                            {`Time Bank (${timeBanks})`}
+                        </Button>
+                    ) : null}
+                </div>
             </div>
         </div>
     );
