@@ -93,7 +93,6 @@ export declare interface MenuButton {
 export declare interface ShowCardButton {
     suit: Suit;
     rank: string;
-    disabled?: boolean;
 }
 
 export declare interface UiCard {
@@ -101,7 +100,6 @@ export declare interface UiCard {
     rank?: string;
     hidden?: boolean;
     partOfWinningHand?: boolean;
-    showCard?: boolean;
 }
 
 export declare interface Table {
@@ -375,9 +373,9 @@ export const TestGame: UiGameState = {
         dealInNextHand: false,
         showCardButtons: [
             { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit, disabled: true },
             { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit, disabled: true },
+            { rank: genRandomCard().rank, suit: genRandomCard().suit },
+            { rank: genRandomCard().rank, suit: genRandomCard().suit },
         ],
         willStraddle: true,
         sizingButtons: [
@@ -435,7 +433,7 @@ export const TestGame: UiGameState = {
             handLabel: 'Set of Kings',
             bet: genRandomInt(0, 10),
             hand: {
-                cards: [{ ...genRandomCard(), showCard: true }, genRandomCard()],
+                cards: [{ ...genRandomCard() }, genRandomCard()],
             },
         },
         {

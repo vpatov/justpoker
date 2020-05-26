@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { animateShowCard } from './AnimiationModule';
-import { generateStringFromRank, SUITS } from './utils';
+import usePrevious, { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -92,15 +92,16 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, showCard, className, partOfWinningHand, shouldFlex } = props;
+    const { suit, rank, hidden, className, partOfWinningHand, shouldFlex } = props;
 
     const [cardId, _] = useState(generateUUID());
+    const prevHidden = usePrevious(hidden);
 
     useEffect(() => {
-        if (showCard) {
+        if (prevHidden && !hidden) {
             animateShowCard(cardId);
         }
-    }, [showCard, cardId]);
+    }, [hidden, prevHidden]);
 
     if (hidden) {
         return (
