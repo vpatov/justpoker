@@ -405,11 +405,12 @@ export class GamePlayService {
 
         const shouldShowWinnersCards = !this.gsm.hasEveryoneButOnePlayerFolded();
 
-        // Show everyones hand at showdown if they havent folded yet.
-        // TODO show only those hands youre supposed to show.
-        this.gsm.updatePlayers((player) =>
-            shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
-        );
+        // TODO TODO
+        // // Show everyones hand at showdown if they havent folded yet.
+        // // TODO show only those hands youre supposed to show.
+        // this.gsm.updatePlayers((player) =>
+        //     shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
+        // );
 
         this.gsm.clearWinnersAndDeltas();
 

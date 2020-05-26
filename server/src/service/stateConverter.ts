@@ -286,12 +286,11 @@ export class StateConverter {
 
     transformPlayerCards(player: Player, heroPlayerUUID: string): CardInformation {
         const isHero = heroPlayerUUID === player.uuid;
-        const shouldCardsBeVisible = isHero || !player.cardsAreHidden;
         const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
         const isWinner = player.winner;
 
         const cards: UiCard[] = player.holeCards.map((holeCard) => {
-            return shouldCardsBeVisible
+            return holeCard.visible || isHero
                 ? {
                       ...holeCard,
                       partOfWinningHand:
@@ -304,7 +303,7 @@ export class StateConverter {
 
         return {
             hand: { cards },
-            handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? player.handDescription : undefined,
+            handLabel: isHero && player.holeCards.length > 0 ? player.handDescription : undefined,
         };
     }
 

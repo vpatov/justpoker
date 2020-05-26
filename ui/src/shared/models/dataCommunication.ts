@@ -1,4 +1,5 @@
 import { BettingRoundAction, GameType } from './game';
+import { Suit, Card } from './cards';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
@@ -51,6 +52,7 @@ export enum ClientActionType {
     BOOTPLAYER = 'BOOTPLAYER',
     LEAVETABLE = 'LEAVETABLE',
     USETIMEBANK = 'USETIMEBANK',
+    SHOWCARD = 'SHOWCARD',
 }
 
 export enum ServerActionType {
@@ -98,6 +100,11 @@ export declare interface BootPlayerRequest {
     playerUUID: string;
 }
 
+export declare interface ShowCardRequest {
+    playerUUID: string;
+    cards: Card[];
+}
+
 export type ClientWsMessageRequest = SitDownRequest &
     JoinTableRequest &
     (SitDownRequest & JoinTableRequest) &
@@ -106,7 +113,8 @@ export type ClientWsMessageRequest = SitDownRequest &
     SetChipsRequest &
     ClientStraddleRequest &
     ClientChatMessage &
-    BootPlayerRequest;
+    BootPlayerRequest &
+    ShowCardRequest;
 
 export declare interface ClientWsMessage {
     actionType: ClientActionType;

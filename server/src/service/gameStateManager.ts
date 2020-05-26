@@ -24,7 +24,7 @@ import { generateUUID, getLoggableGameState } from '../../../ui/src/shared/util/
 import { NewGameForm, JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/dataCommunication';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
-import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
+import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger } from '../logger';
@@ -774,6 +774,11 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { sittingOut: false });
     }
 
+    setPlayerCardsVisible(playerUUID: string, cards: Card[]) {
+        const player = this.getPlayer(playerUUID);
+        this.updatePlayer(playerUUID, { holeCards: player.holeCards.map((c) => ({ ...c, visible: true })) });
+    }
+
     getFirstToAct() {
         return this.gameState.firstToAct;
     }
@@ -883,7 +888,6 @@ export class GameStateManager {
             bestHand: null,
             winner: false,
             betAmount: 0,
-            cardsAreHidden: true,
             timeBanksUsedThisAction: 0,
         }));
 

@@ -8,6 +8,7 @@ import {
     EventType,
     ServerActionType,
     createTimeoutEvent,
+    ShowCardRequest,
 } from '../../../ui/src/shared/models/dataCommunication';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
@@ -167,6 +168,12 @@ export class EventProcessorService {
         [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),
             perform: () => this.gamePlayService.useTimeBankAction(),
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.SHOWCARD]: {
+            validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
+            perform: (uuid, req: ShowCardRequest) =>
+                this.gameStateManager.setPlayerCardsVisible(req.playerUUID, req.cards),
             updates: [ServerStateKey.GAMESTATE],
         },
     };
