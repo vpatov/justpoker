@@ -774,9 +774,16 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { sittingOut: false });
     }
 
-    setPlayerCardsVisible(playerUUID: string, cards: Card[]) {
+    setPlayerCardsVisible(playerUUID: string, card: Card) {
         const player = this.getPlayer(playerUUID);
-        this.updatePlayer(playerUUID, { holeCards: player.holeCards.map((c) => ({ ...c, visible: true })) });
+        this.updatePlayer(playerUUID, {
+            holeCards: player.holeCards.map((c) => {
+                if (c.rank === card.rank && c.suit === card.suit) {
+                    return { ...c, visible: true };
+                }
+                return c;
+            }),
+        });
     }
 
     getFirstToAct() {

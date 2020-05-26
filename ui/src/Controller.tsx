@@ -8,6 +8,7 @@ import {
     allowStraddleSelector,
     bettingRoundActionTypesToUnqueueSelector,
     isHeroSeatedSelector,
+    heroPlayerUUIDSelector,
 } from './store/selectors';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -128,6 +129,7 @@ function ControllerComp(props: ControllerProps) {
     const allowStraddle = useSelector(allowStraddleSelector);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
     const heroSeated = useSelector(isHeroSeatedSelector);
+    const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
     const [betAmt, setBetAmt] = useState(0);
     const [queuedActionType, setQueuedActionType] = useState('');
@@ -267,7 +269,9 @@ function ControllerComp(props: ControllerProps) {
                 />
             </div>
             <div className={classes.additionalGamePlayCont}>
-                {showCardButtons ? <ControllerShowCard showCardButtons={showCardButtons} /> : null}
+                {showCardButtons && showCardButtons.length > 0 ? (
+                    <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
+                ) : null}
 
                 <div className={classes.addGamePlaySectionRight}>
                     <FormControlLabel

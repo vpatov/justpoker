@@ -3,7 +3,12 @@ import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { WsServer } from './api/ws';
-import { ClientActionType, UiActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
+import {
+    ClientActionType,
+    UiActionType,
+    ClientWsMessageRequest,
+    ShowCardRequest,
+} from './shared/models/dataCommunication';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
@@ -12,6 +17,7 @@ import Paper from '@material-ui/core/Paper';
 import { ShowCardButton } from './shared/models/uiState';
 import { Button, ButtonGroup } from '@material-ui/core';
 import Suit from './Suit';
+import { Card } from './shared/models/cards';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -25,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.1vmin',
         },
         button: {
-            fontSize: '0.9vmin',
+            fontSize: '1vmin',
             padding: '0.4vmin',
         },
         suit: {
@@ -43,6 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export interface ControllerShowCardProps {
     showCardButtons: ShowCardButton[];
+    heroPlayerUUID: string;
     className?: string;
 }
 
@@ -50,7 +57,7 @@ function ControllerShowCard(props: ControllerShowCardProps) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
 
-    const { showCardButtons, className } = props;
+    const { showCardButtons, heroPlayerUUID, className } = props;
 
     const handleOpen = () => {
         setOpen(true);
@@ -60,30 +67,39 @@ function ControllerShowCard(props: ControllerShowCardProps) {
         setOpen(false);
     };
 
-    function handleClickButton(action) {}
-
-    function sendServerAction(action) {
-        WsServer.send({
-            actionType: action,
-            request: {} as ClientWsMessageRequest,
-        });
+    function handleSingleClickButton(button: ShowCardButton) {
+        sendShowCardRequest([{ suit: button.suit, rank: button.rank }]);
     }
 
+    function handleShowAllButton() {
+        sendShowCardRequest(showCardButtons.map((b) => ({ suit: b.suit, rank: b.rank })));
+    }
+
+    function sendShowCardRequest(cards: Card[]) {
+        WsServer.send({
+            actionType: ClientActionType.SHOWCARD,
+            request: {
+                playerUUID: heroPlayerUUID,
+                cards: cards,
+            } as ClientWsMessageRequest,
+        });
+    }
     return (
         <div className={classnames(classes.root, className)} onMouseLeave={handleClose}>
             {open ? (
                 <ButtonGroup orientation="vertical" className={classes.group}>
                     {showCardButtons
                         .map((button) => (
-                            <Button
-                                className={classes.button}
-                                // onClick={() => handleClickButton(button.action)}
-                            >
+                            <Button className={classes.button} onClick={() => handleSingleClickButton(button)}>
                                 {generateStringFromRank(button.rank)}
                                 <Suit className={classes.suit} suit={button.suit}></Suit>
                             </Button>
                         ))
-                        .concat(<Button className={classes.button}>All</Button>)}
+                        .concat(
+                            <Button onClick={() => handleShowAllButton()} className={classes.button}>
+                                All
+                            </Button>,
+                        )}
                 </ButtonGroup>
             ) : (
                 <Button className={classes.showButton} onClick={handleOpen} variant="outlined">

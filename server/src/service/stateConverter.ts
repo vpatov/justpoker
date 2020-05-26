@@ -20,6 +20,7 @@ import {
     MenuButton,
     LEDGER_BUTTON,
     PositionIndicator,
+    ShowCardButton,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -196,6 +197,7 @@ export class StateConverter {
             min: minBet,
             max: maxBet,
             sizingButtons: getSizingButtons(),
+            showCardButtons: this.getShowCardButtons(clientUUID),
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
@@ -262,6 +264,16 @@ export class StateConverter {
 
         // TODO leave table button
         return menuButtons;
+    }
+
+    getShowCardButtons(clientUUID: string): ShowCardButton[] {
+        const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+        const showCardButtons: ShowCardButton[] = [];
+        heroPlayer.holeCards.forEach((c) => {
+            if (!c.visible) showCardButtons.push({ suit: c.suit, rank: c.rank });
+        });
+        // TODO leave table button
+        return showCardButtons;
     }
 
     transformAudioForPlayer(playerUUID: string): SoundByte {
