@@ -236,6 +236,12 @@ function ControllerComp(props: ControllerProps) {
                     {actionButtons.map((button) => {
                         return (
                             <Button
+                                id={
+                                    button.action === BettingRoundActionType.CHECK ||
+                                    button.action === BettingRoundActionType.CALL
+                                        ? `ID_CheckCallButton`
+                                        : ''
+                                }
                                 variant="outlined"
                                 className={classnames(classes.actionButton, classes[button.action], {
                                     [classes[`${button.action}_QUEUED`]]: button.action === queuedActionType,

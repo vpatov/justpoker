@@ -133,6 +133,7 @@ function MakeGame(props) {
                     <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
                 </Select>
                 <Button
+                    id={'ID_CreateGameButton'}
                     className={classes.button}
                     variant="contained"
                     color="primary"

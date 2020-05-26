@@ -3,7 +3,7 @@
 server/node_modules
 server/dist
 
-shared/node_modules
+test/node_modules
 
 ui/node_modules
 ui/src/shared/node_modules

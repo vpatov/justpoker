@@ -95,7 +95,7 @@ function OpenSeat(props) {
         <Fragment>
             <IconButton
                 color="primary"
-                className={classnames(classes.root, className)}
+                className={classnames(classes.root, className, 'CLASS_OpenSeatButton')}
                 style={style}
                 onClick={onClickSitDown}
             >
@@ -111,7 +111,7 @@ function OpenSeat(props) {
                 <DialogContent>
                     <TextFieldWrap
                         autoFocus
-                        id="name"
+                        id="ID_NameField"
                         label="Name"
                         type="text"
                         fullWidth
@@ -137,7 +137,12 @@ function OpenSeat(props) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={dialogClose}>Cancel</Button>
-                    <Button disabled={formInvalid()} onClick={onSubmitSitDownForm} color="primary">
+                    <Button
+                        id="ID_SitDownButton"
+                        disabled={formInvalid()}
+                        onClick={onSubmitSitDownForm}
+                        color="primary"
+                    >
                         Sit Down
                     </Button>
                 </DialogActions>
