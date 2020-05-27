@@ -20,7 +20,7 @@ import { hasError, ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { logger } from '../logger';
-import { PlayerUUID, makeBlankUUID, makeUUID } from '../../../ui/src/shared/models/uuid';
+import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
 
 @Service()
 export class GamePlayService {
@@ -493,7 +493,7 @@ export class GamePlayService {
 
         const coalescedPots: Pot[] = [...potsByContestors.entries()].map(([contestorsStr, pots]) => ({
             value: pots.reduce((sum, pot) => pot.value + sum, 0),
-            contestors: contestorsStr.split(',').map((contestor) => makeUUID(contestor)),
+            contestors: contestorsStr.split(',').map((contestor) => contestor as PlayerUUID),
         }));
 
         this.gsm.updateGameState({ pots: coalescedPots });

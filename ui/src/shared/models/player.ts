@@ -19,7 +19,7 @@ export declare interface Player {
     readonly handDescription: string;
 
     /** Cards that make up the player's best hand.*/
-    readonly bestHand: Hand|null;
+    readonly bestHand: Hand | null;
 
     /**
      * If a player is sitting they are either playing/have played
@@ -80,7 +80,7 @@ export function getCleanPlayer(): Player {
         chipsAtStartOfHand: 0,
         chipDelta: 0,
         timeBanksLeft: 0,
-    };   
+    };
 }
 
 export const TIME_BANKS_DEFAULT = 5;

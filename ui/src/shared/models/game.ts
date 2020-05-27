@@ -7,16 +7,16 @@ export declare interface BettingRoundAction {
 // and see if you can find a better design
 export enum BettingRoundActionType {
     // distinction between bet and call may be unnecessary
-    CALL = "CALL",
-    CHECK = "CHECK",
-    BET = "BET",
+    CALL = 'CALL',
+    CHECK = 'CHECK',
+    BET = 'BET',
     // distinction between bet and raise may be unnecessary
     // RAISE = 'RAISE',
-    FOLD = "FOLD",
-    WAITING_TO_ACT = "WAITING_TO_ACT",
-    NOT_IN_HAND = "NOT_IN_HAND",
-    ALL_IN = "ALL_IN",
-    PLACE_BLIND = "PLACE_BLIND",
+    FOLD = 'FOLD',
+    WAITING_TO_ACT = 'WAITING_TO_ACT',
+    NOT_IN_HAND = 'NOT_IN_HAND',
+    ALL_IN = 'ALL_IN',
+    PLACE_BLIND = 'PLACE_BLIND',
 }
 
 export declare interface GameParameters {
@@ -30,26 +30,26 @@ export declare interface GameParameters {
 }
 
 export enum StraddleType {
-    NoStraddle = "NoStraddle",
-    MississipiStraddle = "MississipiStraddle",
-    NormalStraddle = "NormalStraddle",
+    NoStraddle = 'NoStraddle',
+    MississipiStraddle = 'MississipiStraddle',
+    NormalStraddle = 'NormalStraddle',
 }
 
 export enum GameType {
-    LHOLDEM = "LHOLDEM",
-    NLHOLDEM = "NLHOLDEM",
-    PLOMAHA = "PLOMAHA",
+    LHOLDEM = 'LHOLDEM',
+    NLHOLDEM = 'NLHOLDEM',
+    PLOMAHA = 'PLOMAHA',
 }
 
 // The usage of this enum might need to change
 // if expanding app to beyond nlholdem and plo
 export enum BettingRoundStage {
-    WAITING = "WAITING",
-    PREFLOP = "PREFLOP",
-    FLOP = "FLOP",
-    TURN = "TURN",
-    RIVER = "RIVER",
-    SHOWDOWN = "SHOWDOWN",
+    WAITING = 'WAITING',
+    PREFLOP = 'PREFLOP',
+    FLOP = 'FLOP',
+    TURN = 'TURN',
+    RIVER = 'RIVER',
+    SHOWDOWN = 'SHOWDOWN',
 }
 
 export const BETTING_ROUND_STAGES = [
@@ -85,5 +85,5 @@ export const ALL_BETTING_ROUND_ACTION_TYPES: BettingRoundActionType[] = [
     BettingRoundActionType.CHECK,
     BettingRoundActionType.FOLD,
     BettingRoundActionType.BET,
-    BettingRoundActionType.CALL
+    BettingRoundActionType.CALL,
 ];

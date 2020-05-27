@@ -4,8 +4,6 @@ import { Card, Deck } from './cards';
 import { ClientActionType } from './api';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from './uuid';
 
-
-
 export const enum GameStage {
     NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
     INITIALIZE_NEW_HAND = 'INITIALIZE_NEW_HAND',

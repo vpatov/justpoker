@@ -3,7 +3,7 @@ import { StateConverter } from '../service/stateConverter';
 import * as WebSocket from 'ws';
 import { generateUUID } from '../../../ui/src/shared/util/util';
 import { logger, debugFunc } from '../logger';
-import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID, GameInstanceUUID, generateClientUUID } from '../../../ui/src/shared/models/uuid';
 
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
@@ -18,7 +18,7 @@ export class ConnectedClientManager {
 
     @debugFunc({ noArgs: true })
     createClientSessionInGroup(gameInstanceUUID: GameInstanceUUID, ws: WebSocket): ClientUUID {
-        const clientUUID = generateUUID();
+        const clientUUID = generateClientUUID();
         if (!this.ClientGroups[gameInstanceUUID]) {
             // create group if doesnt exist
             this.ClientGroups[gameInstanceUUID] = { [clientUUID]: ws };

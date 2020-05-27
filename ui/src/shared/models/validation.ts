@@ -1,9 +1,9 @@
 export declare interface ValidationResponse {
     errorType: ErrorType;
     errorString: string;
-  }
-  
-  export const enum ErrorType {
+}
+
+export const enum ErrorType {
     NO_ERROR = 'NO_ERROR',
     CLIENT_DOES_NOT_EXIST = 'CLIENT_DOES_NOT_EXIST',
     CLIENT_ALREADY_HAS_PLAYER = 'CLIENT_ALREADY_HAS_PLAYER',
@@ -16,24 +16,24 @@ export declare interface ValidationResponse {
     NOT_ENOUGH_CHIPS = 'NOT_ENOUGH_CHIPS',
     SEAT_IS_TAKEN = 'SEAT_IS_TAKEN',
     ILLEGAL_BETTING_ACTION = 'ILLEGAL_BETTING_ACTION',
-    MAX_CHAT_MESSAGE_LENGTH_EXCEEDED = "MAX_CHAT_MESSAGE_LENGTH_EXCEEDED",
-    NOT_IMPLEMENTED_YET = "NOT_IMPLEMENTED_YET",
-    INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
-    NOT_ADMIN = "NOT_ADMIN",
-    NO_MORE_TIMEBANKS = "NO_MORE_TIMEBANKS"
+    MAX_CHAT_MESSAGE_LENGTH_EXCEEDED = 'MAX_CHAT_MESSAGE_LENGTH_EXCEEDED',
+    NOT_IMPLEMENTED_YET = 'NOT_IMPLEMENTED_YET',
+    INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
+    NOT_ADMIN = 'NOT_ADMIN',
+    NO_MORE_TIMEBANKS = 'NO_MORE_TIMEBANKS',
 }
-  
-  export const NO_ERROR: ValidationResponse = {
+
+export const NO_ERROR: ValidationResponse = {
     errorType: ErrorType.NO_ERROR,
     errorString: '',
-  };
-  
-  export const NOT_IMPLEMENTED_YET: ValidationResponse = {
-    errorType: ErrorType.NOT_IMPLEMENTED_YET,
-    errorString: "This code path hasn't been implemented yet."
-  };
+};
 
-  export const INTERNAL_SERVER_ERROR: ValidationResponse = {
+export const NOT_IMPLEMENTED_YET: ValidationResponse = {
+    errorType: ErrorType.NOT_IMPLEMENTED_YET,
+    errorString: "This code path hasn't been implemented yet.",
+};
+
+export const INTERNAL_SERVER_ERROR: ValidationResponse = {
     errorType: ErrorType.INTERNAL_SERVER_ERROR,
-    errorString: "There has been an internal server error."
-  };
+    errorString: 'There has been an internal server error.',
+};
