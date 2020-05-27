@@ -412,10 +412,31 @@ export class GamePlayService {
         if (!this.gsm.hasEveryoneButOnePlayerFolded()) {
             // always show winning players hands
             winningPlayers.map((wp) => this.gsm.setPlayerCardsAllVisible(wp));
-            // if last aggressor is in pot show his/her hand too
+
+            // sort eligible players by position
+            eligiblePlayers.sort(([playerA, _], [playerB, __]) => this.gsm.comparePositions(playerA, playerB));
+
+            // choose starting player
+            // start with last aggressor if eligible
             const lastAggressorUUID = this.gsm.getLastAggressorUUID();
-            if (this.gsm.getPlayersInHand().includes(lastAggressorUUID)) {
-                this.gsm.setPlayerCardsAllVisible(lastAggressorUUID);
+            const aggIndex = eligiblePlayers.findIndex(([p, _]) => p === lastAggressorUUID);
+            if (aggIndex !== -1) {
+                // rotate array so that last aggressor is at the beginning
+                for (let i = 0; i < aggIndex; i++) {
+                    eligiblePlayers.push(eligiblePlayers.shift());
+                }
+            }
+
+            logger.debug(`HERE: ${eligiblePlayers.map((p) => this.gsm.getPlayer(p[0]).name)}`);
+            // start with startingPlayer continue left
+            // only show if your hand is the best seen thus far, break if we hit a winning hand
+            let playerToBeat = eligiblePlayers[0];
+            for (let i = 0; i < eligiblePlayers.length; i++) {
+                const curPlayer = eligiblePlayers[i];
+                if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
+                    this.gsm.setPlayerCardsAllVisible(curPlayer[0]);
+                    playerToBeat = curPlayer;
+                }
             }
         }
 
