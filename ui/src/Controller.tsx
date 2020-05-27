@@ -54,13 +54,14 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         additionalGamePlayCont: {
             display: 'flex',
-            marginRight: '2vw',
-        },
-        addGamePlaySectionRight: {
-            display: 'flex',
             justifyContent: 'center',
             flexDirection: 'column',
             alignItems: 'flex-end',
+            marginRight: '2vw',
+        },
+        additionalGamePlayTopButtons: {
+            display: 'flex',
+            alignItems: 'center',
         },
         betActionsCont: {
             width: '50%',
@@ -268,37 +269,12 @@ function ControllerComp(props: ControllerProps) {
                     onClickActionButton={onClickActionButton}
                 />
             </div>
+
             <div className={classes.additionalGamePlayCont}>
-                {showCardButtons && showCardButtons.length > 0 ? (
-                    <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
-                ) : null}
-
-                <div className={classes.addGamePlaySectionRight}>
-                    <FormControlLabel
-                        classes={{ label: classes.checkLabel }}
-                        control={
-                            <Checkbox
-                                className={classes.button}
-                                checked={!dealInNextHand}
-                                onChange={onToggleSitOutNextHand}
-                            />
-                        }
-                        label="Sit Out Next Hand"
-                    />
-                    {allowStraddle ? (
-                        <FormControlLabel
-                            classes={{ label: classes.checkLabel }}
-                            control={
-                                <Checkbox
-                                    className={classes.button}
-                                    checked={willStraddle}
-                                    onChange={onToggleStraddle}
-                                />
-                            }
-                            label="Straddle"
-                        />
+                <div className={classes.additionalGamePlayTopButtons}>
+                    {showCardButtons && showCardButtons.length > 0 ? (
+                        <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
                     ) : null}
-
                     {heroSeated ? (
                         <Button
                             className={classnames(classes.timeBankButton, 'ani_timeBank')}
@@ -310,6 +286,26 @@ function ControllerComp(props: ControllerProps) {
                         </Button>
                     ) : null}
                 </div>
+                {allowStraddle ? (
+                    <FormControlLabel
+                        classes={{ label: classes.checkLabel }}
+                        control={
+                            <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
+                        }
+                        label="Straddle"
+                    />
+                ) : null}
+                <FormControlLabel
+                    classes={{ label: classes.checkLabel }}
+                    control={
+                        <Checkbox
+                            className={classes.button}
+                            checked={!dealInNextHand}
+                            onChange={onToggleSitOutNextHand}
+                        />
+                    }
+                    label="Sit Out Next Hand"
+                />
             </div>
         </div>
     );

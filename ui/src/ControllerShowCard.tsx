@@ -15,20 +15,23 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 
 import { ShowCardButton } from './shared/models/uiState';
-import { Button, ButtonGroup } from '@material-ui/core';
+import { Button, ButtonGroup, Tooltip } from '@material-ui/core';
 import Suit from './Suit';
 import { Card } from './shared/models/cards';
+import { grey } from '@material-ui/core/colors';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            width: '7vw',
-            margin: '0.5vmin',
+            display: 'flex',
+            height: '100%',
+            alignItems: 'center',
+            minWidth: '4vw',
             position: 'relative',
         },
         showButton: {
-            position: 'absolute',
-            bottom: 0,
             fontSize: '1.1vmin',
+            width: '100%',
+            margin: '0.5vmin',
         },
         button: {
             fontSize: '1vmin',
@@ -38,11 +41,20 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '1vmin',
             height: '1vmin',
         },
+        groupCont: {
+            width: '100%',
+        },
         group: {
+            width: '100%',
             position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: ' translate(-50%, -50%)',
+            backgroundColor: grey[900],
+            boxShadow: theme.shadows[24],
+            transform: 'translateY(-20%)',
+        },
+        label: {
+            fontSize: '1vmin',
+            writingMode: 'vertical-rl',
+            textOrientation: 'upright',
         },
     }),
 );
@@ -87,6 +99,7 @@ function ControllerShowCard(props: ControllerShowCardProps) {
     return (
         <div className={classnames(classes.root, className)} onMouseLeave={handleClose}>
             {open ? (
+                // <Paper className={classes.groupCont}>
                 <ButtonGroup orientation="vertical" className={classes.group}>
                     {showCardButtons
                         .map((button) => (
@@ -102,8 +115,9 @@ function ControllerShowCard(props: ControllerShowCardProps) {
                         )}
                 </ButtonGroup>
             ) : (
-                <Button className={classes.showButton} onClick={handleOpen} variant="outlined">
-                    Show Cards
+                // </Paper>
+                <Button className={classes.showButton} onMouseEnter={handleOpen} variant="outlined">
+                    Show
                 </Button>
             )}
         </div>
