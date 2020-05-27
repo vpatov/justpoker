@@ -8,7 +8,7 @@ import {
     StageDelayMap,
 } from '../../../ui/src/shared/models/stateGraph';
 import { GameStage, QueuedServerAction } from '../../../ui/src/shared/models/gameState';
-import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/dataCommunication';
+import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';

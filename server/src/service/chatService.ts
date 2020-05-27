@@ -1,9 +1,10 @@
 import { Service } from 'typedi';
 import { ChatMessage, ChatLog } from '../../../ui/src/shared/models/chat';
-import { ClientChatMessage } from '../../../ui/src/shared/models/dataCommunication';
+import { ClientChatMessage } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { ValidationService, hasError } from './validationService';
+import { ClientUUID } from '../../../ui/src/shared/models/uuid';
 
 const changeNameCommandRegEx = /\/name\s(.+)$/;
 const sitDownCommandRegEx = /\/sitdown\s(\d{1,2})$/;
@@ -42,7 +43,7 @@ export class ChatService {
         this.chatLog = { messages: [] };
     }
 
-    processChatMessage(clientUUID: string, message: ClientChatMessage) {
+    processChatMessage(clientUUID: ClientUUID, message: ClientChatMessage) {
         const client = this.gameStateManager.getConnectedClient(clientUUID);
         const player = this.gameStateManager.getPlayerByClientUUID(client.uuid);
 
@@ -60,7 +61,7 @@ export class ChatService {
         this.chatLog.messages.push(this.lastMessage);
     }
 
-    performSpecialDebugActions(clientUUID: string, message: ClientChatMessage) {
+    performSpecialDebugActions(clientUUID: ClientUUID, message: ClientChatMessage) {
         const player = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const nameMatch = message.content.match(changeNameCommandRegEx);
         if (nameMatch) {

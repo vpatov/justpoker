@@ -1,5 +1,5 @@
 import { Suit, genRandomCard } from './cards';
-import { ClientActionType, UiActionType } from './dataCommunication';
+import { ClientActionType, UiActionType } from './api';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
 import { AnimationTrigger } from './animationState';
@@ -7,6 +7,7 @@ import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../util/consts';
 import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
+import { PlayerUUID, makeBlankUUID, makeUUID } from './uuid';
 
 export declare interface ErrorDisplay {
     message?: string;
@@ -106,7 +107,7 @@ export declare interface Table {
 }
 
 export declare interface AwardPot {
-    winnerUUID: string;
+    winnerUUID: PlayerUUID;
     value: number;
 }
 
@@ -144,7 +145,7 @@ export declare interface UiChatMessage {
     timestamp: number;
     content: string;
     senderName: string;
-    playerUUID: string;
+    playerUUID: PlayerUUID;
     seatNumber: number;
 }
 
@@ -292,7 +293,7 @@ export function getCleanChatMessage(): UiChatMessage {
         senderName: '',
         content: '',
         timestamp: 0,
-        playerUUID: '',
+        playerUUID: makeBlankUUID(),
         seatNumber: 0,
     };
 }
@@ -310,21 +311,21 @@ export const testUiChatLog: UiChatLog = {
             senderName: 'Vasia',
             content: 'Message in the chat log.',
             timestamp: 0,
-            playerUUID: '123',
+            playerUUID: makeUUID('123'),
             seatNumber: 0,
         },
         {
             senderName: 'Jules',
             content: 'witty response to something clever.',
             timestamp: 0,
-            playerUUID: '234',
+            playerUUID: makeUUID('234'),
             seatNumber: 1,
         },
         {
             senderName: 'ShaemusGoatmaster',
             content: 'Message in the chataaaasssssssssss sadasdasd asdasd lots of words lorem ipsum lorel sdfsdf log.',
             timestamp: 0,
-            playerUUID: '345',
+            playerUUID: makeUUID('345'),
             seatNumber: 2,
         },
     ],
@@ -393,7 +394,7 @@ export const TestGame: UiGameState = {
         fullPot: genRandomInt(0, 10000),
         inactivePots: [100000, 10000].map((p) => genRandomInt(0, p)),
         awardPots: [
-            { winnerUUID: 'TEST_UUID_1', value: genRandomInt(0, 100000) },
+            { winnerUUID: makeUUID('TEST_UUID_1'), value: genRandomInt(0, 100000) },
             // { winnerUUID: 'TEST_UUID_2', value: genRandomInt(0, 100000) },
         ],
         communityCards: [

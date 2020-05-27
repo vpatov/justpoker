@@ -1,11 +1,12 @@
 import util from 'util';
 import Location from 'history';
 import { GameState } from '../models/gameState';
-import { WSParams, HTTPParams } from '../models/dataCommunication';
+import { WSParams, HTTPParams } from '../models/api';
 import queryString from 'query-string';
+import { makeUUID, UUID } from '../models/uuid';
 
-export function generateUUID(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+export function generateUUID(): UUID {
+    return makeUUID(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
 }
 
 export function printObj(obj: any) {
@@ -49,7 +50,7 @@ export function getLoggableGameState(gameState: GameState) {
 
 export function parseHTTPParams(parsedQuery: queryString.ParsedUrl) {
     const queryParams: HTTPParams = {
-        gameInstanceUUID: parsedQuery.query.gameInstanceUUID as string,
+        gameInstanceUUID: makeUUID(parsedQuery.query.gameInstanceUUID as string),
     };
     return queryParams;
 }

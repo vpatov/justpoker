@@ -3,7 +3,9 @@ import { StateConverter } from '../service/stateConverter';
 import * as WebSocket from 'ws';
 import { generateUUID } from '../../../ui/src/shared/util/util';
 import { logger, debugFunc } from '../logger';
+import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/uuid';
 
+// TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
     [gameInstanceUUID: string]: { [clientUUID: string]: WebSocket };
 }
@@ -15,40 +17,40 @@ export class ConnectedClientManager {
     constructor(private stateConverter: StateConverter) {}
 
     @debugFunc({ noArgs: true })
-    createClientSessionInGroup(groupKey: string, ws: WebSocket): string {
+    createClientSessionInGroup(gameInstanceUUID: GameInstanceUUID, ws: WebSocket): ClientUUID {
         const clientUUID = generateUUID();
-        if (!this.ClientGroups[groupKey]) {
+        if (!this.ClientGroups[gameInstanceUUID]) {
             // create group if doesnt exist
-            this.ClientGroups[groupKey] = { [clientUUID]: ws };
+            this.ClientGroups[gameInstanceUUID] = { [clientUUID]: ws };
         } else {
             // add to group if exists
-            this.ClientGroups[groupKey] = { ...this.ClientGroups[groupKey], [clientUUID]: ws };
+            this.ClientGroups[gameInstanceUUID] = { ...this.ClientGroups[gameInstanceUUID], [clientUUID]: ws };
         }
         return clientUUID;
     }
 
-    createNewClientGroup(groupKey: string) {
-        this.ClientGroups[groupKey] = {};
+    createNewClientGroup(gameInstanceUUID: GameInstanceUUID) {
+        this.ClientGroups[gameInstanceUUID] = {};
     }
 
     @debugFunc({ noArgs: true })
-    updateClientSessionInGroup(groupKey: string, clientUUID: string, ws: WebSocket) {
-        if (this.ClientGroups[groupKey]) {
-            this.ClientGroups[groupKey][clientUUID] = ws;
+    updateClientSessionInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: WebSocket) {
+        if (this.ClientGroups[gameInstanceUUID]) {
+            this.ClientGroups[gameInstanceUUID][clientUUID] = ws;
         }
         // TODO error, there is no group
     }
 
     // If groups can be something other than gameInstances, it might be helpful to have typed
     // helper methods for each group type. (different UUID types will have actual unique types in future)
-    sendStateToEachInGameInstance(gameInstanceUUID: string) {
+    sendStateToEachInGameInstance(gameInstanceUUID: GameInstanceUUID) {
         this.sendStateToEachInGroup(gameInstanceUUID);
     }
 
     // would be good to refactor this so there isnt a direct dependency on stateConverter
-    sendStateToEachInGroup(key: string) {
-        Object.entries(this.ClientGroups[key]).forEach(([clientUUID, websocket]) => {
-            const newState = this.stateConverter.getUIState(clientUUID, false);
+    sendStateToEachInGroup(gameInstanceUUID: GameInstanceUUID) {
+        Object.entries(this.ClientGroups[gameInstanceUUID]).forEach(([clientUUID, websocket]) => {
+            const newState = this.stateConverter.getUIState(clientUUID as ClientUUID, false);
             const jsonRes = JSON.stringify(newState);
             websocket.send(jsonRes);
         });

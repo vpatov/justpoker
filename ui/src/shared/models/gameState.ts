@@ -1,9 +1,10 @@
 import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
-import { Player, PlayerUUID } from './player';
+import { Player } from './player';
 import { Card, Deck } from './cards';
-import { ClientActionType } from './dataCommunication';
+import { ClientActionType } from './api';
+import { ClientUUID, PlayerUUID, makeBlankUUID, PlayerUUID2 } from './uuid';
 
-export declare type ClientUUID = string;
+
 
 export const enum GameStage {
     NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
@@ -32,25 +33,26 @@ export declare interface GameState {
     queuedServerActions: QueuedServerAction[];
 
     /** Sensitive field. */
+    // TODO when branded types can be used as index signatures, replace string with PlayerUUID
     players: Readonly<{ [key: string]: Player }>;
 
     board: ReadonlyArray<Card>;
 
-    gameParameters: Readonly<GameParameters>;
+    gameParameters: GameParameters;
 
-    dealerUUID: Readonly<string>;
+    dealerUUID: PlayerUUID;
 
-    smallBlindUUID: Readonly<string>;
+    smallBlindUUID: PlayerUUID;
 
-    bigBlindUUID: Readonly<string>;
+    bigBlindUUID: PlayerUUID;
 
-    straddleUUID: Readonly<string>;
+    straddleUUID: PlayerUUID;
 
     bettingRoundStage: Readonly<BettingRoundStage>;
 
-    firstToAct: Readonly<string>;
+    firstToAct: PlayerUUID;
 
-    currentPlayerToAct: Readonly<string>;
+    currentPlayerToAct: PlayerUUID;
 
     lastBettingRoundAction: BettingRoundAction;
 
@@ -62,7 +64,7 @@ export declare interface GameState {
     pots: ReadonlyArray<Pot>;
 
     /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
-    handWinners: Set<string>;
+    handWinners: Set<PlayerUUID>;
 
     /**
      * This variable is checked before initializing a new hand. If it's true, and there are enough players, the
@@ -100,7 +102,7 @@ export declare interface ConnectedClient {
 
 export declare interface Pot {
     value: number;
-    contestors: ReadonlyArray<string>;
+    contestors: ReadonlyArray<PlayerUUID>;
 }
 
 export const enum ServerStateKey {
@@ -135,14 +137,14 @@ export function getCleanGameState(): GameState {
             maxPlayers: 9,
             timeBankValue: 0,
         },
-        dealerUUID: '',
-        smallBlindUUID: '',
-        bigBlindUUID: '',
-        straddleUUID: '',
+        dealerUUID: makeBlankUUID(),
+        smallBlindUUID: makeBlankUUID(),
+        bigBlindUUID: makeBlankUUID(),
+        straddleUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
-        firstToAct: '',
-        admin: '',
-        currentPlayerToAct: '',
+        firstToAct: makeBlankUUID(),
+        admin: makeBlankUUID(),
+        currentPlayerToAct: makeBlankUUID(),
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,
         activeConnections: new Map(),
@@ -150,7 +152,7 @@ export function getCleanGameState(): GameState {
             cards: [],
         },
         pots: [],
-        handWinners: new Set<string>(),
+        handWinners: new Set<PlayerUUID>(),
         timeCurrentPlayerTurnStarted: 0,
         timeBanksUsedThisAction: 0,
         serverTime: 0,

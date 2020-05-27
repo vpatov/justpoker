@@ -1,5 +1,5 @@
 import { GameStage } from './gameState';
-import { ActionType } from './dataCommunication';
+import { ActionType } from './api';
 
 export declare interface Condition {
     fn: () => boolean;

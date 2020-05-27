@@ -12,7 +12,7 @@ const winston = require('winston');
 //   }
 
 function getLogLevel(): string {
-    const defaultLogLevel = 'info';
+    const defaultLogLevel = 'debug';
     return process.env.LOG_LEVEL || defaultLogLevel;
 }
 
@@ -83,7 +83,9 @@ export function debugFunc(paramsArg?: DebugFuncParams) {
                     }
                     return result;
                 } catch (e) {
+                    const err = e as Error;
                     logger.debug(`RTRN: ${String(key)} \t ERRR: ${e}`);
+                    logger.debug(`Stacktrace: ${err.stack}`);
                     throw e;
                 }
             };

@@ -1,4 +1,5 @@
 import { BettingRoundAction, GameType } from './game';
+import { GameInstanceUUID, ClientUUID, PlayerUUID } from './uuid';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
@@ -13,11 +14,11 @@ export declare interface Event {
 export declare type ActionType = ClientActionType | ServerActionType;
 export declare interface BaseAction {
     actionType: ActionType;
-    gameInstanceUUID: string;
+    gameInstanceUUID: GameInstanceUUID;
 }
 export declare interface ClientAction extends BaseAction {
     actionType: ClientActionType;
-    clientUUID: string;
+    clientUUID: ClientUUID;
     request: ClientWsMessageRequest;
 }
 export declare interface ServerAction extends BaseAction {
@@ -25,12 +26,12 @@ export declare interface ServerAction extends BaseAction {
 }
 
 export declare interface WSParams {
-    clientUUID: string;
-    gameInstanceUUID: string;
+    clientUUID: ClientUUID;
+    gameInstanceUUID: GameInstanceUUID;
 }
 
 export declare interface HTTPParams {
-    gameInstanceUUID: string;
+    gameInstanceUUID: GameInstanceUUID;
 }
 
 export enum ClientActionType {
@@ -83,7 +84,7 @@ export declare interface AddChipsRequest {
 
 export declare interface SetChipsRequest {
     chipAmount: number;
-    playerUUID: string;
+    playerUUID: PlayerUUID;
 }
 
 export declare interface ClientChatMessage {
@@ -95,7 +96,7 @@ export declare interface ClientStraddleRequest {
 }
 
 export declare interface BootPlayerRequest {
-    playerUUID: string;
+    playerUUID: PlayerUUID;
 }
 
 export type ClientWsMessageRequest = SitDownRequest &
@@ -123,7 +124,7 @@ export declare interface NewGameForm {
     adminOptions?: any;
 }
 
-export function createTimeoutEvent(gameInstanceUUID: string): Event {
+export function createTimeoutEvent(gameInstanceUUID: GameInstanceUUID): Event {
     return {
         eventType: EventType.SERVER_ACTION,
         body: {

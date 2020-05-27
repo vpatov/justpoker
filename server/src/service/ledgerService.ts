@@ -7,6 +7,7 @@ import {
     UILedgerRow,
 } from '../../../ui/src/shared/models/ledger';
 import { logger } from '../logger';
+import { ClientUUID } from '../../../ui/src/shared/models/uuid';
 
 /*
     TODO:
@@ -19,7 +20,7 @@ export class LedgerService {
     private ledger: ServerLedger = {};
 
     /** Initiate the ledger row for the client. Called when client is initialized. */
-    initRow(clientUUID: string) {
+    initRow(clientUUID: ClientUUID) {
         if (!this.getLedgerRow(clientUUID)) {
             this.ledger[clientUUID] = {
                 ...getCleanLedgerRow(),
@@ -42,14 +43,14 @@ export class LedgerService {
         this.ledger = ledger;
     }
 
-    private getLedgerRow(clientUUID: string): ServerLedgerRow {
+    private getLedgerRow(clientUUID: ClientUUID): ServerLedgerRow {
         return this.ledger[clientUUID];
     }
 
     /**
      * Aliases (player names) are recorded during sitdown or name change via chat.
      */
-    addAlias(clientUUID: string, name: string): void {
+    addAlias(clientUUID: ClientUUID, name: string): void {
         this.getLedgerRow(clientUUID).aliases.add(name);
     }
 
@@ -58,7 +59,7 @@ export class LedgerService {
      *      - player fills out sit down form
      *      - player adds on more chips from menu
      */
-    addBuyin(clientUUID: string, buyin: number): void {
+    addBuyin(clientUUID: ClientUUID, buyin: number): void {
         this.getLedgerRow(clientUUID).buyins.push(buyin);
     }
 
@@ -66,41 +67,41 @@ export class LedgerService {
      * Walkaway should be recorded when
      *      - player stands up (either manually or by being stacked)
      */
-    addWalkaway(clientUUID: string, walkaway: number): void {
+    addWalkaway(clientUUID: ClientUUID, walkaway: number): void {
         this.getLedgerRow(clientUUID).walkaways.push(walkaway);
     }
 
-    private setTimeStartedPlaying(clientUUID: string, timeStartedPlaying: number): void {
+    private setTimeStartedPlaying(clientUUID: ClientUUID, timeStartedPlaying: number): void {
         this.getLedgerRow(clientUUID).timeStartedPlaying = timeStartedPlaying;
     }
 
-    private setTimeMostRecentHand(clientUUID: string, timeMostRecentHand: number): void {
+    private setTimeMostRecentHand(clientUUID: ClientUUID, timeMostRecentHand: number): void {
         this.getLedgerRow(clientUUID).timeMostRecentHand = timeMostRecentHand;
     }
 
-    setCurrentChips(clientUUID: string, currentChips: number): void {
+    setCurrentChips(clientUUID: ClientUUID, currentChips: number): void {
         this.getLedgerRow(clientUUID).currentChips = currentChips;
     }
 
     /** Helper method for incrementHandsWon. */
-    incrementHandsWonForPlayers(clientUUIDs: Iterable<string>): void {
+    incrementHandsWonForPlayers(clientUUIDs: Iterable<ClientUUID>): void {
         for (const clientUUID of clientUUIDs) {
             this.incrementHandsWon(clientUUID);
         }
     }
 
     /** Called everytime the client wins a hand. Incremented only once even if there are multiple pots. */
-    incrementHandsWon(clientUUID: string): void {
+    incrementHandsWon(clientUUID: ClientUUID): void {
         this.getLedgerRow(clientUUID).handsWon += 1;
     }
 
     /** Called everytime the betting round stage reaches the flop, and the client is still in the game. */
-    incrementFlopsSeen(clientUUID: string): void {
+    incrementFlopsSeen(clientUUID: ClientUUID): void {
         this.getLedgerRow(clientUUID).flopsSeen += 1;
     }
 
     /** Called everytime the client is dealt in preflop. timeStartedPlaying and timeMostRecentHand are handled here. */
-    incrementHandsDealtIn(clientUUID: string): void {
+    incrementHandsDealtIn(clientUUID: ClientUUID): void {
         const row = this.getLedgerRow(clientUUID);
         const currentTime = Date.now();
         if (row.handsDealtIn === 0) {

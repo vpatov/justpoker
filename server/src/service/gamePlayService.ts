@@ -20,6 +20,7 @@ import { hasError, ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { logger } from '../logger';
+import { PlayerUUID, makeBlankUUID, makeUUID } from '../../../ui/src/shared/models/uuid';
 
 @Service()
 export class GamePlayService {
@@ -64,7 +65,7 @@ export class GamePlayService {
         const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
         const timeRemaining =
             this.gsm.getTimeToAct() +
-            this.gsm.getSumTimeBankValueThisAction(currentPlayerToAct) -
+            this.gsm.getSumTimeBankValueThisAction() -
             this.gsm.getCurrentPlayerTurnElapsedTime();
         return timeRemaining;
     }
@@ -159,7 +160,7 @@ export class GamePlayService {
         // TODO only if player is facing bet
     }
 
-    bet(betAmount: number, playerPlacingBlindBetUUID?: string) {
+    bet(betAmount: number, playerPlacingBlindBetUUID?: PlayerUUID) {
         const playerPlacingBet = playerPlacingBlindBetUUID
             ? playerPlacingBlindBetUUID
             : this.gsm.getCurrentPlayerToAct();
@@ -277,7 +278,7 @@ export class GamePlayService {
         this.gsm.updateGameState({
             smallBlindUUID,
             bigBlindUUID,
-            straddleUUID: placeStraddle ? straddleUUID : '',
+            straddleUUID: placeStraddle ? straddleUUID : makeBlankUUID(),
         });
     }
 
@@ -286,7 +287,7 @@ export class GamePlayService {
         const dealerUUID = this.gsm.getDealerUUID();
         const straddleUUID = this.gsm.getStraddleUUID();
         const headsUp = this.gsm.getPlayersReadyToPlay().length === 2;
-        let firstToAct = '';
+        let firstToAct: PlayerUUID = makeBlankUUID();
 
         if (this.gsm.getBettingRoundStage() === BettingRoundStage.PREFLOP) {
             if (headsUp) {
@@ -303,7 +304,7 @@ export class GamePlayService {
         this.gsm.setFirstToAct(firstToAct);
     }
 
-    dealHoleCards(playerUUID: string) {
+    dealHoleCards(playerUUID: PlayerUUID) {
         const gameType = this.gsm.getGameType();
         switch (gameType) {
             case GameType.NLHOLDEM: {
@@ -366,17 +367,19 @@ export class GamePlayService {
     }
 
     showDown() {
-        const playersHands: [string, any][] = this.gsm
+        const playersHands: [PlayerUUID, any][] = this.gsm
             .getPlayersInHand()
             .map((playerUUID) => [playerUUID, this.gsm.computeBestHandForPlayer(playerUUID)]);
 
         const pot = this.gsm.popPot();
 
-        const eligiblePlayers: [string, Hand][] = playersHands.filter(([uuid, hand]) => pot.contestors.includes(uuid));
+        const eligiblePlayers: [PlayerUUID, Hand][] = playersHands.filter(([uuid, hand]) =>
+            pot.contestors.includes(uuid),
+        );
         const winningHands: Hand[] = this.handSolverService.getWinningHands(
             eligiblePlayers.map(([uuid, hand]) => hand),
         );
-        const winningPlayers: string[] = eligiblePlayers
+        const winningPlayers: PlayerUUID[] = eligiblePlayers
             .filter(([uuid, hand]) => winningHands.includes(hand))
             .map(([uuid, hand]) => uuid);
 
@@ -433,9 +436,9 @@ export class GamePlayService {
     }
 
     placeBetsInPot() {
-        let playerBets: [number, string][] = Object.entries(this.gsm.getPlayers()).map(([uuid, player]) => [
+        let playerBets: [number, PlayerUUID][] = Object.entries(this.gsm.getPlayers()).map(([uuid, player]) => [
             player.betAmount,
-            uuid,
+            player.uuid,
         ]);
 
         // TODO see if you can make this more functional style
@@ -455,7 +458,7 @@ export class GamePlayService {
 
             // TODO why is the cast necessary? compiler errors without it
             playerBets = playerBets
-                .map(([betAmount, uuid]) => [betAmount - minimumBet, uuid] as [number, string])
+                .map(([betAmount, uuid]) => [betAmount - minimumBet, uuid] as [number, PlayerUUID])
                 .filter(([betAmount, uuid]) => betAmount > 0);
         }
 
@@ -490,7 +493,7 @@ export class GamePlayService {
 
         const coalescedPots: Pot[] = [...potsByContestors.entries()].map(([contestorsStr, pots]) => ({
             value: pots.reduce((sum, pot) => pot.value + sum, 0),
-            contestors: contestorsStr.split(','),
+            contestors: contestorsStr.split(',').map((contestor) => makeUUID(contestor)),
         }));
 
         this.gsm.updateGameState({ pots: coalescedPots });
