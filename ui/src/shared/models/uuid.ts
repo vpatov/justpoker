@@ -8,10 +8,6 @@ export declare type PlayerUUID = string & { __brand: "PlayerUUID"};
 export declare type GameInstanceUUID = string & {__brand: "GameInstanceUUID"};
 export declare type UUID = ClientUUID & PlayerUUID & GameInstanceUUID;
 
-export declare interface PlayerUUID2 {
-    uuid: string;
-}
-
 export function makeClientUUID(s: string): ClientUUID {
     return s as ClientUUID;
 }

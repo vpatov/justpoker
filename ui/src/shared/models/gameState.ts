@@ -2,7 +2,7 @@ import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, Bettin
 import { Player } from './player';
 import { Card, Deck } from './cards';
 import { ClientActionType } from './api';
-import { ClientUUID, PlayerUUID, makeBlankUUID, PlayerUUID2 } from './uuid';
+import { ClientUUID, PlayerUUID, makeBlankUUID } from './uuid';
 
 
 
@@ -34,9 +34,9 @@ export declare interface GameState {
 
     /** Sensitive field. */
     // TODO when branded types can be used as index signatures, replace string with PlayerUUID
-    players: Readonly<{ [key: string]: Player }>;
+    players: { [key: string]: Player };
 
-    board: ReadonlyArray<Card>;
+    board: Array<Card>;
 
     gameParameters: GameParameters;
 
@@ -48,7 +48,7 @@ export declare interface GameState {
 
     straddleUUID: PlayerUUID;
 
-    bettingRoundStage: Readonly<BettingRoundStage>;
+    bettingRoundStage: BettingRoundStage;
 
     firstToAct: PlayerUUID;
 
@@ -61,7 +61,7 @@ export declare interface GameState {
     /** Amount of timebanks that the player has used this turn. */
     timeBanksUsedThisAction: number;
 
-    pots: ReadonlyArray<Pot>;
+    pots: Array<Pot>;
 
     /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
     handWinners: Set<PlayerUUID>;
@@ -72,10 +72,10 @@ export declare interface GameState {
      * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently
      * in progress - that is determined by the gameStage !== NOT_IN_PROGRESS, exposed in gsm.isGameInProgress().
      */
-    shouldDealNextHand: Readonly<boolean>;
+    shouldDealNextHand: boolean;
 
     /** Sensitive field. */
-    deck: Readonly<Deck>;
+    deck: Deck;
 
     /** Sensitive field. */
     admin: ClientUUID;
@@ -83,10 +83,10 @@ export declare interface GameState {
     /** Sensitive field. */
     activeConnections: Map<ClientUUID, ConnectedClient>;
 
-    serverTime: Readonly<number>;
+    serverTime: number;
 
     /** The minimum amount by which the next player can raise. */
-    minRaiseDiff: Readonly<number>;
+    minRaiseDiff: number;
 
     /** The size of the bet of the last aggressor. It will not include callers and partial all-ins. */
     previousRaise: number;
@@ -102,7 +102,7 @@ export declare interface ConnectedClient {
 
 export declare interface Pot {
     value: number;
-    contestors: ReadonlyArray<PlayerUUID>;
+    contestors: Array<PlayerUUID>;
 }
 
 export const enum ServerStateKey {
