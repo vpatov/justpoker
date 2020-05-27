@@ -219,6 +219,11 @@ export class GamePlayService {
             });
         }
 
+        // record last aggressor
+        this.gsm.updateGameState({
+            lastAggressorUUID: playerPlacingBet,
+        });
+
         this.audioService.playBetSFX();
     }
 
@@ -403,14 +408,16 @@ export class GamePlayService {
             }),
         );
 
-        const shouldShowWinnersCards = !this.gsm.hasEveryoneButOnePlayerFolded();
-
-        // TODO TODO
-        // // Show everyones hand at showdown if they havent folded yet.
-        // // TODO show only those hands youre supposed to show.
-        // this.gsm.updatePlayers((player) =>
-        //     shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
-        // );
+        // show cards
+        if (!this.gsm.hasEveryoneButOnePlayerFolded()) {
+            // always show winning players hands
+            winningPlayers.map((wp) => this.gsm.setPlayerCardsAllVisible(wp));
+            // if last aggressor is in pot show his/her hand too
+            const lastAggressorUUID = this.gsm.getLastAggressorUUID();
+            if (this.gsm.getPlayersInHand().includes(lastAggressorUUID)) {
+                this.gsm.setPlayerCardsAllVisible(lastAggressorUUID);
+            }
+        }
 
         this.gsm.clearWinnersAndDeltas();
 

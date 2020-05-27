@@ -46,6 +46,9 @@ export declare interface GameState {
 
     straddleUUID: Readonly<string>;
 
+    // playerUUID of last player to bet or raise
+    lastAggressorUUID: string;
+
     bettingRoundStage: Readonly<BettingRoundStage>;
 
     firstToAct: Readonly<string>;
@@ -139,6 +142,7 @@ export function getCleanGameState(): GameState {
         smallBlindUUID: '',
         bigBlindUUID: '',
         straddleUUID: '',
+        lastAggressorUUID: '',
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: '',
         admin: '',

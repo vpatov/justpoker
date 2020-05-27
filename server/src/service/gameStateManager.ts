@@ -786,8 +786,21 @@ export class GameStateManager {
         });
     }
 
+    setPlayerCardsAllVisible(playerUUID: string) {
+        const player = this.getPlayer(playerUUID);
+        this.updatePlayer(playerUUID, {
+            holeCards: player.holeCards.map((c) => {
+                return { ...c, visible: true };
+            }),
+        });
+    }
+
     getFirstToAct() {
         return this.gameState.firstToAct;
+    }
+
+    getLastAggressorUUID(): string {
+        return this.gameState.lastAggressorUUID;
     }
 
     setFirstToAct(playerUUID: string) {
