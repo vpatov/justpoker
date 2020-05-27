@@ -34,11 +34,11 @@ export class GamePlayService {
     ) {}
 
     startGame() {
-        this.gsm.updateGameState({ shouldDealNextHand: true });
+        this.gsm.setShouldDealNextHand(true);
     }
 
     stopGame() {
-        this.gsm.updateGameState({ shouldDealNextHand: false });
+        this.gsm.setShouldDealNextHand(false);
     }
 
     computeAndSetCurrentPlayerToAct() {
@@ -55,9 +55,7 @@ export class GamePlayService {
 
     setTimeCurrentPlayerTurnStarted() {
         if (this.gsm.getTimeBanksUsedThisAction() === 0) {
-            this.gsm.updateGameState({
-                timeCurrentPlayerTurnStarted: Date.now(),
-            });
+            this.gsm.setTimeCurrentPlayerTurnStarted(Date.now());
         }
     }
 
@@ -95,12 +93,9 @@ export class GamePlayService {
     }
 
     startOfBettingRound() {
-        this.gsm.updateGameState({
-            minRaiseDiff: this.gsm.getBB(),
-            previousRaise:
-                this.gsm.getBettingRoundStage() === BettingRoundStage.PREFLOP ? this.gsm.getPreviousRaise() : 0,
-            partialAllInLeftOver: 0,
-        });
+        this.gsm.setPreviousRaise(0);
+        this.gsm.setMinRaiseDiff(this.gsm.getBB());
+        this.gsm.setPartialAllInLeftOver(0);
         this.updateHandDescriptions();
     }
 
@@ -208,18 +203,13 @@ export class GamePlayService {
                 );
             }
             const partialAllInLeftOver = actualBetAmount - previousRaise;
-            this.gsm.updateGameState({
-                partialAllInLeftOver,
-            });
+            this.gsm.setPartialAllInLeftOver(partialAllInLeftOver);
         } else {
             // If SB/BB are going all in with less than a blind preflop, if you have more than one BB
             // you cant call less then the BB, you must put in at least a BB
-            this.gsm.updateGameState({
-                minRaiseDiff: Math.max(this.gsm.getBB(), actualBetAmount - previousRaise),
-                previousRaise: Math.max(this.gsm.getBB(), actualBetAmount),
-            });
+            this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
+            this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
         }
-
         this.audioService.playBetSFX();
     }
 
@@ -247,7 +237,7 @@ export class GamePlayService {
             ? this.gsm.getNextPlayerReadyToPlayUUID(this.gsm.getDealerUUID())
             : seatZeroPlayerUUID;
 
-        this.gsm.updateGameState({ dealerUUID });
+        this.gsm.setDealerUUID(dealerUUID);
     }
 
     /*
@@ -275,11 +265,9 @@ export class GamePlayService {
             this.bet(BB * 2, straddleUUID);
         }
 
-        this.gsm.updateGameState({
-            smallBlindUUID,
-            bigBlindUUID,
-            straddleUUID: placeStraddle ? straddleUUID : makeBlankUUID(),
-        });
+        this.gsm.setSmallBlindUUID(smallBlindUUID);
+        this.gsm.setBigBlindUUID(bigBlindUUID);
+        this.gsm.setStraddleUUID(placeStraddle ? straddleUUID : makeBlankUUID());
     }
 
     setFirstToActAtStartOfBettingRound() {
@@ -496,7 +484,7 @@ export class GamePlayService {
             contestors: contestorsStr.split(',').map((contestor) => makeUUID(contestor)),
         }));
 
-        this.gsm.updateGameState({ pots: coalescedPots });
+        this.gsm.setPots(coalescedPots);
 
         // update players chip counts
         this.gsm.updatePlayers((player) => ({ chips: player.chips - player.betAmount, betAmount: 0 }));

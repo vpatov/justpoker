@@ -25,8 +25,6 @@ export declare interface QueuedServerAction {
     args: any[];
 }
 
-// TODO break up into gameState and serverState
-// TODO revisit the way immutability is implemented via readonly.
 export declare interface GameState {
     gameStage: GameStage;
 

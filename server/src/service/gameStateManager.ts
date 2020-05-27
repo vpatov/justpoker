@@ -29,12 +29,13 @@ import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { throws } from 'assert';
 
 // TODO Re-organize methods in some meaningful way
 
 @Service()
 export class GameStateManager {
-    private gameState: Readonly<GameState> = getCleanGameState();
+    private gameState: GameState = getCleanGameState();
 
     // TODO place updatedKey logic into a seperate ServerStateManager file.
     updatedKeys: Set<ServerStateKey> = ALL_STATE_KEYS;
@@ -77,19 +78,13 @@ export class GameStateManager {
     }
 
     updateGameStage(gameStage: GameStage) {
-        this.updateGameState({ gameStage });
+        this.gameState.gameStage = gameStage;
     }
 
     updateGameState(updates: Partial<GameState>) {
         this.gameState = {
             ...this.gameState,
             ...updates,
-        };
-    }
-
-    snapShotGameState() {
-        return {
-            ...this.gameState,
         };
     }
 
@@ -110,15 +105,12 @@ export class GameStateManager {
         };
     }
 
-    updatePlayer(playerUUID: PlayerUUID, updates: Partial<Player>) {
+    updatePlayer(playerUUID: PlayerUUID, updates: Partial<Player>, create?: boolean) {
         const player = this.getPlayer(playerUUID);
-
-        this.updateGameState({
-            players: {
-                ...this.gameState.players,
-                [player.uuid]: { ...player, ...updates },
-            },
-        });
+        this.getPlayers()[create ? playerUUID : player.uuid] = {
+            ...player,
+            ...updates,
+        };
     }
     updatePlayers(updateFn: (player: Player) => Partial<Player>) {
         Object.entries(this.gameState.players).forEach(([uuid, player]) =>
@@ -176,7 +168,7 @@ export class GameStateManager {
     }
 
     // TODO when branded types can be used as index signatures, replace string with PlayerUUID
-    getPlayers(): Readonly<{ [key: string]: Player }> {
+    getPlayers(): { [key: string]: Player } {
         return this.gameState.players;
     }
 
@@ -184,12 +176,24 @@ export class GameStateManager {
         return this.gameState.previousRaise;
     }
 
+    setPreviousRaise(previousRaise: number) {
+        this.gameState.previousRaise = previousRaise;
+    }
+
     getPartialAllInLeftOver() {
         return this.gameState.partialAllInLeftOver;
     }
 
+    setPartialAllInLeftOver(partialAllInLeftOver: number) {
+        this.gameState.partialAllInLeftOver = partialAllInLeftOver;
+    }
+
     getMinRaiseDiff() {
         return this.gameState.minRaiseDiff;
+    }
+
+    setMinRaiseDiff(minRaiseDiff: number) {
+        this.gameState.minRaiseDiff = minRaiseDiff;
     }
 
     getCurrentPlayerToAct() {
@@ -200,16 +204,32 @@ export class GameStateManager {
         return this.gameState.dealerUUID;
     }
 
+    setDealerUUID(dealerUUID: PlayerUUID): void {
+        this.gameState.dealerUUID = dealerUUID;
+    }
+
     getBigBlindUUID(): PlayerUUID {
         return this.gameState.bigBlindUUID;
+    }
+
+    setBigBlindUUID(bigBlindUUID: PlayerUUID): void {
+        this.gameState.bigBlindUUID = bigBlindUUID;
     }
 
     getSmallBlindUUID(): PlayerUUID {
         return this.gameState.smallBlindUUID;
     }
 
+    setSmallBlindUUID(smallBlindUUID: PlayerUUID) {
+        this.gameState.smallBlindUUID = smallBlindUUID;
+    }
+
     getStraddleUUID(): PlayerUUID {
         return this.gameState.straddleUUID;
+    }
+
+    setStraddleUUID(straddleUUID: PlayerUUID) {
+        this.gameState.straddleUUID = straddleUUID;
     }
 
     getBoard() {
@@ -238,6 +258,10 @@ export class GameStateManager {
     // returns time in milliseconds
     getTimeCurrentPlayerTurnStarted() {
         return this.gameState.timeCurrentPlayerTurnStarted;
+    }
+
+    setTimeCurrentPlayerTurnStarted(timeCurrentPlayerTurnStarted: number) {
+        this.gameState.timeCurrentPlayerTurnStarted = timeCurrentPlayerTurnStarted;
     }
 
     // returns time in milliseconds
@@ -270,17 +294,19 @@ export class GameStateManager {
     }
 
     incrementTimeBanksUsedThisAction() {
-        this.updateGameState({
-            timeBanksUsedThisAction: this.getTimeBanksUsedThisAction() + 1,
-        });
+        this.gameState.timeBanksUsedThisAction += 1;
     }
 
     clearTimeBanksUsedThisAction() {
-        this.updateGameState({ timeBanksUsedThisAction: 0 });
+        this.gameState.timeBanksUsedThisAction = 0;
     }
 
     getPots() {
         return this.gameState.pots;
+    }
+
+    setPots(pots: Pot[]) {
+        this.gameState.pots = pots;
     }
 
     getActivePotValue() {
@@ -316,7 +342,7 @@ export class GameStateManager {
             );
         }
         const poppedPot = this.gameState.pots[0];
-        this.updateGameState({ pots: this.gameState.pots.filter((pot) => pot != poppedPot) });
+        this.gameState.pots = this.getPots().filter((pot) => pot != poppedPot);
         if (!(this.gameState.pots.length === potsLength - 1)) {
             throw Error(
                 `Pot array should have pot removed after calling popPot. This is a bug. GameState: ${getLoggableGameState(
@@ -345,9 +371,7 @@ export class GameStateManager {
     }
 
     addHandWinner(playerUUID: PlayerUUID) {
-        this.updateGameState({
-            handWinners: new Set([...this.getHandWinners(), playerUUID]),
-        });
+        this.gameState.handWinners.add(playerUUID);
     }
 
     getSB() {
@@ -442,6 +466,10 @@ export class GameStateManager {
 
     shouldDealNextHand() {
         return this.gameState.shouldDealNextHand;
+    }
+
+    setShouldDealNextHand(shouldDealNextHand: boolean) {
+        this.gameState.shouldDealNextHand = shouldDealNextHand;
     }
 
     isPlayerReadyToPlay(playerUUID: PlayerUUID): boolean {
@@ -587,7 +615,7 @@ export class GameStateManager {
 
     dealCardsToBoard(amount: number) {
         const newCards = [...Array(amount).keys()].map((_) => this.drawCard());
-        this.updateGameState({ board: [...this.getBoard(), ...newCards] });
+        this.gameState.board.push(...newCards);
     }
 
     dealCardsToPlayer(amount: number, playerUUID: PlayerUUID) {
@@ -607,18 +635,13 @@ export class GameStateManager {
                 this.initAdmin(clientUUID);
             }
             const newClient = this.createConnectedClient(clientUUID);
-            this.gameState = {
-                ...this.gameState,
-                activeConnections: new Map([...this.gameState.activeConnections, [clientUUID, newClient]]),
-            };
+            this.gameState.activeConnections.set(clientUUID, newClient);
             this.ledgerService.initRow(clientUUID);
         }
     }
 
     initAdmin(clientUUID: ClientUUID) {
-        this.updateGameState({
-            admin: clientUUID,
-        });
+        this.gameState.admin = clientUUID;
     }
 
     getAdminUUID() {
@@ -653,28 +676,25 @@ export class GameStateManager {
     }
 
     initializeNewDeck() {
-        this.updateGameState({ deck: this.deckService.newDeck() });
+        this.gameState.deck = this.deckService.newDeck();
     }
 
     /* Updaters */
 
     updateGameParameters(gameParameters: GameParameters) {
-        this.gameState = {
-            ...this.gameState,
-            gameParameters: {
-                ...gameParameters,
-            },
-        };
+        this.gameState.gameParameters = gameParameters;
     }
 
     queueAction(queuedServerAction: QueuedServerAction) {
-        this.updateGameState({
-            queuedServerActions: [...this.gameState.queuedServerActions, queuedServerAction],
-        });
+        this.gameState.queuedServerActions.push(queuedServerAction);
     }
 
     getQueuedServerActions(): QueuedServerAction[] {
         return this.gameState.queuedServerActions;
+    }
+
+    clearQueuedServerActions() {
+        this.gameState.queuedServerActions = [];
     }
 
     /* Player operations */
@@ -706,30 +726,16 @@ export class GameStateManager {
         if (player.sitting) {
             this.standUpPlayer(playerUUID);
         }
-        this.updateGameState({
-            players: Object.fromEntries(
-                Object.entries(this.getPlayers()).filter(([uuid, player]) => uuid !== playerUUID),
-            ),
-        });
+        delete this.gameState.players[playerUUID];
     }
 
     // TODO if you need to perform more operations like this, you need to create helpers
     deassociateClientAndPlayer(playerUUID: PlayerUUID) {
-        const playerClientUUID = this.getClientByPlayerUUID(playerUUID);
-        if (!playerClientUUID) {
+        const clientUUID = this.getClientByPlayerUUID(playerUUID);
+        if (!clientUUID) {
             throw Error('deassociateClientAndPlayer called with a player that doesnt have a client.');
         }
-        this.updateGameState({
-            activeConnections: new Map(
-                [...this.gameState.activeConnections].map(([clientUUID, client]) => [
-                    clientUUID,
-                    {
-                        ...client,
-                        playerUUID: clientUUID === playerClientUUID ? makeBlankUUID() : client.playerUUID,
-                    },
-                ]),
-            ),
-        });
+        this.gameState.activeConnections.set(clientUUID, this.createConnectedClient(clientUUID));
     }
 
     addNewPlayerToGame(clientUUID: ClientUUID, request: JoinTableRequest) {
@@ -747,14 +753,8 @@ export class GameStateManager {
         // -----
 
         const associatedClient = this.associateClientAndPlayer(clientUUID, player.uuid);
-        this.gameState = {
-            ...this.gameState,
-            players: { ...this.gameState.players, [player.uuid]: player },
-            activeConnections: new Map([
-                ...this.gameState.activeConnections,
-                [associatedClient.uuid, associatedClient],
-            ]),
-        };
+        this.updatePlayer(player.uuid, player, true);
+        this.gameState.activeConnections.set(associatedClient.uuid, associatedClient);
 
         this.ledgerService.addAlias(clientUUID, name);
         this.ledgerService.addBuyin(clientUUID, buyin);
@@ -787,15 +787,15 @@ export class GameStateManager {
     }
 
     setFirstToAct(playerUUID: PlayerUUID) {
-        this.updateGameState({ firstToAct: playerUUID });
+        this.gameState.firstToAct = playerUUID;
     }
 
     setCurrentPlayerToAct(playerUUID: PlayerUUID) {
-        this.updateGameState({ currentPlayerToAct: playerUUID });
+        this.gameState.currentPlayerToAct = playerUUID;
     }
 
     setBettingRoundStage(bettingRoundStage: BettingRoundStage) {
-        this.updateGameState({ bettingRoundStage });
+        this.gameState.bettingRoundStage = bettingRoundStage;
     }
 
     setPlayerLastActionType(playerUUID: PlayerUUID, lastActionType: BettingRoundActionType) {
@@ -812,7 +812,7 @@ export class GameStateManager {
     }
 
     setLastBettingRoundAction(lastBettingRoundAction: BettingRoundAction) {
-        this.updateGameState({ lastBettingRoundAction });
+        this.gameState.lastBettingRoundAction = lastBettingRoundAction;
     }
 
     computeBestHandForPlayer(playerUUID: PlayerUUID): Hand {
@@ -884,7 +884,7 @@ export class GameStateManager {
     }
 
     clearStateOfHandInfo() {
-        this.updatePlayers((player) => ({
+        this.updatePlayers((_) => ({
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
             holeCards: [],
             handDescription: '',
@@ -926,9 +926,7 @@ export class GameStateManager {
     }
 
     clearCurrentPlayerToAct() {
-        this.updateGameState({
-            currentPlayerToAct: makeBlankUUID(),
-        });
+        this.gameState.currentPlayerToAct = makeBlankUUID();
     }
 
     getHighestBet() {
@@ -996,10 +994,10 @@ export class GameStateManager {
     }
 
     incrementBettingRoundStage() {
-        this.updateGameState({ bettingRoundStage: this.getNextBettingRoundStage() });
+        this.gameState.bettingRoundStage = this.getNextBettingRoundStage();
     }
 
     clearBettingRoundStage() {
-        this.updateGameState({ bettingRoundStage: BettingRoundStage.WAITING });
+        this.gameState.bettingRoundStage = BettingRoundStage.WAITING;
     }
 }

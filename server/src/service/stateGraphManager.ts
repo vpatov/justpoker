@@ -192,7 +192,7 @@ export class StateGraphManager {
                 this.gameStateManager.initializeNewDeck();
                 this.gamePlayService.initializeDealerButton();
                 this.gamePlayService.placeBlinds();
-                this.gameStateManager.updateGameState({ bettingRoundStage: BettingRoundStage.WAITING });
+                this.gameStateManager.setBettingRoundStage(BettingRoundStage.WAITING);
                 break;
             }
 
@@ -273,6 +273,6 @@ export class StateGraphManager {
     // elegant queueing / precondition check / function+argument delivery.
     executeQueuedServerActions() {
         this.gameStateManager.getQueuedServerActions().forEach((action) => this.executeQueuedServerAction(action));
-        this.gameStateManager.updateGameState({ queuedServerActions: [] });
+        this.gameStateManager.clearQueuedServerActions();
     }
 }
