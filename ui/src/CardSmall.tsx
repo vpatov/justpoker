@@ -95,13 +95,13 @@ function CardSmall(props) {
     const { suit, rank, hidden, className, partOfWinningHand, shouldFlex } = props;
 
     const [cardId, _] = useState(generateUUID());
-    const prevHidden = usePrevious(hidden);
+    // const prevHidden = usePrevious(hidden);
 
-    useEffect(() => {
-        if (prevHidden && !hidden) {
-            animateShowCard(cardId);
-        }
-    }, [hidden, prevHidden]);
+    // useEffect(() => {
+    //     if (prevHidden && !hidden) {
+    //         animateShowCard(cardId);
+    //     }
+    // }, [hidden, prevHidden]);
 
     if (hidden) {
         return (

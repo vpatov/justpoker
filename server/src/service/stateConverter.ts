@@ -267,13 +267,23 @@ export class StateConverter {
     }
 
     getShowCardButtons(clientUUID: string): ShowCardButton[] {
+        // condition to allow for possibility of showing cards
+        // still might be empty if all cards are shown
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const showCardButtons: ShowCardButton[] = [];
-        heroPlayer.holeCards.forEach((c) => {
-            if (!c.visible) showCardButtons.push({ suit: c.suit, rank: c.rank });
-        });
-        // TODO leave table button
-        return showCardButtons;
+
+        if (
+            (this.gameStateManager.isPlayerInHand(heroPlayer.uuid) &&
+                this.gameStateManager.getPlayersInHand().length === 2) ||
+            this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
+        ) {
+            const showCardButtons: ShowCardButton[] = [];
+            heroPlayer.holeCards.forEach((c) => {
+                if (!c.visible) showCardButtons.push({ suit: c.suit, rank: c.rank });
+            });
+
+            return showCardButtons;
+        }
+        return [];
     }
 
     transformAudioForPlayer(playerUUID: string): SoundByte {
