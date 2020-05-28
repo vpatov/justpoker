@@ -272,7 +272,7 @@ function ControllerComp(props: ControllerProps) {
 
             <div className={classes.additionalGamePlayCont}>
                 <div className={classes.additionalGamePlayTopButtons}>
-                    {showCardButtons && showCardButtons.length > 0 ? (
+                    {showCardButtons?.length ? (
                         <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
                     ) : null}
                     {heroSeated ? (
