@@ -108,7 +108,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function Default(props) {
+function ControllerBetSizer(props) {
     const classes = useStyles();
     const theme = useTheme();
     const { sizingButtons, min, max, value, onChange, onClickActionButton } = props;
@@ -196,4 +196,4 @@ function Default(props) {
     );
 }
 
-export default Default;
+export default ControllerBetSizer;
