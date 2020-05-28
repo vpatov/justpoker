@@ -11,7 +11,7 @@ import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
-const Color = require('color');
+const Color = require('color'); // for some reason i was complication error from import, this now gives lint errs...
 
 export declare interface UserPreferences {
     theme: ThemePreferences;

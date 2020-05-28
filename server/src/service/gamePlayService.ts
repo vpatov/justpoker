@@ -430,7 +430,6 @@ export class GamePlayService {
                 }
             }
 
-            logger.debug(`HERE: ${eligiblePlayers.map((p) => this.gsm.getPlayer(p[0]).name)}`);
             // start with startingPlayer continue left
             // only show if your hand is the best seen thus far, break if we hit a winning hand
             let playerToBeat = eligiblePlayers[0];
