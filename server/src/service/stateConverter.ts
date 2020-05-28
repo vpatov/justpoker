@@ -280,8 +280,8 @@ export class StateConverter {
             this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
         ) {
             const showCardButtons: ShowCardButton[] = [];
-            heroPlayer.holeCards.forEach((c) => {
-                if (!c.visible) showCardButtons.push({ suit: c.suit, rank: c.rank });
+            heroPlayer.holeCards.forEach((card) => {
+                if (!card.visible) showCardButtons.push({ suit: card.suit, rank: card.rank });
             });
 
             return showCardButtons;

@@ -782,14 +782,14 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { sittingOut: false });
     }
 
-    setPlayerCardsVisible(playerUUID: PlayerUUID, card: Card) {
+    setPlayerCardsVisible(playerUUID: PlayerUUID, matchCard: Card) {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {
-            holeCards: player.holeCards.map((c) => {
-                if (c.rank === card.rank && c.suit === card.suit) {
-                    return { ...c, visible: true };
+            holeCards: player.holeCards.map((holeCard) => {
+                if (holeCard.rank === matchCard.rank && holeCard.suit === matchCard.suit) {
+                    return { ...holeCard, visible: true };
                 }
-                return c;
+                return holeCard;
             }),
         });
     }

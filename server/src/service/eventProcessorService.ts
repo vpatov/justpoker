@@ -174,7 +174,7 @@ export class EventProcessorService {
         [ClientActionType.SHOWCARD]: {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, req: ShowCardRequest) =>
-                req.cards.forEach((c) => this.gameStateManager.setPlayerCardsVisible(req.playerUUID, c)),
+                req.cards.forEach((card) => this.gameStateManager.setPlayerCardsVisible(req.playerUUID, card)),
             updates: [ServerStateKey.GAMESTATE],
         },
     };

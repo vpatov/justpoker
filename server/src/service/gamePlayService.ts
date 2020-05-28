@@ -422,18 +422,15 @@ export class GamePlayService {
             // choose starting player
             // start with last aggressor if eligible
             const lastAggressorUUID = this.gsm.getLastAggressorUUID();
-            const aggIndex = eligiblePlayers.findIndex(([p, _]) => p === lastAggressorUUID);
-            if (aggIndex !== -1) {
-                // rotate array so that last aggressor is at the beginning
-                for (let i = 0; i < aggIndex; i++) {
-                    eligiblePlayers.push(eligiblePlayers.shift());
-                }
+            let startIndex = eligiblePlayers.findIndex(([p, _]) => p === lastAggressorUUID);
+            if (startIndex === -1) {
+                startIndex = 0; // if last aggressor is not eligible then start at beginning
             }
 
-            // start with startingPlayer continue left
+            // start with startingPlayer continue left, circularly
             // only show if your hand is the best seen thus far, break if we hit a winning hand
             let playerToBeat = eligiblePlayers[0];
-            for (let i = 0; i < eligiblePlayers.length; i++) {
+            for (let i = startIndex; i < eligiblePlayers.length + startIndex; i = (i + 1) % eligiblePlayers.length) {
                 const curPlayer = eligiblePlayers[i];
                 if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
                     this.gsm.setPlayerCardsAllVisible(curPlayer[0]);
