@@ -1,4 +1,4 @@
-import { ClientUUID, makeBlankUUID } from "./uuid";
+import { ClientUUID, makeBlankUUID } from './uuid';
 
 export declare interface BaseLedgerRow {
     /**

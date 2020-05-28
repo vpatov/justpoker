@@ -12,7 +12,7 @@ const winston = require('winston');
 //   }
 
 function getLogLevel(): string {
-    const defaultLogLevel = 'debug';
+    const defaultLogLevel = 'info';
     return process.env.LOG_LEVEL || defaultLogLevel;
 }
 

@@ -11,7 +11,12 @@ import { LedgerService } from './ledgerService';
 import { TimerManager } from './timerManager';
 import { UILedger } from '../../../ui/src/shared/models/ledger';
 import { logger, debugFunc } from '../logger';
-import { GameInstanceUUID, makeBlankUUID, ClientUUID } from '../../../ui/src/shared/models/uuid';
+import {
+    GameInstanceUUID,
+    makeBlankUUID,
+    ClientUUID,
+    generateGameInstanceUUID,
+} from '../../../ui/src/shared/models/uuid';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -32,8 +37,8 @@ export class GameInstanceManager {
     ) {}
 
     @debugFunc()
-    createNewGameInstance(newGameForm: NewGameForm) {
-        const gameInstanceUUID = generateUUID();
+    createNewGameInstance(newGameForm: NewGameForm): GameInstanceUUID {
+        const gameInstanceUUID = generateGameInstanceUUID();
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
         this.loadGameInstance(gameInstanceUUID);
         this.gameStateManager.initGame(newGameForm);

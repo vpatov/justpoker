@@ -20,7 +20,7 @@ import {
 } from '../../../ui/src/shared/models/game';
 import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
-import { generateUUID, getLoggableGameState } from '../../../ui/src/shared/util/util';
+import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { NewGameForm, JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
@@ -28,8 +28,7 @@ import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/s
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger } from '../logger';
-import { ClientUUID, makeBlankUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { throws } from 'assert';
+import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -91,7 +90,7 @@ export class GameStateManager {
     createNewPlayer(name: string, chips: number): Player {
         return {
             ...getCleanPlayer(),
-            uuid: generateUUID(),
+            uuid: generatePlayerUUID(),
             name,
             chips,
             timeBanksLeft: TIME_BANKS_DEFAULT,
