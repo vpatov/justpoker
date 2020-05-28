@@ -3,7 +3,7 @@ import { ChatMessage, ChatLog } from '../../../ui/src/shared/models/chat';
 import { ClientChatMessage } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
-import { ValidationService, hasError } from './validationService';
+import { ValidationService } from './validationService';
 import { ClientUUID } from '../../../ui/src/shared/models/uuid';
 
 const changeNameCommandRegEx = /\/name\s(.+)$/;
@@ -79,8 +79,8 @@ export class ChatService {
             }
             const seatNumber = Number(sitDownMatch[1]);
             if (!isNaN(seatNumber)) {
-                const response = this.validationService.validateSitDownRequest(clientUUID, { seatNumber });
-                if (!hasError(response)) {
+                const error = this.validationService.validateSitDownRequest(clientUUID, { seatNumber });
+                if (!error) {
                     this.gameStateManager.sitDownPlayer(player.uuid, seatNumber);
                 }
             }

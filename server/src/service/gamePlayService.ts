@@ -15,7 +15,7 @@ import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
 
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { hasError, ValidationService } from './validationService';
+import { ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { logger } from '../logger';
@@ -77,7 +77,8 @@ export class GamePlayService {
             return;
         }
         const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
-        if (!hasError(this.validationService.validateBettingRoundAction(clientUUID, CHECK_ACTION))) {
+        const error = this.validationService.validateBettingRoundAction(clientUUID, CHECK_ACTION);
+        if (!error) {
             this.check();
         } else {
             this.fold();

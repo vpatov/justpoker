@@ -1,10 +1,11 @@
-export declare interface ValidationResponse {
+export declare interface ValidationError {
     errorType: ErrorType;
     errorString: string;
 }
 
+export declare type ValidationResponse = ValidationError | undefined;
+
 export const enum ErrorType {
-    NO_ERROR = 'NO_ERROR',
     CLIENT_DOES_NOT_EXIST = 'CLIENT_DOES_NOT_EXIST',
     CLIENT_ALREADY_HAS_PLAYER = 'CLIENT_ALREADY_HAS_PLAYER',
     PLAYER_DOES_NOT_EXIST = 'PLAYER_DOES_NOT_EXIST',
@@ -22,11 +23,6 @@ export const enum ErrorType {
     NOT_ADMIN = 'NOT_ADMIN',
     NO_MORE_TIMEBANKS = 'NO_MORE_TIMEBANKS',
 }
-
-export const NO_ERROR: ValidationResponse = {
-    errorType: ErrorType.NO_ERROR,
-    errorString: '',
-};
 
 export const NOT_IMPLEMENTED_YET: ValidationResponse = {
     errorType: ErrorType.NOT_IMPLEMENTED_YET,
