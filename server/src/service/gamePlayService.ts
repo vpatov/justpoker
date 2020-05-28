@@ -430,8 +430,8 @@ export class GamePlayService {
             // start with startingPlayer continue left, circularly
             // only show if your hand is the best seen thus far, break if we hit a winning hand
             let playerToBeat = eligiblePlayers[0];
-            for (let i = startIndex; i < eligiblePlayers.length + startIndex; i = (i + 1) % eligiblePlayers.length) {
-                const curPlayer = eligiblePlayers[i];
+            for (let i = startIndex; i < eligiblePlayers.length + startIndex; i++) {
+                const curPlayer = eligiblePlayers[i % eligiblePlayers.length];
                 if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
                     this.gsm.setPlayerCardsAllVisible(curPlayer[0]);
                     playerToBeat = curPlayer;
