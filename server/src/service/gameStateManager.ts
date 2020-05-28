@@ -782,6 +782,13 @@ export class GameStateManager {
         this.updatePlayer(playerUUID, { sittingOut: false });
     }
 
+    canPlayerShowCards(playerUUID: PlayerUUID) {
+        return (
+            (this.isPlayerInHand(playerUUID) && this.getPlayersInHand().length === 2) ||
+            this.getGameStage() === GameStage.SHOW_WINNER
+        );
+    }
+
     setPlayerCardsVisible(playerUUID: PlayerUUID, matchCard: Card) {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {

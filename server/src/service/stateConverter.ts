@@ -274,11 +274,7 @@ export class StateConverter {
         // still might be empty if all cards are shown
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        if (
-            (this.gameStateManager.isPlayerInHand(heroPlayer.uuid) &&
-                this.gameStateManager.getPlayersInHand().length === 2) ||
-            this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
-        ) {
+        if (this.gameStateManager.canPlayerShowCards(heroPlayer.uuid)) {
             const showCardButtons: ShowCardButton[] = [];
             heroPlayer.holeCards.forEach((card) => {
                 if (!card.visible) showCardButtons.push({ suit: card.suit, rank: card.rank });
