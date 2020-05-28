@@ -783,8 +783,20 @@ export class GameStateManager {
     }
 
     canPlayerShowCards(playerUUID: PlayerUUID) {
+        // obiviously never let player show cards who wasn't dealt cards
+        if (!this.wasPlayerDealtIn(playerUUID)) {
+            return false;
+        }
+        const numPlayersInHand = this.getPlayersInHand().length;
         return (
-            (this.isPlayerInHand(playerUUID) && this.getPlayersInHand().length === 2) ||
+            // everyone can show if on player left in hand
+            numPlayersInHand === 1 ||
+            // players who are heads up can show anytime
+            (this.isPlayerInHand(playerUUID) && numPlayersInHand === 2) ||
+            // all players can show after betting finishes if we are on river
+            (this.getGameStage() === GameStage.FINISH_BETTING_ROUND &&
+                this.getBettingRoundStage() === BettingRoundStage.RIVER) ||
+            // all players can show in showdown
             this.getGameStage() === GameStage.SHOW_WINNER
         );
     }

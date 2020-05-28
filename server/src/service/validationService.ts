@@ -295,6 +295,7 @@ export class ValidationService {
                     errorString: `Player does not have card ${JSON.stringify(showCard)} in the hole.`,
                 };
             }
+            return undefined;
         });
         return NO_ERROR;
     }
