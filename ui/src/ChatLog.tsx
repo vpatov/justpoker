@@ -98,6 +98,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface ChatLogProps {
     className?: string;
 }
+const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp_chatOpen';
 
 function ChatLog(props: ChatLogProps) {
     const classes = useStyles();
@@ -124,7 +125,7 @@ function ChatLog(props: ChatLogProps) {
 
     function sendMessage() {
         const trimmedMessage = draftMessage.trim();
-        if (trimmedMessage){
+        if (trimmedMessage) {
             WsServer.sendChatMessage(trimmedMessage);
             setDraftMessage('');
         }
@@ -169,9 +170,9 @@ function ChatLog(props: ChatLogProps) {
                 <div className={classes.chatLog}>
                     {messages.map((message) => (
                         <Typography key={message.timestamp} className={classes.chatMessage}>
-                            <span 
+                            <span
                                 className={classes.senderName}
-                                style={{color:getPlayerNameColor(message.seatNumber)}}
+                                style={{ color: getPlayerNameColor(message.seatNumber) }}
                             >
                                 {message.senderName}:
                             </span>

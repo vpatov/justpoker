@@ -11,7 +11,7 @@ import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
-import { Color } from 'color';
+const Color = require('color');
 
 export declare interface UserPreferences {
     theme: ThemePreferences;
@@ -37,7 +37,7 @@ export const Background = {
     blue: computeBackgroundGradient(blue[600]),
     purple: computeBackgroundGradient(deepPurple[600]),
     teal: computeBackgroundGradient(teal[500]),
-    yellow: computeBackgroundGradient(yellow[600]),
+    yellow: computeBackgroundGradient(yellow[700]),
     grey: computeBackgroundGradient(grey[700]),
     indigo: computeBackgroundGradient(indigo[800]),
     red: computeBackgroundGradient(red[700]),
