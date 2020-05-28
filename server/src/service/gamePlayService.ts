@@ -87,25 +87,29 @@ export class GamePlayService {
     }
 
     updateHandDescriptions() {
-        this.gsm.updatePlayers((player) => ({
-            handDescription: this.gsm.isPlayerInHand(player.uuid) ? this.gsm.getPlayerHandDescription(player.uuid) : '',
-        }));
+        this.gsm.forEveryPlayerUUID((playerUUID) => {
+            this.gsm.isPlayerInHand(playerUUID)
+                ? this.gsm.updatePlayerHandDescription(playerUUID)
+                : this.gsm.clearPlayerHandDescription(playerUUID);
+        });
     }
 
     startOfBettingRound() {
-        this.gsm.setPreviousRaise(0);
+        // During preflop the previousRaise is set by placing the blinds
+        if (this.gsm.getBettingRoundStage() !== BettingRoundStage.PREFLOP) {
+            this.gsm.setPreviousRaise(0);
+        }
         this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPartialAllInLeftOver(0);
         this.updateHandDescriptions();
     }
 
     resetBettingRoundActions() {
-        this.gsm.updatePlayers((player) => {
-            if (this.gsm.isPlayerInHand(player.uuid)) {
-                return !this.gsm.isPlayerAllIn(player.uuid)
-                    ? { lastActionType: BettingRoundActionType.WAITING_TO_ACT, betAmount: 0 }
-                    : {};
-            } else return {};
+        this.gsm.forEveryPlayerUUID((playerUUID) => {
+            if (this.gsm.isPlayerInHand(playerUUID) && !this.gsm.isPlayerAllIn(playerUUID)) {
+                this.gsm.setPlayerLastActionType(playerUUID, BettingRoundActionType.WAITING_TO_ACT);
+                this.gsm.setPlayerBetAmount(playerUUID, 0);
+            }
         });
     }
 
@@ -163,7 +167,7 @@ export class GamePlayService {
         // It is possible that this bet method is called with a betAmount greater
         // than the amount of chips the player has (for example, player is placing
         // a $2 BB but they only have $1). To simplify app logic this is handled here.
-        const chips = this.gsm.getChips(playerPlacingBet);
+        const chips = this.gsm.getPlayerChips(playerPlacingBet);
         const actualBetAmount = betAmount > chips ? chips : betAmount;
         this.gsm.setPlayerBetAmount(playerPlacingBet, actualBetAmount);
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(playerPlacingBet);
@@ -219,7 +223,7 @@ export class GamePlayService {
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
         // TODO find the cleanest way to do this. Should that logic be handled in setPlayerBetAmount, or here?
-        const chips = this.gsm.getChips(currentPlayerToAct);
+        const chips = this.gsm.getPlayerChips(currentPlayerToAct);
         const callAmount = this.gsm.getPreviousRaise() > chips ? chips : this.gsm.getPreviousRaise();
         this.gsm.setPlayerBetAmount(currentPlayerToAct, callAmount);
 
@@ -406,18 +410,16 @@ export class GamePlayService {
 
         winningPlayers.forEach((playerUUID) => {
             this.audioService.playHeroWinSFX(playerUUID);
-            this.gsm.updatePlayer(playerUUID, {
-                chips: this.gsm.getChips(playerUUID) + amountsWon[playerUUID],
-                winner: true,
-                chipDelta: amountsWon[playerUUID], // used to compute awardPts
-            });
+            this.gsm.addPlayerChips(playerUUID, amountsWon[playerUUID]);
+            this.gsm.setIsPlayerWinner(playerUUID, true);
+            this.gsm.setPlayerChipDelta(playerUUID, amountsWon[playerUUID]);
             this.gsm.addHandWinner(playerUUID);
         });
     }
 
     ejectStackedPlayers() {
         this.gsm.forEveryPlayerUUID((playerUUID) => {
-            if (this.gsm.getChips(playerUUID) === 0) {
+            if (this.gsm.getPlayerChips(playerUUID) === 0) {
                 this.gsm.standUpPlayer(playerUUID);
             }
         });
@@ -458,7 +460,7 @@ export class GamePlayService {
         uncalledBets.forEach((pot) => {
             const playerUUID = pot.contestors[0];
             const uncalledBet = pot.value;
-            this.gsm.updatePlayer(playerUUID, { betAmount: this.gsm.getPlayerBetAmount(playerUUID) - uncalledBet });
+            this.gsm.setPlayerBetAmount(playerUUID, this.gsm.getPlayerBetAmount(playerUUID) - uncalledBet);
         });
 
         // remove folded players from all pots
@@ -487,6 +489,9 @@ export class GamePlayService {
         this.gsm.setPots(coalescedPots);
 
         // update players chip counts
-        this.gsm.updatePlayers((player) => ({ chips: player.chips - player.betAmount, betAmount: 0 }));
+        this.gsm.forEveryPlayerUUID((playerUUID) => {
+            this.gsm.subtractBetAmountFromChips(playerUUID);
+            this.gsm.setPlayerBetAmount(playerUUID, 0);
+        });
     }
 }

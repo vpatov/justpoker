@@ -7,58 +7,58 @@ export declare interface Player {
     readonly uuid: PlayerUUID;
 
     /** Player's display name at the table. */
-    readonly name: string;
+    name: string;
 
     /** Amount of chips that the player has. (Rename to stack?) */
-    readonly chips: number;
+    chips: number;
 
     /** Player's hole cards. */
-    readonly holeCards: Card[];
+    holeCards: ReadonlyArray<Card>;
 
     /** Label describing the best hand the player current holds. */
-    readonly handDescription: string;
+    handDescription: string;
 
     /** Cards that make up the player's best hand.*/
-    readonly bestHand: Hand | null;
+    bestHand: Hand | null;
 
     /**
      * If a player is sitting they are either playing/have played
      * in the current hand, or are waiting to be dealt in the next hand.
      */
-    readonly sitting: boolean;
+    sitting: boolean;
 
     /** Player is at the table but not being dealt in. */
-    readonly sittingOut: boolean;
+    sittingOut: boolean;
 
     /** If this is true, player will straddle when they are in position to do so. */
-    readonly willStraddle: boolean;
+    willStraddle: boolean;
 
     /** Gameplay goes from lower seat number to higher seat number and wraps around. */
-    readonly seatNumber: number;
+    seatNumber: number;
 
     /**
      * The last action that the player has performed (check, bet, etc.) If they are in the
      * current hand, but have not acted yet, lastAction.type === WAITING_TO_ACT.
      */
-    readonly lastActionType: BettingRoundActionType;
+    lastActionType: BettingRoundActionType;
 
     /** Is set to true when the player has won the hand. */
-    readonly winner: boolean;
+    winner: boolean;
 
     /** The amount of chips the player is about to put into the pot. */
-    readonly betAmount: number;
+    betAmount: number;
 
     /** Whether or not the player's cards are publicly visible at the table. */
-    readonly cardsAreHidden: boolean;
+    cardsAreHidden: boolean;
 
     /** The total amount of chips the player has won or lost during this hand. */
-    readonly chipDelta: number;
+    chipDelta: number;
 
     /** Used to calculate chipDelta. */
-    readonly chipsAtStartOfHand: number;
+    chipsAtStartOfHand: number;
 
     /** Amount of timebanks that the player has left that they can use. */
-    readonly timeBanksLeft: number;
+    timeBanksLeft: number;
 }
 
 export function getCleanPlayer(): Player {

@@ -235,23 +235,43 @@ export class GameStateManager {
         return this.gameState.board;
     }
 
-    addPlayerChips(playerUUID: PlayerUUID, addChips: number) {
+    playerBuyinAddChips(playerUUID: PlayerUUID, addChips: number) {
+        if (addChips <= 0) {
+            logger.error(
+                `gameStateManager.playerBuyinAddChips was called with a zero or negative chip amount: ${addChips}`,
+            );
+            return;
+        }
         this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), addChips);
-        this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
+        const newChipAmount = this.getPlayerChips(playerUUID) + addChips;
+        this.setPlayerChips(playerUUID, newChipAmount);
     }
 
-    setPlayerChips(playerUUID: PlayerUUID, setChips: number) {
-        const chipDifference = setChips - this.getChips(playerUUID);
+    playerBuyinSetChips(playerUUID: PlayerUUID, setChips: number) {
+        const chipDifference = setChips - this.getPlayerChips(playerUUID);
         if (chipDifference > 0) {
             this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
         } else {
             logger.warning(
-                `gameStateManager.setPlayerChips has been called with a chip amount that is less than the player's 
+                `gameStateManager.playerBuyinSetChips has been called with a chip amount that is less than the player's 
                 current stack. This is either a bug, or being used for development`,
             );
         }
 
-        this.updatePlayer(playerUUID, { chips: setChips });
+        this.setPlayerChips(playerUUID, setChips);
+    }
+
+    subtractBetAmountFromChips(playerUUID: PlayerUUID) {
+        const player = this.getPlayer(playerUUID);
+        player.chips -= player.betAmount;
+    }
+
+    addPlayerChips(playerUUID: PlayerUUID, addChips: number) {
+        this.getPlayer(playerUUID).chips += addChips;
+    }
+
+    setPlayerChips(playerUUID: PlayerUUID, chips: number) {
+        this.getPlayer(playerUUID).chips = chips;
     }
 
     // returns time in milliseconds
@@ -281,7 +301,7 @@ export class GameStateManager {
     }
 
     decrementTimeBanksLeft(playerUUID: PlayerUUID) {
-        this.updatePlayer(playerUUID, { timeBanksLeft: this.getTimeBanksLeft(playerUUID) - 1 });
+        this.getPlayer(playerUUID).timeBanksLeft -= 1;
     }
 
     getTimeBanksUsedThisAction() {
@@ -619,7 +639,7 @@ export class GameStateManager {
 
     dealCardsToPlayer(amount: number, playerUUID: PlayerUUID) {
         const newCards = [...Array(amount).keys()].map((_) => this.drawCard());
-        this.updatePlayer(playerUUID, { holeCards: newCards });
+        this.getPlayer(playerUUID).holeCards = newCards;
     }
 
     /* Initialization methods */
@@ -758,25 +778,31 @@ export class GameStateManager {
     }
 
     setWillPlayerStraddle(playerUUID: PlayerUUID, willStraddle: boolean) {
-        this.updatePlayer(playerUUID, { willStraddle });
+        this.getPlayer(playerUUID).willStraddle = willStraddle;
     }
 
     sitDownPlayer(playerUUID: PlayerUUID, seatNumber: number) {
-        this.updatePlayer(playerUUID, { sitting: true, sittingOut: false, seatNumber: seatNumber });
+        const player = this.getPlayer(playerUUID);
+        player.sitting = true;
+        player.sittingOut = false;
+        player.seatNumber = seatNumber;
     }
 
     standUpPlayer(playerUUID: PlayerUUID) {
-        this.updatePlayer(playerUUID, { sitting: false, sittingOut: false, seatNumber: -1 });
+        const player = this.getPlayer(playerUUID);
+        player.sitting = false;
+        player.sittingOut = false;
+        player.seatNumber = -1;
         const clientUUID = this.getClientByPlayerUUID(playerUUID);
-        this.ledgerService.addWalkaway(clientUUID, this.getPlayer(playerUUID).chips);
+        this.ledgerService.addWalkaway(clientUUID, player.chips);
     }
 
     sitOutPlayer(playerUUID: PlayerUUID) {
-        this.updatePlayer(playerUUID, { sittingOut: true });
+        this.getPlayer(playerUUID).sittingOut = true;
     }
 
     sitInPlayer(playerUUID: PlayerUUID) {
-        this.updatePlayer(playerUUID, { sittingOut: false });
+        this.getPlayer(playerUUID).sittingOut = false;
     }
 
     getFirstToAct() {
@@ -796,11 +822,11 @@ export class GameStateManager {
     }
 
     setPlayerLastActionType(playerUUID: PlayerUUID, lastActionType: BettingRoundActionType) {
-        this.updatePlayer(playerUUID, { lastActionType });
+        this.getPlayer(playerUUID).lastActionType = lastActionType;
     }
 
     changePlayerName(playerUUID: PlayerUUID, name: string) {
-        this.updatePlayer(playerUUID, { name });
+        this.getPlayer(playerUUID).name = name;
         this.ledgerService.addAlias(this.getClientByPlayerUUID(playerUUID), name);
     }
 
@@ -817,7 +843,7 @@ export class GameStateManager {
             this.getGameType() === GameType.PLOMAHA
                 ? this.handSolverService.computeBestPLOHand(this.getPlayer(playerUUID).holeCards, this.getBoard())
                 : this.handSolverService.computeBestNLEHand(this.getPlayer(playerUUID).holeCards, this.getBoard());
-        this.updatePlayer(playerUUID, { bestHand });
+        this.getPlayer(playerUUID).bestHand = bestHand;
         return bestHand;
     }
 
@@ -831,9 +857,13 @@ export class GameStateManager {
         return this.getPlayer(playerUUID).bestHand;
     }
 
-    getPlayerHandDescription(playerUUID: PlayerUUID): string {
+    updatePlayerHandDescription(playerUUID: PlayerUUID) {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
-        return bestHand.descr;
+        this.getPlayer(playerUUID).handDescription = bestHand.descr;
+    }
+
+    clearPlayerHandDescription(playerUUID: PlayerUUID) {
+        this.getPlayer(playerUUID).handDescription = '';
     }
 
     getGameType(): GameType {
@@ -854,7 +884,7 @@ export class GameStateManager {
         return true;
     }
 
-    getChips(playerUUID: PlayerUUID) {
+    getPlayerChips(playerUUID: PlayerUUID) {
         return this.getPlayer(playerUUID).chips;
     }
 
@@ -863,14 +893,18 @@ export class GameStateManager {
     }
 
     setPlayerBetAmount(playerUUID: PlayerUUID, betAmount: number) {
-        if (betAmount > this.getChips(playerUUID)) {
+        if (betAmount > this.getPlayerChips(playerUUID)) {
             throw Error(
-                `Player: ${playerUUID} betamount: ${betAmount} is larger than their number of chips: ${this.getChips(
+                `Player: ${playerUUID} betamount: ${betAmount} is larger than their number of chips: ${this.getPlayerChips(
                     playerUUID,
                 )}.` + `GameState: ${getLoggableGameState(this.gameState)}`,
             );
         }
-        this.updatePlayer(playerUUID, { betAmount });
+        this.getPlayer(playerUUID).betAmount = betAmount;
+    }
+
+    setPlayerChipDelta(playerUUID: PlayerUUID, chipDelta: number) {
+        this.getPlayer(playerUUID).chipDelta = chipDelta;
     }
 
     clearWinnersAndDeltas() {
@@ -958,7 +992,7 @@ export class GameStateManager {
     }
 
     hasPlayerPutAllChipsInThePot(playerUUID: PlayerUUID): boolean {
-        return this.getChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
+        return this.getPlayerChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
     }
 
     haveAllPlayersActed() {
@@ -974,6 +1008,10 @@ export class GameStateManager {
 
     getWinners() {
         return this.filterPlayerUUIDs((playerUUID) => this.getPlayer(playerUUID).winner);
+    }
+
+    setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {
+        this.getPlayer(playerUUID).winner = isWinner;
     }
 
     currentHandHasResult() {

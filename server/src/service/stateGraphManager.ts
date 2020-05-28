@@ -255,7 +255,7 @@ export class StateGraphManager {
         this.gameStateManager.forEveryClient((client) => {
             const player = this.gameStateManager.getPlayerByClientUUID(client.uuid);
             if (player) {
-                this.ledgerService.setCurrentChips(client.uuid, this.gameStateManager.getChips(player.uuid));
+                this.ledgerService.setCurrentChips(client.uuid, this.gameStateManager.getPlayerChips(player.uuid));
             }
         });
     }
