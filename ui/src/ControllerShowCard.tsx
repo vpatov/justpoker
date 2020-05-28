@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         group: {
             position: 'absolute',
-            bottom: '-40%',
+            bottom: '-30%',
             zIndex: 6,
             backgroundColor: grey[900],
             boxShadow: theme.shadows[24],

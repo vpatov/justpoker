@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
             flexDirection: 'column',
             alignItems: 'flex-end',
             marginRight: '2vw',
+            minWidth: '12vw',
         },
         additionalGamePlayTopButtons: {
             display: 'flex',
