@@ -19,19 +19,20 @@ import { Button, ButtonGroup, Tooltip } from '@material-ui/core';
 import Suit from './Suit';
 import { Card } from './shared/models/cards';
 import { grey } from '@material-ui/core/colors';
+import Grow from '@material-ui/core/Grow';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
-            height: '100%',
             alignItems: 'center',
-            minWidth: '4vw',
             position: 'relative',
+            justifyContent: 'center',
         },
+
         showButton: {
             fontSize: '1.1vmin',
-            width: '100%',
             margin: '0.5vmin',
+            // transition: 'opacity 0.3s ease-in-out',
         },
         button: {
             fontSize: '1vmin',
@@ -41,20 +42,15 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '1vmin',
             height: '1vmin',
         },
-        groupCont: {
-            width: '100%',
-        },
         group: {
-            width: '100%',
             position: 'absolute',
+            bottom: '-40%',
+            zIndex: 6,
             backgroundColor: grey[900],
             boxShadow: theme.shadows[24],
-            transform: 'translateY(-20%)',
         },
-        label: {
-            fontSize: '1vmin',
-            writingMode: 'vertical-rl',
-            textOrientation: 'upright',
+        hide: {
+            opacity: 0,
         },
     }),
 );
@@ -98,8 +94,7 @@ function ControllerShowCard(props: ControllerShowCardProps) {
     }
     return (
         <div className={classnames(classes.root, className)} onMouseLeave={handleClose}>
-            {open ? (
-                // <Paper className={classes.groupCont}>
+            <Grow in={open}>
                 <ButtonGroup orientation="vertical" className={classes.group}>
                     {showCardButtons
                         .map((button) => (
@@ -110,16 +105,19 @@ function ControllerShowCard(props: ControllerShowCardProps) {
                         ))
                         .concat(
                             <Button onClick={() => handleShowAllButton()} className={classes.button}>
-                                All
+                                All Cards
                             </Button>,
                         )}
                 </ButtonGroup>
-            ) : (
-                // </Paper>
-                <Button className={classes.showButton} onMouseEnter={handleOpen} variant="outlined">
-                    Show
-                </Button>
-            )}
+            </Grow>
+
+            <Button
+                className={classnames(classes.showButton, { [classes.hide]: open })}
+                variant="outlined"
+                onMouseEnter={handleOpen}
+            >
+                Show Cards
+            </Button>
         </div>
     );
 }
