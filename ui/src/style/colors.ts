@@ -9,7 +9,7 @@ import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
-import { Color } from 'color';
+import Color from 'color';
 
 
 function computeColor(color: string) {
