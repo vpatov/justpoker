@@ -9,13 +9,12 @@ import {
 } from '../../../ui/src/shared/models/game';
 
 import { HandSolverService } from './handSolverService';
-import { TimerManager } from './timerManager';
-import { Pot, GameState } from '../../../ui/src/shared/models/gameState';
+import { Pot } from '../../../ui/src/shared/models/gameState';
 
 import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
 
-import { printObj, logGameState, getLoggableGameState } from '../../../ui/src/shared/util/util';
+import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { hasError, ValidationService } from './validationService';
 import { Hand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
@@ -315,10 +314,10 @@ export class GamePlayService {
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
                 this.animationService.animateDeal();
-                this.gsm.forEveryPlayer((player) => {
-                    if (this.gsm.isPlayerReadyToPlay(player.uuid)) {
-                        this.dealHoleCards(player.uuid);
-                        this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(player.uuid));
+                this.gsm.forEveryPlayerUUID((playerUUID) => {
+                    if (this.gsm.isPlayerReadyToPlay(playerUUID)) {
+                        this.dealHoleCards(playerUUID);
+                        this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(playerUUID));
                     }
                 });
 
@@ -327,9 +326,9 @@ export class GamePlayService {
 
             case BettingRoundStage.FLOP: {
                 this.gsm.dealCardsToBoard(3);
-                this.gsm.forEveryPlayer((player) => {
-                    if (this.gsm.isPlayerInHand(player.uuid)) {
-                        this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(player.uuid));
+                this.gsm.forEveryPlayerUUID((playerUUID) => {
+                    if (this.gsm.isPlayerInHand(playerUUID)) {
+                        this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(playerUUID));
                     }
                 });
                 break;
@@ -416,9 +415,9 @@ export class GamePlayService {
     }
 
     ejectStackedPlayers() {
-        this.gsm.forEveryPlayer((player) => {
-            if (player.chips === 0) {
-                this.gsm.standUpPlayer(player.uuid);
+        this.gsm.forEveryPlayerUUID((playerUUID) => {
+            if (this.gsm.getChips(playerUUID) === 0) {
+                this.gsm.standUpPlayer(playerUUID);
             }
         });
     }

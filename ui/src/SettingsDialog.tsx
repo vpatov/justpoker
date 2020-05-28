@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { ThemePreferences, Background } from './shared/models/userPreferences';
+import { ThemePreferences } from './shared/models/userPreferences';
 import { ThemeSetter } from './App';
 import InputLabel from '@material-ui/core/InputLabel';
 import capitalize from 'lodash/capitalize';
@@ -16,6 +16,7 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { Select, MenuItem } from '@material-ui/core';
+import { Background } from './style/colors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

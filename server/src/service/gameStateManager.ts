@@ -121,8 +121,8 @@ export class GameStateManager {
         return Object.keys(this.gameState.players).filter(filterFn) as PlayerUUID[];
     }
 
-    forEveryPlayer(performFn: (player: Player) => void) {
-        Object.entries(this.gameState.players).forEach(([uuid, player]) => performFn(player));
+    forEveryPlayerUUID(performFn: (playerUUID: PlayerUUID) => void) {
+        Object.keys(this.gameState.players).forEach(performFn);
     }
 
     forEveryClient(performFn: (client: ConnectedClient) => void) {
@@ -700,10 +700,8 @@ export class GameStateManager {
 
     associateClientAndPlayer(clientUUID: ClientUUID, playerUUID: PlayerUUID): ConnectedClient {
         const connectedClient = this.getConnectedClient(clientUUID);
-        return {
-            ...connectedClient,
-            playerUUID,
-        };
+        connectedClient.playerUUID = playerUUID;
+        return connectedClient;
     }
 
     bootPlayerFromGame(playerUUID: PlayerUUID) {

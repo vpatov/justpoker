@@ -79,6 +79,7 @@ export declare interface GameState {
     /** Sensitive field. */
     activeConnections: Map<ClientUUID, ConnectedClient>;
 
+    /** Timestamp of server time when this state was processed. */
     serverTime: number;
 
     /** The minimum amount by which the next player can raise. */
@@ -93,7 +94,7 @@ export declare interface GameState {
 
 export declare interface ConnectedClient {
     readonly uuid: ClientUUID;
-    readonly playerUUID: PlayerUUID;
+    playerUUID: PlayerUUID;
 }
 
 export declare interface Pot {
