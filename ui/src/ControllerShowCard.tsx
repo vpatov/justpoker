@@ -3,12 +3,7 @@ import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { WsServer } from './api/ws';
-import {
-    ClientActionType,
-    UiActionType,
-    ClientWsMessageRequest,
-    ShowCardRequest,
-} from './shared/models/dataCommunication';
+import { ClientActionType, UiActionType, ClientWsMessageRequest, ShowCardRequest } from './shared/models/api';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 

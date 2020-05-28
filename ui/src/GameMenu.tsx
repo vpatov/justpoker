@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { selectMenuButtons } from './store/selectors';
 import { WsServer } from './api/ws';
 import SettingsDialog from './SettingsDialog';
-import { ClientActionType, UiActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
+import { ClientActionType, UiActionType, ClientWsMessageRequest } from './shared/models/api';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';

@@ -11,8 +11,7 @@ import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
-
-var Color = require('color');
+const Color = require('color');
 
 export declare interface UserPreferences {
     theme: ThemePreferences;
@@ -23,7 +22,7 @@ export declare interface ThemePreferences {
     background: string;
 }
 
-function computeColor(color: string){
+function computeColor(color: string) {
     return color.toString();
 }
 
@@ -46,7 +45,7 @@ export const Background = {
     orange: computeBackgroundGradient(orange[600]),
 };
 
-export const PlayerColors: {[color: string]: string} = {
+export const PlayerColors: { [color: string]: string } = {
     blue: computeColor(blue[500]),
     purple: computeColor(deepPurple[400]),
     teal: computeColor(teal[300]),
@@ -60,12 +59,11 @@ export const PlayerColors: {[color: string]: string} = {
     lime: computeColor(lime[400]),
 };
 
-const playerColorKeys = Object.keys(PlayerColors)
-export function getPlayerNameColor(seatNumber: number){
-    if (seatNumber >= 0 || seatNumber < playerColorKeys.length){   
-        return PlayerColors[playerColorKeys[seatNumber]]; 
-    }
-    else return computeColor(grey[400]);
+const playerColorKeys = Object.keys(PlayerColors);
+export function getPlayerNameColor(seatNumber: number) {
+    if (seatNumber >= 0 || seatNumber < playerColorKeys.length) {
+        return PlayerColors[playerColorKeys[seatNumber]];
+    } else return computeColor(grey[400]);
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {

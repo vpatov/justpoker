@@ -12,17 +12,12 @@ import { EventProcessorService } from '../service/eventProcessorService';
 import { StateConverter } from '../service/stateConverter';
 import { GameInstanceManager } from '../service/gameInstanceManager';
 
-import {
-    NewGameForm,
-    ClientAction,
-    Event,
-    EventType,
-    ClientWsMessage,
-} from '../../../ui/src/shared/models/dataCommunication';
+import { NewGameForm, ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src/shared/models/api';
 
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
+import { GameInstanceUUID, ClientUUID } from '../../../ui/src/shared/models/uuid';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -98,7 +93,7 @@ class Server {
 
         router.get('/ledger', (req, res) => {
             const parsedQuery = queryString.parseUrl(req.url);
-            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
             const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
             if (!ledger) {
                 logger.info(`ledger not found for ${gameInstanceUUID}`);
@@ -124,7 +119,7 @@ class Server {
     }
 
     @debugFunc()
-    private processGameMessage(data: WebSocket.Data, clientUUID: string, gameInstanceUUID: string) {
+    private processGameMessage(data: WebSocket.Data, clientUUID: ClientUUID, gameInstanceUUID: GameInstanceUUID) {
         logger.verbose(`Incoming Game Message: ${data}`);
 
         // TODO typeof check seems not the best way to do this
@@ -157,15 +152,15 @@ class Server {
             logger.verbose(`WS connection request from: ${ip} on url: ${req.url}`);
 
             const parsedQuery = queryString.parseUrl(req.url);
-            const clientUUID = parsedQuery.query.clientUUID as string;
-            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as string;
+            const clientUUID = parsedQuery.query.clientUUID as ClientUUID;
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
 
             this.onConnectionToGame(ws, gameInstanceUUID, clientUUID);
             return;
         });
     }
 
-    onConnectionToGame(ws: WebSocket, gameInstanceUUID: string, clientUUID: string) {
+    onConnectionToGame(ws: WebSocket, gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID) {
         // if game is not in instanceManager then send 404
         // TODO implement FE for this
         if (!this.gameInstanceManager.doesGameInstanceExist(gameInstanceUUID)) {
@@ -176,7 +171,7 @@ class Server {
         if (!clientUUID) {
             clientUUID = this.connectedClientManager.createClientSessionInGroup(gameInstanceUUID, ws);
             // send back clientUUID for client to store
-            ws.send(JSON.stringify({ clientUUID: clientUUID }));
+            ws.send(JSON.stringify({ clientUUID }));
         } else {
             // if there is a session replace old websocket
             // TODO define app behavior in scenario when user accesses same game in two browser tabs.
@@ -204,8 +199,8 @@ class Server {
         this.server = http.createServer(this.app);
         this.initGameWSS();
         this.server.listen(process.env.PORT || this.defaultPort, () => {
-            const port = this.server.address() as AddressInfo;
-            logger.info(`Server started on address `, port);
+            const addressInfo = this.server.address() as AddressInfo;
+            logger.info(`Server started on address `, addressInfo);
         });
     }
 }

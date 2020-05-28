@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import { Typography } from '@material-ui/core';
 
 import { WsServer } from './api/ws';
-import { ClientActionType, ClientWsMessageRequest } from './shared/models/dataCommunication';
+import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

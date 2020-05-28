@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { GameInstance, getCleanGameInstance } from '../../../ui/src/shared/models/gameInstance';
-import { NewGameForm } from '../../../ui/src/shared/models/dataCommunication';
+import { NewGameForm } from '../../../ui/src/shared/models/api';
 import { generateUUID } from '../../../ui/src/shared/util/util';
 
 import { AudioService } from './audioService';
@@ -11,6 +11,12 @@ import { LedgerService } from './ledgerService';
 import { TimerManager } from './timerManager';
 import { UILedger } from '../../../ui/src/shared/models/ledger';
 import { logger, debugFunc } from '../logger';
+import {
+    GameInstanceUUID,
+    makeBlankUUID,
+    ClientUUID,
+    generateGameInstanceUUID,
+} from '../../../ui/src/shared/models/uuid';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -19,7 +25,7 @@ export interface GameInstances {
 @Service()
 export class GameInstanceManager {
     private gameInstances: GameInstances = {};
-    private activeGameInstanceUUID = '';
+    private activeGameInstanceUUID: GameInstanceUUID = makeBlankUUID();
 
     constructor(
         private readonly gameStateManager: GameStateManager,
@@ -31,28 +37,25 @@ export class GameInstanceManager {
     ) {}
 
     @debugFunc()
-    createNewGameInstance(newGameForm: NewGameForm) {
-        const gameInstanceUUID = generateUUID();
+    createNewGameInstance(newGameForm: NewGameForm): GameInstanceUUID {
+        const gameInstanceUUID = generateGameInstanceUUID();
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
         this.loadGameInstance(gameInstanceUUID);
         this.gameStateManager.initGame(newGameForm);
         return gameInstanceUUID;
     }
 
-    doesGameInstanceExist(gameInstanceUUID: string): boolean {
+    doesGameInstanceExist(gameInstanceUUID: GameInstanceUUID): boolean {
         if (this.gameInstances[gameInstanceUUID]) return true;
         return false;
     }
 
     // TODO decouple clients from games
-    addClientToGameInstance(gameInstanceUUID: string, clientUUID: string) {
+    addClientToGameInstance(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID) {
         this.gameStateManager.initConnectedClient(clientUUID);
     }
 
-    getGameInstance(gameInstanceUUID: string): GameInstance | undefined {
-        if (!this.doesGameInstanceExist(gameInstanceUUID)) {
-            return undefined;
-        }
+    getGameInstance(gameInstanceUUID: GameInstanceUUID): GameInstance | undefined {
         return this.gameInstances[gameInstanceUUID];
     }
 
@@ -60,7 +63,7 @@ export class GameInstanceManager {
         return this.gameInstances[this.activeGameInstanceUUID];
     }
 
-    getActiveGameInstanceUUID(): string {
+    getActiveGameInstanceUUID(): GameInstanceUUID {
         return this.activeGameInstanceUUID;
     }
 
@@ -78,18 +81,21 @@ export class GameInstanceManager {
     }
 
     @debugFunc()
-    loadGameInstance(gameInstanceUUID: string) {
+    loadGameInstance(gameInstanceUUID: GameInstanceUUID) {
+        // TODO is it best to save the game instance here (before loading the next one),
+        // or right after finishing processing it? The latter can be done, since processing
+        // has one explicit code path after our eventProcessing refactor
         if (this.gameInstances[this.activeGameInstanceUUID]) {
             this.saveActiveGameInstance();
         }
-        const gi = this.getGameInstance(gameInstanceUUID);
+        const gameInstance = this.getGameInstance(gameInstanceUUID);
         logger.verbose(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
 
-        if (!gi) {
+        if (!gameInstance) {
             // TODO error path
+            logger.error(`Did not find gameInstanceUUID: ${gameInstanceUUID}`);
         }
-        logger.info(`Switching to gameInstanceUUID: ${gameInstanceUUID}`);
-        const gameInstance = gi as GameInstance;
+
         this.gameStateManager.loadGameState(gameInstance.gameState);
         this.chatService.loadChatState(gameInstance.chatLog);
         this.audioService.loadAudioState(gameInstance.audioQueue);
@@ -107,11 +113,12 @@ export class GameInstanceManager {
     }
 
     // no need to load entire game instance as no update
-    getLedgerForGameInstance(gameInstanceUUID: string): UILedger | undefined {
-        if (!this.doesGameInstanceExist(gameInstanceUUID)) {
+    getLedgerForGameInstance(gameInstanceUUID: GameInstanceUUID): UILedger | undefined {
+        const gameInstance = this.getGameInstance(gameInstanceUUID);
+        if (!gameInstance) {
             return undefined;
         }
-        const ledgerState = this.gameInstances[gameInstanceUUID].ledger;
+        const ledgerState = gameInstance.ledger;
         return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
     }
 }

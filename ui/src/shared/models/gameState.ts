@@ -1,9 +1,8 @@
 import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
-import { Player, PlayerUUID } from './player';
+import { Player } from './player';
 import { Card, Deck } from './cards';
-import { ClientActionType } from './dataCommunication';
-
-export declare type ClientUUID = string;
+import { ClientActionType } from './api';
+import { ClientUUID, PlayerUUID, makeBlankUUID } from './uuid';
 
 export const enum GameStage {
     NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
@@ -32,28 +31,29 @@ export declare interface GameState {
     queuedServerActions: QueuedServerAction[];
 
     /** Sensitive field. */
-    players: Readonly<{ [key: string]: Player }>;
+    // TODO when branded types can be used as index signatures, replace string with PlayerUUID
+    players: { [key: string]: Player };
 
-    board: ReadonlyArray<Card>;
+    board: Array<Card>;
 
-    gameParameters: Readonly<GameParameters>;
+    gameParameters: GameParameters;
 
-    dealerUUID: Readonly<string>;
+    dealerUUID: PlayerUUID;
 
-    smallBlindUUID: Readonly<string>;
+    smallBlindUUID: PlayerUUID;
 
-    bigBlindUUID: Readonly<string>;
+    bigBlindUUID: PlayerUUID;
 
-    straddleUUID: Readonly<string>;
+    straddleUUID: PlayerUUID;
 
     // playerUUID of last player to bet or raise
-    lastAggressorUUID: string;
+    lastAggressorUUID: PlayerUUID;
 
-    bettingRoundStage: Readonly<BettingRoundStage>;
+    bettingRoundStage: BettingRoundStage;
 
-    firstToAct: Readonly<string>;
+    firstToAct: PlayerUUID;
 
-    currentPlayerToAct: Readonly<string>;
+    currentPlayerToAct: PlayerUUID;
 
     lastBettingRoundAction: BettingRoundAction;
 
@@ -62,10 +62,10 @@ export declare interface GameState {
     /** Amount of timebanks that the player has used this turn. */
     timeBanksUsedThisAction: number;
 
-    pots: ReadonlyArray<Pot>;
+    pots: Array<Pot>;
 
     /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
-    handWinners: Set<string>;
+    handWinners: Set<PlayerUUID>;
 
     /**
      * This variable is checked before initializing a new hand. If it's true, and there are enough players, the
@@ -73,10 +73,10 @@ export declare interface GameState {
      * gameStage will proceed to NOT_IN_PROGRESS. This variable does not represent whether the game is currently
      * in progress - that is determined by the gameStage !== NOT_IN_PROGRESS, exposed in gsm.isGameInProgress().
      */
-    shouldDealNextHand: Readonly<boolean>;
+    shouldDealNextHand: boolean;
 
     /** Sensitive field. */
-    deck: Readonly<Deck>;
+    deck: Deck;
 
     /** Sensitive field. */
     admin: ClientUUID;
@@ -84,10 +84,10 @@ export declare interface GameState {
     /** Sensitive field. */
     activeConnections: Map<ClientUUID, ConnectedClient>;
 
-    serverTime: Readonly<number>;
+    serverTime: number;
 
     /** The minimum amount by which the next player can raise. */
-    minRaiseDiff: Readonly<number>;
+    minRaiseDiff: number;
 
     /** The size of the bet of the last aggressor. It will not include callers and partial all-ins. */
     previousRaise: number;
@@ -103,7 +103,7 @@ export declare interface ConnectedClient {
 
 export declare interface Pot {
     value: number;
-    contestors: ReadonlyArray<string>;
+    contestors: Array<PlayerUUID>;
 }
 
 export const enum ServerStateKey {
@@ -138,15 +138,15 @@ export function getCleanGameState(): GameState {
             maxPlayers: 9,
             timeBankValue: 0,
         },
-        dealerUUID: '',
-        smallBlindUUID: '',
-        bigBlindUUID: '',
-        straddleUUID: '',
-        lastAggressorUUID: '',
+        dealerUUID: makeBlankUUID(),
+        smallBlindUUID: makeBlankUUID(),
+        bigBlindUUID: makeBlankUUID(),
+        straddleUUID: makeBlankUUID(),
+        lastAggressorUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
-        firstToAct: '',
-        admin: '',
-        currentPlayerToAct: '',
+        firstToAct: makeBlankUUID(),
+        admin: makeBlankUUID(),
+        currentPlayerToAct: makeBlankUUID(),
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,
         activeConnections: new Map(),
@@ -154,7 +154,7 @@ export function getCleanGameState(): GameState {
             cards: [],
         },
         pots: [],
-        handWinners: new Set<string>(),
+        handWinners: new Set<PlayerUUID>(),
         timeCurrentPlayerTurnStarted: 0,
         timeBanksUsedThisAction: 0,
         serverTime: 0,

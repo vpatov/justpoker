@@ -39,6 +39,7 @@ import { AnimationService } from './animationService';
 import { ChatService } from './chatService';
 
 import { debugFunc } from '../logger';
+import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
 
 declare interface CardInformation {
     hand: {
@@ -76,12 +77,12 @@ export class StateConverter {
 
     // Hero refers to the player who is receiving this particular UiState.
     @debugFunc({ noResult: true })
-    transformGameStateToUIState(clientUUID: string, sendAll: boolean): UiState {
+    transformGameStateToUIState(clientUUID: ClientUUID, sendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
-        const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : '';
+        const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
         const board = this.gameStateManager.getBoard();
 
         // TODO put each key into its own function
@@ -121,7 +122,8 @@ export class StateConverter {
         return uiState;
     }
 
-    getUIGlobal(clientUUID: string): Global {
+    @debugFunc({ noResult: true })
+    getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const gameStage = this.gameStateManager.getGameStage();
@@ -147,7 +149,8 @@ export class StateConverter {
     // and returns an unpopulated controller for when its not the players turn? Or is this function
     // only called for the current player to act? Whatever the choice is, the usage/parameters have
     // to be made consistent with the decision, because there is some redundancy right now.
-    getUIController(clientUUID: string, heroPlayerUUID: string): Controller {
+    @debugFunc({ noResult: true })
+    getUIController(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): Controller {
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
 
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
@@ -208,7 +211,7 @@ export class StateConverter {
         return controller;
     }
 
-    getMaxBetSizeForPlayer(playerUUID: string) {
+    getMaxBetSizeForPlayer(playerUUID: PlayerUUID) {
         return this.gameStateManager.getGameType() === GameType.PLOMAHA
             ? Math.min(
                   this.gameStateManager.getPotSizedBetForPlayer(playerUUID),
@@ -221,7 +224,7 @@ export class StateConverter {
         return { ...button, disabled: true };
     }
 
-    getValidBettingRoundActions(clientUUID: string, heroPlayerUUID: string): BettingRoundActionButton[] {
+    getValidBettingRoundActions(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): BettingRoundActionButton[] {
         if (!this.gameStateManager.isGameInProgress()) {
             return [];
         }
@@ -241,11 +244,11 @@ export class StateConverter {
         return buttons;
     }
 
-    getMinimumBetSize(heroPlayerUUID: string) {
+    getMinimumBetSize(heroPlayerUUID: PlayerUUID) {
         return this.gameStateManager.getMinimumBetSizeForPlayer(heroPlayerUUID);
     }
 
-    getValidMenuButtons(clientUUID: string): MenuButton[] {
+    getValidMenuButtons(clientUUID: ClientUUID): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
         const menuButtons = [SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
@@ -266,7 +269,7 @@ export class StateConverter {
         return menuButtons;
     }
 
-    getShowCardButtons(clientUUID: string): ShowCardButton[] {
+    getShowCardButtons(clientUUID: ClientUUID): ShowCardButton[] {
         // condition to allow for possibility of showing cards
         // still might be empty if all cards are shown
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
@@ -286,7 +289,7 @@ export class StateConverter {
         return [];
     }
 
-    transformAudioForPlayer(playerUUID: string): SoundByte {
+    transformAudioForPlayer(playerUUID: PlayerUUID): SoundByte {
         const audioQueue = this.audioService.getAudioQueue();
         return audioQueue.personal[playerUUID] || audioQueue.global;
     }
@@ -306,7 +309,8 @@ export class StateConverter {
         return uiChatMessage;
     }
 
-    transformPlayerCards(player: Player, heroPlayerUUID: string): CardInformation {
+    @debugFunc({ noResult: true })
+    transformPlayerCards(player: Player, heroPlayerUUID: PlayerUUID): CardInformation {
         const isHero = heroPlayerUUID === player.uuid;
         const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
         const isWinner = player.winner;
@@ -345,7 +349,8 @@ export class StateConverter {
         }
     }
 
-    transformPlayer(player: Player, heroPlayerUUID: string): UiPlayer {
+    @debugFunc({ noResult: true })
+    transformPlayer(player: Player, heroPlayerUUID: PlayerUUID): UiPlayer {
         const herosTurnToAct =
             this.gameStateManager.getCurrentPlayerToAct() === player.uuid &&
             this.gameStateManager.gameIsWaitingForBetAction();
@@ -360,7 +365,7 @@ export class StateConverter {
                       // subtract one second such that the server timer ends just a little bit after
                       // the visual component of the UI indicates that the turn is over, to compensate
                       // and prevent from the vice-versa scenario (which would be way worse)
-                      timeLimit: this.gameStateManager.getTotalPlayerTimeToAct(heroPlayerUUID) / 1000 - 1,
+                      timeLimit: this.gameStateManager.getTotalPlayerTimeToAct() / 1000 - 1,
                   }
                 : undefined,
             name: player.name,
@@ -376,7 +381,7 @@ export class StateConverter {
         return uiPlayer;
     }
 
-    getPlayerPositionIndicator(playerUUID: string): PositionIndicator | undefined {
+    getPlayerPositionIndicator(playerUUID: PlayerUUID): PositionIndicator | undefined {
         if (!this.gameStateManager.isGameInProgress()) {
             return undefined;
         }
@@ -397,7 +402,7 @@ export class StateConverter {
         return undefined;
     }
 
-    getUIState(clientUUID: string, sendAll: boolean): UiState {
+    getUIState(clientUUID: ClientUUID, sendAll: boolean): UiState {
         // TODO document the usage of updatedKeys and consider a refactor/redesign if too complex
         const uiState = this.transformGameStateToUIState(clientUUID, sendAll);
         return uiState;

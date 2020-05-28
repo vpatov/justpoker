@@ -7,7 +7,7 @@ import {
     ClientWsMessageRequest,
     ClientChatMessage,
     BootPlayerRequest,
-} from '../../../ui/src/shared/models/dataCommunication';
+} from '../../../ui/src/shared/models/api';
 import { printObj } from '../../../ui/src/shared/util/util';
 import {
     ValidationResponse,
@@ -15,6 +15,7 @@ import {
     NO_ERROR,
     INTERNAL_SERVER_ERROR,
 } from '../../../ui/src/shared/models/validation';
+import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -39,7 +40,7 @@ export function hasError(response: ValidationResponse): boolean {
 export class ValidationService {
     constructor(private readonly gsm: GameStateManager) {}
 
-    ensureClientExists(clientUUID: string): ValidationResponse {
+    ensureClientExists(clientUUID: ClientUUID): ValidationResponse {
         const client = this.gsm.getConnectedClient(clientUUID);
         if (!client) {
             return {
@@ -50,7 +51,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensureClientIsInGame(clientUUID: string): ValidationResponse {
+    ensureClientIsInGame(clientUUID: ClientUUID): ValidationResponse {
         const client = this.gsm.getConnectedClient(clientUUID);
 
         if (!client.playerUUID) {
@@ -70,7 +71,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensureClientIsNotInGame(clientUUID: string): ValidationResponse {
+    ensureClientIsNotInGame(clientUUID: ClientUUID): ValidationResponse {
         const client = this.gsm.getConnectedClient(clientUUID);
         if (client.playerUUID) {
             return {
@@ -81,7 +82,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensurePlayerIsSitting(playerUUID: string): ValidationResponse {
+    ensurePlayerIsSitting(playerUUID: PlayerUUID): ValidationResponse {
         const player = this.gsm.getPlayer(playerUUID);
         if (!player.sitting) {
             return {
@@ -92,7 +93,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensurePlayerIsStanding(playerUUID: string): ValidationResponse {
+    ensurePlayerIsStanding(playerUUID: PlayerUUID): ValidationResponse {
         const player = this.gsm.getPlayer(playerUUID);
         if (player.sitting) {
             return {
@@ -103,7 +104,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensurePlayerIsSittingIn(playerUUID: string): ValidationResponse {
+    ensurePlayerIsSittingIn(playerUUID: PlayerUUID): ValidationResponse {
         const player = this.gsm.getPlayer(playerUUID);
         if (player.sittingOut) {
             return {
@@ -114,7 +115,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensurePlayerIsSittingOut(playerUUID: string): ValidationResponse {
+    ensurePlayerIsSittingOut(playerUUID: PlayerUUID): ValidationResponse {
         const player = this.gsm.getPlayer(playerUUID);
         if (!player.sittingOut) {
             return {
@@ -125,7 +126,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensurePlayerCanActRightNow(clientUUID: string): ValidationResponse {
+    ensurePlayerCanActRightNow(clientUUID: ClientUUID): ValidationResponse {
         let response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
             return response;
@@ -146,7 +147,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateJoinTableRequest(clientUUID: string, request: JoinTableRequest): ValidationResponse {
+    validateJoinTableRequest(clientUUID: ClientUUID, request: JoinTableRequest): ValidationResponse {
         // TODO return this logic later
         // const response = this.ensureClientIsNotInGame(clientUUID);
         // if (hasError(response)) {
@@ -161,7 +162,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateSitDownRequest(clientUUID: string, request: SitDownRequest): ValidationResponse {
+    validateSitDownRequest(clientUUID: ClientUUID, request: SitDownRequest): ValidationResponse {
         let response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
             return response;
@@ -199,7 +200,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateStandUpRequest(clientUUID: string): ValidationResponse {
+    validateStandUpRequest(clientUUID: ClientUUID): ValidationResponse {
         const response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
             return response;
@@ -208,7 +209,7 @@ export class ValidationService {
         return this.ensurePlayerIsSitting(player.uuid);
     }
 
-    validateSitInAction(clientUUID: string): ValidationResponse {
+    validateSitInAction(clientUUID: ClientUUID): ValidationResponse {
         const response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
             return response;
@@ -217,7 +218,7 @@ export class ValidationService {
         return this.ensurePlayerIsSittingOut(player.uuid);
     }
 
-    validateSitOutAction(clientUUID: string): ValidationResponse {
+    validateSitOutAction(clientUUID: ClientUUID): ValidationResponse {
         const response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
             return response;
@@ -226,7 +227,7 @@ export class ValidationService {
         return this.ensurePlayerIsSittingIn(player.uuid);
     }
 
-    validateStartGameRequest(clientUUID: string): ValidationResponse {
+    validateStartGameRequest(clientUUID: ClientUUID): ValidationResponse {
         // TODO validate that client is admin
         if (this.gsm.shouldDealNextHand()) {
             return {
@@ -237,7 +238,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateStopGameRequest(clientUUID: string): ValidationResponse {
+    validateStopGameRequest(clientUUID: ClientUUID): ValidationResponse {
         // TODO validate that client is admin
         if (!this.gsm.shouldDealNextHand()) {
             return {
@@ -248,7 +249,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateBettingRoundAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
+    validateBettingRoundAction(clientUUID: ClientUUID, action: BettingRoundAction): ValidationResponse {
         const response = this.ensurePlayerCanActRightNow(clientUUID);
         if (hasError(response)) {
             return response;
@@ -267,7 +268,7 @@ export class ValidationService {
         }
     }
 
-    private validateCheckAction(clientUUID: string): ValidationResponse {
+    private validateCheckAction(clientUUID: ClientUUID): ValidationResponse {
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const bettingRoundActions = this.gsm.getBettingRoundActionTypes();
         const playerBetAmt = player.betAmount;
@@ -317,7 +318,7 @@ export class ValidationService {
     - player has at least X chips
     - player hasnt folded (if a player has folded, it should never be their turn to act)
     */
-    private validateBetAction(clientUUID: string, action: BettingRoundAction): ValidationResponse {
+    private validateBetAction(clientUUID: ClientUUID, action: BettingRoundAction): ValidationResponse {
         // TODO remove this from here and put this extra checking in a type validation layer.
         const betAmount = typeof action.amount === 'number' ? action.amount : Number(action.amount);
 
@@ -391,7 +392,7 @@ export class ValidationService {
         Player can call if they havent folded
         Player can call if they are facing a bet.
     */
-    private validateCallAction(clientUUID: string): ValidationResponse {
+    private validateCallAction(clientUUID: ClientUUID): ValidationResponse {
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot Call\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
@@ -405,7 +406,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateChatMessage(clientUUID: string, message: ClientChatMessage): ValidationResponse {
+    validateChatMessage(clientUUID: ClientUUID, message: ClientChatMessage): ValidationResponse {
         const messageLength = message.content.length;
         if (messageLength > 1000) {
             return {
@@ -419,7 +420,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    ensureClientIsAdmin(clientUUID: string): ValidationResponse {
+    ensureClientIsAdmin(clientUUID: ClientUUID): ValidationResponse {
         if (this.gsm.getAdminUUID() !== clientUUID) {
             return {
                 errorType: ErrorType.NOT_ADMIN,
@@ -429,7 +430,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateBootPlayerAction(clientUUID: string, req: BootPlayerRequest): ValidationResponse {
+    validateBootPlayerAction(clientUUID: ClientUUID, req: BootPlayerRequest): ValidationResponse {
         const response = this.ensureClientIsAdmin(clientUUID);
         if (hasError(response)) {
             return response;
@@ -454,7 +455,7 @@ export class ValidationService {
         return NO_ERROR;
     }
 
-    validateUseTimeBankAction(clientUUID: string) {
+    validateUseTimeBankAction(clientUUID: ClientUUID) {
         const response = this.ensurePlayerCanActRightNow(clientUUID);
         if (hasError(response)) {
             return response;

@@ -1,7 +1,6 @@
 import { Card, Hand } from './cards';
 import { BettingRoundActionType } from './game';
-
-export declare type PlayerUUID = string;
+import { PlayerUUID, makeBlankUUID } from './uuid';
 
 export declare interface Player {
     /** Unique identifier for player. */
@@ -61,7 +60,7 @@ export declare interface Player {
 
 export function getCleanPlayer(): Player {
     return {
-        uuid: '',
+        uuid: makeBlankUUID(),
         name: '',
         chips: 0,
         holeCards: [],

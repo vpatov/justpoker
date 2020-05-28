@@ -9,7 +9,7 @@ import {
     ServerActionType,
     createTimeoutEvent,
     ShowCardRequest,
-} from '../../../ui/src/shared/models/dataCommunication';
+} from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService, hasError } from './validationService';
 import { Service } from 'typedi';
@@ -21,10 +21,11 @@ import { StateGraphManager } from './stateGraphManager';
 import { GameInstanceManager } from './gameInstanceManager';
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '..//server/connectedClientManager';
+import { ClientUUID } from '../../../ui/src/shared/models/uuid';
 
 declare interface ActionProcessor {
-    validation: (clientUUID: string, messagePayload: ClientWsMessageRequest) => ValidationResponse;
-    perform: (clientUUID: string, messagePayload: ClientWsMessageRequest) => void;
+    validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
+    perform: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => void;
     updates: ServerStateKey[];
 }
 

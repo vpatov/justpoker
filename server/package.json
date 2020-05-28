@@ -8,7 +8,7 @@
     },
     "scripts": {
         "prebuild": "npm run lint; rm -rf dist",
-        "lint": "eslint --quiet --fix --config .eslintrc.js --no-eslintrc ./src/**/*.ts",
+        "lint": "eslint --quiet --fix --config .eslintrc.js --no-eslintrc ./src/**/*.ts ../ui/src/shared/**/*",
         "build": "tsc",
         "prestart": "npm run build",
         "start": "node ./dist/server/server/src/server/server.js",
@@ -37,6 +37,7 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
+        "@types/color": "^3.0.1",
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
         "pokersolver": "^2.1.3",
