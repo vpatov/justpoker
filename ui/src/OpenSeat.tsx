@@ -35,11 +35,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const NAME_LOCAL_STORAGE_KEY = 'jp_lastUsedName';
+
 function OpenSeat(props) {
     const classes = useStyles();
     const { className, style, seatNumber } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [name, setName] = useState('');
+    const [name, setName] = useState(localStorage.getItem(NAME_LOCAL_STORAGE_KEY) || '');
     const [minBuyin, setMinBuyin] = useState(25);
     // TODO maxBuyin should be read from game parameters.
     // TODO when entering the buyin amount, the textbox adjusts it too quickly.
@@ -115,7 +117,10 @@ function OpenSeat(props) {
                         label="Name"
                         type="text"
                         fullWidth
-                        onChange={(event) => setName(event.target.value)}
+                        onChange={(event) => {
+                            setName(event.target.value);
+                            localStorage.setItem(NAME_LOCAL_STORAGE_KEY, event.target.value);
+                        }}
                         value={name}
                         variant="standard"
                         maxChars={24}
