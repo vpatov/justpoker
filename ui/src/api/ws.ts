@@ -11,6 +11,7 @@ import {
 } from '../shared/models/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
 
+const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
 const DEFAULT_WS_PORT = 8080;
 
@@ -25,7 +26,7 @@ export class WsServer {
         const wsURI = {
             url: wsURL,
             query: {
-                clientUUID: docCookies.getItem(WsServer.clientUUID) || null,
+                clientUUID: docCookies.getItem(clientUUIDCookieID) || null,
                 gameInstanceUUID: gameInstanceUUID || null,
             } as ParsedQuery,
         };
@@ -42,7 +43,8 @@ export class WsServer {
         const jsonData = JSON.parse(get(msg, 'data', {}));
         console.log(jsonData);
         if (jsonData.clientUUID) {
-            docCookies.setItem(WsServer.clientUUID, jsonData.clientUUID, ONE_DAY);
+            docCookies.setItem(clientUUIDCookieID, jsonData.clientUUID, ONE_DAY);
+            WsServer.clientUUID = jsonData.clientUUID;
         }
         Object.keys(WsServer.subscriptions).forEach((key) => {
             if (jsonData[key]) {
@@ -53,7 +55,6 @@ export class WsServer {
 
     // TODO make this private, and expose a helper method to each component.
     static send(message: ClientWsMessage) {
-        console.log('sending: ', message);
         WsServer.ws.send(JSON.stringify(message));
     }
 
