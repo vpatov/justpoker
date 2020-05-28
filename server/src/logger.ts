@@ -83,7 +83,9 @@ export function debugFunc(paramsArg?: DebugFuncParams) {
                     }
                     return result;
                 } catch (e) {
+                    const err = e as Error;
                     logger.debug(`RTRN: ${String(key)} \t ERRR: ${e}`);
+                    logger.debug(`Stacktrace: ${err.stack}`);
                     throw e;
                 }
             };

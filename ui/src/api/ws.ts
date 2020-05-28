@@ -8,24 +8,24 @@ import {
     ClientWsMessageRequest,
     BootPlayerRequest,
     WSParams,
-} from '../shared/models/dataCommunication';
+} from '../shared/models/api';
+import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
 
-const clientUUID = 'clientUUID';
 const ONE_DAY = 60 * 60 * 24;
 const DEFAULT_WS_PORT = 8080;
 
 export class WsServer {
-    static clientUUID: string | null;
+    static clientUUID: ClientUUID | null = null;
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
 
-    static openWs(gameInstanceUUID: string) {
+    static openWs(gameInstanceUUID: GameInstanceUUID) {
         console.log('opening ws...');
         const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
         const wsURI = {
             url: wsURL,
             query: {
-                clientUUID: docCookies.getItem(clientUUID) || null,
+                clientUUID: docCookies.getItem(WsServer.clientUUID) || null,
                 gameInstanceUUID: gameInstanceUUID || null,
             } as ParsedQuery,
         };
@@ -42,7 +42,7 @@ export class WsServer {
         const jsonData = JSON.parse(get(msg, 'data', {}));
         console.log(jsonData);
         if (jsonData.clientUUID) {
-            docCookies.setItem(clientUUID, jsonData.clientUUID, ONE_DAY);
+            docCookies.setItem(WsServer.clientUUID, jsonData.clientUUID, ONE_DAY);
         }
         Object.keys(WsServer.subscriptions).forEach((key) => {
             if (jsonData[key]) {
@@ -66,7 +66,7 @@ export class WsServer {
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 
-    static sendBootPlayerMessage(playerUUID: string) {
+    static sendBootPlayerMessage(playerUUID: PlayerUUID) {
         const clientWsMessage: ClientWsMessage = {
             actionType: ClientActionType.BOOTPLAYER,
             request: ({ playerUUID } as BootPlayerRequest) as ClientWsMessageRequest,

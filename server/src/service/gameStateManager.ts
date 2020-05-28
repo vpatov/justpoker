@@ -20,14 +20,15 @@ import {
 } from '../../../ui/src/shared/models/game';
 import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
-import { generateUUID, getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { NewGameForm, JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/dataCommunication';
+import { getLoggableGameState } from '../../../ui/src/shared/util/util';
+import { NewGameForm, JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger } from '../logger';
+import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -95,21 +96,21 @@ export class GameStateManager {
     createNewPlayer(name: string, chips: number): Player {
         return {
             ...getCleanPlayer(),
-            uuid: generateUUID(),
+            uuid: generatePlayerUUID(),
             name,
             chips,
             timeBanksLeft: TIME_BANKS_DEFAULT,
         };
     }
 
-    createConnectedClient(clientUUID: string): ConnectedClient {
+    createConnectedClient(clientUUID: ClientUUID): ConnectedClient {
         return {
             uuid: clientUUID,
-            playerUUID: '',
+            playerUUID: makeBlankUUID(),
         };
     }
 
-    updatePlayer(playerUUID: string, updates: Partial<Player>) {
+    updatePlayer(playerUUID: PlayerUUID, updates: Partial<Player>) {
         const player = this.getPlayer(playerUUID);
 
         this.updateGameState({
@@ -120,7 +121,13 @@ export class GameStateManager {
         });
     }
     updatePlayers(updateFn: (player: Player) => Partial<Player>) {
-        Object.entries(this.gameState.players).forEach(([uuid, player]) => this.updatePlayer(uuid, updateFn(player)));
+        Object.entries(this.gameState.players).forEach(([uuid, player]) =>
+            this.updatePlayer(uuid as PlayerUUID, updateFn(player)),
+        );
+    }
+
+    filterPlayerUUIDs(filterFn: (playerUUID: PlayerUUID) => boolean): PlayerUUID[] {
+        return Object.keys(this.gameState.players).filter(filterFn) as PlayerUUID[];
     }
 
     forEveryPlayer(performFn: (player: Player) => void) {
@@ -131,11 +138,11 @@ export class GameStateManager {
         [...this.gameState.activeConnections.entries()].forEach(([clientUUID, client]) => performFn(client));
     }
 
-    getConnectedClient(clientUUID: string) {
+    getConnectedClient(clientUUID: ClientUUID) {
         return this.gameState.activeConnections.get(clientUUID);
     }
 
-    getClientByPlayerUUID(playerUUID: string): string {
+    getClientByPlayerUUID(playerUUID: PlayerUUID): ClientUUID {
         if (!playerUUID) {
             throw Error(`getClientByPlayerUUID called with null playerUUID`);
         }
@@ -158,16 +165,17 @@ export class GameStateManager {
         return this.gameState.activeConnections.values();
     }
 
-    getPlayerByClientUUID(clientUUID: string): Player {
+    getPlayerByClientUUID(clientUUID: ClientUUID): Player {
         const connectedClient = this.getConnectedClient(clientUUID);
         const playerUUID = connectedClient.playerUUID;
         return this.getPlayer(playerUUID);
     }
 
-    getPlayer(playerUUID: string): Player {
+    getPlayer(playerUUID: PlayerUUID): Player {
         return this.gameState.players[playerUUID];
     }
 
+    // TODO when branded types can be used as index signatures, replace string with PlayerUUID
     getPlayers(): Readonly<{ [key: string]: Player }> {
         return this.gameState.players;
     }
@@ -188,19 +196,19 @@ export class GameStateManager {
         return this.gameState.currentPlayerToAct;
     }
 
-    getDealerUUID() {
+    getDealerUUID(): PlayerUUID {
         return this.gameState.dealerUUID;
     }
 
-    getBigBlindUUID() {
+    getBigBlindUUID(): PlayerUUID {
         return this.gameState.bigBlindUUID;
     }
 
-    getSmallBlindUUID() {
+    getSmallBlindUUID(): PlayerUUID {
         return this.gameState.smallBlindUUID;
     }
 
-    getStraddleUUID() {
+    getStraddleUUID(): PlayerUUID {
         return this.gameState.straddleUUID;
     }
 
@@ -208,12 +216,12 @@ export class GameStateManager {
         return this.gameState.board;
     }
 
-    addPlayerChips(playerUUID: string, addChips: number) {
+    addPlayerChips(playerUUID: PlayerUUID, addChips: number) {
         this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), addChips);
         this.updatePlayer(playerUUID, { chips: this.getChips(playerUUID) + addChips });
     }
 
-    setPlayerChips(playerUUID: string, setChips: number) {
+    setPlayerChips(playerUUID: PlayerUUID, setChips: number) {
         const chipDifference = setChips - this.getChips(playerUUID);
         if (chipDifference > 0) {
             this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
@@ -241,15 +249,15 @@ export class GameStateManager {
         return this.gameState.gameParameters.timeToAct;
     }
 
-    getTotalPlayerTimeToAct(playerUUID: string) {
-        return this.getTimeToAct() + this.getSumTimeBankValueThisAction(playerUUID);
+    getTotalPlayerTimeToAct() {
+        return this.getTimeToAct() + this.getSumTimeBankValueThisAction();
     }
 
-    getTimeBanksLeft(playerUUID: string) {
+    getTimeBanksLeft(playerUUID: PlayerUUID) {
         return this.getPlayer(playerUUID).timeBanksLeft;
     }
 
-    decrementTimeBanksLeft(playerUUID: string) {
+    decrementTimeBanksLeft(playerUUID: PlayerUUID) {
         this.updatePlayer(playerUUID, { timeBanksLeft: this.getTimeBanksLeft(playerUUID) - 1 });
     }
 
@@ -257,7 +265,7 @@ export class GameStateManager {
         return this.gameState.timeBanksUsedThisAction;
     }
 
-    getSumTimeBankValueThisAction(playerUUID: string) {
+    getSumTimeBankValueThisAction() {
         return this.getTimeBanksUsedThisAction() * this.getTimeBankValue();
     }
 
@@ -332,11 +340,11 @@ export class GameStateManager {
         return this.getTotalPot() + this.getAllCommitedBets();
     }
 
-    getHandWinners(): Set<string> {
+    getHandWinners(): Set<PlayerUUID> {
         return this.gameState.handWinners;
     }
 
-    addHandWinner(playerUUID: string) {
+    addHandWinner(playerUUID: PlayerUUID) {
         this.updateGameState({
             handWinners: new Set([...this.getHandWinners(), playerUUID]),
         });
@@ -355,9 +363,9 @@ export class GameStateManager {
     }
 
     getBettingRoundActionTypes() {
-        return Object.values(this.gameState.players)
-            .filter((player) => this.wasPlayerDealtIn(player.uuid))
-            .map((player) => player.lastActionType);
+        return this.filterPlayerUUIDs((playerUUID) => this.wasPlayerDealtIn(playerUUID)).map(
+            (playerUUID) => this.getPlayer(playerUUID).lastActionType,
+        );
     }
 
     getBettingRoundStage() {
@@ -365,14 +373,14 @@ export class GameStateManager {
     }
 
     getSeats() {
-        const seats: [number, string][] = Object.values(this.gameState.players)
+        const seats: [number, PlayerUUID][] = Object.values(this.gameState.players)
             .filter((player) => player.seatNumber >= 0)
             .map((player) => [player.seatNumber, player.uuid]);
         seats.sort();
         return seats;
     }
 
-    getPositionRelativeToDealer(playerUUID: string) {
+    getPositionRelativeToDealer(playerUUID: PlayerUUID) {
         const numPlayers = this.getPlayersDealtIn().length;
         return (
             this.getPlayer(playerUUID).seatNumber +
@@ -380,7 +388,7 @@ export class GameStateManager {
         );
     }
 
-    comparePositions(playerA: string, playerB: string) {
+    comparePositions(playerA: PlayerUUID, playerB: PlayerUUID) {
         const posA = this.getPositionRelativeToDealer(playerA);
         const posB = this.getPositionRelativeToDealer(playerB);
 
@@ -404,12 +412,12 @@ export class GameStateManager {
         return this.gameState.deck;
     }
 
-    getPlayersInHand(): string[] {
-        return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerInHand(playerUUID));
+    getPlayersInHand(): PlayerUUID[] {
+        return this.filterPlayerUUIDs((playerUUID) => this.isPlayerInHand(playerUUID));
     }
 
-    getPlayersEligibleToActNext(): string[] {
-        return Object.keys(this.gameState.players).filter((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
+    getPlayersEligibleToActNext(): PlayerUUID[] {
+        return this.filterPlayerUUIDs((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
     gameIsWaitingForBetAction() {
@@ -421,13 +429,13 @@ export class GameStateManager {
         return minimumBet;
     }
 
-    getMinimumBetSizeForPlayer(playerUUID: string) {
+    getMinimumBetSizeForPlayer(playerUUID: PlayerUUID) {
         const player = this.getPlayer(playerUUID);
         const minimumBetSize = this.getMinimumBetSize();
         return minimumBetSize > player.chips ? player.chips : minimumBetSize;
     }
 
-    getPotSizedBetForPlayer(playerUUID: string) {
+    getPotSizedBetForPlayer(playerUUID: PlayerUUID) {
         const player = this.getPlayer(playerUUID);
         return this.getFullPot() + this.getPreviousRaise() * 2 - player.betAmount;
     }
@@ -436,24 +444,24 @@ export class GameStateManager {
         return this.gameState.shouldDealNextHand;
     }
 
-    isPlayerReadyToPlay(playerUUID: string): boolean {
+    isPlayerReadyToPlay(playerUUID: PlayerUUID): boolean {
         return this.getPlayer(playerUUID).sitting && !this.getPlayer(playerUUID).sittingOut;
     }
 
-    isPlayerInHand(playerUUID: string): boolean {
+    isPlayerInHand(playerUUID: PlayerUUID): boolean {
         return !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID);
     }
 
-    isPlayerFacingBet(playerUUID: string): boolean {
+    isPlayerFacingBet(playerUUID: PlayerUUID): boolean {
         return this.getPreviousRaise() + this.getPartialAllInLeftOver() > this.getPlayerBetAmount(playerUUID);
     }
 
     // TODO
-    isPlayerFacingRaise(playerUUID: string): boolean {
+    isPlayerFacingRaise(playerUUID: PlayerUUID): boolean {
         return false;
     }
 
-    isPlayerEligibleToActNext(playerUUID: string): boolean {
+    isPlayerEligibleToActNext(playerUUID: PlayerUUID): boolean {
         return (
             !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID) && !this.isPlayerAllIn(playerUUID)
         );
@@ -464,7 +472,7 @@ export class GameStateManager {
         return this.haveAllPlayersActed();
     }
 
-    hasPlayerFolded(playerUUID: string): boolean {
+    hasPlayerFolded(playerUUID: PlayerUUID): boolean {
         return this.getPlayer(playerUUID).lastActionType === BettingRoundActionType.FOLD;
     }
 
@@ -485,7 +493,7 @@ export class GameStateManager {
      * be visible to a player if the player is ready to play (sitting down),
      * if the game is not currently in progress, and if there are enough players to play.
      */
-    canPlayerStartGame(playerUUID: string) {
+    canPlayerStartGame(playerUUID: PlayerUUID) {
         return (
             this.isPlayerReadyToPlay(playerUUID) &&
             this.getPlayersReadyToPlay().length >= 2 &&
@@ -506,12 +514,12 @@ export class GameStateManager {
         return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
     }
 
-    willPlayerStraddle(playerUUID: string): boolean {
+    willPlayerStraddle(playerUUID: PlayerUUID): boolean {
         const player = this.getPlayer(playerUUID);
         return player.willStraddle;
     }
 
-    getNextPlayerReadyToPlayUUID(currentPlayerUUID: string) {
+    getNextPlayerReadyToPlayUUID(currentPlayerUUID: PlayerUUID) {
         //TODO is this method ever called while nobody is sitting?
         // in a single-threaded env, probably
 
@@ -535,7 +543,7 @@ export class GameStateManager {
         return nextPlayerUUID;
     }
 
-    getNextPlayerInHandUUID(currentPlayerUUID: string) {
+    getNextPlayerInHandUUID(currentPlayerUUID: PlayerUUID) {
         //TODO duplicate safeguard.
         if (this.haveAllPlayersActed()) {
             throw Error('getNextPlayerInHandUUID shouldnt be called if all plalyers have acted.');
@@ -582,7 +590,7 @@ export class GameStateManager {
         this.updateGameState({ board: [...this.getBoard(), ...newCards] });
     }
 
-    dealCardsToPlayer(amount: number, playerUUID: string) {
+    dealCardsToPlayer(amount: number, playerUUID: PlayerUUID) {
         const newCards = [...Array(amount).keys()].map((_) => this.drawCard());
         this.updatePlayer(playerUUID, { holeCards: newCards });
     }
@@ -592,7 +600,7 @@ export class GameStateManager {
     // TODO validation around this method. Shouldn't be executed when table is not intialized.
     // TODO break away client logic into server state manager.
     // TODO rename method, as it is not always initializing a client.
-    initConnectedClient(clientUUID: string) {
+    initConnectedClient(clientUUID: ClientUUID) {
         const client = this.gameState.activeConnections.get(clientUUID);
         if (!client) {
             if (!this.gameState.admin) {
@@ -607,7 +615,7 @@ export class GameStateManager {
         }
     }
 
-    initAdmin(clientUUID: string) {
+    initAdmin(clientUUID: ClientUUID) {
         this.updateGameState({
             admin: clientUUID,
         });
@@ -671,7 +679,7 @@ export class GameStateManager {
 
     /* Player operations */
 
-    associateClientAndPlayer(clientUUID: string, playerUUID: string): ConnectedClient {
+    associateClientAndPlayer(clientUUID: ClientUUID, playerUUID: PlayerUUID): ConnectedClient {
         const connectedClient = this.getConnectedClient(clientUUID);
         return {
             ...connectedClient,
@@ -679,7 +687,7 @@ export class GameStateManager {
         };
     }
 
-    bootPlayerFromGame(playerUUID: string) {
+    bootPlayerFromGame(playerUUID: PlayerUUID) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
                 actionType: ClientActionType.BOOTPLAYER,
@@ -693,7 +701,7 @@ export class GameStateManager {
         }
     }
 
-    removePlayerFromPlayers(playerUUID: string) {
+    removePlayerFromPlayers(playerUUID: PlayerUUID) {
         const player = this.getPlayer(playerUUID);
         if (player.sitting) {
             this.standUpPlayer(playerUUID);
@@ -706,7 +714,7 @@ export class GameStateManager {
     }
 
     // TODO if you need to perform more operations like this, you need to create helpers
-    deassociateClientAndPlayer(playerUUID: string) {
+    deassociateClientAndPlayer(playerUUID: PlayerUUID) {
         const playerClientUUID = this.getClientByPlayerUUID(playerUUID);
         if (!playerClientUUID) {
             throw Error('deassociateClientAndPlayer called with a player that doesnt have a client.');
@@ -717,14 +725,14 @@ export class GameStateManager {
                     clientUUID,
                     {
                         ...client,
-                        playerUUID: clientUUID === playerClientUUID ? '' : client.playerUUID,
+                        playerUUID: clientUUID === playerClientUUID ? makeBlankUUID() : client.playerUUID,
                     },
                 ]),
             ),
         });
     }
 
-    addNewPlayerToGame(clientUUID: string, request: JoinTableRequest) {
+    addNewPlayerToGame(clientUUID: ClientUUID, request: JoinTableRequest) {
         const name = request.name;
         const buyin = request.buyin;
         const player = this.createNewPlayer(name, buyin);
@@ -752,25 +760,25 @@ export class GameStateManager {
         this.ledgerService.addBuyin(clientUUID, buyin);
     }
 
-    setWillPlayerStraddle(playerUUID: string, willStraddle: boolean) {
+    setWillPlayerStraddle(playerUUID: PlayerUUID, willStraddle: boolean) {
         this.updatePlayer(playerUUID, { willStraddle });
     }
 
-    sitDownPlayer(playerUUID: string, seatNumber: number) {
+    sitDownPlayer(playerUUID: PlayerUUID, seatNumber: number) {
         this.updatePlayer(playerUUID, { sitting: true, sittingOut: false, seatNumber: seatNumber });
     }
 
-    standUpPlayer(playerUUID: string) {
+    standUpPlayer(playerUUID: PlayerUUID) {
         this.updatePlayer(playerUUID, { sitting: false, sittingOut: false, seatNumber: -1 });
         const clientUUID = this.getClientByPlayerUUID(playerUUID);
         this.ledgerService.addWalkaway(clientUUID, this.getPlayer(playerUUID).chips);
     }
 
-    sitOutPlayer(playerUUID: string) {
+    sitOutPlayer(playerUUID: PlayerUUID) {
         this.updatePlayer(playerUUID, { sittingOut: true });
     }
 
-    sitInPlayer(playerUUID: string) {
+    sitInPlayer(playerUUID: PlayerUUID) {
         this.updatePlayer(playerUUID, { sittingOut: false });
     }
 
@@ -778,11 +786,11 @@ export class GameStateManager {
         return this.gameState.firstToAct;
     }
 
-    setFirstToAct(playerUUID: string) {
+    setFirstToAct(playerUUID: PlayerUUID) {
         this.updateGameState({ firstToAct: playerUUID });
     }
 
-    setCurrentPlayerToAct(playerUUID: string) {
+    setCurrentPlayerToAct(playerUUID: PlayerUUID) {
         this.updateGameState({ currentPlayerToAct: playerUUID });
     }
 
@@ -790,11 +798,11 @@ export class GameStateManager {
         this.updateGameState({ bettingRoundStage });
     }
 
-    setPlayerLastActionType(playerUUID: string, lastActionType: BettingRoundActionType) {
+    setPlayerLastActionType(playerUUID: PlayerUUID, lastActionType: BettingRoundActionType) {
         this.updatePlayer(playerUUID, { lastActionType });
     }
 
-    changePlayerName(playerUUID: string, name: string) {
+    changePlayerName(playerUUID: PlayerUUID, name: string) {
         this.updatePlayer(playerUUID, { name });
         this.ledgerService.addAlias(this.getClientByPlayerUUID(playerUUID), name);
     }
@@ -807,7 +815,7 @@ export class GameStateManager {
         this.updateGameState({ lastBettingRoundAction });
     }
 
-    computeBestHandForPlayer(playerUUID: string): Hand {
+    computeBestHandForPlayer(playerUUID: PlayerUUID): Hand {
         const bestHand =
             this.getGameType() === GameType.PLOMAHA
                 ? this.handSolverService.computeBestPLOHand(this.getPlayer(playerUUID).holeCards, this.getBoard())
@@ -816,17 +824,17 @@ export class GameStateManager {
         return bestHand;
     }
 
-    isCardInPlayersBestHand(playerUUID: string, card: Card) {
+    isCardInPlayersBestHand(playerUUID: PlayerUUID, card: Card) {
         return convertHandToCardArray(this.getPlayerBestHand(playerUUID)).some((handCard) =>
             cardsAreEqual(handCard, card),
         );
     }
 
-    getPlayerBestHand(playerUUID: string): Hand {
+    getPlayerBestHand(playerUUID: PlayerUUID): Hand {
         return this.getPlayer(playerUUID).bestHand;
     }
 
-    getPlayerHandDescription(playerUUID: string): string {
+    getPlayerHandDescription(playerUUID: PlayerUUID): string {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
         return bestHand.descr;
     }
@@ -837,9 +845,9 @@ export class GameStateManager {
 
     getAwardPots(): AwardPot[] {
         const awardPots: AwardPot[] = [];
-        for (const [uuid, player] of Object.entries(this.getPlayers())) {
+        for (const player of Object.values(this.getPlayers())) {
             if (player.winner) {
-                awardPots.push({ winnerUUID: uuid, value: player.chipDelta });
+                awardPots.push({ winnerUUID: player.uuid, value: player.chipDelta });
             }
         }
         return awardPots;
@@ -849,15 +857,15 @@ export class GameStateManager {
         return true;
     }
 
-    getChips(playerUUID: string) {
+    getChips(playerUUID: PlayerUUID) {
         return this.getPlayer(playerUUID).chips;
     }
 
-    getPlayerBetAmount(playerUUID: string) {
+    getPlayerBetAmount(playerUUID: PlayerUUID) {
         return this.getPlayer(playerUUID).betAmount;
     }
 
-    setPlayerBetAmount(playerUUID: string, betAmount: number) {
+    setPlayerBetAmount(playerUUID: PlayerUUID, betAmount: number) {
         if (betAmount > this.getChips(playerUUID)) {
             throw Error(
                 `Player: ${playerUUID} betamount: ${betAmount} is larger than their number of chips: ${this.getChips(
@@ -891,16 +899,16 @@ export class GameStateManager {
         this.updateGameState({
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
-            firstToAct: '',
-            currentPlayerToAct: '',
+            firstToAct: makeBlankUUID(),
+            currentPlayerToAct: makeBlankUUID(),
             pots: [],
             deck: {
                 cards: [],
             },
-            handWinners: new Set<string>(),
-            smallBlindUUID: '',
-            bigBlindUUID: '',
-            straddleUUID: '',
+            handWinners: new Set<PlayerUUID>(),
+            smallBlindUUID: makeBlankUUID(),
+            bigBlindUUID: makeBlankUUID(),
+            straddleUUID: makeBlankUUID(),
         });
     }
 
@@ -913,13 +921,13 @@ export class GameStateManager {
         return Object.values(this.gameState.players).filter((player) => this.isPlayerReadyToPlay(player.uuid));
     }
 
-    wasPlayerDealtIn(playerUUID: string) {
+    wasPlayerDealtIn(playerUUID: PlayerUUID) {
         return this.getPlayer(playerUUID).holeCards.length > 0;
     }
 
     clearCurrentPlayerToAct() {
         this.updateGameState({
-            currentPlayerToAct: '',
+            currentPlayerToAct: makeBlankUUID(),
         });
     }
 
@@ -935,19 +943,17 @@ export class GameStateManager {
         }, 0);
     }
 
-    isPlayerAdmin(clientUUID: string): boolean {
+    isPlayerAdmin(clientUUID: ClientUUID): boolean {
         return this.getAdminUUID() === clientUUID;
     }
 
-    isPlayerAllIn(playerUUID: string): boolean {
+    isPlayerAllIn(playerUUID: PlayerUUID): boolean {
         const player = this.getPlayer(playerUUID);
         return player.lastActionType === BettingRoundActionType.ALL_IN;
     }
 
-    getPlayersAllIn(): string[] {
-        return Object.entries(this.gameState.players)
-            .filter(([uuid, player]) => this.isPlayerAllIn(uuid))
-            .map(([uuid, player]) => uuid);
+    getPlayersAllIn(): PlayerUUID[] {
+        return this.filterPlayerUUIDs((playerUUID) => this.isPlayerAllIn(playerUUID));
     }
 
     isAllInRunOut() {
@@ -956,7 +962,7 @@ export class GameStateManager {
         return playersAllIn.length >= playersInHand.length - 1;
     }
 
-    hasPlayerPutAllChipsInThePot(playerUUID: string): boolean {
+    hasPlayerPutAllChipsInThePot(playerUUID: PlayerUUID): boolean {
         return this.getChips(playerUUID) === this.getPlayerBetAmount(playerUUID);
     }
 
@@ -972,9 +978,7 @@ export class GameStateManager {
     }
 
     getWinners() {
-        return Object.entries(this.gameState.players)
-            .filter(([uuid, player]) => player.winner)
-            .map(([uuid, player]) => uuid);
+        return this.filterPlayerUUIDs((playerUUID) => this.getPlayer(playerUUID).winner);
     }
 
     currentHandHasResult() {

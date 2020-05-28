@@ -1,7 +1,6 @@
 import { Card, Hand } from './cards';
 import { BettingRoundActionType } from './game';
-
-export declare type PlayerUUID = string;
+import { PlayerUUID, makeBlankUUID } from './uuid';
 
 export declare interface Player {
     /** Unique identifier for player. */
@@ -20,7 +19,7 @@ export declare interface Player {
     readonly handDescription: string;
 
     /** Cards that make up the player's best hand.*/
-    readonly bestHand: Hand|null;
+    readonly bestHand: Hand | null;
 
     /**
      * If a player is sitting they are either playing/have played
@@ -64,7 +63,7 @@ export declare interface Player {
 
 export function getCleanPlayer(): Player {
     return {
-        uuid: '',
+        uuid: makeBlankUUID(),
         name: '',
         chips: 0,
         holeCards: [],
@@ -81,7 +80,7 @@ export function getCleanPlayer(): Player {
         chipsAtStartOfHand: 0,
         chipDelta: 0,
         timeBanksLeft: 0,
-    };   
+    };
 }
 
 export const TIME_BANKS_DEFAULT = 5;

@@ -1,3 +1,5 @@
+import { ClientUUID, makeBlankUUID } from './uuid';
+
 export declare interface BaseLedgerRow {
     /**
      * The number of chips the client's player currently has, such that net can be calculated
@@ -23,7 +25,7 @@ export declare interface BaseLedgerRow {
 
 export declare interface ServerOnlyLedgerFields {
     /** The uuid of the client. */
-    clientUUID: string;
+    clientUUID: ClientUUID;
 
     /** A set of (case insensitive) aliases that the client has named their players, i.e. "Vas", "Vasia" .*/
     aliases: Set<string>;
@@ -79,7 +81,7 @@ export function getCleanLedger(): ServerLedger {
 
 export function getCleanLedgerRow(): ServerLedgerRow {
     return {
-        clientUUID: '',
+        clientUUID: makeBlankUUID(),
         aliases: new Set<string>(),
         buyins: [],
         walkaways: [],
