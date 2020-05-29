@@ -5,7 +5,7 @@ import { Typography, Tooltip } from '@material-ui/core';
 import { PositionIndicator } from './shared/models/uiState';
 import yellow from '@material-ui/core/colors/yellow';
 import orange from '@material-ui/core/colors/orange';
-import deepOrange from '@material-ui/core/colors/deepOrange';
+import grey from '@material-ui/core/colors/grey';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -25,9 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
             boxShadow: '0 0 4px 1px rgba(0,0,0,0.5)',
         },
         text: {
-            fontSize: '1.2vmin',
-            fontWeight: 'bold',
-            color: 'black',
+            fontSize: '1vmin',
             lineHeight: 0,
         },
     }),
@@ -44,7 +42,8 @@ function TablePositionIndicator(props) {
                     <div
                         className={classes.root}
                         style={{
-                            backgroundColor: deepOrange[700],
+                            backgroundColor: grey[900],
+                            color: 'white',
                         }}
                     >
                         <Typography className={classes.text}>{'D'}</Typography>
@@ -57,7 +56,7 @@ function TablePositionIndicator(props) {
                     <div
                         className={classes.root}
                         style={{
-                            backgroundColor: yellow[700],
+                            backgroundColor: yellow[800],
                         }}
                     >
                         <Typography className={classes.text}>{'SB'}</Typography>
@@ -70,7 +69,7 @@ function TablePositionIndicator(props) {
                     <div
                         className={classes.root}
                         style={{
-                            backgroundColor: orange[700],
+                            backgroundColor: orange[800],
                         }}
                     >
                         <Typography className={classes.text}>{'BB'}</Typography>

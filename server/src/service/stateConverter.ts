@@ -20,6 +20,7 @@ import {
     MenuButton,
     LEDGER_BUTTON,
     PositionIndicator,
+    ShowCardButton,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -199,6 +200,7 @@ export class StateConverter {
             min: minBet,
             max: maxBet,
             sizingButtons: getSizingButtons(),
+            showCardButtons: this.getShowCardButtons(clientUUID),
             bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
@@ -267,6 +269,22 @@ export class StateConverter {
         return menuButtons;
     }
 
+    getShowCardButtons(clientUUID: ClientUUID): ShowCardButton[] {
+        // condition to allow for possibility of showing cards
+        // still might be empty if all cards are shown
+        const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
+
+        if (this.gameStateManager.canPlayerShowCards(heroPlayer.uuid)) {
+            const showCardButtons: ShowCardButton[] = [];
+            heroPlayer.holeCards.forEach((card) => {
+                if (!card.visible) showCardButtons.push({ suit: card.suit, rank: card.rank });
+            });
+
+            return showCardButtons;
+        }
+        return [];
+    }
+
     transformAudioForPlayer(playerUUID: PlayerUUID): SoundByte {
         const audioQueue = this.audioService.getAudioQueue();
         return audioQueue.personal[playerUUID] || audioQueue.global;
@@ -289,12 +307,11 @@ export class StateConverter {
 
     transformPlayerCards(player: Player, heroPlayerUUID: PlayerUUID): CardInformation {
         const isHero = heroPlayerUUID === player.uuid;
-        const shouldCardsBeVisible = isHero || !player.cardsAreHidden;
         const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
         const isWinner = player.winner;
 
         const cards: UiCard[] = player.holeCards.map((holeCard) => {
-            return shouldCardsBeVisible
+            return holeCard.visible || isHero
                 ? {
                       ...holeCard,
                       partOfWinningHand:
@@ -307,7 +324,7 @@ export class StateConverter {
 
         return {
             hand: { cards },
-            handLabel: shouldCardsBeVisible && player.holeCards.length > 0 ? player.handDescription : undefined,
+            handLabel: isHero && player.holeCards.length > 0 ? player.handDescription : undefined,
         };
     }
 

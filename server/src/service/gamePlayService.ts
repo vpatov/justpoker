@@ -214,6 +214,12 @@ export class GamePlayService {
             this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
             this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
         }
+
+        // record last aggressor
+        this.gsm.updateGameState({
+            lastAggressorUUID: playerPlacingBet,
+        });
+
         this.audioService.playBetSFX();
     }
 
@@ -398,13 +404,33 @@ export class GamePlayService {
             }),
         );
 
-        const shouldShowWinnersCards = !this.gsm.hasEveryoneButOnePlayerFolded();
+        // show cards
+        if (!this.gsm.hasEveryoneButOnePlayerFolded()) {
+            // always show winning players hands
+            winningPlayers.map((wp) => this.gsm.setPlayerCardsAllVisible(wp));
 
-        // Show everyones hand at showdown if they havent folded yet.
-        // TODO show only those hands youre supposed to show.
-        this.gsm.updatePlayers((player) =>
-            shouldShowWinnersCards ? (this.gsm.isPlayerInHand(player.uuid) ? { cardsAreHidden: false } : {}) : {},
-        );
+            // sort eligible players by position
+            eligiblePlayers.sort(([playerA, _], [playerB, __]) => this.gsm.comparePositions(playerA, playerB));
+
+            // choose starting player
+            // start with last aggressor if eligible
+            const lastAggressorUUID = this.gsm.getLastAggressorUUID();
+            let startIndex = eligiblePlayers.findIndex(([p, _]) => p === lastAggressorUUID);
+            if (startIndex === -1) {
+                startIndex = 0; // if last aggressor is not eligible then start at beginning
+            }
+
+            // start with startingPlayer continue left, circularly
+            // only show if your hand is the best seen thus far, break if we hit a winning hand
+            let playerToBeat = eligiblePlayers[startIndex];
+            for (let i = startIndex; i < eligiblePlayers.length + startIndex; i++) {
+                const curPlayer = eligiblePlayers[i % eligiblePlayers.length];
+                if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
+                    this.gsm.setPlayerCardsAllVisible(curPlayer[0]);
+                    playerToBeat = curPlayer;
+                }
+            }
+        }
 
         this.gsm.clearWinnersAndDeltas();
 

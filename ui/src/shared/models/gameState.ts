@@ -44,6 +44,9 @@ export declare interface GameState {
 
     straddleUUID: PlayerUUID;
 
+    // playerUUID of last player to bet or raise
+    lastAggressorUUID: PlayerUUID;
+
     bettingRoundStage: BettingRoundStage;
 
     firstToAct: PlayerUUID;
@@ -138,6 +141,7 @@ export function getCleanGameState(): GameState {
         smallBlindUUID: makeBlankUUID(),
         bigBlindUUID: makeBlankUUID(),
         straddleUUID: makeBlankUUID(),
+        lastAggressorUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: makeBlankUUID(),
         admin: makeBlankUUID(),

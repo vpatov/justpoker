@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 

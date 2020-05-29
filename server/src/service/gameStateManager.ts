@@ -24,7 +24,7 @@ import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { NewGameForm, JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
-import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/cards';
+import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger } from '../logger';
@@ -805,8 +805,52 @@ export class GameStateManager {
         this.getPlayer(playerUUID).sittingOut = false;
     }
 
+    canPlayerShowCards(playerUUID: PlayerUUID) {
+        // obiviously never let player show cards who wasn't dealt cards
+        if (!this.wasPlayerDealtIn(playerUUID)) {
+            return false;
+        }
+        const numPlayersInHand = this.getPlayersInHand().length;
+        return (
+            // everyone can show if one player left in hand
+            numPlayersInHand === 1 ||
+            // players who are heads up can show anytime
+            (this.isPlayerInHand(playerUUID) && numPlayersInHand === 2) ||
+            // all players can show after betting finishes if we are on river
+            (this.getGameStage() === GameStage.FINISH_BETTING_ROUND &&
+                this.getBettingRoundStage() === BettingRoundStage.RIVER) ||
+            // all players can show in showdown
+            this.getGameStage() === GameStage.SHOW_WINNER
+        );
+    }
+
+    setPlayerCardsVisible(playerUUID: PlayerUUID, matchCard: Card) {
+        const player = this.getPlayer(playerUUID);
+        this.updatePlayer(playerUUID, {
+            holeCards: player.holeCards.map((holeCard) => {
+                if (cardsAreEqual(holeCard, matchCard)) {
+                    return { ...holeCard, visible: true };
+                }
+                return holeCard;
+            }),
+        });
+    }
+
+    setPlayerCardsAllVisible(playerUUID: PlayerUUID) {
+        const player = this.getPlayer(playerUUID);
+        this.updatePlayer(playerUUID, {
+            holeCards: player.holeCards.map((c) => {
+                return { ...c, visible: true };
+            }),
+        });
+    }
+
     getFirstToAct() {
         return this.gameState.firstToAct;
+    }
+
+    getLastAggressorUUID(): string {
+        return this.gameState.lastAggressorUUID;
     }
 
     setFirstToAct(playerUUID: PlayerUUID) {
@@ -922,7 +966,6 @@ export class GameStateManager {
             bestHand: null,
             winner: false,
             betAmount: 0,
-            cardsAreHidden: true,
             timeBanksUsedThisAction: 0,
         }));
 

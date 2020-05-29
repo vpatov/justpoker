@@ -55,10 +55,6 @@ export const CUSTOM_THEME = {
             backgroundColor: `${grey[900]}`,
             backgroundImage: ``,
         },
-        FOLDED: {
-            opacity: 0.8,
-            filter: 'grayscale(50%) brightness(0.4)',
-        },
         BACKGROUND: {
             background: 'linear-gradient(360deg, rgba(50,50,63) 0%, rgb(25,25,40));',
         },

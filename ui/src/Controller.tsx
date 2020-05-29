@@ -8,6 +8,7 @@ import {
     allowStraddleSelector,
     bettingRoundActionTypesToUnqueueSelector,
     isHeroSeatedSelector,
+    heroPlayerUUIDSelector,
 } from './store/selectors';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -21,6 +22,7 @@ import { BettingRoundActionType } from './shared/models/game';
 
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
+import ControllerShowCard from './ControllerShowCard';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -50,14 +52,17 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-evenly',
             alignItems: 'center',
         },
-        adminButtonCont: {
-            marginRight: '2vw',
-            float: 'right',
-            height: '100%',
+        additionalGamePlayCont: {
             display: 'flex',
             justifyContent: 'center',
             flexDirection: 'column',
             alignItems: 'flex-end',
+            marginRight: '2vw',
+            minWidth: '12vw',
+        },
+        additionalGamePlayTopButtons: {
+            display: 'flex',
+            alignItems: 'center',
         },
         betActionsCont: {
             width: '50%',
@@ -115,6 +120,7 @@ function ControllerComp(props: ControllerProps) {
         max,
         sizingButtons,
         bettingRoundActionButtons: actionButtons,
+        showCardButtons,
         dealInNextHand,
         timeBanks,
         willStraddle,
@@ -125,6 +131,7 @@ function ControllerComp(props: ControllerProps) {
     const allowStraddle = useSelector(allowStraddleSelector);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
     const heroSeated = useSelector(isHeroSeatedSelector);
+    const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
     const [betAmt, setBetAmt] = useState(0);
     const [queuedActionType, setQueuedActionType] = useState('');
@@ -263,7 +270,32 @@ function ControllerComp(props: ControllerProps) {
                     onClickActionButton={onClickActionButton}
                 />
             </div>
-            <div className={classes.adminButtonCont}>
+
+            <div className={classes.additionalGamePlayCont}>
+                <div className={classes.additionalGamePlayTopButtons}>
+                    {showCardButtons?.length ? (
+                        <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
+                    ) : null}
+                    {heroSeated ? (
+                        <Button
+                            className={classnames(classes.timeBankButton, 'ani_timeBank')}
+                            variant="outlined"
+                            onClick={() => onClickTimeBank()}
+                            disabled={timeBanks === 0}
+                        >
+                            {`Time Bank (${timeBanks})`}
+                        </Button>
+                    ) : null}
+                </div>
+                {allowStraddle ? (
+                    <FormControlLabel
+                        classes={{ label: classes.checkLabel }}
+                        control={
+                            <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
+                        }
+                        label="Straddle"
+                    />
+                ) : null}
                 <FormControlLabel
                     classes={{ label: classes.checkLabel }}
                     control={
@@ -275,25 +307,6 @@ function ControllerComp(props: ControllerProps) {
                     }
                     label="Sit Out Next Hand"
                 />
-                {allowStraddle ? (
-                    <FormControlLabel
-                        classes={{ label: classes.checkLabel }}
-                        control={
-                            <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
-                        }
-                        label="Straddle"
-                    />
-                ) : null}
-                {heroSeated ? (
-                    <Button
-                        className={classnames(classes.timeBankButton, 'ani_timeBank')}
-                        variant="outlined"
-                        onClick={() => onClickTimeBank()}
-                        disabled={timeBanks === 0}
-                    >
-                        {`Time Bank (${timeBanks})`}
-                    </Button>
-                ) : null}
             </div>
         </div>
     );
