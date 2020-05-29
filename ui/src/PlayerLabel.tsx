@@ -10,18 +10,17 @@ const useStyles = makeStyles((theme: Theme) =>
             zIndex: -1,
             display: 'flex',
             justifyContent: 'center',
-            backgroundColor: 'rgba(255,255,255,0.5)',
+            backgroundColor: 'rgba(230,230,230,0.8)',
             borderBottomLeftRadius: '0.6vmin',
             borderBottomRightRadius: '0.6vmin',
             position: 'absolute',
-            bottom: 0,
+            bottom: '0',
             left: '50%',
             margin: '0 auto',
             minWidth: '40%',
             transform: 'translateX(-50%)',
             transition: 'transform 0.3s ease-in-out',
             color: 'black',
-            filter: 'unset',
         },
         show: {
             transform: 'translateY(100%) translateX(-50%)',
@@ -45,7 +44,7 @@ function PlayerLabel(props) {
                 [classes.show]: show,
             })}
         >
-            {props.children}
+            {children}
         </div>
     );
 }

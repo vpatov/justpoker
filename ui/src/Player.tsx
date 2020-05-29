@@ -26,14 +26,14 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateY(-50%) translateX(-50%)',
     },
     folded: {
-        filter: 'opacity(0.4)',
+        opacity: 0.5,
     },
 
-    sittingOutText: {
-        margin: '0.6vmin 0',
-        width: '11vmin',
+    labelText: {
+        margin: '0.3vmin 0',
+        width: '9vmin',
         textAlign: 'center',
-        fontSize: '1.6vmin',
+        fontSize: '1.4vmin',
     },
     hero: {
         transform: 'translateY(-50%) translateX(-50%) scale(1.21)',
@@ -78,15 +78,18 @@ function Player(props) {
 
     function getPlayerLabelComponet() {
         if (sittingOut) {
-            return <Typography className={classes.sittingOutText}>Sitting Out</Typography>;
+            return <Typography className={classes.labelText}>Sitting Out</Typography>;
         }
         if (folded) {
-            return <Typography className={classes.sittingOutText}>Folded</Typography>;
+            return <Typography className={classes.labelText}>Folded</Typography>;
         }
         if (playerTimer) {
-            return <PlayerTimer playerTimer={playerTimer} hero={hero} />;
+            return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
         }
+        return undefined;
     }
+
+    const playerLabelComponet = getPlayerLabelComponet();
 
     return (
         <div
@@ -114,11 +117,11 @@ function Player(props) {
                 toAct={toAct}
                 name={name}
                 stack={stack}
-                folded={folded}
+                outOfHand={folded || sittingOut}
                 positionIndicator={positionIndicator}
                 winner={winner}
             />
-            <PlayerLabel>{getPlayerLabelComponet()}</PlayerLabel>
+            {playerLabelComponet ? <PlayerLabel>{playerLabelComponet}</PlayerLabel> : null}
         </div>
     );
 }

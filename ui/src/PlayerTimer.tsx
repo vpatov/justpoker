@@ -7,17 +7,7 @@ import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        secondsRemaining: {
-            color: 'black',
-            width: '3vmin',
-            marginBottom: '0.3vmin',
-            fontSize: '1.4vmin',
-            textAlign: 'center',
-        },
-    }),
-);
+const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
 function getPercentTimeRemaining(timeElapsed: number, timeLimit: number): number {
     const timeElapsedPercentage = (timeElapsed * 100.0) / timeLimit;
@@ -60,7 +50,7 @@ function PlayerTimer(props) {
         animateTimeBankButton();
     }
 
-    return <Typography className={classes.secondsRemaining}>{Math.floor(secondsRemaining)}</Typography>;
+    return <Typography className={className}>{Math.floor(secondsRemaining)}</Typography>;
 }
 
 export default PlayerTimer;

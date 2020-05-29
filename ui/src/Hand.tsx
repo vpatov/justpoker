@@ -21,13 +21,14 @@ const useStyles = makeStyles((theme) => ({
 
 function Hand(props) {
     const classes = useStyles();
-    const { folded, hand, hero } = props;
+    const { folded, hand, hero, className } = props;
     const { cards } = hand;
 
     return (
         <div
             className={classnames(
                 classes.root,
+                className,
                 //{ [classes.folded]: folded, [classes.heroHover]: hero }
             )}
         >
