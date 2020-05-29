@@ -6,7 +6,7 @@ import banana from './assets/animoji/banana.gif';
 import cool from './assets/animoji/cool.gif';
 import throwup from './assets/animoji/throwup.gif';
 import why from './assets/animoji/why.gif';
-import surrender from './assets/animoji/surrender.gif';
+import wow from './assets/animoji/wow.gif';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
@@ -26,7 +26,7 @@ const GET_ANIMOJI_ASSET = {
     cool: cool,
     throwup: throwup,
     why: why,
-    surrender: surrender,
+    wow: wow,
 };
 
 function Animoji(props) {

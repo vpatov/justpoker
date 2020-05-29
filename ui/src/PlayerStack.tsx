@@ -40,13 +40,14 @@ const useStyles = makeStyles((theme) => ({
     },
     avatar: {
         marginLeft: '-10%',
+        marginRight: '0.3vmin',
         flexShrink: 0,
         height: '7.6vmin',
         width: '7.6vmin',
     },
     name: {
         paddingBottom: '0.8vmin',
-        paddingLeft: '0.6vmin',
+
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
@@ -55,7 +56,6 @@ const useStyles = makeStyles((theme) => ({
     },
     stack: {
         paddingTop: '0.8vmin',
-        paddingLeft: '0.6vmin',
         fontWeight: 'bold',
         fontSize: '1.7vmin',
     },
