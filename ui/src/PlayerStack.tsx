@@ -5,12 +5,17 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import classnames from 'classnames';
 import TablePositionIndicator from './TablePositionIndicator';
+import PlayerAvatar from './PlayerAvatar';
+import Animoji from './Animoji';
 
 const useStyles = makeStyles((theme) => ({
     stackCont: {
         width: '100%',
         marginTop: '-1vmin',
         position: 'relative',
+        display: 'flex',
+        height: '6vmin',
+        alignItems: 'center',
         ...theme.custom.STACK,
     },
     folded: {
@@ -30,13 +35,22 @@ const useStyles = makeStyles((theme) => ({
             backgroundPosition: '200% -200%',
         },
     },
+    nameStackCont: {
+        width: '60%',
+    },
+    avatar: {
+        marginLeft: '-10%',
+        flexShrink: 0,
+        height: '7.6vmin',
+        width: '7.6vmin',
+    },
     name: {
         paddingBottom: '0.8vmin',
         paddingLeft: '0.6vmin',
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
-        width: '80%',
+
         fontSize: '1.3vmin',
     },
     stack: {
@@ -69,7 +83,7 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, positionIndicator, winner, toAct, folded } = props;
+    const { stack, name, positionIndicator, winner, toAct, folded, position, reaction } = props;
     const prevStack = usePrevious(stack);
 
     return (
@@ -80,13 +94,16 @@ function PlayerStack(props) {
                 [classes.folded]: folded,
             })}
         >
+            <PlayerAvatar className={classes.avatar} position={position} reaction={reaction} />
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
-            <Typography variant="h4" className={classes.stack}>
-                {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
-            </Typography>
-            <Typography variant="body1" className={classes.name}>
-                {name}
-            </Typography>
+            <div className={classes.nameStackCont}>
+                <Typography variant="h4" className={classes.stack}>
+                    {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
+                </Typography>
+                <Typography variant="body1" className={classes.name}>
+                    {name}
+                </Typography>
+            </div>
         </div>
     );
 }

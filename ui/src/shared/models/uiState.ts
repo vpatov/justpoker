@@ -136,6 +136,7 @@ export declare interface UiPlayer {
     bet?: number;
     handLabel?: string;
     playerTimer?: PlayerTimer;
+    reaction?: boolean;
     hand: {
         cards: UiCard[];
     };
@@ -497,6 +498,7 @@ export const TestGame: UiGameState = {
             uuid: 'TEST_UUID_2',
             bet: genRandomInt(0, 1000000),
             positionIndicator: PositionIndicator.BIG_BLIND,
+            reaction: true,
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },

@@ -126,36 +126,6 @@ export function animateTimeBankButton() {
     });
 }
 
-export function animateEmoji(id) {
-    console.log('called', id);
-    const duration = 800;
-
-    const [tx, ty] = getCenterOfTable();
-    const emoji = document.getElementById(id);
-    const [ex, ey] = getCenterOfRef(emoji);
-
-    var tl = anime.timeline({
-        duration: duration,
-    });
-
-    tl.add({
-        targets: [`#${id}`],
-        translateX: (target) => {
-            return (tx - ex) / 5;
-        },
-        translateY: (target) => {
-            return (ty - ey) / 5;
-        },
-        scale: [0.3, 1],
-        easing: 'spring(1, 80, 10, 0)',
-    });
-    tl.add({
-        targets: [`#${id}`],
-        opacity: 0,
-        easing: 'easeOutExpo',
-    });
-}
-
 export function animateShowCard(id) {
     const duration = 1250;
 

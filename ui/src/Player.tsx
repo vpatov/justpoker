@@ -72,6 +72,8 @@ function Player(props) {
         uuid,
         sittingOut,
         hero,
+        position,
+        reaction,
     } = props.player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -92,7 +94,6 @@ function Player(props) {
             style={style}
             id={uuid}
         >
-            {hero ? <Animoji /> : null}
             <MoreHoriz className={classes.moreIcon} onClick={handleClick} />
             <PlayerMenu
                 handleClose={handleClose}
@@ -117,6 +118,8 @@ function Player(props) {
                 folded={folded}
                 positionIndicator={positionIndicator}
                 winner={winner}
+                position={position}
+                reaction={reaction}
             />
             <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} hero={hero} /> : null}</div>
         </div>

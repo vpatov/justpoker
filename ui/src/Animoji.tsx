@@ -1,38 +1,43 @@
 import React, { useEffect } from 'react';
 import classnames from 'classnames';
-import wink from './animojiAssets/wink.gif';
-import thinking from './animojiAssets/thinking.gif';
-import ohno from './animojiAssets/ohno.gif';
+import wink from './assets/animoji/wink.gif';
+import thinking from './assets/animoji/thinking.gif';
+import banana from './assets/animoji/banana.gif';
+import cool from './assets/animoji/cool.gif';
+import throwup from './assets/animoji/throwup.gif';
+import why from './assets/animoji/why.gif';
+import surrender from './assets/animoji/surrender.gif';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { animateEmoji } from './AnimiationModule';
 
-const size = 8;
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         img: {
-            position: 'absolute',
-            zIndex: 7,
-            width: `${size}vmin`,
-            height: `${size}vmin`,
-            top: '20%',
-            left: `calc(50% - ${size / 2}vmin)`,
-            // margin-right: -50%;
-            // transform: 'translate(-50%, -50%)',
+            width: `100%`,
+            height: `100%`,
         },
     }),
 );
+
+const GET_ANIMOJI_ASSET = {
+    wink: wink,
+    thinking: thinking,
+    banana: banana,
+    cool: cool,
+    throwup: throwup,
+    why: why,
+    surrender: surrender,
+};
 
 function Animoji(props) {
     const classes = useStyles();
     const { className } = props;
     const id = 'emoji';
 
-    useEffect(() => {
-        animateEmoji(id);
-    }, []);
+    const assetArr = Object.values(GET_ANIMOJI_ASSET);
+    const asset = assetArr[Math.floor(Math.random() * assetArr.length)];
 
-    return <img id={id} className={classnames(classes.img, className)} src={wink} alt="loading..." />;
+    return <img id={id} className={classnames(classes.img, className)} src={asset} alt="loading..." />;
 }
 
 export default Animoji;
