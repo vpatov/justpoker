@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { usePrevious } from './utils';
 import { animateWinningCards } from './AnimiationModule';
-import { generateStringFromSuit, generateStringFromRank, SUITS } from './utils';
+import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';

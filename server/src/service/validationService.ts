@@ -16,6 +16,8 @@ import {
     INTERNAL_SERVER_ERROR,
 } from '../../../ui/src/shared/models/validation';
 import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { Card, cardsAreEqual } from '../../../ui/src/shared/models/cards';
+import { debugFunc } from '../logger';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -266,6 +268,32 @@ export class ValidationService {
             default:
                 return INTERNAL_SERVER_ERROR;
         }
+    }
+
+    @debugFunc()
+    validateShowCardAction(clientUUID: ClientUUID, cards: Card[]): ValidationResponse {
+        const response = this.ensureClientIsInGame(clientUUID);
+        if (hasError(response)) {
+            return response;
+        }
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
+        // check that they are allowed to show cards
+        if (!this.gsm.canPlayerShowCards(player.uuid)) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is not allowed to show cards.`,
+            };
+        }
+
+        // check that player posseses cards they want to show
+        return cards.every((showCard) => player.holeCards.find((holeCard) => cardsAreEqual(holeCard, showCard)))
+            ? NO_ERROR
+            : {
+                  errorType: ErrorType.ILLEGAL_ACTION,
+                  errorString:
+                      `Player cannot show cards: ${JSON.stringify(cards)}. ` +
+                      `Player cards: ${JSON.stringify(player.holeCards)}`,
+              };
     }
 
     private validateCheckAction(clientUUID: ClientUUID): ValidationResponse {

@@ -11,6 +11,7 @@
         "@testing-library/user-event": "^7.2.1",
         "@types/animejs": "^3.1.0",
         "@types/classnames": "^2.2.10",
+        "@types/color": "^3.0.1",
         "@types/lodash": "^4.14.149",
         "@types/node": "^13.11.1",
         "@types/react-dom": "^16.9.6",
