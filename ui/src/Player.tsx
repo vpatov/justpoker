@@ -11,6 +11,7 @@ import grey from '@material-ui/core/colors/grey';
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import MoreHoriz from '@material-ui/icons/MoreHoriz';
+import PlayerLabel from './PlayerLabel';
 
 const PLAYER_WIDTH = 16;
 const PLAYER_HEIGHT = 12;
@@ -28,18 +29,11 @@ const useStyles = makeStyles((theme) => ({
     folded: {
         ...theme.custom.FOLDED,
     },
-    sittingOut: {
-        width: '80%',
-        margin: '0 auto',
-        borderTopLeftRadius: '1vmin',
-        borderTopRightRadius: '1vmin',
-        backgroundColor: blueGrey[400],
-        display: 'flex',
-        justifyContent: 'space-evenly',
-    },
+
     sittingOutText: {
-        marginTop: '3%',
-        marginBottom: '10%',
+        margin: '0.6vmin 0',
+        width: '11vmin',
+        textAlign: 'center',
         fontSize: '1.6vmin',
     },
     hero: {
@@ -83,6 +77,18 @@ function Player(props) {
         setAnchorEl(null);
     };
 
+    function getPlayerLabelComponet() {
+        if (sittingOut) {
+            return <Typography className={classes.sittingOutText}>Sitting Out</Typography>;
+        }
+        if (folded) {
+            return <Typography className={classes.sittingOutText}>Folded</Typography>;
+        }
+        if (playerTimer) {
+            return <PlayerTimer playerTimer={playerTimer} hero={hero} />;
+        }
+    }
+
     return (
         <div
             className={classnames(classes.root, className, {
@@ -102,13 +108,9 @@ function Player(props) {
                 setHeroRotation={setHeroRotation}
                 virtualPositon={virtualPositon}
             />
-            {sittingOut ? (
-                <Typography className={classnames(classes.sittingOut)}>
-                    <Typography className={classes.sittingOutText}>Sitting Out</Typography>
-                </Typography>
-            ) : (
-                <Hand hand={hand} folded={folded} hero={hero} />
-            )}
+
+            <Hand hand={hand} folded={folded} hero={hero} />
+
             <PlayerStack
                 toAct={toAct}
                 name={name}
@@ -116,7 +118,7 @@ function Player(props) {
                 positionIndicator={positionIndicator}
                 winner={winner}
             />
-            <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} hero={hero} /> : null}</div>
+            <PlayerLabel>{getPlayerLabelComponet()}</PlayerLabel>
         </div>
     );
 }

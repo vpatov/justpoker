@@ -11,7 +11,7 @@ import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
-import { Color } from 'color';
+var Color = require('color');
 
 export declare interface UserPreferences {
     theme: ThemePreferences;
