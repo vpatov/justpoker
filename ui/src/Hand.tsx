@@ -25,7 +25,12 @@ function Hand(props) {
     const { cards } = hand;
 
     return (
-        <div className={classnames(classes.root, { [classes.folded]: folded, [classes.heroHover]: hero })}>
+        <div
+            className={classnames(
+                classes.root,
+                //{ [classes.folded]: folded, [classes.heroHover]: hero }
+            )}
+        >
             {cards.map((c, i) => (
                 <CardSmall {...c} size="small" className={`ani_playerCard_${i}`} shouldFlex={cards.length > 2} />
             ))}

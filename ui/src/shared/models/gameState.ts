@@ -23,8 +23,6 @@ export declare interface QueuedServerAction {
     args: any[];
 }
 
-// TODO break up into gameState and serverState
-// TODO revisit the way immutability is implemented via readonly.
 export declare interface GameState {
     gameStage: GameStage;
 
@@ -45,6 +43,9 @@ export declare interface GameState {
     bigBlindUUID: PlayerUUID;
 
     straddleUUID: PlayerUUID;
+
+    // playerUUID of last player to bet or raise
+    lastAggressorUUID: PlayerUUID;
 
     bettingRoundStage: BettingRoundStage;
 
@@ -81,6 +82,7 @@ export declare interface GameState {
     /** Sensitive field. */
     activeConnections: Map<ClientUUID, ConnectedClient>;
 
+    /** Timestamp of server time when this state was processed. */
     serverTime: number;
 
     /** The minimum amount by which the next player can raise. */
@@ -95,7 +97,7 @@ export declare interface GameState {
 
 export declare interface ConnectedClient {
     readonly uuid: ClientUUID;
-    readonly playerUUID: PlayerUUID;
+    playerUUID: PlayerUUID;
 }
 
 export declare interface Pot {
@@ -139,6 +141,7 @@ export function getCleanGameState(): GameState {
         smallBlindUUID: makeBlankUUID(),
         bigBlindUUID: makeBlankUUID(),
         straddleUUID: makeBlankUUID(),
+        lastAggressorUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: makeBlankUUID(),
         admin: makeBlankUUID(),

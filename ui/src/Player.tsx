@@ -25,9 +25,8 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-end',
         transform: 'translateY(-50%) translateX(-50%)',
     },
-
     folded: {
-        ...theme.custom.FOLDED,
+        filter: 'opacity(0.4)',
     },
     sittingOut: {
         width: '80%',
@@ -115,6 +114,7 @@ function Player(props) {
                 toAct={toAct}
                 name={name}
                 stack={stack}
+                folded={folded}
                 positionIndicator={positionIndicator}
                 winner={winner}
             />
