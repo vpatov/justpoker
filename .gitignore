@@ -30,3 +30,4 @@ ui/yarn-error.log*
 
 server/**/*.log*
 *.log
+*.DS_Store
