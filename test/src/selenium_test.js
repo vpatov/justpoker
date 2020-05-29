@@ -118,9 +118,9 @@ async function PlayOneTableNinePlayers() {
   }
 }
 
-async function SitDownThreePlayersOneTable() {
+async function SitDownPlayersAtOneTable(n) {
   try {
-    await createGameSitDownPlayers(3);
+    await createGameSitDownPlayers(n);
   } catch (error) {
     console.log("caught err", error);
     allDrivers.forEach((d) => d.quit());
@@ -129,4 +129,4 @@ async function SitDownThreePlayersOneTable() {
 
 // PlayThreeTablesThreePlayers();
 // PlayOneTableNinePlayers();
-SitDownThreePlayersOneTable();
+SitDownPlayersAtOneTable(4);

@@ -7,6 +7,7 @@ export declare interface Deck {
 export declare interface Card {
     readonly suit: Suit;
     readonly rank: string;
+    visible?: boolean; // is card globally visible
 }
 
 export enum Suit {

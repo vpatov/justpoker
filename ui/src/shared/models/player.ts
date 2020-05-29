@@ -48,9 +48,6 @@ export declare interface Player {
     /** The amount of chips the player is about to put into the pot. */
     readonly betAmount: number;
 
-    /** Whether or not the player's cards are publicly visible at the table. */
-    readonly cardsAreHidden: boolean;
-
     /** The total amount of chips the player has won or lost during this hand. */
     readonly chipDelta: number;
 
@@ -76,7 +73,6 @@ export function getCleanPlayer(): Player {
         lastActionType: BettingRoundActionType.NOT_IN_HAND,
         winner: false,
         betAmount: 0,
-        cardsAreHidden: true,
         chipsAtStartOfHand: 0,
         chipDelta: 0,
         timeBanksLeft: 0,
