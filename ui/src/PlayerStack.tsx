@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         ...theme.custom.STACK,
     },
-    folded: {
+    outOfHand: {
         boxShadow: theme.shadows[3],
     },
     toAct: {
@@ -83,7 +83,8 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, positionIndicator, winner, toAct, folded, position, reaction } = props;
+    const { stack, name, positionIndicator, winner, toAct, outOfHand, position, reaction } = props;
+
     const prevStack = usePrevious(stack);
 
     return (
@@ -91,7 +92,7 @@ function PlayerStack(props) {
             className={classnames(classes.stackCont, {
                 [classes.toAct]: toAct,
                 [classes.winner]: winner,
-                [classes.folded]: folded,
+                [classes.outOfHand]: outOfHand,
             })}
         >
             <PlayerAvatar className={classes.avatar} position={position} reaction={reaction} />

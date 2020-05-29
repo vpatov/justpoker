@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { ThemePreferences } from './shared/models/userPreferences';
+import { ThemePreferences, UserPreferences } from './shared/models/userPreferences';
 import cloneDeep from 'lodash/cloneDeep';
 import { CUSTOM_THEME, DEFAULT_PREFERENCES } from './style/Theme';
 import { ThemeProvider } from '@material-ui/core/styles';
 import GameContainer from './GameContainer';
 import { createMuiTheme } from '@material-ui/core/styles';
 
-import Home from "./Home";
-import Ledger from "./Ledger";
+import Home from './Home';
+import Ledger from './Ledger';
+
+const USER_PREFS_LOCAL_STORAGE_KEY = 'jp-user-prefs';
 
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);
@@ -23,18 +25,28 @@ function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     }
     return newTheme;
 }
+
 export const ThemeSetter = React.createContext({
     curfPrefs: DEFAULT_PREFERENCES.theme,
     themeSetter: (tp: ThemePreferences) => null,
 });
 
-const initTheme = loadPreferencesIntoTheme(CUSTOM_THEME, DEFAULT_PREFERENCES.theme);
+function loadInitUserPreferences(): UserPreferences {
+    const cachedPrefs = localStorage.getItem(USER_PREFS_LOCAL_STORAGE_KEY);
+    if (cachedPrefs) return JSON.parse(cachedPrefs);
+    return DEFAULT_PREFERENCES;
+}
+
+const initPrefs = loadInitUserPreferences();
+const initTheme = loadPreferencesIntoTheme(CUSTOM_THEME, initPrefs.theme);
+
 function App() {
     const [theme, setTheme] = useState(initTheme);
-    const [pref, setPrefs] = useState(DEFAULT_PREFERENCES.theme);
+    const [pref, setPrefs] = useState(initPrefs.theme);
 
     function setNewTheme(tp: ThemePreferences) {
         setPrefs(tp);
+        localStorage.setItem(USER_PREFS_LOCAL_STORAGE_KEY, JSON.stringify({ theme: tp }));
         setTheme((oldTheme) => loadPreferencesIntoTheme(oldTheme, tp));
         return null;
     }

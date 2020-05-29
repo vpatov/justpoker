@@ -12,6 +12,7 @@ import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import MoreHoriz from '@material-ui/icons/MoreHoriz';
 import Animoji from './Animoji';
+import PlayerLabel from './PlayerLabel';
 
 const PLAYER_WIDTH = 16;
 const PLAYER_HEIGHT = 12;
@@ -26,21 +27,14 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateY(-50%) translateX(-50%)',
     },
     folded: {
-        filter: 'opacity(0.4)',
+        opacity: 0.5,
     },
-    sittingOut: {
-        width: '80%',
-        margin: '0 auto',
-        borderTopLeftRadius: '1vmin',
-        borderTopRightRadius: '1vmin',
-        backgroundColor: blueGrey[400],
-        display: 'flex',
-        justifyContent: 'space-evenly',
-    },
-    sittingOutText: {
-        marginTop: '3%',
-        marginBottom: '10%',
-        fontSize: '1.6vmin',
+
+    labelText: {
+        margin: '0.3vmin 0',
+        width: '9vmin',
+        textAlign: 'center',
+        fontSize: '1.4vmin',
     },
     hero: {
         transform: 'translateY(-50%) translateX(-50%) scale(1.21)',
@@ -85,6 +79,21 @@ function Player(props) {
         setAnchorEl(null);
     };
 
+    function getplayerLabelComponent() {
+        if (sittingOut) {
+            return <Typography className={classes.labelText}>Sitting Out</Typography>;
+        }
+        if (folded) {
+            return <Typography className={classes.labelText}>Folded</Typography>;
+        }
+        if (playerTimer) {
+            return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
+        }
+        return undefined;
+    }
+
+    const playerLabelComponent = getplayerLabelComponent();
+
     return (
         <div
             className={classnames(classes.root, className, {
@@ -104,24 +113,20 @@ function Player(props) {
                 setHeroRotation={setHeroRotation}
                 virtualPositon={virtualPositon}
             />
-            {sittingOut ? (
-                <Typography className={classnames(classes.sittingOut)}>
-                    <Typography className={classes.sittingOutText}>Sitting Out</Typography>
-                </Typography>
-            ) : (
-                <Hand hand={hand} folded={folded} hero={hero} />
-            )}
+
+            <Hand hand={hand} folded={folded} hero={hero} />
+
             <PlayerStack
                 toAct={toAct}
                 name={name}
                 stack={stack}
-                folded={folded}
+                outOfHand={folded || sittingOut}
                 positionIndicator={positionIndicator}
                 winner={winner}
                 position={position}
                 reaction={reaction}
             />
-            <div>{playerTimer ? <PlayerTimer playerTimer={playerTimer} hero={hero} /> : null}</div>
+            {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>
     );
 }

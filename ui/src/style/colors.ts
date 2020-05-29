@@ -26,7 +26,7 @@ export const Background = {
     blue: computeBackgroundGradient(blue[600]),
     purple: computeBackgroundGradient(deepPurple[600]),
     teal: computeBackgroundGradient(teal[500]),
-    yellow: computeBackgroundGradient(yellow[600]),
+    yellow: computeBackgroundGradient(yellow[700]),
     grey: computeBackgroundGradient(grey[700]),
     indigo: computeBackgroundGradient(indigo[800]),
     red: computeBackgroundGradient(red[700]),
