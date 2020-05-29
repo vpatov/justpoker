@@ -126,7 +126,6 @@ export function animateTimeBankButton() {
     });
 }
 
-<<<<<<< HEAD
 export function animateEmoji(id) {
     console.log('called', id);
     const duration = 800;
@@ -157,7 +156,6 @@ export function animateEmoji(id) {
     });
 }
 
-=======
 export function animateShowCard(id) {
     const duration = 1250;
 
@@ -176,7 +174,6 @@ export function animateShowCard(id) {
         easing: 'easeOutExpo',
     });
 }
->>>>>>> 26891203017e1e1f4b8d854d586a5349d1871144
 // utility functions
 
 function getCenterOfRef(ref) {
