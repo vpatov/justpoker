@@ -1,4 +1,4 @@
-import { UserPreferences } from './shared/models/userPreferences';
+import { UserPreferences } from '../shared/models/userPreferences';
 import { createMuiTheme, Theme } from '@material-ui/core/styles';
 
 import { PaletteType } from '@material-ui/core';
@@ -11,7 +11,7 @@ import teal from '@material-ui/core/colors/teal';
 import indigo from '@material-ui/core/colors/indigo';
 import orange from '@material-ui/core/colors/orange';
 import red from '@material-ui/core/colors/red';
-import { Background } from './style/colors';
+import { Background } from './colors';
 
 declare module '@material-ui/core/styles/createMuiTheme' {
     interface Theme {
