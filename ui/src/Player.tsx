@@ -76,7 +76,7 @@ function Player(props) {
         setAnchorEl(null);
     };
 
-    function getPlayerLabelComponet() {
+    function getplayerLabelComponent() {
         if (sittingOut) {
             return <Typography className={classes.labelText}>Sitting Out</Typography>;
         }
@@ -89,7 +89,7 @@ function Player(props) {
         return undefined;
     }
 
-    const playerLabelComponet = getPlayerLabelComponet();
+    const playerLabelComponent = getplayerLabelComponent();
 
     return (
         <div
@@ -121,7 +121,7 @@ function Player(props) {
                 positionIndicator={positionIndicator}
                 winner={winner}
             />
-            {playerLabelComponet ? <PlayerLabel>{playerLabelComponet}</PlayerLabel> : null}
+            {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>
     );
 }
