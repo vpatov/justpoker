@@ -1,6 +1,7 @@
 import { BettingRoundAction, GameType } from './game';
 import { Suit, Card } from './cards';
 import { GameInstanceUUID, ClientUUID, PlayerUUID } from './uuid';
+import { AniReaction } from './uiState';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
@@ -54,6 +55,7 @@ export enum ClientActionType {
     LEAVETABLE = 'LEAVETABLE',
     USETIMEBANK = 'USETIMEBANK',
     SHOWCARD = 'SHOWCARD',
+    REACTION = 'REACTION',
 }
 
 export enum ServerActionType {
@@ -106,6 +108,11 @@ export declare interface ShowCardRequest {
     cards: Card[];
 }
 
+export declare interface PlayerReactionRequest {
+    playerUUID: PlayerUUID;
+    reaction: AniReaction;
+}
+
 export type ClientWsMessageRequest = SitDownRequest &
     JoinTableRequest &
     (SitDownRequest & JoinTableRequest) &
@@ -115,7 +122,8 @@ export type ClientWsMessageRequest = SitDownRequest &
     ClientStraddleRequest &
     ClientChatMessage &
     BootPlayerRequest &
-    ShowCardRequest;
+    ShowCardRequest &
+    PlayerReactionRequest;
 
 export declare interface ClientWsMessage {
     actionType: ClientActionType;

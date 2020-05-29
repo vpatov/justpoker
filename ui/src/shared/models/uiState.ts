@@ -162,12 +162,12 @@ export declare interface UiChatLog {
 }
 
 export enum AniReaction {
-    WOW = 'WOW',
-    LOL = 'LOL',
-    WINK = 'WINK',
-    PUKE = 'PUKE',
-    THINK = 'THINK',
-    BANANA = 'BANANA',
+    WOW = 'Wow',
+    LOL = 'Lol',
+    WINK = 'Wink',
+    PUKE = 'Puke',
+    MONEY = 'Money',
+    BANANA = 'Banana',
 }
 
 /* Action Buttons */

@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import classnames from 'classnames';
 import wink from './assets/animoji/wink.gif';
-import thinking from './assets/animoji/thinking.gif';
+import money from './assets/animoji/money.gif';
 import banana from './assets/animoji/banana.gif';
-import throwup from './assets/animoji/throwup.gif';
+import puke from './assets/animoji/puke.gif';
 import wow from './assets/animoji/wow.gif';
 import lol from './assets/animoji/lol.gif';
 
@@ -21,9 +21,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const ANIMOJI_ASSET = {
     [AniReaction.WINK]: wink,
-    [AniReaction.THINK]: thinking,
+    [AniReaction.MONEY]: money,
     [AniReaction.BANANA]: banana,
-    [AniReaction.PUKE]: throwup,
+    [AniReaction.PUKE]: puke,
     [AniReaction.WOW]: wow,
     [AniReaction.LOL]: lol,
 };
