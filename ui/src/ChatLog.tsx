@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface ChatLogProps {
     className?: string;
 }
-const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp_chatOpen';
+const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
 
 function getChatButtonState(): boolean {
     const cached = localStorage.getItem(CHAT_OPEN_LOCAL_STORAGE_KEY);

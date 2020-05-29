@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const NAME_LOCAL_STORAGE_KEY = 'jp_lastUsedName';
+const NAME_LOCAL_STORAGE_KEY = 'jp-last-used-name';
 
 function OpenSeat(props) {
     const classes = useStyles();

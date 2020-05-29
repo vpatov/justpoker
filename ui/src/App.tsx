@@ -10,7 +10,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import Home from './Home';
 import Ledger from './Ledger';
 
-const USER_PREFS_LOCAL_STORAGE_KEY = 'JP_userPrefs';
+const USER_PREFS_LOCAL_STORAGE_KEY = 'jp-user-prefs';
 
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);
