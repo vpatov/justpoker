@@ -23,14 +23,19 @@ export class HandSolverService {
     // return 1 if hand1 is winner, -1 if hand2 is winner, 0 if tie
     compareHands(hand1: Hand, hand2: Hand): number {
         const winners = HandSolver.winners([hand1, hand2]);
-        if (winners.length === 2) return 0;
-        if (winners[0] === hand1) return 1;
-        if (winners[0] === hand2) return -1;
         const err = Error(
             `unexpected result in HandSolverService.compareHands, args: ${JSON.stringify(hand1)}, ${JSON.stringify(
                 hand2,
             )}`,
         );
+        if (winners.length === 0 || winners.length > 2) {
+            logger.error(err.message);
+            throw err;
+        }
+        if (winners.length === 2) return 0;
+        if (winners[0] === hand1) return 1;
+        if (winners[0] === hand2) return -1;
+
         logger.error(err.message);
         throw err;
     }

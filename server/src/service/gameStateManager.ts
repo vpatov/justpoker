@@ -805,7 +805,7 @@ export class GameStateManager {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {
             holeCards: player.holeCards.map((holeCard) => {
-                if (holeCard.rank === matchCard.rank && holeCard.suit === matchCard.suit) {
+                if (cardsAreEqual(holeCard, matchCard)) {
                     return { ...holeCard, visible: true };
                 }
                 return holeCard;
