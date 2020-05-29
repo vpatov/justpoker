@@ -17,6 +17,7 @@ import {
 } from '../../../ui/src/shared/models/validation';
 import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
 import { Card, cardsAreEqual } from '../../../ui/src/shared/models/cards';
+import { debugFunc } from '../logger';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -269,6 +270,7 @@ export class ValidationService {
         }
     }
 
+    @debugFunc()
     validateShowCardAction(clientUUID: ClientUUID, cards: Card[]): ValidationResponse {
         const response = this.ensureClientIsInGame(clientUUID);
         if (hasError(response)) {
@@ -283,16 +285,15 @@ export class ValidationService {
             };
         }
 
-        // check that player has cards
-        return cards.every((showCard) => {
-            if (player.holeCards.find((holeCard) => cardsAreEqual(holeCard, showCard)) === undefined) {
-            }
-        })
-            ? {
+        // check that player posseses cards they want to show
+        return cards.every((showCard) => player.holeCards.find((holeCard) => cardsAreEqual(holeCard, showCard)))
+            ? NO_ERROR
+            : {
                   errorType: ErrorType.ILLEGAL_ACTION,
-                  errorString: `Player does not have some card: ${JSON.stringify(cards)} in the hole.`,
-              }
-            : NO_ERROR;
+                  errorString:
+                      `Player cannot show cards: ${JSON.stringify(cards)}. ` +
+                      `Player cards: ${JSON.stringify(player.holeCards)}`,
+              };
     }
 
     private validateCheckAction(clientUUID: ClientUUID): ValidationResponse {

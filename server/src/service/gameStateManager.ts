@@ -789,7 +789,7 @@ export class GameStateManager {
         }
         const numPlayersInHand = this.getPlayersInHand().length;
         return (
-            // everyone can show if on player left in hand
+            // everyone can show if one player left in hand
             numPlayersInHand === 1 ||
             // players who are heads up can show anytime
             (this.isPlayerInHand(playerUUID) && numPlayersInHand === 2) ||
