@@ -8,12 +8,13 @@ import {
     EventType,
     ServerActionType,
     createTimeoutEvent,
+    ShowCardRequest,
 } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
-import { ValidationService, hasError } from './validationService';
+import { ValidationService } from './validationService';
 import { Service } from 'typedi';
 import { GamePlayService } from './gamePlayService';
-import { ValidationResponse, NO_ERROR, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
+import { ValidationResponse, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
 import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
 import { ChatService } from './chatService';
 import { StateGraphManager } from './stateGraphManager';
@@ -95,14 +96,14 @@ export class EventProcessorService {
         },
         [ClientActionType.JOINTABLEANDSITDOWN]: {
             validation: (uuid, req) => {
-                const response = this.validationService.validateJoinTableRequest(uuid, req);
-                if (hasError(response)) {
-                    return response;
+                const error = this.validationService.validateJoinTableRequest(uuid, req);
+                if (error) {
+                    return error;
                 }
                 // TODO either remove jointableandsitdown or change code path to allow for
                 // jointable validation, jointable, and then sitdown validation (because sitdown
                 // validation depends on jointable being completed)
-                return response;
+                return error;
                 // return this.validationService.validateSitDownRequest(uuid, req);
             },
             perform: (uuid, req) => {
@@ -113,7 +114,7 @@ export class EventProcessorService {
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.PINGSTATE]: {
-            validation: (uuid, req) => NO_ERROR,
+            validation: (uuid, req) => undefined,
             perform: (uuid, req) => {},
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -130,11 +131,11 @@ export class EventProcessorService {
             updates: [ServerStateKey.CHAT],
         },
         [ClientActionType.ADDCHIPS]: {
-            validation: (_, __) => NO_ERROR,
+            validation: (_, __) => undefined,
             perform: (uuid, request) => {
                 this.validationService.ensureClientIsInGame(uuid);
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.addPlayerChips(player.uuid, Number(request.chipAmount));
+                this.gameStateManager.playerBuyinAddChips(player.uuid, Number(request.chipAmount));
             },
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -142,7 +143,7 @@ export class EventProcessorService {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, request) => {
                 const player = this.gameStateManager.getPlayer(request.playerUUID);
-                this.gameStateManager.setPlayerChips(player.uuid, Number(request.chipAmount));
+                this.gameStateManager.playerBuyinSetChips(player.uuid, Number(request.chipAmount));
             },
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -161,13 +162,19 @@ export class EventProcessorService {
         },
         // TODO impement leave table
         [ClientActionType.LEAVETABLE]: {
-            validation: (uuid, req) => NO_ERROR,
+            validation: (uuid, req) => undefined,
             perform: () => null,
             updates: [],
         },
         [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),
             perform: () => this.gamePlayService.useTimeBankAction(),
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.SHOWCARD]: {
+            validation: (uuid, req) => this.validationService.validateShowCardAction(uuid, req.cards),
+            perform: (uuid, req: ShowCardRequest) =>
+                req.cards.forEach((card) => this.gameStateManager.setPlayerCardsVisible(req.playerUUID, card)),
             updates: [ServerStateKey.GAMESTATE],
         },
     };
@@ -186,26 +193,28 @@ export class EventProcessorService {
     }
 
     @debugFunc()
-    processClientAction(clientAction: ClientAction) {
+    processClientAction(clientAction: ClientAction): ValidationResponse {
         const { clientUUID, actionType, request } = clientAction;
 
-        let response = this.validationService.ensureClientExists(clientUUID);
-        if (hasError(response)) {
-            logger.error(JSON.stringify(response));
-            return;
+        let error = this.validationService.ensureClientExists(clientUUID);
+        if (error) {
+            logger.error(JSON.stringify(error));
+            return error;
         }
 
         const actionProcessor = this.eventProcessor[actionType];
-        response = actionProcessor.validation(clientUUID, request);
+        error = actionProcessor.validation(clientUUID, request);
 
-        if (hasError(response)) {
-            logger.error(JSON.stringify(response));
-            return;
+        if (error) {
+            logger.error(JSON.stringify(error));
+            return error;
         }
 
         this.gameStateManager.clearUpdatedKeys();
         actionProcessor.perform(clientUUID, clientAction.request);
         this.gameStateManager.addUpdatedKeys(...actionProcessor.updates);
+
+        return undefined;
     }
 
     @debugFunc()
@@ -225,7 +234,12 @@ export class EventProcessorService {
             }
 
             case EventType.CLIENT_ACTION: {
-                this.processClientAction(event.body as ClientAction);
+                // TODO refactor handling of errors from validation.
+                // Consider removing NO_ERROR var and replacing with ValidationResponse | undefined
+                const error = this.processClientAction(event.body as ClientAction);
+                if (error) {
+                    return;
+                }
                 break;
             }
         }

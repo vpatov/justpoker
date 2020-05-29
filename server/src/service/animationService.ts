@@ -5,8 +5,8 @@ import { AnimationState, AnimationTrigger, getCleanAnimationState } from '../../
 export class AnimationService {
     private animationState: AnimationState = getCleanAnimationState();
 
-    loadAnimationState(as: AnimationState) {
-        this.animationState = as;
+    loadAnimationState(animationState: AnimationState) {
+        this.animationState = animationState;
     }
 
     getAnimationState(): AnimationState {

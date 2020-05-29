@@ -1,23 +1,30 @@
-import { DEFAULT_PREFERENCES, ThemePreferences } from './shared/models/userPreferences';
+import { UserPreferences } from '../shared/models/userPreferences';
 import { createMuiTheme, Theme } from '@material-ui/core/styles';
 
 import { PaletteType } from '@material-ui/core';
-import lightBlue from '@material-ui/core/colors/lightBlue';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 import green from '@material-ui/core/colors/green';
-import blue from '@material-ui/core/colors/blue';
-import indigo from '@material-ui/core/colors/indigo';
-import red from '@material-ui/core/colors/red';
-import grey from '@material-ui/core/colors/grey';
-import teal from '@material-ui/core/colors/teal';
 import blueGrey from '@material-ui/core/colors/blueGrey';
+import grey from '@material-ui/core/colors/grey';
+import blue from '@material-ui/core/colors/blue';
+import teal from '@material-ui/core/colors/teal';
+import indigo from '@material-ui/core/colors/indigo';
 import orange from '@material-ui/core/colors/orange';
+import red from '@material-ui/core/colors/red';
+import { Background } from './colors';
 
 declare module '@material-ui/core/styles/createMuiTheme' {
     interface Theme {
         custom?: any;
     }
 }
+
+export const DEFAULT_PREFERENCES: UserPreferences = {
+    theme: {
+        twoColor: false,
+        background: Background.blue,
+    },
+};
 
 const CUSTOM_PALETTE = {
     primary: {
@@ -47,10 +54,6 @@ export const CUSTOM_THEME = {
         HIDDEN: {
             backgroundColor: `${grey[900]}`,
             backgroundImage: ``,
-        },
-        FOLDED: {
-            opacity: 0.8,
-            filter: 'grayscale(50%) brightness(0.4)',
         },
         BACKGROUND: {
             background: 'linear-gradient(360deg, rgba(50,50,63) 0%, rgb(25,25,40));',

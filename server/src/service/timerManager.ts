@@ -8,14 +8,12 @@ export class TimerManager {
         return this.stateTimer;
     }
 
-    loadStateTimer(st: NodeJS.Timer) {
-        this.stateTimer = st;
+    loadStateTimer(stateTimer: NodeJS.Timer) {
+        this.stateTimer = stateTimer;
     }
 
     setStateTimer(fn: Function, timeout: number) {
-        if (this.stateTimer) {
-            global.clearTimeout(this.stateTimer);
-        }
+        this.cancelStateTimer();
         this.stateTimer = global.setTimeout(() => fn(), timeout);
     }
 
