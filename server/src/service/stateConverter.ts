@@ -305,7 +305,6 @@ export class StateConverter {
         return uiChatMessage;
     }
 
-    @debugFunc({ noResult: true })
     transformPlayerCards(player: Player, heroPlayerUUID: PlayerUUID): CardInformation {
         const isHero = heroPlayerUUID === player.uuid;
         const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
@@ -345,7 +344,6 @@ export class StateConverter {
         }
     }
 
-    @debugFunc({ noResult: true })
     transformPlayer(player: Player, heroPlayerUUID: PlayerUUID): UiPlayer {
         const herosTurnToAct =
             this.gameStateManager.getCurrentPlayerToAct() === player.uuid &&

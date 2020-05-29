@@ -10,7 +10,7 @@ export declare interface GameInstance {
     animationState: AnimationState;
     chatLog: ChatLog;
     ledger: ServerLedger;
-    stateTimer?: NodeJS.Timer;
+    stateTimer: NodeJS.Timer | null;
 }
 
 export function getCleanGameInstance(): GameInstance {
@@ -20,5 +20,6 @@ export function getCleanGameInstance(): GameInstance {
         animationState: getCleanAnimationState(),
         chatLog: getCleanChatLog(),
         ledger: getCleanLedger(),
+        stateTimer: null,
     };
 }

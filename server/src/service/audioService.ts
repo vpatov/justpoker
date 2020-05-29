@@ -9,8 +9,8 @@ export class AudioService {
 
     constructor(private readonly gameStateManager: GameStateManager) {}
 
-    loadAudioState(as: AudioQueue) {
-        this.audioQueue = as;
+    loadAudioState(audioQueue: AudioQueue) {
+        this.audioQueue = audioQueue;
     }
 
     // TODO we most likely dont need "global" and "personal",

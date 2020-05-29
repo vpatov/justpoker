@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { ThemePreferences, DEFAULT_PREFERENCES } from './shared/models/userPreferences';
+import { ThemePreferences } from './shared/models/userPreferences';
 import cloneDeep from 'lodash/cloneDeep';
-import { CUSTOM_THEME } from './Theme';
+import { CUSTOM_THEME, DEFAULT_PREFERENCES } from './style/Theme';
 import { ThemeProvider } from '@material-ui/core/styles';
 import GameContainer from './GameContainer';
 import { createMuiTheme } from '@material-ui/core/styles';
