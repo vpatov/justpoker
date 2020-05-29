@@ -39,8 +39,8 @@ export class GameStateManager {
     // TODO place updatedKey logic into a seperate ServerStateManager file.
     updatedKeys: Set<ServerStateKey> = ALL_STATE_KEYS;
 
-    loadGameState(gs: GameState) {
-        this.gameState = gs;
+    loadGameState(gameState: GameState) {
+        this.gameState = gameState;
     }
 
     getUpdatedKeys(): Set<ServerStateKey> {

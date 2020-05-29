@@ -23,8 +23,8 @@ export class ChatService {
         private readonly validationService: ValidationService,
     ) {}
 
-    loadChatState(cs: ChatLog) {
-        this.chatLog = cs;
+    loadChatState(chatLog: ChatLog) {
+        this.chatLog = chatLog;
     }
 
     getChatState(): ChatLog {
