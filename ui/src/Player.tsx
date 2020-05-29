@@ -11,6 +11,7 @@ import grey from '@material-ui/core/colors/grey';
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import MoreHoriz from '@material-ui/icons/MoreHoriz';
+import Animoji from './Animoji';
 
 const PLAYER_WIDTH = 16;
 const PLAYER_HEIGHT = 12;
@@ -92,6 +93,7 @@ function Player(props) {
             style={style}
             id={uuid}
         >
+            {hero ? <Animoji /> : null}
             <MoreHoriz className={classes.moreIcon} onClick={handleClick} />
             <PlayerMenu
                 handleClose={handleClose}
