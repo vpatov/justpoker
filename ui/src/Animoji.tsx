@@ -3,12 +3,12 @@ import classnames from 'classnames';
 import wink from './assets/animoji/wink.gif';
 import thinking from './assets/animoji/thinking.gif';
 import banana from './assets/animoji/banana.gif';
-import cool from './assets/animoji/cool.gif';
 import throwup from './assets/animoji/throwup.gif';
-import why from './assets/animoji/why.gif';
 import wow from './assets/animoji/wow.gif';
+import lol from './assets/animoji/lol.gif';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { AniReaction } from './shared/models/uiState';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -19,25 +19,21 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const GET_ANIMOJI_ASSET = {
-    wink: wink,
-    thinking: thinking,
-    banana: banana,
-    cool: cool,
-    throwup: throwup,
-    why: why,
-    wow: wow,
+const ANIMOJI_ASSET = {
+    [AniReaction.WINK]: wink,
+    [AniReaction.THINK]: thinking,
+    [AniReaction.BANANA]: banana,
+    [AniReaction.PUKE]: throwup,
+    [AniReaction.WOW]: wow,
+    [AniReaction.LOL]: lol,
 };
 
 function Animoji(props) {
     const classes = useStyles();
-    const { className } = props;
-    const id = 'emoji';
+    const { className, reaction } = props;
 
-    const assetArr = Object.values(GET_ANIMOJI_ASSET);
-    const asset = assetArr[Math.floor(Math.random() * assetArr.length)];
-
-    return <img id={id} className={classnames(classes.img, className)} src={asset} alt="loading..." />;
+    console.log(reaction, ANIMOJI_ASSET[reaction]);
+    return <img className={classnames(classes.img, className)} src={ANIMOJI_ASSET[reaction]} alt="" />;
 }
 
 export default Animoji;

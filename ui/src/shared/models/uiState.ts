@@ -1,3 +1,4 @@
+import sample from 'lodash/sample';
 import { Suit, genRandomCard } from './cards';
 import { ClientActionType, UiActionType } from './api';
 import { genRandomInt } from '../util/util';
@@ -136,7 +137,7 @@ export declare interface UiPlayer {
     bet?: number;
     handLabel?: string;
     playerTimer?: PlayerTimer;
-    reaction?: boolean;
+    reaction?: AniReaction;
     hand: {
         cards: UiCard[];
     };
@@ -158,6 +159,15 @@ export declare interface UiChatMessage {
 
 export declare interface UiChatLog {
     messages: UiChatMessage[];
+}
+
+export enum AniReaction {
+    WOW = 'WOW',
+    LOL = 'LOL',
+    WINK = 'WINK',
+    PUKE = 'PUKE',
+    THINK = 'THINK',
+    BANANA = 'BANANA',
 }
 
 /* Action Buttons */
@@ -498,7 +508,7 @@ export const TestGame: UiGameState = {
             uuid: 'TEST_UUID_2',
             bet: genRandomInt(0, 1000000),
             positionIndicator: PositionIndicator.BIG_BLIND,
-            reaction: true,
+            reaction: sample(Object.values(AniReaction)),
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },

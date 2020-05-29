@@ -28,11 +28,11 @@ const REACTION_TIME = 4000;
 function PlayerAvatar(props) {
     const classes = useStyles();
     const { className, position, reaction } = props;
-    const [showReaction, showReactionSet] = useState(reaction);
+    const [showReaction, showReactionSet] = useState(reaction !== undefined);
 
     useEffect(() => {
         if (reaction) {
-            showReactionSet(reaction);
+            showReactionSet(true);
             setTimeout(() => showReactionSet(false), REACTION_TIME);
         }
     }, [reaction]);
@@ -40,7 +40,7 @@ function PlayerAvatar(props) {
     const background = getPlayerAvatarBackground(position);
     return (
         <div className={classnames(classes.root, className)} style={{ background: background }}>
-            {showReaction ? <Animoji /> : <Avatar avatarKey={`a${position}`} />}
+            {showReaction ? <Animoji reaction={reaction} /> : <Avatar />}
         </div>
     );
 }
