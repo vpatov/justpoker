@@ -1,5 +1,11 @@
 import { Service } from 'typedi';
-import { AnimationState, AnimationTrigger, getCleanAnimationState } from '../../../ui/src/shared/models/animationState';
+import {
+    AnimationState,
+    ReactionTrigger,
+    getCleanAnimationState,
+    AnimationType,
+} from '../../../ui/src/shared/models/animationState';
+import { PlayerUUID } from '../../../ui/src/shared/models/uuid';
 
 @Service()
 export class AnimationService {
@@ -12,19 +18,16 @@ export class AnimationService {
     getAnimationState(): AnimationState {
         return this.animationState;
     }
-    private setTrigger(trigger: AnimationTrigger) {
-        return (this.animationState.trigger = trigger);
+
+    setPlayerReaction(playerUUID: PlayerUUID, reaction: ReactionTrigger) {
+        this.animationState = {
+            animationType: AnimationType.REACTION,
+            trigger: reaction,
+            target: playerUUID,
+        };
     }
-    getAnimationTrigger(): AnimationTrigger {
-        return this.animationState.trigger;
-    }
+
     reset() {
         this.animationState = getCleanAnimationState();
-    }
-    animateDeal() {
-        this.setTrigger(AnimationTrigger.DEAL_CARDS);
-    }
-    animateFlipTable() {
-        this.setTrigger(AnimationTrigger.FLIP_TABLE);
     }
 }

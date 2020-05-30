@@ -83,7 +83,7 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, positionIndicator, winner, toAct, outOfHand, position, reaction } = props;
+    const { stack, name, positionIndicator, winner, toAct, outOfHand, position, playerUUID } = props;
 
     const prevStack = usePrevious(stack);
 
@@ -95,7 +95,7 @@ function PlayerStack(props) {
                 [classes.outOfHand]: outOfHand,
             })}
         >
-            <PlayerAvatar className={classes.avatar} position={position} reaction={reaction} />
+            <PlayerAvatar className={classes.avatar} position={position} playerUUID={playerUUID} />
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <div className={classes.nameStackCont}>
                 <Typography variant="h4" className={classes.stack}>

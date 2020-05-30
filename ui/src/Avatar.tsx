@@ -1,14 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import classnames from 'classnames';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { genRandomInt } from './shared/util/util';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        img: {
-            width: `75%`,
-            height: `75%`,
-        },
+        img: {},
     }),
 );
 

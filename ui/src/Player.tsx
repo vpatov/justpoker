@@ -67,7 +67,6 @@ function Player(props) {
         sittingOut,
         hero,
         position,
-        reaction,
     } = props.player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -124,7 +123,7 @@ function Player(props) {
                 positionIndicator={positionIndicator}
                 winner={winner}
                 position={position}
-                reaction={reaction}
+                playerUUID={uuid}
             />
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>

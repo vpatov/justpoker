@@ -1,9 +1,8 @@
-import sample from 'lodash/sample';
 import { Suit, genRandomCard } from './cards';
 import { ClientActionType, UiActionType } from './api';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
-import { AnimationTrigger } from './animationState';
+import { AnimationState, getCleanAnimationState } from './animationState';
 import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../util/consts';
@@ -31,7 +30,7 @@ export declare interface UiState {
     game: UiGameState;
     audio: SoundByte;
     chat: UiChatMessage;
-    animation: AnimationTrigger;
+    animation: AnimationState;
     userPreferences?: UserPreferences;
 }
 
@@ -137,7 +136,6 @@ export declare interface UiPlayer {
     bet?: number;
     handLabel?: string;
     playerTimer?: PlayerTimer;
-    reaction?: AniReaction;
     hand: {
         cards: UiCard[];
     };
@@ -159,15 +157,6 @@ export declare interface UiChatMessage {
 
 export declare interface UiChatLog {
     messages: UiChatMessage[];
-}
-
-export enum AniReaction {
-    WOW = 'Wow',
-    LOL = 'Lol',
-    WINK = 'Wink',
-    PUKE = 'Puke',
-    MONEY = 'Money',
-    BANANA = 'Banana',
 }
 
 /* Action Buttons */
@@ -318,7 +307,7 @@ export const CleanRootState: UiState = {
     game: getCleanGame(),
     audio: SoundByte.NONE,
     chat: getCleanChatMessage(),
-    animation: AnimationTrigger.NONE,
+    animation: getCleanAnimationState(),
 };
 
 export const testUiChatLog: UiChatLog = {
@@ -508,7 +497,6 @@ export const TestGame: UiGameState = {
             uuid: 'TEST_UUID_2',
             bet: genRandomInt(0, 1000000),
             positionIndicator: PositionIndicator.BIG_BLIND,
-            reaction: sample(Object.values(AniReaction)),
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },

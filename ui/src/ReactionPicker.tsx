@@ -11,9 +11,10 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
-import EmojiEmotionsIcon from '@material-ui/icons/Mood';
-import { AniReaction } from './shared/models/uiState';
+import MoodIcon from '@material-ui/icons/Mood';
+import { ReactionTrigger } from './shared/models/animationState';
 import Animoji from './Animoji';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         hoverArea: {
@@ -93,16 +94,16 @@ function ReactionPicker(props) {
                 })}
             >
                 {open ? (
-                    Object.values(AniReaction).map((reaction) => (
+                    Object.values(ReactionTrigger).map((reaction) => (
                         <Tooltip title={reaction} placement="right">
-                            <IconButton className={classes.iconButton} onClick={() => handleClickButton(AniReaction)}>
+                            <IconButton className={classes.iconButton} onClick={() => handleClickButton(reaction)}>
                                 <Animoji reaction={reaction} />
                             </IconButton>
                         </Tooltip>
                     ))
                 ) : (
                     <IconButton className={classes.iconButton}>
-                        <EmojiEmotionsIcon className={classes.icon} />
+                        <MoodIcon className={classes.icon} />
                     </IconButton>
                 )}
             </Paper>

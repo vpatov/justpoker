@@ -109,6 +109,7 @@ export const enum ServerStateKey {
     GAMESTATE = 'GAMESTATE',
     AUDIO = 'AUDIO',
     CHAT = 'CHAT',
+    ANIMATION = 'ANIMATION',
 }
 
 export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerAction) {

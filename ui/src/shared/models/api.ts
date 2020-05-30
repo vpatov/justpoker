@@ -1,7 +1,7 @@
 import { BettingRoundAction, GameType } from './game';
 import { Suit, Card } from './cards';
 import { GameInstanceUUID, ClientUUID, PlayerUUID } from './uuid';
-import { AniReaction } from './uiState';
+import { ReactionTrigger } from './animationState';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
@@ -110,7 +110,7 @@ export declare interface ShowCardRequest {
 
 export declare interface PlayerReactionRequest {
     playerUUID: PlayerUUID;
-    reaction: AniReaction;
+    reaction: ReactionTrigger;
 }
 
 export type ClientWsMessageRequest = SitDownRequest &

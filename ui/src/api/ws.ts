@@ -7,7 +7,6 @@ import {
     ClientActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
-    WSParams,
 } from '../shared/models/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
 
@@ -76,7 +75,6 @@ export class WsServer {
     }
 
     static subscribe(key: string, onMessage) {
-        console.log(key, onMessage);
         if (WsServer.subscriptions[key]) {
             WsServer.subscriptions[key].push(onMessage);
         } else {

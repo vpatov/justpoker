@@ -324,7 +324,6 @@ export class GamePlayService {
 
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
-                this.animationService.animateDeal();
                 this.gsm.forEveryPlayerUUID((playerUUID) => {
                     if (this.gsm.isPlayerReadyToPlay(playerUUID)) {
                         this.dealHoleCards(playerUUID);
