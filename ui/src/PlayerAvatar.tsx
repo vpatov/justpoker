@@ -72,7 +72,7 @@ function PlayerAvatar(props) {
             {showReaction ? (
                 <Animoji reaction={reaction} className={classes.animoji} />
             ) : (
-                <Avatar className={classes.avatar} />
+                <Avatar className={classes.avatar} playerUUID={playerUUID} />
             )}
         </div>
     );

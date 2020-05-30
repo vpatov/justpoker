@@ -12,13 +12,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function Avatar(props) {
     const classes = useStyles();
-    const { className, avatarKey } = props;
+    const { className, playerUUID } = props;
 
     const r = genRandomInt(0, 10000);
     return (
         <img
             className={classnames(classes.img, className)}
-            src={`https://avatars.dicebear.com/api/bottts/test${r}.svg?options[colors][]=blue&options[primaryColorLevel]=50`}
+            src={`https://avatars.dicebear.com/api/bottts/test${playerUUID}.svg?options[colors][]=blue&options[primaryColorLevel]=50`}
             alt=""
         />
     );
