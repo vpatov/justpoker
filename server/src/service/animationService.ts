@@ -4,12 +4,16 @@ import {
     ReactionTrigger,
     getCleanAnimationState,
     AnimationType,
+    GameplayTrigger,
 } from '../../../ui/src/shared/models/animationState';
 import { PlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { GameStateManager } from './gameStateManager';
+import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 
 @Service()
 export class AnimationService {
     private animationState: AnimationState = getCleanAnimationState();
+    private readonly gameStateManager: GameStateManager;
 
     loadAnimationState(animationState: AnimationState) {
         this.animationState = animationState;
@@ -17,6 +21,14 @@ export class AnimationService {
 
     getAnimationState(): AnimationState {
         return this.animationState;
+    }
+
+    setDealCardsAnimation() {
+        this.gameStateManager.addUpdatedKeys(ServerStateKey.ANIMATION);
+        this.animationState = {
+            animationType: AnimationType.GAMEPLAY,
+            trigger: GameplayTrigger.DEAL_CARDS,
+        };
     }
 
     setPlayerReaction(playerUUID: PlayerUUID, reaction: ReactionTrigger) {

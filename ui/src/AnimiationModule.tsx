@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { WsServer } from './api/ws';
-import { AnimationType, AnimationState } from './shared/models/animationState';
+import { AnimationType, AnimationState, GameplayTrigger } from './shared/models/animationState';
 import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
@@ -12,10 +12,13 @@ function AnimiationModule(props) {
 
     const onReceiveNewAnimationState = (animationState: AnimationState) => {
         switch (animationState.animationType) {
+            case AnimationType.GAMEPLAY:
+                handleGamePlayAnimation(animationState);
             case AnimationType.REACTION:
                 break;
             case AnimationType.EMPTY:
                 break;
+
             default:
                 console.warn(`No animation provided for ${animationState}`);
                 break;
@@ -26,6 +29,12 @@ function AnimiationModule(props) {
 }
 
 export default AnimiationModule;
+
+function handleGamePlayAnimation(animationState: AnimationState) {
+    if (animationState.trigger === GameplayTrigger.DEAL_CARDS) {
+        dealCards();
+    }
+}
 
 export function flipTable() {
     const animations = [] as any;

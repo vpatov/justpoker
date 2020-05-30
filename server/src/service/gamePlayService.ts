@@ -9,7 +9,7 @@ import {
 } from '../../../ui/src/shared/models/game';
 
 import { HandSolverService } from './handSolverService';
-import { Pot } from '../../../ui/src/shared/models/gameState';
+import { Pot, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 
 import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
@@ -324,6 +324,7 @@ export class GamePlayService {
 
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
+                this.animationService.setDealCardsAnimation();
                 this.gsm.forEveryPlayerUUID((playerUUID) => {
                     if (this.gsm.isPlayerReadyToPlay(playerUUID)) {
                         this.dealHoleCards(playerUUID);
