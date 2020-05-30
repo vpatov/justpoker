@@ -10,7 +10,7 @@ import grey from '@material-ui/core/colors/grey';
 
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
-import MoreHoriz from '@material-ui/icons/MoreHoriz';
+import MoreIcom from '@material-ui/icons/MoreVert';
 import Animoji from './Animoji';
 import PlayerLabel from './PlayerLabel';
 
@@ -40,10 +40,11 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateY(-50%) translateX(-50%) scale(1.21)',
     },
     moreIcon: {
+        zIndex: 10,
         position: 'absolute',
-        bottom: 0,
+        bottom: '3%',
         right: 0,
-        marginRight: '0.4vmin',
+        marginRight: '0vmin',
         color: grey[700],
         '&:hover': {
             color: 'black',
@@ -102,7 +103,6 @@ function Player(props) {
             style={style}
             id={uuid}
         >
-            <MoreHoriz className={classes.moreIcon} onClick={handleClick} />
             <PlayerMenu
                 handleClose={handleClose}
                 anchorEl={anchorEl}
@@ -116,6 +116,7 @@ function Player(props) {
             <Hand hand={hand} folded={folded} hero={hero} />
 
             <PlayerStack
+                onClickStack={handleClick}
                 toAct={toAct}
                 name={name}
                 stack={stack}

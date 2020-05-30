@@ -16,6 +16,12 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         height: '6vmin',
         alignItems: 'center',
+        cursor: 'pointer',
+        border: '0.25vmin solid transparent',
+        '&:hover': {
+            borderColor: theme.palette.secondary.main,
+        },
+
         ...theme.custom.STACK,
     },
     outOfHand: {
@@ -39,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
         width: '60%',
     },
     avatar: {
-        marginLeft: '-10%',
+        marginLeft: '-11%',
         marginRight: '0.3vmin',
         flexShrink: 0,
         height: '6.8vmin',
@@ -83,12 +89,13 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, positionIndicator, winner, toAct, outOfHand, position, playerUUID } = props;
+    const { stack, name, positionIndicator, winner, toAct, outOfHand, position, playerUUID, onClickStack } = props;
 
     const prevStack = usePrevious(stack);
 
     return (
         <div
+            onClick={onClickStack}
             className={classnames(classes.stackCont, {
                 [classes.toAct]: toAct,
                 [classes.winner]: winner,
