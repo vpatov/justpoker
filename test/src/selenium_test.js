@@ -8,7 +8,7 @@ function sleep(ms) {
 }
 
 // global params
-const windowSize = { x: 850, y: 600 }; // https://www.amazon.com/LG-27UD68-P-27-Inch-Monitor-FreeSync/dp/B01CH9ZTI4
+const windowSize = { x: 950, y: 800 }; // https://www.amazon.com/LG-27UD68-P-27-Inch-Monitor-FreeSync/dp/B01CH9ZTI4
 let curPos = { x: 0, y: 0 };
 const maxCols = 4;
 const allDrivers = [];
@@ -129,4 +129,4 @@ async function SitDownPlayersAtOneTable(n) {
 
 // PlayThreeTablesThreePlayers();
 // PlayOneTableNinePlayers();
-SitDownPlayersAtOneTable(4);
+SitDownPlayersAtOneTable(3);

@@ -42,8 +42,8 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '-10%',
         marginRight: '0.3vmin',
         flexShrink: 0,
-        height: '7.6vmin',
-        width: '7.6vmin',
+        height: '6.8vmin',
+        width: '6.8vmin',
     },
     name: {
         paddingBottom: '0.8vmin',

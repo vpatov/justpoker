@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: '50%',
-            border: `0.3vmin solid ${grey[900]}`,
+            border: `0.25vmin solid ${grey[900]}`,
             overflow: 'hidden',
         },
         avatar: {
