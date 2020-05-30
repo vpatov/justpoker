@@ -3,6 +3,7 @@ import { AnimationState, getCleanAnimationState } from './animationState';
 import { AudioQueue, getCleanAudioQueue } from './audioQueue';
 import { ChatLog, getCleanChatLog } from './chat';
 import { ServerLedger, getCleanLedger } from './ledger';
+import { GameInstanceLog, getCleanGameInstanceLog } from './handLog';
 
 export declare interface GameInstance {
     gameState: GameState;
@@ -10,6 +11,7 @@ export declare interface GameInstance {
     animationState: AnimationState;
     chatLog: ChatLog;
     ledger: ServerLedger;
+    gameInstanceLog: GameInstanceLog;
     stateTimer: NodeJS.Timer | null;
 }
 
@@ -20,6 +22,7 @@ export function getCleanGameInstance(): GameInstance {
         animationState: getCleanAnimationState(),
         chatLog: getCleanChatLog(),
         ledger: getCleanLedger(),
+        gameInstanceLog: getCleanGameInstanceLog(),
         stateTimer: null,
     };
 }

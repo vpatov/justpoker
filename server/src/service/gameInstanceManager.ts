@@ -17,6 +17,7 @@ import {
     ClientUUID,
     generateGameInstanceUUID,
 } from '../../../ui/src/shared/models/uuid';
+import { GameInstanceLogService } from './gameInstanceLogService';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -33,6 +34,7 @@ export class GameInstanceManager {
         private readonly animationService: AnimationService,
         private readonly chatService: ChatService,
         private readonly ledgerService: LedgerService,
+        private readonly gameInstanceLogService: GameInstanceLogService,
         private readonly timerManager: TimerManager,
     ) {}
 
@@ -42,6 +44,7 @@ export class GameInstanceManager {
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
         this.loadGameInstance(gameInstanceUUID);
         this.gameStateManager.initGame(newGameForm);
+        this.gameInstanceLogService.initGameInstanceLog(gameInstanceUUID);
         return gameInstanceUUID;
     }
 
@@ -69,12 +72,13 @@ export class GameInstanceManager {
 
     @debugFunc()
     saveActiveGameInstance() {
-        const activeGameInstance = {
+        const activeGameInstance: GameInstance = {
             gameState: this.gameStateManager.getGameState(),
             chatLog: this.chatService.getChatState(),
             audioQueue: this.audioService.getAudioQueue(),
             animationState: this.animationService.getAnimationState(),
             ledger: this.ledgerService.getLedger(),
+            gameInstanceLog: this.gameInstanceLogService.getGameInstanceLog(),
             stateTimer: this.timerManager.getStateTimer(),
         };
         this.gameInstances[this.activeGameInstanceUUID] = activeGameInstance;
@@ -102,6 +106,7 @@ export class GameInstanceManager {
         this.animationService.loadAnimationState(gameInstance.animationState);
         this.ledgerService.loadLedger(gameInstance.ledger);
         this.timerManager.loadStateTimer(gameInstance.stateTimer);
+        this.gameInstanceLogService.loadGameInstanceLog(gameInstance.gameInstanceLog);
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 
