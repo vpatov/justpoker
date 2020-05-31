@@ -4,6 +4,9 @@ export const MIN_VALUES = {
     SMALL_BLIND: 1,
     BUY_IN: 1,
     PLAYER_STACK: 0,
+    MAX_PLAYERS: 2,
+    NUMBER_TIME_BANKS: 1,
+    TIME_BANK_TIME: 5,
 };
 
 export const MAX_VALUES = {
@@ -12,4 +15,7 @@ export const MAX_VALUES = {
     SMALL_BLIND: Math.pow(10, 8),
     BUY_IN: Math.pow(10, 9),
     PLAYER_STACK: Math.pow(10, 9),
+    MAX_PLAYERS: 9,
+    NUMBER_TIME_BANKS: 100,
+    TIME_BANK_TIME: 60 * 10, // 10 minutes
 };

@@ -1,8 +1,9 @@
-import { GameParameters, GameType, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
+import { GameParameters, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
 import { Player } from './player';
 import { Card, Deck } from './cards';
 import { ClientActionType } from './api';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from './uuid';
+import { getCleanGameParameters } from './game';
 
 export const enum GameStage {
     NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
@@ -129,15 +130,7 @@ export function getCleanGameState(): GameState {
         queuedServerActions: [],
         players: {},
         board: [],
-        gameParameters: {
-            smallBlind: 0,
-            bigBlind: 0,
-            gameType: GameType.NLHOLDEM,
-            maxBuyin: 0,
-            timeToAct: 0,
-            maxPlayers: 9,
-            timeBankValue: 0,
-        },
+        gameParameters: getCleanGameParameters(),
         dealerUUID: makeBlankUUID(),
         smallBlindUUID: makeBlankUUID(),
         bigBlindUUID: makeBlankUUID(),

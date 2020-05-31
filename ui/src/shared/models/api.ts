@@ -130,16 +130,6 @@ export declare interface ClientWsMessage {
     request: ClientWsMessageRequest;
 }
 
-export declare interface NewGameForm {
-    gameType: GameType;
-    smallBlind: number;
-    bigBlind: number;
-    maxBuyin: number;
-    timeToAct: number;
-    password?: string;
-    adminOptions?: any;
-}
-
 export function createTimeoutEvent(gameInstanceUUID: GameInstanceUUID): Event {
     return {
         eventType: EventType.SERVER_ACTION,
