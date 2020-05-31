@@ -6,7 +6,7 @@ export const MIN_VALUES = {
     PLAYER_STACK: 0,
     MAX_PLAYERS: 2,
     NUMBER_TIME_BANKS: 1,
-    TIME_BANK_TIME: 5,
+    TIME_BANK_TIME: 1,
 };
 
 export const MAX_VALUES = {

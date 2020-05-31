@@ -116,6 +116,7 @@ export class StateConverter {
                               this.transformPlayer(player, heroPlayerUUID),
                           ),
                           menu: this.getValidMenuButtons(clientUUID),
+                          gameParameters: this.gameStateManager.getGameParameters(),
                       }
                     : undefined,
             audio: this.audioUpdated() || sendAll ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
@@ -136,14 +137,11 @@ export class StateConverter {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isPlayerAdmin(clientUUID),
             heroIsSeated: clientPlayerIsSeated,
-            bigBlind: this.gameStateManager.getBB(),
-            smallBlind: this.gameStateManager.getSB(),
-            allowStraddle: this.gameStateManager.getAllowStraddle(),
-            gameType: this.gameStateManager.getGameType(),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
             unqueueAllBettingRoundActions:
                 gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
+            areOpenSeats: this.gameStateManager.areOpenSeats(),
         };
 
         return global;

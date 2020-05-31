@@ -1,4 +1,5 @@
 import React, { useState, Fragment } from 'react';
+import { useSelector } from 'react-redux';
 import classnames from 'classnames';
 import { WsServer } from './api/ws';
 import { ClientActionType } from './shared/models/api';
@@ -10,6 +11,7 @@ import grey from '@material-ui/core/colors/grey';
 import Typography from '@material-ui/core/Typography';
 import { ClientWsMessageRequest } from './shared/models/api';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
+import { selectGameParameters } from './store/selectors';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +44,8 @@ function OpenSeat(props) {
     const { className, style, seatNumber } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
     const [name, setName] = useState(localStorage.getItem(NAME_LOCAL_STORAGE_KEY) || '');
+    const { maxPlayers } = useSelector(selectGameParameters);
+
     const [minBuyin, setMinBuyin] = useState(25);
     // TODO maxBuyin should be read from game parameters.
     // TODO when entering the buyin amount, the textbox adjusts it too quickly.

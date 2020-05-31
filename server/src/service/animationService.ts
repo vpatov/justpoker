@@ -13,7 +13,7 @@ import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 @Service()
 export class AnimationService {
     private animationState: AnimationState = getCleanAnimationState();
-    private readonly gameStateManager: GameStateManager;
+    constructor(private readonly gameStateManager: GameStateManager) {}
 
     loadAnimationState(animationState: AnimationState) {
         this.animationState = animationState;

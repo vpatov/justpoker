@@ -146,9 +146,15 @@ export class ValidationService {
         // if (error) {
         //     return error;
         // }
+        if (!this.gsm.areOpenSeats()) {
+            return {
+                errorString: `There are no open seats left at this table`,
+                errorType: ErrorType.NO_OPEN_SEATS,
+            };
+        }
         if (request.name.length > MAX_NAME_LENGTH) {
             return {
-                errorString: `Name ${request.name} is too long - exceeds limit of 32 characters.`,
+                errorString: `Name ${request.name} is too long - exceeds limit of ${MAX_NAME_LENGTH} characters.`,
                 errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
             };
         }
@@ -475,6 +481,13 @@ export class ValidationService {
     }
 
     validateUseTimeBankAction(clientUUID: ClientUUID) {
+        const { allowTimeBanks } = this.gsm.getGameParameters();
+        if (!allowTimeBanks) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Time bank are not enabled in this game.`,
+            };
+        }
         const error = this.ensurePlayerCanActRightNow(clientUUID);
         if (error) {
             return error;

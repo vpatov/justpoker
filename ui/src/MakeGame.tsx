@@ -119,7 +119,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Small Blind"
                     variant="standard"
-                    onChange={(event) => setSmallBlind(Number(event.target.value))}
+                    onChange={(event) => setSmallBlind(event.target.value)}
                     value={smallBlind}
                     min={MIN_VALUES.SMALL_BLIND}
                     max={MAX_VALUES.SMALL_BLIND}
@@ -129,7 +129,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Big Blind"
                     variant="standard"
-                    onChange={(event) => setBigBlind(Number(event.target.value))}
+                    onChange={(event) => setBigBlind(event.target.value)}
                     value={bigBlind}
                     min={MIN_VALUES.BIG_BLIND}
                     max={MAX_VALUES.BIG_BLIND}
@@ -139,7 +139,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Buyin"
                     variant="standard"
-                    onChange={(event) => setMaxBuyin(Number(event.target.value))}
+                    onChange={(event) => setMaxBuyin(event.target.value)}
                     value={maxBuyin}
                     min={MIN_VALUES.BUY_IN}
                     max={MAX_VALUES.BUY_IN}
@@ -149,7 +149,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Time To Act"
                     variant="standard"
-                    onChange={(event) => setTimeToAct(Number(event.target.value))}
+                    onChange={(event) => setTimeToAct(event.target.value)}
                     value={timeToAct}
                     min={MIN_VALUES.TIME_TO_ACT}
                     max={MAX_VALUES.TIME_TO_ACT}
