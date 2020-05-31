@@ -6,12 +6,11 @@ import { MIN_VALUES, MAX_VALUES } from './shared/util/consts';
 
 import { makeStyles } from '@material-ui/core/styles';
 import TextFieldWrap from './reuseable/TextFieldWrap';
-import RadioForm from './reuseable/RadioForm';
 
 import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
 import { GameType, getDefaultGameParameters, GameParameters } from './shared/models/game';
-import Collapse from '@material-ui/core/Collapse';
+import GameParamatersDialog from './GameParamatersDialog';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,44 +38,20 @@ const useStyles = makeStyles((theme) => ({
         margin: '12px auto',
         color: 'white',
     },
-    advancedFieldCont: {
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
-    },
-    advancedField: {
-        flex: '1 1 200px',
-        margin: '12px',
-        color: 'white',
-    },
+
     button: {
         width: '100%',
         margin: '12px 0',
     },
 }));
 
-const defaultParams = getDefaultGameParameters();
-
 function MakeGame(props) {
     const classes = useStyles();
     const { history } = props;
 
     const [showAdvanced, SET_showAdvanced] = useState(false);
-
-    const [bigBlind, setBigBlind] = useState(defaultParams.bigBlind);
-    const [smallBlind, setSmallBlind] = useState(defaultParams.smallBlind);
-    const [maxBuyin, setMaxBuyin] = useState(defaultParams.maxBuyin);
-    const [timeToAct, setTimeToAct] = useState(defaultParams.timeToAct);
-    const [gameType, setGameType] = useState(defaultParams.gameType);
-
-    // advanced params
-    const [maxPlayers, SET_maxPlayers] = useState(defaultParams.maxPlayers);
-    const [allowStraddle, SET_allowStraddle] = useState(defaultParams.allowStraddle);
-    const [canShowHeadsUp, SET_canShowHeadsUp] = useState(defaultParams.canShowHeadsUp);
-    const [numberTimeBanks, SET_numberTimeBanks] = useState(defaultParams.numberTimeBanks);
-    const [timeBankTime, SET_timeBankTime] = useState(defaultParams.timeBankTime);
-    const [allowTimeBanks, SET_allowTimeBanks] = useState(defaultParams.allowTimeBanks);
+    const [gameParameters, SET_gameParameters] = useState(getDefaultGameParameters());
+    const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType } = gameParameters;
 
     function canCreate() {
         return true;
@@ -91,21 +66,17 @@ function MakeGame(props) {
         console.log(err);
     };
 
-    // TODO use the NewGameForm interface
+    function setIntoGameParameters(field, value) {
+        SET_gameParameters({ ...gameParameters, [field]: value });
+    }
+
+    const onGameParamatersDialogSave = (gameParameters: GameParameters) => {
+        console.log('makegame', gameParameters);
+        SET_gameParameters(gameParameters);
+        SET_showAdvanced(false);
+    };
+
     function handleCreateGame() {
-        const gameParameters: GameParameters = {
-            bigBlind,
-            smallBlind,
-            maxBuyin,
-            timeToAct,
-            gameType,
-            maxPlayers,
-            allowStraddle,
-            canShowHeadsUp,
-            numberTimeBanks,
-            timeBankTime,
-            allowTimeBanks,
-        };
         const createReq = {
             gameParameters: gameParameters,
         };
@@ -119,7 +90,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Small Blind"
                     variant="standard"
-                    onChange={(event) => setSmallBlind(event.target.value)}
+                    onChange={(event) => setIntoGameParameters('smallBlind', event.target.value)}
                     value={smallBlind}
                     min={MIN_VALUES.SMALL_BLIND}
                     max={MAX_VALUES.SMALL_BLIND}
@@ -129,7 +100,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Big Blind"
                     variant="standard"
-                    onChange={(event) => setBigBlind(event.target.value)}
+                    onChange={(event) => setIntoGameParameters('bigBlind', event.target.value)}
                     value={bigBlind}
                     min={MIN_VALUES.BIG_BLIND}
                     max={MAX_VALUES.BIG_BLIND}
@@ -139,7 +110,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Buyin"
                     variant="standard"
-                    onChange={(event) => setMaxBuyin(event.target.value)}
+                    onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
                     value={maxBuyin}
                     min={MIN_VALUES.BUY_IN}
                     max={MAX_VALUES.BUY_IN}
@@ -149,7 +120,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Time To Act"
                     variant="standard"
-                    onChange={(event) => setTimeToAct(event.target.value)}
+                    onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
                     value={timeToAct}
                     min={MIN_VALUES.TIME_TO_ACT}
                     max={MAX_VALUES.TIME_TO_ACT}
@@ -158,13 +129,13 @@ function MakeGame(props) {
                 <Select
                     className={classes.field}
                     value={gameType}
-                    onChange={(event) => setGameType(event.target.value as GameType)}
+                    onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
                 >
                     <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
                     <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
                 </Select>
                 <Button className={classes.button} onClick={() => SET_showAdvanced(!showAdvanced)}>
-                    {showAdvanced ? 'Hide' : 'Show'} Advanced Settings
+                    Show Advanced Settings
                 </Button>
                 <Button
                     id={'ID_CreateGameButton'}
@@ -177,78 +148,15 @@ function MakeGame(props) {
                 >
                     Create Game
                 </Button>
+                {showAdvanced ? (
+                    <GameParamatersDialog
+                        open={showAdvanced}
+                        gameParameters={gameParameters}
+                        onCancel={() => SET_showAdvanced(false)}
+                        onSave={onGameParamatersDialogSave}
+                    />
+                ) : null}
             </div>
-            {showAdvanced ? (
-                <Collapse in={showAdvanced} mountOnEnter>
-                    <div className={classes.advancedFieldCont}>
-                        <TextFieldWrap
-                            className={classes.advancedField}
-                            label="Max Players"
-                            onChange={(event) => SET_maxPlayers(event.target.value)}
-                            value={maxPlayers}
-                            type="number"
-                            variant="standard"
-                            min={MIN_VALUES.MAX_PLAYERS}
-                            max={MAX_VALUES.MAX_PLAYERS}
-                        />
-                        <RadioForm
-                            className={classes.advancedField}
-                            label="Allow Straddle"
-                            onChange={(event) => SET_allowStraddle(event.target.value === 'true')}
-                            value={allowStraddle + ''}
-                            options={[
-                                { label: 'Allow', value: 'true' },
-                                { label: 'Disallow', value: 'false' },
-                            ]}
-                            radioGroupProps={{ row: true }}
-                        />
-                        <RadioForm
-                            className={classes.advancedField}
-                            label="Can Show Heads Up"
-                            onChange={(event) => SET_canShowHeadsUp(event.target.value === 'true')}
-                            value={canShowHeadsUp + ''}
-                            options={[
-                                { label: 'Can Show', value: 'true' },
-                                { label: "Can't Show", value: 'false' },
-                            ]}
-                            radioGroupProps={{ row: true }}
-                        />
-                        <RadioForm
-                            className={classes.advancedField}
-                            label="Time Banks"
-                            onChange={(event) => SET_allowTimeBanks(event.target.value === 'true')}
-                            value={allowTimeBanks + ''}
-                            options={[
-                                { label: 'On', value: 'true' },
-                                { label: 'Off', value: 'false' },
-                            ]}
-                            radioGroupProps={{ row: true }}
-                        />
-                        <TextFieldWrap
-                            className={classes.advancedField}
-                            label="Number of Time Banks"
-                            onChange={(event) => SET_numberTimeBanks(event.target.value)}
-                            value={numberTimeBanks}
-                            type="number"
-                            variant="standard"
-                            disabled={!allowTimeBanks}
-                            min={MIN_VALUES.NUMBER_TIME_BANKS}
-                            max={MAX_VALUES.NUMBER_TIME_BANKS}
-                        />
-                        <TextFieldWrap
-                            className={classes.advancedField}
-                            label="Time Bank Time"
-                            onChange={(event) => SET_timeBankTime(event.target.value)}
-                            value={timeBankTime}
-                            type="number"
-                            variant="standard"
-                            disabled={!allowTimeBanks}
-                            min={MIN_VALUES.TIME_BANK_TIME}
-                            max={MAX_VALUES.TIME_BANK_TIME}
-                        />
-                    </div>
-                </Collapse>
-            ) : null}
         </div>
     );
 }

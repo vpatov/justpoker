@@ -21,8 +21,14 @@ function RadioForm(props) {
         <FormControl className={className} component="fieldset">
             <FormLabel component="legend">{label}</FormLabel>
             <RadioGroup value={value} onChange={onChange} {...radioGroupProps}>
-                {options.map((option) => (
-                    <FormControlLabel value={option.value} control={<Radio />} label={option.label} {...option.props} />
+                {options.map((option, index) => (
+                    <FormControlLabel
+                        key={option.label + index}
+                        value={option.value}
+                        control={<Radio />}
+                        label={option.label}
+                        {...option.props}
+                    />
                 ))}
             </RadioGroup>
         </FormControl>
