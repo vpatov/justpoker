@@ -5,16 +5,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {},
-    }),
-);
-
 function RadioForm(props) {
-    const classes = useStyles();
     const { className, value, label, onChange, options, radioGroupProps } = props;
 
     return (

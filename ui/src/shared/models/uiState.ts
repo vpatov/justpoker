@@ -7,7 +7,6 @@ import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../util/consts';
 import {
-    GameType,
     BettingRoundActionType,
     BettingRoundAction,
     NOT_IN_HAND,
