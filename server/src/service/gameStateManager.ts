@@ -174,12 +174,12 @@ export class GameStateManager {
         return this.gameState.gameParameters.maxPlayers;
     }
 
-    getNumberOfPlayers(): number {
-        return Object.keys(this.getPlayers()).length;
+    getSittingPlayers(): Player[] {
+        return Object.values(this.getPlayers()).filter((player) => player.sitting);
     }
 
     areOpenSeats(): boolean {
-        return this.getMaxPlayers() !== this.getNumberOfPlayers();
+        return this.getMaxPlayers() !== this.getSittingPlayers().length;
     }
 
     // TODO when branded types can be used as index signatures, replace string with PlayerUUID
