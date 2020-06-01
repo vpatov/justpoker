@@ -1,12 +1,14 @@
 import React from 'react';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import InfoIcon from '@material-ui/icons/Info';
+import InfoIcon from '@material-ui/icons/Help';
 import { Tooltip } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        root: {},
+        icon: {
+            cursor: 'help',
+        },
     }),
 );
 
@@ -16,7 +18,7 @@ function IconTooltip(props) {
 
     return (
         <Tooltip {...rest}>
-            <InfoIcon />
+            <InfoIcon className={classes.icon} />
         </Tooltip>
     );
 }

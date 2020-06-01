@@ -5,6 +5,8 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
 import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
 
@@ -135,15 +137,16 @@ function GameParamatersDialog(props) {
                         max={MAX_VALUES.TIME_TO_ACT}
                         type="number"
                     />
-                    <Select
-                        className={classes.field}
-                        value={gameType}
-                        onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
-                    >
-                        <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
-                        <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
-                    </Select>
-
+                    <FormControl className={classes.field}>
+                        <InputLabel>Game Type</InputLabel>
+                        <Select
+                            value={gameType}
+                            onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
+                        >
+                            <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
+                            <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
+                        </Select>
+                    </FormControl>
                     <TextFieldWrap
                         className={classes.field}
                         label="Max Players"
@@ -158,7 +161,7 @@ function GameParamatersDialog(props) {
                     <div className={classes.field}>
                         <IconTooltip
                             className={classes.iconTip}
-                            title="Gives players ability to straddle. That is, the player to the left of the big blind bets twice the big blind before the cards are dealt."
+                            title="Gives players ability to straddle. The player to the left of the big blind bets twice the big blind before the cards are dealt."
                             placement="left"
                         />
                         <RadioForm
@@ -175,7 +178,7 @@ function GameParamatersDialog(props) {
                     <div className={classes.field}>
                         <IconTooltip
                             className={classes.iconTip}
-                            title="Gives players ability to show some or all of their hole cards once heads up with another player."
+                            title="Gives players ability to show some or all of their hole cards once one vs one with another player."
                             placement="left"
                         />
                         <RadioForm
@@ -229,12 +232,12 @@ function GameParamatersDialog(props) {
                     <div className={classes.field}>
                         <IconTooltip
                             className={classes.iconTip}
-                            title="The number of seconds by which a players time to act is extended after using a time bank."
+                            title="The number of seconds by which a player's time to act is extended after using a time bank."
                             placement="left"
                         />
                         <TextFieldWrap
                             className={classes.field}
-                            label="Time Bank Time"
+                            label="Time Bank Seconds"
                             onChange={(event) => setIntoGameParameters('timeBankTime', event.target.value)}
                             value={timeBankTime}
                             type="number"

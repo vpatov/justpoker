@@ -9,6 +9,8 @@ import TextFieldWrap from './reuseable/TextFieldWrap';
 
 import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
 import { GameType, getDefaultGameParameters, GameParameters } from './shared/models/game';
 import GameParamatersDialog from './GameParamatersDialog';
 
@@ -18,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'rgba(0, 0, 0, 0.7)',
         border: '1px solid black',
         borderRadius: 12,
-        width: '70%',
+        width: '40%',
         maxWidth: '1000px',
         maxHeight: '900px',
         padding: 'min(24px, 2vmin)',
@@ -27,11 +29,11 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'wrap',
         overflowY: 'auto',
         flex: '1 1 500px',
+        marginTop: 12,
         marginBottom: 'min(96px, 8vh)',
         position: 'relative',
     },
     fieldCont: {
-        minWidth: '200px',
         maxWidth: '300px',
     },
     field: {
@@ -131,15 +133,18 @@ function MakeGame(props) {
                     min={MIN_VALUES.TIME_TO_ACT}
                     max={MAX_VALUES.TIME_TO_ACT}
                     type="number"
-                />
-                <Select
-                    className={classes.field}
-                    value={gameType}
-                    onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
-                >
-                    <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
-                    <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
-                </Select>
+                />{' '}
+                <FormControl className={classes.field}>
+                    <InputLabel>Game Type</InputLabel>
+                    <Select
+                        className={classes.field}
+                        value={gameType}
+                        onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
+                    >
+                        <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
+                        <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
+                    </Select>
+                </FormControl>
                 <Button className={classes.advButton} onClick={() => SET_showAdvanced(!showAdvanced)}>
                     Advanced Settings
                 </Button>
