@@ -202,7 +202,7 @@ export const LEAVE_TABLE_BUTTON: MenuButton = {
 
 export const VOLUME_BUTTON: MenuButton = {
     action: UiActionType.VOLUME,
-    label: 'Volume',
+    label: 'Mute',
 };
 
 export const SETTINGS_BUTTON: MenuButton = {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Table from './Table';
 import Controller from './Controller';
@@ -34,11 +34,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Game(props) {
+    const [mute, SET_mute] = useState(false);
+
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
-            <GameMenu />
+            <GameMenu mute={mute} SET_mute={SET_mute} />
             <div className={classes.gameTableCont}>
                 <GameLabel />
                 <Table className={classes.table} />
@@ -47,7 +49,7 @@ function Game(props) {
             </div>
             <ChatLog className={classes.chatlog} />
 
-            <AudioModule />
+            <AudioModule mute={mute} />
             <AnimiationModule />
         </div>
     );
