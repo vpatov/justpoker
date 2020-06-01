@@ -107,7 +107,7 @@ function MakeGame(props) {
                 />
                 <TextFieldWrap
                     className={classes.field}
-                    label="Buyin"
+                    label="Max Buyin"
                     variant="standard"
                     onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
                     value={maxBuyin}

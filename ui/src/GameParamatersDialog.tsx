@@ -49,6 +49,7 @@ function GameParamatersDialog(props) {
         timeToAct,
         gameType,
         maxPlayers,
+        minBuyin,
         allowStraddle,
         canShowHeadsUp,
         numberTimeBanks,
@@ -100,13 +101,23 @@ function GameParamatersDialog(props) {
                     />
                     <TextFieldWrap
                         className={classes.field}
-                        label="Buyin"
+                        label="Max Buyin"
                         variant="standard"
                         onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
                         value={maxBuyin}
                         min={MIN_VALUES.BUY_IN}
                         max={MAX_VALUES.BUY_IN}
                         type="number"
+                    />
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Min Buyin"
+                        onChange={(event) => setIntoGameParameters('minBuyin', event.target.value)}
+                        value={minBuyin}
+                        type="number"
+                        variant="standard"
+                        min={0}
+                        max={MAX_VALUES.BUY_IN}
                     />
                     <TextFieldWrap
                         className={classes.field}
@@ -137,6 +148,7 @@ function GameParamatersDialog(props) {
                         min={MIN_VALUES.MAX_PLAYERS}
                         max={MAX_VALUES.MAX_PLAYERS}
                     />
+
                     <RadioForm
                         className={classes.field}
                         label="Allow Straddle"

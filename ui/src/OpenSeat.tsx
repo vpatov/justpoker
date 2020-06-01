@@ -44,15 +44,9 @@ function OpenSeat(props) {
     const { className, style, seatNumber } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
     const [name, setName] = useState(localStorage.getItem(NAME_LOCAL_STORAGE_KEY) || '');
-    const { maxPlayers } = useSelector(selectGameParameters);
+    const { maxBuyin, minBuyin } = useSelector(selectGameParameters);
 
-    const [minBuyin, setMinBuyin] = useState(25);
-    // TODO maxBuyin should be read from game parameters.
-    // TODO when entering the buyin amount, the textbox adjusts it too quickly.
-    // For instance, if the minimum is 25, and you want to buyin for 50, when you
-    // type the first 5, the text box automatically changes it to 25.
-    const [maxBuyin, setMaxBuyin] = useState(200);
-    const [buyin, setBuyin] = useState(100);
+    const [buyin, setBuyin] = useState<number | undefined>();
 
     const dialogClose = () => {
         setDialogOpen(false);
@@ -67,6 +61,9 @@ function OpenSeat(props) {
     }
 
     function invalidBuyin() {
+        if (buyin === undefined) {
+            return false;
+        }
         return buyin < minBuyin || buyin > maxBuyin;
     }
 
@@ -75,7 +72,7 @@ function OpenSeat(props) {
     }
 
     function formInvalid() {
-        return invalidBuyin() || invalidName();
+        return invalidBuyin() || invalidName() || buyin === undefined;
     }
 
     function onSubmitSitDownForm() {
@@ -141,7 +138,7 @@ function OpenSeat(props) {
                         }}
                         max={maxBuyin}
                         error={invalidBuyin()}
-                        helperText={invalidBuyin() ? `Min Buy In is ${minBuyin}` : ''}
+                        helperText={invalidBuyin() ? `Min Buyin is ${minBuyin}` : ''}
                     />
                 </DialogContent>
                 <DialogActions>
