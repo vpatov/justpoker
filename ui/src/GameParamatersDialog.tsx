@@ -12,6 +12,7 @@ import { MIN_VALUES, MAX_VALUES } from './shared/util/consts';
 import { GameType } from './shared/models/game';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import RadioForm from './reuseable/RadioForm';
+import IconTooltip from './reuseable/IconTooltip';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,6 +30,11 @@ const useStyles = makeStyles((theme: Theme) =>
             margin: '12px',
             color: 'white',
             width: 240,
+            display: 'flex',
+        },
+        iconTip: {
+            margin: '0px 12px',
+            alignSelf: 'center',
         },
         button: {
             width: '100%',
@@ -149,61 +155,95 @@ function GameParamatersDialog(props) {
                         max={MAX_VALUES.MAX_PLAYERS}
                     />
 
-                    <RadioForm
-                        className={classes.field}
-                        label="Allow Straddle"
-                        onChange={(event) => setIntoGameParameters('allowStraddle', event.target.value === 'true')}
-                        value={allowStraddle + ''}
-                        options={[
-                            { label: 'Allow', value: 'true' },
-                            { label: 'Disallow', value: 'false' },
-                        ]}
-                        radioGroupProps={{ row: true }}
-                    />
-                    <RadioForm
-                        className={classes.field}
-                        label="Can Show Heads Up"
-                        onChange={(event) => setIntoGameParameters('canShowHeadsUp', event.target.value === 'true')}
-                        value={canShowHeadsUp + ''}
-                        options={[
-                            { label: 'Can Show', value: 'true' },
-                            { label: "Can't Show", value: 'false' },
-                        ]}
-                        radioGroupProps={{ row: true }}
-                    />
-                    <RadioForm
-                        className={classes.field}
-                        label="Time Banks"
-                        onChange={(event) => setIntoGameParameters('allowTimeBanks', event.target.value === 'true')}
-                        value={allowTimeBanks + ''}
-                        options={[
-                            { label: 'On', value: 'true' },
-                            { label: 'Off', value: 'false' },
-                        ]}
-                        radioGroupProps={{ row: true }}
-                    />
-                    <TextFieldWrap
-                        className={classes.field}
-                        label="Number of Time Banks"
-                        onChange={(event) => setIntoGameParameters('numberTimeBanks', event.target.value)}
-                        value={numberTimeBanks}
-                        type="number"
-                        variant="standard"
-                        disabled={!allowTimeBanks}
-                        min={MIN_VALUES.NUMBER_TIME_BANKS}
-                        max={MAX_VALUES.NUMBER_TIME_BANKS}
-                    />
-                    <TextFieldWrap
-                        className={classes.field}
-                        label="Time Bank Time"
-                        onChange={(event) => setIntoGameParameters('timeBankTime', event.target.value)}
-                        value={timeBankTime}
-                        type="number"
-                        variant="standard"
-                        disabled={!allowTimeBanks}
-                        min={MIN_VALUES.TIME_BANK_TIME}
-                        max={MAX_VALUES.TIME_BANK_TIME}
-                    />
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="Gives players ability to straddle. That is, the player to the left of the big blind bets twice the big blind before the cards are dealt."
+                            placement="left"
+                        />
+                        <RadioForm
+                            label="Allow Straddle"
+                            onChange={(event) => setIntoGameParameters('allowStraddle', event.target.value === 'true')}
+                            value={allowStraddle + ''}
+                            options={[
+                                { label: 'Allow', value: 'true' },
+                                { label: 'Disallow', value: 'false' },
+                            ]}
+                            radioGroupProps={{ row: true }}
+                        />
+                    </div>
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="Gives players ability to show some or all of their hole cards once heads up with another player."
+                            placement="left"
+                        />
+                        <RadioForm
+                            className={classes.field}
+                            label="Can Show Heads Up"
+                            onChange={(event) => setIntoGameParameters('canShowHeadsUp', event.target.value === 'true')}
+                            value={canShowHeadsUp + ''}
+                            options={[
+                                { label: 'Can Show', value: 'true' },
+                                { label: "Can't Show", value: 'false' },
+                            ]}
+                            radioGroupProps={{ row: true }}
+                        />
+                    </div>
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="Give players ability use a time bank which extends their time to act on that turn by a fixed amount."
+                            placement="left"
+                        />
+                        <RadioForm
+                            className={classes.field}
+                            label="Time Banks"
+                            onChange={(event) => setIntoGameParameters('allowTimeBanks', event.target.value === 'true')}
+                            value={allowTimeBanks + ''}
+                            options={[
+                                { label: 'On', value: 'true' },
+                                { label: 'Off', value: 'false' },
+                            ]}
+                            radioGroupProps={{ row: true }}
+                        />
+                    </div>
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="The number of time banks a player is given at buyin."
+                            placement="left"
+                        />
+                        <TextFieldWrap
+                            className={classes.field}
+                            label="Number of Time Banks"
+                            onChange={(event) => setIntoGameParameters('numberTimeBanks', event.target.value)}
+                            value={numberTimeBanks}
+                            type="number"
+                            variant="standard"
+                            disabled={!allowTimeBanks}
+                            min={MIN_VALUES.NUMBER_TIME_BANKS}
+                            max={MAX_VALUES.NUMBER_TIME_BANKS}
+                        />
+                    </div>
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="The number of seconds by which a players time to act is extended after using a time bank."
+                            placement="left"
+                        />
+                        <TextFieldWrap
+                            className={classes.field}
+                            label="Time Bank Time"
+                            onChange={(event) => setIntoGameParameters('timeBankTime', event.target.value)}
+                            value={timeBankTime}
+                            type="number"
+                            variant="standard"
+                            disabled={!allowTimeBanks}
+                            min={MIN_VALUES.TIME_BANK_TIME}
+                            max={MAX_VALUES.TIME_BANK_TIME}
+                        />
+                    </div>
                 </div>
             </DialogContent>
             <DialogActions>

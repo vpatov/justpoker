@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
         overflowY: 'auto',
         flex: '1 1 500px',
         marginBottom: 'min(96px, 8vh)',
+        position: 'relative',
     },
     fieldCont: {
         minWidth: '200px',
@@ -42,6 +43,12 @@ const useStyles = makeStyles((theme) => ({
     button: {
         width: '100%',
         margin: '12px 0',
+    },
+    advButton: {
+        margin: '12px',
+        position: 'absolute',
+        top: 0,
+        right: 0,
     },
 }));
 
@@ -133,7 +140,7 @@ function MakeGame(props) {
                     <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
                     <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
                 </Select>
-                <Button className={classes.button} onClick={() => SET_showAdvanced(!showAdvanced)}>
+                <Button className={classes.advButton} onClick={() => SET_showAdvanced(!showAdvanced)}>
                     Advanced Settings
                 </Button>
                 <Button
