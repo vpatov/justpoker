@@ -188,7 +188,7 @@ export class EventProcessorService {
             updates: [ServerStateKey.ANIMATION],
         },
         [ClientActionType.SETGAMEPARAMETERS]: {
-            validation: (uuid, req) => this.validationService.validateSetGameParameters(uuid),
+            validation: (uuid, req) => this.validationService.validateSetGameParameters(uuid, req.gameParameters),
             perform: (uuid, req: SetGameParametersRequest) => {
                 if (this.gameStateManager.isGameInProgress()) {
                     this.gameStateManager.queueAction({
