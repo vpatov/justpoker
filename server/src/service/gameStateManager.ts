@@ -573,6 +573,11 @@ export class GameStateManager {
         return this.isGameInProgress() && this.shouldDealNextHand() === false;
     }
 
+    // Used to display message to users that game will change
+    gameParametersWillChangeAfterHand(): boolean {
+        return this.getQueuedServerActions().some((action) => action.actionType === ClientActionType.SETGAMEPARAMETERS);
+    }
+
     isGameInProgress() {
         return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
     }

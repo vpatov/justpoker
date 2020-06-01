@@ -59,6 +59,7 @@ export declare interface Global {
     gameWillStopAfterHand: boolean;
     unqueueAllBettingRoundActions: boolean;
     areOpenSeats: boolean;
+    gameParametersWillChangeAfterHand: boolean;
 }
 
 export declare interface Controller {
@@ -276,6 +277,7 @@ export function getCleanGlobal(): Global {
         isGameInProgress: false,
         canStartGame: false,
         gameWillStopAfterHand: false,
+        gameParametersWillChangeAfterHand: false,
         unqueueAllBettingRoundActions: true,
         areOpenSeats: true,
     };
@@ -365,6 +367,7 @@ export const TestGame: UiGameState = {
         gameWillStopAfterHand: true,
         unqueueAllBettingRoundActions: true,
         areOpenSeats: true,
+        gameParametersWillChangeAfterHand: true,
     },
     controller: {
         showWarningOnFold: true,

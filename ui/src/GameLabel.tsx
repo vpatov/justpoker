@@ -27,14 +27,18 @@ const useStyles = makeStyles((theme: Theme) =>
 function GameLabel(props) {
     const classes = useStyles();
     const {} = props;
-    const globalData = useSelector(globalGameStateSelector);
+    const { gameWillStopAfterHand, gameParametersWillChangeAfterHand } = useSelector(globalGameStateSelector);
     const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
 
     return (
         <div className={classes.root}>
-            {globalData.gameWillStopAfterHand ? (
+            {gameParametersWillChangeAfterHand ? (
+                <Typography className={classes.pause}>{`Game settings will change after this hand.`}</Typography>
+            ) : null}
+            {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
+
             <Typography className={classes.text}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
         </div>
     );
