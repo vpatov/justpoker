@@ -71,7 +71,6 @@ function MakeGame(props) {
     }
 
     const onGameParamatersDialogSave = (gameParameters: GameParameters) => {
-        console.log('makegame', gameParameters);
         SET_gameParameters(gameParameters);
         SET_showAdvanced(false);
     };
@@ -135,7 +134,7 @@ function MakeGame(props) {
                     <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
                 </Select>
                 <Button className={classes.button} onClick={() => SET_showAdvanced(!showAdvanced)}>
-                    Show Advanced Settings
+                    Advanced Settings
                 </Button>
                 <Button
                     id={'ID_CreateGameButton'}

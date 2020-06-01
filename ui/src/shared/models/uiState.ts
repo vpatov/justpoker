@@ -211,14 +211,14 @@ export const VOLUME_BUTTON: MenuButton = {
     label: 'Volume',
 };
 
-export const SETTINGS_BUTTON: MenuButton = {
-    action: UiActionType.SETTINGS,
-    label: 'Settings',
+export const USER_SETTINGS_BUTTON: MenuButton = {
+    action: UiActionType.USER_SETTINGS,
+    label: 'User Settings',
 };
 
-export const ADMIN_BUTTON: MenuButton = {
-    action: UiActionType.ADMIN,
-    label: 'Admin',
+export const GAME_SETTINGS_BUTTON: MenuButton = {
+    action: UiActionType.GAME_SETTINGS,
+    label: 'Game Settings',
 };
 
 export const LEDGER_BUTTON: MenuButton = {
@@ -237,8 +237,8 @@ export const ALL_MENU_BUTTONS = [
     STOP_GAME_BUTTON,
     LEAVE_TABLE_BUTTON,
     VOLUME_BUTTON,
-    SETTINGS_BUTTON,
-    ADMIN_BUTTON,
+    USER_SETTINGS_BUTTON,
+    GAME_SETTINGS_BUTTON,
 ];
 
 /* Common bet sizes */

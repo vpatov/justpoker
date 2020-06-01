@@ -11,8 +11,8 @@ import {
     BET_BUTTON,
     START_GAME_BUTTON,
     STOP_GAME_BUTTON,
-    ADMIN_BUTTON,
-    SETTINGS_BUTTON,
+    GAME_SETTINGS_BUTTON,
+    USER_SETTINGS_BUTTON,
     VOLUME_BUTTON,
     UiChatMessage,
     BettingRoundActionButton,
@@ -253,10 +253,10 @@ export class StateConverter {
     getValidMenuButtons(clientUUID: ClientUUID): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        const menuButtons = [SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
+        const menuButtons = [USER_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
 
         if (this.gameStateManager.isPlayerAdmin(clientUUID)) {
-            menuButtons.push(ADMIN_BUTTON);
+            menuButtons.push(GAME_SETTINGS_BUTTON);
             if (
                 (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) ||
                 this.gameStateManager.gameWillStopAfterHand()

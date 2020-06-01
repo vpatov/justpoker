@@ -10,6 +10,7 @@ import {
     createTimeoutEvent,
     ShowCardRequest,
     PlayerReactionRequest,
+    SetGameParametersRequest,
 } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService } from './validationService';
@@ -185,6 +186,20 @@ export class EventProcessorService {
             perform: (uuid, req: PlayerReactionRequest) =>
                 this.animationService.setPlayerReaction(req.playerUUID, req.reaction),
             updates: [ServerStateKey.ANIMATION],
+        },
+        [ClientActionType.SETGAMEPARAMETERS]: {
+            validation: (uuid, req) => this.validationService.validateSetGameParameters(uuid),
+            perform: (uuid, req: SetGameParametersRequest) => {
+                if (this.gameStateManager.isGameInProgress()) {
+                    this.gameStateManager.queueAction({
+                        actionType: ClientActionType.SETGAMEPARAMETERS,
+                        args: [req.gameParameters],
+                    });
+                } else {
+                    this.gameStateManager.setGameParameters(req.gameParameters);
+                }
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
     };
 

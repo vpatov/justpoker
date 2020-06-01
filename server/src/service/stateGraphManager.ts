@@ -265,6 +265,12 @@ export class StateGraphManager {
             case ClientActionType.BOOTPLAYER: {
                 const playerUUID = [...action.args][0];
                 this.gameStateManager.bootPlayerFromGame(playerUUID);
+                break;
+            }
+            case ClientActionType.SETGAMEPARAMETERS: {
+                const gameParameters = action.args[0];
+                this.gameStateManager.setGameParameters(gameParameters);
+                break;
             }
         }
     }

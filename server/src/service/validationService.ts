@@ -501,4 +501,8 @@ export class ValidationService {
         }
         return undefined;
     }
+
+    validateSetGameParameters(clientUUID: ClientUUID): ValidationResponse {
+        return undefined;
+    }
 }

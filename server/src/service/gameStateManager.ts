@@ -879,6 +879,10 @@ export class GameStateManager {
         this.getPlayer(playerUUID).lastActionType = lastActionType;
     }
 
+    setGameParameters(gameParameters: GameParameters) {
+        this.gameState.gameParameters = gameParameters;
+    }
+
     changePlayerName(playerUUID: PlayerUUID, name: string) {
         this.getPlayer(playerUUID).name = name;
         this.ledgerService.addAlias(this.getClientByPlayerUUID(playerUUID), name);

@@ -15,6 +15,7 @@ import RadioForm from './reuseable/RadioForm';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
+        dialog: {},
         root: {
             display: 'flex',
             justifyContent: 'center',
@@ -66,9 +67,14 @@ function GameParamatersDialog(props) {
         SET_curGameParameters({ ...curGameParameters, [field]: value });
     }
 
-    console.log('cur', curGameParameters);
     return (
-        <Dialog open={open} maxWidth="lg" fullWidth onKeyPress={(event) => onPressEnter(event)}>
+        <Dialog
+            className={classes.dialog}
+            open={open}
+            maxWidth="md"
+            fullWidth
+            onKeyPress={(event) => onPressEnter(event)}
+        >
             <DialogTitle>{`Game Settings`}</DialogTitle>
             <DialogContent>
                 <div className={classes.root}>
