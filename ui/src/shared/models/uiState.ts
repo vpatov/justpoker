@@ -2,7 +2,7 @@ import { Suit, genRandomCard } from './cards';
 import { ClientActionType, UiActionType } from './api';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
-import { AnimationTrigger } from './animationState';
+import { AnimationState, getCleanAnimationState } from './animationState';
 import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../util/consts';
@@ -30,7 +30,7 @@ export declare interface UiState {
     game: UiGameState;
     audio: SoundByte;
     chat: UiChatMessage;
-    animation: AnimationTrigger;
+    animation: AnimationState;
     userPreferences?: UserPreferences;
 }
 
@@ -307,7 +307,7 @@ export const CleanRootState: UiState = {
     game: getCleanGame(),
     audio: SoundByte.NONE,
     chat: getCleanChatMessage(),
-    animation: AnimationTrigger.NONE,
+    animation: getCleanAnimationState(),
 };
 
 export const testUiChatLog: UiChatLog = {

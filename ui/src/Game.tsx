@@ -9,6 +9,7 @@ import GameMenu from './GameMenu';
 import GameLabel from './GameLabel';
 import ControllerTimer from './ControllerTimer';
 import GameDisconnetionMessage from './GameDisconnetionMessage';
+import ReactionPicker from './ReactionPicker';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -47,6 +48,7 @@ function Game(props) {
             {wsConnClosed ? <GameDisconnetionMessage /> : null}
             <div className={classnames(classes.root, { [classes.disabled]: wsConnClosed })}>
                 <GameMenu />
+                <ReactionPicker />
                 <div className={classes.gameTableCont}>
                     <GameLabel />
                     <Table className={classes.table} />

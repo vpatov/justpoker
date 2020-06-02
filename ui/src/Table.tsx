@@ -118,21 +118,19 @@ function Table(props) {
 
             if (player) {
                 ans.push(
-                    <Fragment>
-                        <Player
-                            key={index}
-                            setHeroRotation={(r) => {
-                                setHeroRotation(r);
-                            }}
-                            virtualPositon={mod(index + offset - 1, 9)}
-                            player={player}
-                            className={classes.player}
-                            style={{
-                                top: `${pPos.y}${H_UNIT}`,
-                                left: `${pPos.x}${W_UNIT}`,
-                            }}
-                        />
-                    </Fragment>,
+                    <Player
+                        key={index}
+                        setHeroRotation={(r) => {
+                            setHeroRotation(r);
+                        }}
+                        virtualPositon={mod(index + offset - 1, 9)}
+                        player={player}
+                        className={classes.player}
+                        style={{
+                            top: `${pPos.y}${H_UNIT}`,
+                            left: `${pPos.x}${W_UNIT}`,
+                        }}
+                    />,
                 );
             } else if (!heroIsSeated) {
                 ans.push(
@@ -149,6 +147,7 @@ function Table(props) {
             } else {
                 ans.push(
                     <EmptySeat
+                        key={index}
                         className={classes.openSeat}
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
@@ -185,6 +184,7 @@ function Table(props) {
             if (player && player.bet) {
                 ans.push(
                     <Bet
+                        key={index}
                         style={{
                             position: 'absolute',
                             top: `${bPos.y}${H_UNIT}`,
@@ -214,17 +214,17 @@ function Table(props) {
                         Start Game
                     </Button>
                 ) : null}
-                {isGameInProgress
-                    ? [
-                          <PotTable
-                              activePot={activePot}
-                              fullPot={fullPot}
-                              inactivePots={inactivePots}
-                              awardPots={awardPots}
-                          />,
-                          <CommunityCards communityCards={communityCards} />,
-                      ]
-                    : null}
+                {isGameInProgress ? (
+                    <>
+                        <PotTable
+                            activePot={activePot}
+                            fullPot={fullPot}
+                            inactivePots={inactivePots}
+                            awardPots={awardPots}
+                        />
+                        <CommunityCards communityCards={communityCards} />
+                    </>
+                ) : null}
                 {players.length < 2 && !isGameInProgress ? <TableCopyLink /> : null}
             </div>
 
