@@ -1,4 +1,4 @@
-import { BettingRoundAction, GameType } from './game';
+import { BettingRoundAction, GameType, GameParameters } from './game';
 import { Suit, Card } from './cards';
 import { GameInstanceUUID, ClientUUID, PlayerUUID } from './uuid';
 import { ReactionTrigger } from './animationState';
@@ -56,6 +56,7 @@ export enum ClientActionType {
     USETIMEBANK = 'USETIMEBANK',
     SHOWCARD = 'SHOWCARD',
     REACTION = 'REACTION',
+    SETGAMEPARAMETERS = 'SETGAMEPARAMETERS',
 }
 
 export enum ServerActionType {
@@ -64,8 +65,8 @@ export enum ServerActionType {
 
 export enum UiActionType {
     VOLUME = 'VOLUME',
-    SETTINGS = 'SETTINGS',
-    ADMIN = 'ADMIN',
+    GAME_SETTINGS = 'GAME_SETTINGS',
+    USER_SETTINGS = 'USER_SETTINGS',
     OPEN_LEDGER = 'OPEN_LEDGER',
 }
 
@@ -113,6 +114,10 @@ export declare interface PlayerReactionRequest {
     reaction: ReactionTrigger;
 }
 
+export declare interface SetGameParametersRequest {
+    gameParameters: GameParameters;
+}
+
 export type ClientWsMessageRequest = SitDownRequest &
     JoinTableRequest &
     (SitDownRequest & JoinTableRequest) &
@@ -123,7 +128,8 @@ export type ClientWsMessageRequest = SitDownRequest &
     ClientChatMessage &
     BootPlayerRequest &
     ShowCardRequest &
-    PlayerReactionRequest;
+    PlayerReactionRequest &
+    SetGameParametersRequest;
 
 export declare interface ClientWsMessage {
     actionType: ClientActionType;
