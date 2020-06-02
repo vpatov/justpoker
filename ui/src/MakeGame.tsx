@@ -6,9 +6,13 @@ import { MIN_VALUES, MAX_VALUES } from './shared/util/consts';
 
 import { makeStyles } from '@material-ui/core/styles';
 import TextFieldWrap from './reuseable/TextFieldWrap';
+
 import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
-import { GameType } from './shared/models/game';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import { GameType, getDefaultGameParameters, GameParameters } from './shared/models/game';
+import GameParamatersDialog from './GameParamatersDialog';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -17,24 +21,36 @@ const useStyles = makeStyles((theme) => ({
         border: '1px solid black',
         borderRadius: 12,
         width: '40%',
-        maxWidth: '700px',
-        padding: 'min(12px, 1vmin)',
+        maxWidth: '1000px',
+        maxHeight: '900px',
+        padding: 'min(24px, 2vmin)',
         justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        overflowY: 'auto',
+        flex: '1 1 500px',
+        marginTop: 12,
+        marginBottom: 'min(96px, 8vh)',
+        position: 'relative',
     },
     fieldCont: {
-        width: '90%',
         maxWidth: '300px',
-        display: 'flex',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
     },
     field: {
         width: '100%',
         margin: '12px auto',
+        color: 'white',
     },
+
     button: {
-        width: 300,
-        margin: 24,
+        width: '100%',
+        margin: '12px 0',
+    },
+    advButton: {
+        margin: '12px',
+        position: 'absolute',
+        top: 0,
+        right: 0,
     },
 }));
 
@@ -42,20 +58,12 @@ function MakeGame(props) {
     const classes = useStyles();
     const { history } = props;
 
-    const [name, setName] = useState('DefaultPlayer');
-    const [bigBlind, setBigBlind] = useState(2);
-    const [smallBlind, setSmallBlind] = useState(1);
-    const [maxBuyin, setMaxBuyin] = useState(200);
-    const [timeToAct, setTimeToAct] = useState(30);
-    const [password, setPassword] = useState('');
-    const [gameType, setGameType] = useState(GameType.NLHOLDEM);
+    const [showAdvanced, SET_showAdvanced] = useState(false);
+    const [gameParameters, SET_gameParameters] = useState(getDefaultGameParameters());
+    const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType } = gameParameters;
 
     function canCreate() {
         return true;
-        if (name && bigBlind && smallBlind && maxBuyin) {
-            return true;
-        }
-        return false;
     }
 
     const createSuccess = (response) => {
@@ -67,16 +75,18 @@ function MakeGame(props) {
         console.log(err);
     };
 
-    // TODO use the NewGameForm interface
+    function setIntoGameParameters(field, value) {
+        SET_gameParameters({ ...gameParameters, [field]: value });
+    }
+
+    const onGameParamatersDialogSave = (gameParameters: GameParameters) => {
+        SET_gameParameters(gameParameters);
+        SET_showAdvanced(false);
+    };
+
     function handleCreateGame() {
         const createReq = {
-            name,
-            bigBlind,
-            smallBlind,
-            maxBuyin,
-            timeToAct,
-            password,
-            gameType,
+            gameParameters: gameParameters,
         };
         createGame(createReq, createSuccess, createFailure);
     }
@@ -88,7 +98,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Small Blind"
                     variant="standard"
-                    onChange={(event) => setSmallBlind(Number(event.target.value))}
+                    onChange={(event) => setIntoGameParameters('smallBlind', event.target.value)}
                     value={smallBlind}
                     min={MIN_VALUES.SMALL_BLIND}
                     max={MAX_VALUES.SMALL_BLIND}
@@ -98,7 +108,7 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Big Blind"
                     variant="standard"
-                    onChange={(event) => setBigBlind(Number(event.target.value))}
+                    onChange={(event) => setIntoGameParameters('bigBlind', event.target.value)}
                     value={bigBlind}
                     min={MIN_VALUES.BIG_BLIND}
                     max={MAX_VALUES.BIG_BLIND}
@@ -106,9 +116,9 @@ function MakeGame(props) {
                 />
                 <TextFieldWrap
                     className={classes.field}
-                    label="Buyin"
+                    label="Max Buyin"
                     variant="standard"
-                    onChange={(event) => setMaxBuyin(Number(event.target.value))}
+                    onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
                     value={maxBuyin}
                     min={MIN_VALUES.BUY_IN}
                     max={MAX_VALUES.BUY_IN}
@@ -118,20 +128,26 @@ function MakeGame(props) {
                     className={classes.field}
                     label="Time To Act"
                     variant="standard"
-                    onChange={(event) => setTimeToAct(Number(event.target.value))}
+                    onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
                     value={timeToAct}
                     min={MIN_VALUES.TIME_TO_ACT}
                     max={MAX_VALUES.TIME_TO_ACT}
                     type="number"
-                />
-                <Select
-                    className={classes.field}
-                    value={gameType}
-                    onChange={(event) => setGameType(event.target.value as GameType)}
-                >
-                    <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
-                    <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
-                </Select>
+                />{' '}
+                <FormControl className={classes.field}>
+                    <InputLabel>Game Type</InputLabel>
+                    <Select
+                        className={classes.field}
+                        value={gameType}
+                        onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
+                    >
+                        <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
+                        <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
+                    </Select>
+                </FormControl>
+                <Button className={classes.advButton} onClick={() => SET_showAdvanced(!showAdvanced)}>
+                    Advanced Settings
+                </Button>
                 <Button
                     id={'ID_CreateGameButton'}
                     className={classes.button}
@@ -143,6 +159,14 @@ function MakeGame(props) {
                 >
                     Create Game
                 </Button>
+                {showAdvanced ? (
+                    <GameParamatersDialog
+                        open={showAdvanced}
+                        gameParameters={gameParameters}
+                        onCancel={() => SET_showAdvanced(false)}
+                        onSave={onGameParamatersDialogSave}
+                    />
+                ) : null}
             </div>
         </div>
     );

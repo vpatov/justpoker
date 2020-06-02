@@ -9,6 +9,8 @@ import {
     ServerActionType,
     createTimeoutEvent,
     ShowCardRequest,
+    PlayerReactionRequest,
+    SetGameParametersRequest,
 } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
 import { ValidationService } from './validationService';
@@ -22,6 +24,7 @@ import { GameInstanceManager } from './gameInstanceManager';
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '..//server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/uuid';
+import { AnimationService } from './animationService';
 
 declare interface ActionProcessor {
     validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -43,6 +46,7 @@ export class EventProcessorService {
         private readonly stateGraphManager: StateGraphManager,
         private readonly gameInstanceManager: GameInstanceManager,
         private readonly connectedClientManager: ConnectedClientManager,
+        private readonly animationService: AnimationService,
     ) {}
 
     eventProcessor: EventProcessor = {
@@ -175,6 +179,26 @@ export class EventProcessorService {
             validation: (uuid, req) => this.validationService.validateShowCardAction(uuid, req.cards),
             perform: (uuid, req: ShowCardRequest) =>
                 req.cards.forEach((card) => this.gameStateManager.setPlayerCardsVisible(req.playerUUID, card)),
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.REACTION]: {
+            validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
+            perform: (uuid, req: PlayerReactionRequest) =>
+                this.animationService.setPlayerReaction(req.playerUUID, req.reaction),
+            updates: [ServerStateKey.ANIMATION],
+        },
+        [ClientActionType.SETGAMEPARAMETERS]: {
+            validation: (uuid, req) => this.validationService.validateSetGameParameters(uuid, req.gameParameters),
+            perform: (uuid, req: SetGameParametersRequest) => {
+                if (this.gameStateManager.isGameInProgress()) {
+                    this.gameStateManager.queueAction({
+                        actionType: ClientActionType.SETGAMEPARAMETERS,
+                        args: [req.gameParameters],
+                    });
+                } else {
+                    this.gameStateManager.setGameParameters(req.gameParameters);
+                }
+            },
             updates: [ServerStateKey.GAMESTATE],
         },
     };

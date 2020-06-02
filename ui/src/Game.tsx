@@ -8,6 +8,7 @@ import ChatLog from './ChatLog';
 import GameMenu from './GameMenu';
 import GameLabel from './GameLabel';
 import ControllerTimer from './ControllerTimer';
+import ReactionPicker from './ReactionPicker';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -41,6 +42,7 @@ function Game(props) {
     return (
         <div className={classes.root}>
             <GameMenu mute={mute} SET_mute={SET_mute} />
+            <ReactionPicker />
             <div className={classes.gameTableCont}>
                 <GameLabel />
                 <Table className={classes.table} />

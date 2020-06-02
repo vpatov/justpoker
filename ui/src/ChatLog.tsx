@@ -13,10 +13,7 @@ import EmojiPicker from './EmojiPicker';
 
 import { WsServer } from './api/ws';
 import { UiChatMessage } from './shared/models/uiState';
-import { Popper } from '@material-ui/core';
 import { getPlayerNameColor } from './style/colors';
-import { playerListSelector } from './store/selectors';
-import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

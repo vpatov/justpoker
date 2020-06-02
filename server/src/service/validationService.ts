@@ -1,6 +1,11 @@
 import { Service } from 'typedi';
 import { GameStateManager } from './gameStateManager';
-import { BettingRoundActionType, BettingRoundAction, GameType } from '../../../ui/src/shared/models/game';
+import {
+    BettingRoundActionType,
+    BettingRoundAction,
+    GameType,
+    GameParameters,
+} from '../../../ui/src/shared/models/game';
 import {
     SitDownRequest,
     JoinTableRequest,
@@ -13,6 +18,7 @@ import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../u
 import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
 import { Card, cardsAreEqual } from '../../../ui/src/shared/models/cards';
 import { debugFunc } from '../logger';
+import { MIN_VALUES, MAX_VALUES } from '../../../ui/src/shared/util/consts';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -146,9 +152,15 @@ export class ValidationService {
         // if (error) {
         //     return error;
         // }
+        if (!this.gsm.areOpenSeats()) {
+            return {
+                errorString: `There are no open seats left at this table`,
+                errorType: ErrorType.NO_OPEN_SEATS,
+            };
+        }
         if (request.name.length > MAX_NAME_LENGTH) {
             return {
-                errorString: `Name ${request.name} is too long - exceeds limit of 32 characters.`,
+                errorString: `Name ${request.name} is too long - exceeds limit of ${MAX_NAME_LENGTH} characters.`,
                 errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
             };
         }
@@ -475,6 +487,13 @@ export class ValidationService {
     }
 
     validateUseTimeBankAction(clientUUID: ClientUUID) {
+        const { allowTimeBanks } = this.gsm.getGameParameters();
+        if (!allowTimeBanks) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Time bank are not enabled in this game.`,
+            };
+        }
         const error = this.ensurePlayerCanActRightNow(clientUUID);
         if (error) {
             return error;
@@ -487,5 +506,59 @@ export class ValidationService {
             };
         }
         return undefined;
+    }
+
+    validateMinMaxValues(value: number, min: number, max: number, field?: string): ValidationResponse {
+        if (value > max) {
+            return {
+                errorType: ErrorType.ILLEGAL_VALUE,
+                errorString: `Value ${value}${field ? ` for field ${field}` : ''} exceeds max value ${max}`,
+            };
+        }
+        if (value < min) {
+            return {
+                errorType: ErrorType.ILLEGAL_VALUE,
+                errorString: `Value ${value}${field ? ` for field ${field}` : ''} is below min value ${max}`,
+            };
+        }
+        return undefined;
+    }
+
+    validateSetGameParameters(clientUUID: ClientUUID, gameParameters: GameParameters): ValidationResponse {
+        let error = this.ensureClientIsAdmin(clientUUID);
+        if (error) {
+            return error;
+        }
+        const minMaxErrors: ValidationResponse[] = [
+            this.validateMinMaxValues(
+                gameParameters.smallBlind,
+                MIN_VALUES.SMALL_BLIND,
+                MAX_VALUES.SMALL_BLIND,
+                'smallBlind',
+            ),
+            this.validateMinMaxValues(gameParameters.bigBlind, MIN_VALUES.BIG_BLIND, MAX_VALUES.BIG_BLIND, 'bigBlind'),
+            this.validateMinMaxValues(gameParameters.maxBuyin, MIN_VALUES.BUY_IN, MAX_VALUES.BUY_IN, 'maxBuyin'),
+            this.validateMinMaxValues(gameParameters.minBuyin, 0, MAX_VALUES.BUY_IN, 'minBuyin'),
+            this.validateMinMaxValues(
+                gameParameters.timeToAct,
+                MIN_VALUES.TIME_TO_ACT,
+                MAX_VALUES.TIME_TO_ACT,
+                'timeToAct',
+            ),
+            this.validateMinMaxValues(
+                gameParameters.numberTimeBanks,
+                MIN_VALUES.NUMBER_TIME_BANKS,
+                MAX_VALUES.NUMBER_TIME_BANKS,
+                'numberTimeBanks',
+            ),
+            this.validateMinMaxValues(
+                gameParameters.timeBankTime,
+                MIN_VALUES.TIME_BANK_TIME,
+                MAX_VALUES.TIME_BANK_TIME,
+                'timeBankTime',
+            ),
+        ];
+
+        return minMaxErrors.find((err) => err !== undefined);
     }
 }

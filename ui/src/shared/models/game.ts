@@ -25,8 +25,15 @@ export declare interface GameParameters {
     gameType: GameType;
     maxBuyin: number;
     timeToAct: number;
-    timeBankValue: number;
+
+    // advanced params
     maxPlayers: number;
+    minBuyin: number;
+    allowTimeBanks: boolean;
+    timeBankTime: number;
+    numberTimeBanks: number;
+    allowStraddle: boolean;
+    canShowHeadsUp: boolean;
 }
 
 export enum StraddleType {
@@ -87,3 +94,37 @@ export const ALL_BETTING_ROUND_ACTION_TYPES: BettingRoundActionType[] = [
     BettingRoundActionType.BET,
     BettingRoundActionType.CALL,
 ];
+
+export function getCleanGameParameters() {
+    return {
+        smallBlind: 0,
+        bigBlind: 0,
+        gameType: GameType.NLHOLDEM,
+        maxBuyin: 0,
+        minBuyin: 0,
+        timeToAct: 0,
+        maxPlayers: 0,
+        timeBankTime: 0,
+        numberTimeBanks: 0,
+        allowTimeBanks: false,
+        allowStraddle: false,
+        canShowHeadsUp: false,
+    };
+}
+
+export function getDefaultGameParameters() {
+    return {
+        smallBlind: 1,
+        bigBlind: 2,
+        gameType: GameType.NLHOLDEM,
+        maxBuyin: 200,
+        minBuyin: 50,
+        timeToAct: 30,
+        maxPlayers: 9,
+        timeBankTime: 30,
+        numberTimeBanks: 5,
+        allowTimeBanks: true,
+        allowStraddle: false,
+        canShowHeadsUp: false,
+    };
+}

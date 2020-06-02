@@ -8,7 +8,7 @@ import TableCopyLink from './TableCopyLink';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { tableSelector, playersSelector, globalGameStateSelector } from './store/selectors';
+import { tableSelector, playersSelector, globalGameStateSelector, selectGameParameters } from './store/selectors';
 import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
 import { WsServer } from './api/ws';
 
@@ -101,7 +101,8 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, heroIsSeated, isGameInProgress } = useSelector(globalGameStateSelector);
+    const { canStartGame, heroIsSeated, isGameInProgress, areOpenSeats } = useSelector(globalGameStateSelector);
+    const { maxPlayers } = useSelector(selectGameParameters);
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
@@ -118,23 +119,21 @@ function Table(props) {
 
             if (player) {
                 ans.push(
-                    <Fragment>
-                        <Player
-                            key={index}
-                            setHeroRotation={(r) => {
-                                setHeroRotation(r);
-                            }}
-                            virtualPositon={mod(index + offset - 1, 9)}
-                            player={player}
-                            className={classes.player}
-                            style={{
-                                top: `${pPos.y}${H_UNIT}`,
-                                left: `${pPos.x}${W_UNIT}`,
-                            }}
-                        />
-                    </Fragment>,
+                    <Player
+                        key={index}
+                        setHeroRotation={(r) => {
+                            setHeroRotation(r);
+                        }}
+                        virtualPositon={mod(index + offset - 1, 9)}
+                        player={player}
+                        className={classes.player}
+                        style={{
+                            top: `${pPos.y}${H_UNIT}`,
+                            left: `${pPos.x}${W_UNIT}`,
+                        }}
+                    />,
                 );
-            } else if (!heroIsSeated) {
+            } else if (!heroIsSeated && areOpenSeats) {
                 ans.push(
                     <OpenSeat
                         key={index}
@@ -149,6 +148,7 @@ function Table(props) {
             } else {
                 ans.push(
                     <EmptySeat
+                        key={index}
                         className={classes.openSeat}
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
@@ -185,6 +185,7 @@ function Table(props) {
             if (player && player.bet) {
                 ans.push(
                     <Bet
+                        key={index}
                         style={{
                             position: 'absolute',
                             top: `${bPos.y}${H_UNIT}`,
@@ -214,17 +215,17 @@ function Table(props) {
                         Start Game
                     </Button>
                 ) : null}
-                {isGameInProgress
-                    ? [
-                          <PotTable
-                              activePot={activePot}
-                              fullPot={fullPot}
-                              inactivePots={inactivePots}
-                              awardPots={awardPots}
-                          />,
-                          <CommunityCards communityCards={communityCards} />,
-                      ]
-                    : null}
+                {isGameInProgress ? (
+                    <>
+                        <PotTable
+                            activePot={activePot}
+                            fullPot={fullPot}
+                            inactivePots={inactivePots}
+                            awardPots={awardPots}
+                        />
+                        <CommunityCards communityCards={communityCards} />
+                    </>
+                ) : null}
                 {players.length < 2 && !isGameInProgress ? <TableCopyLink /> : null}
             </div>
 
