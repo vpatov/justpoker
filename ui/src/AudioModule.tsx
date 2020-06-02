@@ -29,7 +29,6 @@ function AudioModule(props) {
         Howler.mute(mute);
     }, [mute]);
 
-    console.log('AM', mute);
     const onReceiveNewAudioState = (soundByte: SoundByte) => {
         const audio = AUDIO_MAP[soundByte];
         if (audio) {
