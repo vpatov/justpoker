@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import {
     controllerSelector,
     heroHandLabelSelector,
-    allowStraddleSelector,
+    selectGameParameters,
     bettingRoundActionTypesToUnqueueSelector,
     isHeroSeatedSelector,
     heroPlayerUUIDSelector,
@@ -128,7 +128,7 @@ function ControllerComp(props: ControllerProps) {
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
-    const allowStraddle = useSelector(allowStraddleSelector);
+    const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
     const heroSeated = useSelector(isHeroSeatedSelector);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
@@ -276,12 +276,12 @@ function ControllerComp(props: ControllerProps) {
                     {showCardButtons?.length ? (
                         <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
                     ) : null}
-                    {heroSeated ? (
+                    {heroSeated && allowTimeBanks ? (
                         <Button
                             className={classnames(classes.timeBankButton, 'ani_timeBank')}
                             variant="outlined"
                             onClick={() => onClickTimeBank()}
-                            disabled={timeBanks === 0}
+                            disabled={timeBanks === 0 || !toAct}
                         >
                             {`Time Bank (${timeBanks})`}
                         </Button>

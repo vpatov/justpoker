@@ -1,6 +1,7 @@
-import { BettingRoundAction, GameType } from './game';
+import { BettingRoundAction, GameType, GameParameters } from './game';
 import { Suit, Card } from './cards';
 import { GameInstanceUUID, ClientUUID, PlayerUUID } from './uuid';
+import { ReactionTrigger } from './animationState';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
@@ -54,6 +55,8 @@ export enum ClientActionType {
     LEAVETABLE = 'LEAVETABLE',
     USETIMEBANK = 'USETIMEBANK',
     SHOWCARD = 'SHOWCARD',
+    REACTION = 'REACTION',
+    SETGAMEPARAMETERS = 'SETGAMEPARAMETERS',
 }
 
 export enum ServerActionType {
@@ -62,8 +65,8 @@ export enum ServerActionType {
 
 export enum UiActionType {
     VOLUME = 'VOLUME',
-    SETTINGS = 'SETTINGS',
-    ADMIN = 'ADMIN',
+    GAME_SETTINGS = 'GAME_SETTINGS',
+    USER_SETTINGS = 'USER_SETTINGS',
     OPEN_LEDGER = 'OPEN_LEDGER',
 }
 
@@ -106,6 +109,15 @@ export declare interface ShowCardRequest {
     cards: Card[];
 }
 
+export declare interface PlayerReactionRequest {
+    playerUUID: PlayerUUID;
+    reaction: ReactionTrigger;
+}
+
+export declare interface SetGameParametersRequest {
+    gameParameters: GameParameters;
+}
+
 export type ClientWsMessageRequest = SitDownRequest &
     JoinTableRequest &
     (SitDownRequest & JoinTableRequest) &
@@ -115,21 +127,13 @@ export type ClientWsMessageRequest = SitDownRequest &
     ClientStraddleRequest &
     ClientChatMessage &
     BootPlayerRequest &
-    ShowCardRequest;
+    ShowCardRequest &
+    PlayerReactionRequest &
+    SetGameParametersRequest;
 
 export declare interface ClientWsMessage {
     actionType: ClientActionType;
     request: ClientWsMessageRequest;
-}
-
-export declare interface NewGameForm {
-    gameType: GameType;
-    smallBlind: number;
-    bigBlind: number;
-    maxBuyin: number;
-    timeToAct: number;
-    password?: string;
-    adminOptions?: any;
 }
 
 export function createTimeoutEvent(gameInstanceUUID: GameInstanceUUID): Event {

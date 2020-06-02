@@ -1,4 +1,5 @@
 import React, { useState, Fragment } from 'react';
+import { useSelector } from 'react-redux';
 import classnames from 'classnames';
 import { WsServer } from './api/ws';
 import { ClientActionType } from './shared/models/api';
@@ -10,6 +11,7 @@ import grey from '@material-ui/core/colors/grey';
 import Typography from '@material-ui/core/Typography';
 import { ClientWsMessageRequest } from './shared/models/api';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
+import { selectGameParameters } from './store/selectors';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,18 +37,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const NAME_LOCAL_STORAGE_KEY = 'jp-last-used-name';
+
 function OpenSeat(props) {
     const classes = useStyles();
     const { className, style, seatNumber } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [name, setName] = useState('');
-    const [minBuyin, setMinBuyin] = useState(25);
-    // TODO maxBuyin should be read from game parameters.
-    // TODO when entering the buyin amount, the textbox adjusts it too quickly.
-    // For instance, if the minimum is 25, and you want to buyin for 50, when you
-    // type the first 5, the text box automatically changes it to 25.
-    const [maxBuyin, setMaxBuyin] = useState(200);
-    const [buyin, setBuyin] = useState(100);
+    const [name, setName] = useState(localStorage.getItem(NAME_LOCAL_STORAGE_KEY) || '');
+    const { maxBuyin, minBuyin } = useSelector(selectGameParameters);
+
+    const [buyin, setBuyin] = useState<number | undefined>();
 
     const dialogClose = () => {
         setDialogOpen(false);
@@ -61,6 +61,9 @@ function OpenSeat(props) {
     }
 
     function invalidBuyin() {
+        if (buyin === undefined) {
+            return false;
+        }
         return buyin < minBuyin || buyin > maxBuyin;
     }
 
@@ -69,7 +72,7 @@ function OpenSeat(props) {
     }
 
     function formInvalid() {
-        return invalidBuyin() || invalidName();
+        return invalidBuyin() || invalidName() || buyin === undefined;
     }
 
     function onSubmitSitDownForm() {
@@ -115,7 +118,10 @@ function OpenSeat(props) {
                         label="Name"
                         type="text"
                         fullWidth
-                        onChange={(event) => setName(event.target.value)}
+                        onChange={(event) => {
+                            setName(event.target.value);
+                            localStorage.setItem(NAME_LOCAL_STORAGE_KEY, event.target.value);
+                        }}
                         value={name}
                         variant="standard"
                         maxChars={24}
@@ -132,7 +138,7 @@ function OpenSeat(props) {
                         }}
                         max={maxBuyin}
                         error={invalidBuyin()}
-                        helperText={invalidBuyin() ? `Min Buy In is ${minBuyin}` : ''}
+                        helperText={invalidBuyin() ? `Min Buyin is ${minBuyin}` : ''}
                     />
                 </DialogContent>
                 <DialogActions>

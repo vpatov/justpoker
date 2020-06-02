@@ -2,11 +2,19 @@ import { Suit, genRandomCard } from './cards';
 import { ClientActionType, UiActionType } from './api';
 import { genRandomInt } from '../util/util';
 import { SoundByte } from './audioQueue';
-import { AnimationTrigger } from './animationState';
+import { AnimationState, getCleanAnimationState } from './animationState';
 import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../util/consts';
-import { GameType, BettingRoundActionType, BettingRoundAction, NOT_IN_HAND, CHECK_ACTION } from './game';
+import {
+    BettingRoundActionType,
+    BettingRoundAction,
+    NOT_IN_HAND,
+    CHECK_ACTION,
+    GameParameters,
+    getCleanGameParameters,
+    getDefaultGameParameters,
+} from './game';
 import { PlayerUUID, makeBlankUUID } from './uuid';
 
 export declare interface ErrorDisplay {
@@ -30,7 +38,7 @@ export declare interface UiState {
     game: UiGameState;
     audio: SoundByte;
     chat: UiChatMessage;
-    animation: AnimationTrigger;
+    animation: AnimationState;
     userPreferences?: UserPreferences;
 }
 
@@ -40,19 +48,18 @@ export declare interface UiGameState {
     table: Table;
     players: UiPlayer[];
     menu: MenuButton[];
+    gameParameters: GameParameters;
 }
 
 export declare interface Global {
     heroIsAdmin: boolean;
     heroIsSeated: boolean;
     isGameInProgress: boolean;
-    bigBlind: number;
-    smallBlind: number;
-    allowStraddle: boolean;
-    gameType: GameType;
     canStartGame: boolean;
     gameWillStopAfterHand: boolean;
     unqueueAllBettingRoundActions: boolean;
+    areOpenSeats: boolean;
+    gameParametersWillChangeAfterHand: boolean;
 }
 
 export declare interface Controller {
@@ -205,14 +212,14 @@ export const VOLUME_BUTTON: MenuButton = {
     label: 'Volume',
 };
 
-export const SETTINGS_BUTTON: MenuButton = {
-    action: UiActionType.SETTINGS,
-    label: 'Settings',
+export const USER_SETTINGS_BUTTON: MenuButton = {
+    action: UiActionType.USER_SETTINGS,
+    label: 'User Settings',
 };
 
-export const ADMIN_BUTTON: MenuButton = {
-    action: UiActionType.ADMIN,
-    label: 'Admin',
+export const GAME_SETTINGS_BUTTON: MenuButton = {
+    action: UiActionType.GAME_SETTINGS,
+    label: 'Game Settings',
 };
 
 export const LEDGER_BUTTON: MenuButton = {
@@ -231,8 +238,8 @@ export const ALL_MENU_BUTTONS = [
     STOP_GAME_BUTTON,
     LEAVE_TABLE_BUTTON,
     VOLUME_BUTTON,
-    SETTINGS_BUTTON,
-    ADMIN_BUTTON,
+    USER_SETTINGS_BUTTON,
+    GAME_SETTINGS_BUTTON,
 ];
 
 /* Common bet sizes */
@@ -268,13 +275,11 @@ export function getCleanGlobal(): Global {
         heroIsAdmin: false,
         heroIsSeated: false,
         isGameInProgress: false,
-        bigBlind: 2,
-        smallBlind: 1,
-        allowStraddle: false,
-        gameType: GameType.NLHOLDEM,
         canStartGame: false,
         gameWillStopAfterHand: false,
+        gameParametersWillChangeAfterHand: false,
         unqueueAllBettingRoundActions: true,
+        areOpenSeats: true,
     };
 }
 
@@ -290,6 +295,7 @@ export function getCleanGame(): UiGameState {
             communityCards: [],
         },
         players: [],
+        gameParameters: getCleanGameParameters(),
     };
 }
 
@@ -307,7 +313,7 @@ export const CleanRootState: UiState = {
     game: getCleanGame(),
     audio: SoundByte.NONE,
     chat: getCleanChatMessage(),
-    animation: AnimationTrigger.NONE,
+    animation: getCleanAnimationState(),
 };
 
 export const testUiChatLog: UiChatLog = {
@@ -352,17 +358,16 @@ shuffle(positions);
 
 export const TestGame: UiGameState = {
     menu: ALL_MENU_BUTTONS,
+    gameParameters: getDefaultGameParameters(),
     global: {
         heroIsSeated: true,
         heroIsAdmin: true,
         isGameInProgress: true,
-        bigBlind: 2,
-        smallBlind: 1,
-        allowStraddle: true,
-        gameType: GameType.NLHOLDEM,
         canStartGame: false,
         gameWillStopAfterHand: true,
         unqueueAllBettingRoundActions: true,
+        areOpenSeats: true,
+        gameParametersWillChangeAfterHand: true,
     },
     controller: {
         showWarningOnFold: true,

@@ -11,7 +11,6 @@ import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
 import Color from 'color';
 
-
 function computeColor(color: string) {
     return color.toString();
 }
@@ -27,7 +26,7 @@ export const Background = {
     blue: computeBackgroundGradient(blue[600]),
     purple: computeBackgroundGradient(deepPurple[600]),
     teal: computeBackgroundGradient(teal[500]),
-    yellow: computeBackgroundGradient(yellow[600]),
+    yellow: computeBackgroundGradient(yellow[700]),
     grey: computeBackgroundGradient(grey[700]),
     indigo: computeBackgroundGradient(indigo[800]),
     red: computeBackgroundGradient(red[700]),
@@ -50,8 +49,17 @@ export const PlayerColors: { [color: string]: string } = {
 };
 
 const playerColorKeys = Object.keys(PlayerColors);
+
 export function getPlayerNameColor(seatNumber: number) {
     if (seatNumber >= 0 || seatNumber < playerColorKeys.length) {
         return PlayerColors[playerColorKeys[seatNumber]];
     } else return computeColor(grey[400]);
+}
+
+export function getPlayerAvatarBackground(seatNumber: number) {
+    const color = getPlayerNameColor(seatNumber);
+    const c = Color(color);
+    const light = c.lighten(0.2).desaturate(0.2);
+    const dark = c.darken(0.3).desaturate(0);
+    return `radial-gradient(${dark.string()} 0%, ${light.string()})`;
 }

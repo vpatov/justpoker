@@ -11,8 +11,8 @@ import {
     BET_BUTTON,
     START_GAME_BUTTON,
     STOP_GAME_BUTTON,
-    ADMIN_BUTTON,
-    SETTINGS_BUTTON,
+    GAME_SETTINGS_BUTTON,
+    USER_SETTINGS_BUTTON,
     VOLUME_BUTTON,
     UiChatMessage,
     BettingRoundActionButton,
@@ -75,6 +75,10 @@ export class StateConverter {
         return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.CHAT);
     }
 
+    animationUpdated(): boolean {
+        return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.ANIMATION);
+    }
+
     // Hero refers to the player who is receiving this particular UiState.
     @debugFunc({ noResult: true })
     transformGameStateToUIState(clientUUID: ClientUUID, sendAll: boolean): UiState {
@@ -112,10 +116,11 @@ export class StateConverter {
                               this.transformPlayer(player, heroPlayerUUID),
                           ),
                           menu: this.getValidMenuButtons(clientUUID),
+                          gameParameters: this.gameStateManager.getGameParameters(),
                       }
                     : undefined,
             audio: this.audioUpdated() || sendAll ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
-            animation: this.animationService.getAnimationTrigger(),
+            animation: this.animationUpdated() || sendAll ? this.animationService.getAnimationState() : undefined,
             // TODO refactor to send entire chatlog on init.
             chat: this.chatUpdated() || sendAll ? this.transformChatMessage() : undefined,
         };
@@ -132,14 +137,12 @@ export class StateConverter {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isPlayerAdmin(clientUUID),
             heroIsSeated: clientPlayerIsSeated,
-            bigBlind: this.gameStateManager.getBB(),
-            smallBlind: this.gameStateManager.getSB(),
-            allowStraddle: this.gameStateManager.getAllowStraddle(),
-            gameType: this.gameStateManager.getGameType(),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
             unqueueAllBettingRoundActions:
                 gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
+            areOpenSeats: this.gameStateManager.areOpenSeats(),
+            gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
         };
 
         return global;
@@ -251,10 +254,10 @@ export class StateConverter {
     getValidMenuButtons(clientUUID: ClientUUID): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        const menuButtons = [SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
+        const menuButtons = [USER_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
 
         if (this.gameStateManager.isPlayerAdmin(clientUUID)) {
-            menuButtons.push(ADMIN_BUTTON);
+            menuButtons.push(GAME_SETTINGS_BUTTON);
             if (
                 (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) ||
                 this.gameStateManager.gameWillStopAfterHand()

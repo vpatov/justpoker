@@ -1,7 +1,5 @@
 import { Service } from 'typedi';
 import { GameInstance, getCleanGameInstance } from '../../../ui/src/shared/models/gameInstance';
-import { NewGameForm } from '../../../ui/src/shared/models/api';
-import { generateUUID } from '../../../ui/src/shared/util/util';
 
 import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
@@ -18,6 +16,7 @@ import {
     generateGameInstanceUUID,
 } from '../../../ui/src/shared/models/uuid';
 import { GameInstanceLogService } from './gameInstanceLogService';
+import { GameParameters } from '../../../ui/src/shared/models/game';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -39,12 +38,12 @@ export class GameInstanceManager {
     ) {}
 
     @debugFunc()
-    createNewGameInstance(newGameForm: NewGameForm): GameInstanceUUID {
+    createNewGameInstance(gameParameters: GameParameters): GameInstanceUUID {
         const gameInstanceUUID = generateGameInstanceUUID();
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
         this.loadGameInstance(gameInstanceUUID);
-        this.gameStateManager.initGame(newGameForm);
         this.gameInstanceLogService.initGameInstanceLog(gameInstanceUUID);
+        this.gameStateManager.initGame(gameParameters);
         return gameInstanceUUID;
     }
 

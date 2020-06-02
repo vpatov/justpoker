@@ -13,10 +13,7 @@ import EmojiPicker from './EmojiPicker';
 
 import { WsServer } from './api/ws';
 import { UiChatMessage } from './shared/models/uiState';
-import { Popper } from '@material-ui/core';
 import { getPlayerNameColor } from './style/colors';
-import { playerListSelector } from './store/selectors';
-import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -98,17 +95,25 @@ const useStyles = makeStyles((theme: Theme) =>
 interface ChatLogProps {
     className?: string;
 }
+const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
+
+function getChatButtonState(): boolean {
+    const cached = localStorage.getItem(CHAT_OPEN_LOCAL_STORAGE_KEY);
+    if (cached !== null) {
+        return cached === 'true';
+    }
+    return false;
+}
 
 function ChatLog(props: ChatLogProps) {
     const classes = useStyles();
 
     const { className } = props;
 
-    const [hideChat, setHideChat] = useState(false);
+    const [hideChat, setHideChat] = useState(getChatButtonState());
     const [messages, setMessages] = useState([] as any);
     const [draftMessage, setDraftMessage] = useState('');
     const [unreadChats, setUnreadChats] = useState(false);
-    const playerList = useSelector(playerListSelector);
 
     const messagesRef = useRef(null);
 
@@ -124,7 +129,7 @@ function ChatLog(props: ChatLogProps) {
 
     function sendMessage() {
         const trimmedMessage = draftMessage.trim();
-        if (trimmedMessage){
+        if (trimmedMessage) {
             WsServer.sendChatMessage(trimmedMessage);
             setDraftMessage('');
         }
@@ -152,6 +157,7 @@ function ChatLog(props: ChatLogProps) {
                 onClick={(e) => {
                     setUnreadChats(false);
                     setHideChat(!hideChat);
+                    localStorage.setItem(CHAT_OPEN_LOCAL_STORAGE_KEY, JSON.stringify(!hideChat));
                 }}
                 style={hideChat ? {} : { right: 'calc(15% + 15px)' }}
             >
@@ -169,9 +175,9 @@ function ChatLog(props: ChatLogProps) {
                 <div className={classes.chatLog}>
                     {messages.map((message) => (
                         <Typography key={message.timestamp} className={classes.chatMessage}>
-                            <span 
+                            <span
                                 className={classes.senderName}
-                                style={{color:getPlayerNameColor(message.seatNumber)}}
+                                style={{ color: getPlayerNameColor(message.seatNumber) }}
                             >
                                 {message.senderName}:
                             </span>

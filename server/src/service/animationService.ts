@@ -1,9 +1,19 @@
 import { Service } from 'typedi';
-import { AnimationState, AnimationTrigger, getCleanAnimationState } from '../../../ui/src/shared/models/animationState';
+import {
+    AnimationState,
+    ReactionTrigger,
+    getCleanAnimationState,
+    AnimationType,
+    GameplayTrigger,
+} from '../../../ui/src/shared/models/animationState';
+import { PlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { GameStateManager } from './gameStateManager';
+import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
 
 @Service()
 export class AnimationService {
     private animationState: AnimationState = getCleanAnimationState();
+    constructor(private readonly gameStateManager: GameStateManager) {}
 
     loadAnimationState(animationState: AnimationState) {
         this.animationState = animationState;
@@ -12,19 +22,24 @@ export class AnimationService {
     getAnimationState(): AnimationState {
         return this.animationState;
     }
-    private setTrigger(trigger: AnimationTrigger) {
-        return (this.animationState.trigger = trigger);
+
+    setDealCardsAnimation() {
+        this.gameStateManager.addUpdatedKeys(ServerStateKey.ANIMATION);
+        this.animationState = {
+            animationType: AnimationType.GAMEPLAY,
+            trigger: GameplayTrigger.DEAL_CARDS,
+        };
     }
-    getAnimationTrigger(): AnimationTrigger {
-        return this.animationState.trigger;
+
+    setPlayerReaction(playerUUID: PlayerUUID, reaction: ReactionTrigger) {
+        this.animationState = {
+            animationType: AnimationType.REACTION,
+            trigger: reaction,
+            target: playerUUID,
+        };
     }
+
     reset() {
         this.animationState = getCleanAnimationState();
-    }
-    animateDeal() {
-        this.setTrigger(AnimationTrigger.DEAL_CARDS);
-    }
-    animateFlipTable() {
-        this.setTrigger(AnimationTrigger.FLIP_TABLE);
     }
 }

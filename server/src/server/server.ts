@@ -12,12 +12,13 @@ import { EventProcessorService } from '../service/eventProcessorService';
 import { StateConverter } from '../service/stateConverter';
 import { GameInstanceManager } from '../service/gameInstanceManager';
 
-import { NewGameForm, ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src/shared/models/api';
+import { ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src/shared/models/api';
 
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
 import { GameInstanceUUID, ClientUUID } from '../../../ui/src/shared/models/uuid';
+import { GameParameters } from '../../../ui/src/shared/models/game';
 
 declare interface PerformanceMetrics {
     // sum, count (used for average)
@@ -76,15 +77,8 @@ class Server {
         });
 
         router.post('/createGame', (req, res) => {
-            const newGameForm: NewGameForm = {
-                smallBlind: req.body.smallBlind,
-                bigBlind: req.body.bigBlind,
-                gameType: req.body.gameType,
-                maxBuyin: req.body.maxBuyin,
-                password: req.body.password,
-                timeToAct: req.body.timeToAct,
-            };
-            const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(newGameForm);
+            const gameParameters: GameParameters = req.body.gameParameters;
+            const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
             this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
 
             logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
