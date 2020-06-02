@@ -8,7 +8,7 @@ import TableCopyLink from './TableCopyLink';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { tableSelector, playersSelector, globalGameStateSelector } from './store/selectors';
+import { tableSelector, playersSelector, globalGameStateSelector, selectGameParameters } from './store/selectors';
 import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
 import { WsServer } from './api/ws';
 
@@ -101,7 +101,8 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, heroIsSeated, isGameInProgress } = useSelector(globalGameStateSelector);
+    const { canStartGame, heroIsSeated, isGameInProgress, areOpenSeats } = useSelector(globalGameStateSelector);
+    const { maxPlayers } = useSelector(selectGameParameters);
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots } = useSelector(tableSelector);
     const players = useSelector(playersSelector);
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
@@ -132,7 +133,7 @@ function Table(props) {
                         }}
                     />,
                 );
-            } else if (!heroIsSeated) {
+            } else if (!heroIsSeated && areOpenSeats) {
                 ans.push(
                     <OpenSeat
                         key={index}

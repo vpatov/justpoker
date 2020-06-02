@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function SuitIcon(props) {
     const classes = useStyles();
-    const { suit, size, className } = props;
+    const { suit, className } = props;
 
     function generateStringFromSuit(suit) {
         let suitString;
@@ -38,7 +38,7 @@ function SuitIcon(props) {
 export default SuitIcon;
 
 function Club(props) {
-    const { className, size } = props;
+    const { className } = props;
 
     return (
         <svg viewBox="0 0 167 175" className={className}>

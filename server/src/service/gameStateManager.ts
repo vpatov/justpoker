@@ -18,7 +18,7 @@ import {
     BettingRoundAction,
     BettingRoundActionType,
 } from '../../../ui/src/shared/models/game';
-import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
+import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
@@ -27,7 +27,7 @@ import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
-import { logger } from '../logger';
+import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
 
 // TODO Re-organize methods in some meaningful way
@@ -93,7 +93,7 @@ export class GameStateManager {
             uuid: generatePlayerUUID(),
             name,
             chips,
-            timeBanksLeft: TIME_BANKS_DEFAULT,
+            timeBanksLeft: this.getGameParameters().numberTimeBanks,
         };
     }
 
@@ -164,6 +164,22 @@ export class GameStateManager {
 
     getPlayer(playerUUID: PlayerUUID): Player {
         return this.gameState.players[playerUUID];
+    }
+
+    getGameParameters(): GameParameters {
+        return this.gameState.gameParameters;
+    }
+
+    getMaxPlayers(): number {
+        return this.gameState.gameParameters.maxPlayers;
+    }
+
+    getSittingPlayers(): Player[] {
+        return Object.values(this.getPlayers()).filter((player) => player.sitting);
+    }
+
+    areOpenSeats(): boolean {
+        return this.getMaxPlayers() !== this.getSittingPlayers().length;
     }
 
     // TODO when branded types can be used as index signatures, replace string with PlayerUUID
@@ -289,7 +305,7 @@ export class GameStateManager {
     }
 
     getTimeToAct() {
-        return this.gameState.gameParameters.timeToAct;
+        return this.gameState.gameParameters.timeToAct * 1000;
     }
 
     getTotalPlayerTimeToAct() {
@@ -402,7 +418,7 @@ export class GameStateManager {
     }
 
     getTimeBankValue() {
-        return this.gameState.gameParameters.timeBankTime;
+        return this.gameState.gameParameters.timeBankTime * 1000;
     }
 
     getBettingRoundActionTypes() {
@@ -557,6 +573,11 @@ export class GameStateManager {
         return this.isGameInProgress() && this.shouldDealNextHand() === false;
     }
 
+    // Used to display message to users that game will change
+    gameParametersWillChangeAfterHand(): boolean {
+        return this.getQueuedServerActions().some((action) => action.actionType === ClientActionType.SETGAMEPARAMETERS);
+    }
+
     isGameInProgress() {
         return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
     }
@@ -667,18 +688,19 @@ export class GameStateManager {
         return this.gameState.admin;
     }
 
+    @debugFunc()
     initGame(gameParameters: GameParameters) {
         const newGame = {
             ...getCleanGameState(),
             table: this.initTable(),
             gameParameters: gameParameters,
         };
+        console.log(newGame);
         this.timerManager.cancelStateTimer();
-        this.gameState = { ...newGame };
+        this.gameState = newGame;
     }
 
     initTable() {
-        // oH nO a pLaiNtEXt pAssW0Rd!!
         return {
             activeConnections: new Map(),
             admin: '',
@@ -797,6 +819,8 @@ export class GameStateManager {
     }
 
     canPlayerShowCards(playerUUID: PlayerUUID) {
+        const { canShowHeadsUp } = this.getGameParameters();
+
         // obiviously never let player show cards who wasn't dealt cards
         if (!this.wasPlayerDealtIn(playerUUID)) {
             return false;
@@ -805,8 +829,8 @@ export class GameStateManager {
         return (
             // everyone can show if one player left in hand
             numPlayersInHand === 1 ||
-            // players who are heads up can show anytime
-            (this.isPlayerInHand(playerUUID) && numPlayersInHand === 2) ||
+            // if canShowHeadsUp then players who are heads up can show anytime
+            (canShowHeadsUp && this.isPlayerInHand(playerUUID) && numPlayersInHand === 2) ||
             // all players can show after betting finishes if we are on river
             (this.getGameStage() === GameStage.FINISH_BETTING_ROUND &&
                 this.getBettingRoundStage() === BettingRoundStage.RIVER) ||
@@ -858,6 +882,10 @@ export class GameStateManager {
 
     setPlayerLastActionType(playerUUID: PlayerUUID, lastActionType: BettingRoundActionType) {
         this.getPlayer(playerUUID).lastActionType = lastActionType;
+    }
+
+    setGameParameters(gameParameters: GameParameters) {
+        this.gameState.gameParameters = gameParameters;
     }
 
     changePlayerName(playerUUID: PlayerUUID, name: string) {

@@ -28,6 +28,7 @@ export declare interface GameParameters {
 
     // advanced params
     maxPlayers: number;
+    minBuyin: number;
     allowTimeBanks: boolean;
     timeBankTime: number;
     numberTimeBanks: number;
@@ -100,6 +101,7 @@ export function getCleanGameParameters() {
         bigBlind: 0,
         gameType: GameType.NLHOLDEM,
         maxBuyin: 0,
+        minBuyin: 0,
         timeToAct: 0,
         maxPlayers: 0,
         timeBankTime: 0,
@@ -116,6 +118,7 @@ export function getDefaultGameParameters() {
         bigBlind: 2,
         gameType: GameType.NLHOLDEM,
         maxBuyin: 200,
+        minBuyin: 50,
         timeToAct: 30,
         maxPlayers: 9,
         timeBankTime: 30,

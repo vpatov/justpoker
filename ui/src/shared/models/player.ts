@@ -78,5 +78,3 @@ export function getCleanPlayer(): Player {
         timeBanksLeft: 0,
     };
 }
-
-export const TIME_BANKS_DEFAULT = 5;

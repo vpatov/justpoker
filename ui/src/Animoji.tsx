@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import classnames from 'classnames';
 import wink from './assets/animoji/wink.gif';
 import money from './assets/animoji/money.gif';

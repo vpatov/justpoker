@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { globalGameStateSelector } from './store/selectors';
+import { globalGameStateSelector, selectGameParameters } from './store/selectors';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 
@@ -27,13 +27,18 @@ const useStyles = makeStyles((theme: Theme) =>
 function GameLabel(props) {
     const classes = useStyles();
     const {} = props;
-    const globalData = useSelector(globalGameStateSelector);
-    const { gameWillStopAfterHand, gameType, smallBlind, bigBlind } = globalData;
+    const { gameWillStopAfterHand, gameParametersWillChangeAfterHand } = useSelector(globalGameStateSelector);
+    const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
+
     return (
         <div className={classes.root}>
+            {gameParametersWillChangeAfterHand ? (
+                <Typography className={classes.pause}>{`Game settings will change after this hand.`}</Typography>
+            ) : null}
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
+
             <Typography className={classes.text}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
         </div>
     );

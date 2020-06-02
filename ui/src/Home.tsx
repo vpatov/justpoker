@@ -1,10 +1,9 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import {} from './utils';
 import classnames from 'classnames';
+import { makeStyles } from '@material-ui/core/styles';
 import MakeGame from './MakeGame';
 import Typography from '@material-ui/core/Typography';
-
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100vh',
@@ -16,21 +15,28 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'auto',
     },
     title: {
-        margin: 36,
-        fontSize: 'min(90px, 10vmin)',
+        marginTop: 72,
+        marginBottom: 12,
+        fontSize: 'min(90px, 9vmin)',
         color: 'black',
+    },
+    left: {
+        position: 'absolute',
+        left: '0',
+        width: '25%',
+        top: '0',
+        margin: 24,
+        lineHeight: '100%',
     },
 }));
 
 function Home(props) {
     const classes = useStyles();
     const {} = props;
-
+    const smallHeight = useMediaQuery('(max-height:750px)');
     return (
         <div className={classes.root}>
-            <Typography variant="h1" className={classes.title}>
-                Just Poker.
-            </Typography>
+            <Typography className={classnames(classes.title, { [classes.left]: smallHeight })}>Just Poker.</Typography>
             <MakeGame />
         </div>
     );

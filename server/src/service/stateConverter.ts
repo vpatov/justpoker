@@ -11,8 +11,8 @@ import {
     BET_BUTTON,
     START_GAME_BUTTON,
     STOP_GAME_BUTTON,
-    ADMIN_BUTTON,
-    SETTINGS_BUTTON,
+    GAME_SETTINGS_BUTTON,
+    USER_SETTINGS_BUTTON,
     VOLUME_BUTTON,
     UiChatMessage,
     BettingRoundActionButton,
@@ -116,6 +116,7 @@ export class StateConverter {
                               this.transformPlayer(player, heroPlayerUUID),
                           ),
                           menu: this.getValidMenuButtons(clientUUID),
+                          gameParameters: this.gameStateManager.getGameParameters(),
                       }
                     : undefined,
             audio: this.audioUpdated() || sendAll ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
@@ -136,14 +137,12 @@ export class StateConverter {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isPlayerAdmin(clientUUID),
             heroIsSeated: clientPlayerIsSeated,
-            bigBlind: this.gameStateManager.getBB(),
-            smallBlind: this.gameStateManager.getSB(),
-            allowStraddle: this.gameStateManager.getAllowStraddle(),
-            gameType: this.gameStateManager.getGameType(),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
             unqueueAllBettingRoundActions:
                 gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
+            areOpenSeats: this.gameStateManager.areOpenSeats(),
+            gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
         };
 
         return global;
@@ -255,10 +254,10 @@ export class StateConverter {
     getValidMenuButtons(clientUUID: ClientUUID): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        const menuButtons = [SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
+        const menuButtons = [USER_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
 
         if (this.gameStateManager.isPlayerAdmin(clientUUID)) {
-            menuButtons.push(ADMIN_BUTTON);
+            menuButtons.push(GAME_SETTINGS_BUTTON);
             if (
                 (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) ||
                 this.gameStateManager.gameWillStopAfterHand()

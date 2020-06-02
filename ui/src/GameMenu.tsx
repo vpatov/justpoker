@@ -1,9 +1,10 @@
 import React from 'react';
+import { useLocation } from 'react-router';
 import { parseHTTPParams } from './shared/util/util';
 import queryString from 'query-string';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { selectMenuButtons } from './store/selectors';
+import { selectMenuButtons, selectGameParameters } from './store/selectors';
 import { WsServer } from './api/ws';
 import SettingsDialog from './SettingsDialog';
 import { ClientActionType, UiActionType, ClientWsMessageRequest } from './shared/models/api';
@@ -12,16 +13,18 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Paper from '@material-ui/core/Paper';
-import AdminIcon from '@material-ui/icons/SupervisorAccount';
+import GameSettingsIcon from '@material-ui/icons/SettingsApplications';
 import QuitIcon from '@material-ui/icons/Clear';
 import StartIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
-import SettingsIcon from '@material-ui/icons/Settings';
+import UserSettingsIcon from '@material-ui/icons/Person';
 import VolumeOnIcon from '@material-ui/icons/VolumeUp';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
-import FlipIcon from '@material-ui/icons/FlipSharp';
-import { useLocation } from 'react-router';
+
+import GameParamatersDialog from './GameParamatersDialog';
+import { GameParameters } from './shared/models/game';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         hoverArea: {
@@ -67,8 +70,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function getIcon(action, iconClass) {
     const ACTION_TO_ICON = {
-        [UiActionType.ADMIN]: <AdminIcon className={iconClass} />,
-        [UiActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
+        [UiActionType.GAME_SETTINGS]: <GameSettingsIcon className={iconClass} />,
+        [UiActionType.USER_SETTINGS]: <UserSettingsIcon className={iconClass} />,
         [UiActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
         [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
         [ClientActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
@@ -82,9 +85,11 @@ function GameMenu(props) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const menuButtons = useSelector(selectMenuButtons);
+    const gameParameters = useSelector(selectGameParameters);
     const location = useLocation();
 
     const [settingsOpen, setSettingsOpen] = React.useState(false);
+    const [gameParametersOpen, SET_gameParametersOpen] = React.useState(false);
 
     const handleSettingsOpen = () => {
         setSettingsOpen(true);
@@ -111,9 +116,10 @@ function GameMenu(props) {
 
     function handleClickButton(action) {
         switch (action) {
-            case UiActionType.ADMIN:
+            case UiActionType.GAME_SETTINGS:
+                SET_gameParametersOpen(true);
                 break;
-            case UiActionType.SETTINGS:
+            case UiActionType.USER_SETTINGS:
                 handleSettingsOpen();
                 break;
             case UiActionType.VOLUME:
@@ -141,6 +147,16 @@ function GameMenu(props) {
             request: {} as ClientWsMessageRequest,
         });
     }
+
+    const onGameParamatersDialogSave = (gameParameters: GameParameters) => {
+        WsServer.send({
+            actionType: ClientActionType.SETGAMEPARAMETERS,
+            request: {
+                gameParameters,
+            } as ClientWsMessageRequest,
+        });
+        SET_gameParametersOpen(false);
+    };
 
     return (
         <>
@@ -170,6 +186,12 @@ function GameMenu(props) {
                 </Paper>
             </div>
             <SettingsDialog handleClose={handleSettingsClose} open={settingsOpen} />
+            <GameParamatersDialog
+                open={gameParametersOpen}
+                gameParameters={gameParameters}
+                onCancel={() => SET_gameParametersOpen(false)}
+                onSave={onGameParamatersDialogSave}
+            />
         </>
     );
 }
