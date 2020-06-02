@@ -75,7 +75,9 @@ function SettingsDialog(props) {
                     <InputLabel>Background Color</InputLabel>
                     <Select value={background} onChange={(event) => setBackground(event.target.value as any)}>
                         {Object.entries(Background).map(([k, v]) => (
-                            <MenuItem value={v}>{capitalize(k)}</MenuItem>
+                            <MenuItem key={k} value={v}>
+                                {capitalize(k)}
+                            </MenuItem>
                         ))}
                     </Select>
                 </FormControl>

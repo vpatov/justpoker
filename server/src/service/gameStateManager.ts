@@ -21,7 +21,7 @@ import {
 import { Player, getCleanPlayer, TIME_BANKS_DEFAULT } from '../../../ui/src/shared/models/player';
 import { DeckService } from './deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { NewGameForm, JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
+import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
@@ -402,7 +402,7 @@ export class GameStateManager {
     }
 
     getTimeBankValue() {
-        return this.gameState.gameParameters.timeBankValue;
+        return this.gameState.gameParameters.timeBankTime;
     }
 
     getBettingRoundActionTypes() {
@@ -667,20 +667,11 @@ export class GameStateManager {
         return this.gameState.admin;
     }
 
-    initGame(newGameForm: NewGameForm) {
+    initGame(gameParameters: GameParameters) {
         const newGame = {
             ...getCleanGameState(),
             table: this.initTable(),
-            gameParameters: {
-                smallBlind: Number(newGameForm.smallBlind),
-                bigBlind: Number(newGameForm.bigBlind),
-                gameType: newGameForm.gameType || GameType.NLHOLDEM,
-                timeToAct: Number(newGameForm.timeToAct) * 1000,
-                timeBankValue: 60 * 1000, // TODO add to game form
-                maxBuyin: Number(newGameForm.maxBuyin),
-                maxPlayers: 9,
-                // consider adding timeToAct and maxPlayers to form
-            },
+            gameParameters: gameParameters,
         };
         this.timerManager.cancelStateTimer();
         this.gameState = { ...newGame };

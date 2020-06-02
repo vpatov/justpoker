@@ -75,6 +75,10 @@ export class StateConverter {
         return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.CHAT);
     }
 
+    animationUpdated(): boolean {
+        return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.ANIMATION);
+    }
+
     // Hero refers to the player who is receiving this particular UiState.
     @debugFunc({ noResult: true })
     transformGameStateToUIState(clientUUID: ClientUUID, sendAll: boolean): UiState {
@@ -115,7 +119,7 @@ export class StateConverter {
                       }
                     : undefined,
             audio: this.audioUpdated() || sendAll ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
-            animation: this.animationService.getAnimationTrigger(),
+            animation: this.animationUpdated() || sendAll ? this.animationService.getAnimationState() : undefined,
             // TODO refactor to send entire chatlog on init.
             chat: this.chatUpdated() || sendAll ? this.transformChatMessage() : undefined,
         };

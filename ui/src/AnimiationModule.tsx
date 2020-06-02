@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { WsServer } from './api/ws';
-import { AnimationTrigger } from './shared/models/animationState';
+import { AnimationType, AnimationState, GameplayTrigger } from './shared/models/animationState';
 import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
@@ -10,12 +10,18 @@ function AnimiationModule(props) {
         WsServer.subscribe('animation', onReceiveNewAnimationState);
     }, []);
 
-    const onReceiveNewAnimationState = (animationState: AnimationTrigger) => {
-        const ani = ANIMATION_MAP[animationState];
-        if (ani && typeof ani === 'function') {
-            ani();
-        } else {
-            console.log(`No animation provided for ${animationState}`);
+    const onReceiveNewAnimationState = (animationState: AnimationState) => {
+        switch (animationState.animationType) {
+            case AnimationType.GAMEPLAY:
+                handleGamePlayAnimation(animationState);
+            case AnimationType.REACTION:
+                break;
+            case AnimationType.EMPTY:
+                break;
+
+            default:
+                console.warn(`No animation provided for ${animationState}`);
+                break;
         }
     };
 
@@ -24,10 +30,11 @@ function AnimiationModule(props) {
 
 export default AnimiationModule;
 
-const ANIMATION_MAP = {
-    [AnimationTrigger.FLIP_TABLE]: flipTable,
-    [AnimationTrigger.DEAL_CARDS]: dealCards,
-};
+function handleGamePlayAnimation(animationState: AnimationState) {
+    if (animationState.trigger === GameplayTrigger.DEAL_CARDS) {
+        dealCards();
+    }
+}
 
 export function flipTable() {
     const animations = [] as any;
