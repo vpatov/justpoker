@@ -54,3 +54,7 @@ export function parseHTTPParams(parsedQuery: queryString.ParsedUrl) {
     };
     return queryParams;
 }
+
+export function getEpochTimeMs(): number {
+    return new Date().getTime();
+}

@@ -33,8 +33,14 @@ export class WsServer {
 
         WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
         WsServer.ws.onmessage = WsServer.onGameMessage;
+        WsServer.ws.onclose = WsServer.onWSClose;
 
         return true;
+    }
+
+    private static onWSClose() {
+        const key = 'onclose';
+        WsServer.subscriptions[key].forEach((func) => func());
     }
 
     // TODO redesign dataCommunications and create general websocket data object so we

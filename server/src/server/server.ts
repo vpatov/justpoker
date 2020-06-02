@@ -193,10 +193,15 @@ class Server {
         // the event being a server action like GAME_INIT or something.
         ws.send(JSON.stringify(this.stateConverter.getUIState(currentClientUUID, true)));
 
-        // maybe this should be done else where?
         ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, currentClientUUID, gameInstanceUUID));
         ws.on('close', (data: WebSocket.Data) => {
-            logger.warn(`WS CLOSE! for client ${currentClientUUID} in game ${gameInstanceUUID}`);
+            logger.verbose(`WS closed for client ${currentClientUUID} in game ${gameInstanceUUID}`);
+            const succ = this.connectedClientManager.removeClientFromGroup(gameInstanceUUID, currentClientUUID);
+            if (!succ) {
+                logger.verbose(
+                    `Client ${currentClientUUID} not in group ${gameInstanceUUID}. Cannot remove from group. May have been deleted in other context.`,
+                );
+            }
         });
     }
 

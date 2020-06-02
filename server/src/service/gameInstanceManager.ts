@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { GameInstance, getCleanGameInstance } from '../../../ui/src/shared/models/gameInstance';
 import { NewGameForm } from '../../../ui/src/shared/models/api';
-import { generateUUID } from '../../../ui/src/shared/util/util';
+import { generateUUID, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 
 import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
@@ -17,10 +17,12 @@ import {
     ClientUUID,
     generateGameInstanceUUID,
 } from '../../../ui/src/shared/models/uuid';
+import { ConnectedClientManager } from '../server/connectedClientManager';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
 }
+const EXPIRE_GAME_INSTANCE_TIME = 1000 * 11; // 1000 * 60 * 60 * 10; // ten hours in ms
 
 @Service()
 export class GameInstanceManager {
@@ -34,7 +36,10 @@ export class GameInstanceManager {
         private readonly chatService: ChatService,
         private readonly ledgerService: LedgerService,
         private readonly timerManager: TimerManager,
-    ) {}
+        private readonly connectedClientManager: ConnectedClientManager,
+    ) {
+        setInterval(this.clearStaleGames.bind(this), 1000); // attempt to expire games every
+    }
 
     @debugFunc()
     createNewGameInstance(newGameForm: NewGameForm): GameInstanceUUID {
@@ -75,6 +80,23 @@ export class GameInstanceManager {
         return this.activeGameInstanceUUID;
     }
 
+    clearStaleGames() {
+        logger.verbose(`attempting to expiring game instances`);
+        if (this.gameInstances) {
+            // TODO implement warning game will be cleared do to inactivity
+            const now = getEpochTimeMs();
+            Object.entries(this.gameInstances).forEach(([gameInstanceUUID, gameInstance]) => {
+                const timeInactive = now - gameInstance.lastActive;
+                logger.verbose(`${gameInstanceUUID} has been inactive for ${timeInactive}`);
+                if (timeInactive > EXPIRE_GAME_INSTANCE_TIME) {
+                    logger.verbose(`expiring game instance ${gameInstanceUUID}`);
+                    this.connectedClientManager.removeGroupFromManager(gameInstanceUUID as GameInstanceUUID);
+                    delete this.gameInstances[gameInstanceUUID];
+                }
+            });
+        }
+    }
+
     @debugFunc()
     saveActiveGameInstance() {
         const activeGameInstance = {
@@ -84,6 +106,7 @@ export class GameInstanceManager {
             animationState: this.animationService.getAnimationState(),
             ledger: this.ledgerService.getLedger(),
             stateTimer: this.timerManager.getStateTimer(),
+            lastActive: getEpochTimeMs(),
         };
         this.gameInstances[this.activeGameInstanceUUID] = activeGameInstance;
     }
