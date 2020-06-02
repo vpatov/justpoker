@@ -45,6 +45,14 @@ export class GameInstanceManager {
         return gameInstanceUUID;
     }
 
+    isClientInGame(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): boolean {
+        const game = this.gameInstances[gameInstanceUUID];
+        if (game && game.gameState.activeConnections.get(clientUUID)) {
+            return true;
+        }
+        return false;
+    }
+
     doesGameInstanceExist(gameInstanceUUID: GameInstanceUUID): boolean {
         if (this.gameInstances[gameInstanceUUID]) return true;
         return false;

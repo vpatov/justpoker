@@ -17,29 +17,27 @@ export class ConnectedClientManager {
     constructor(private stateConverter: StateConverter) {}
 
     @debugFunc({ noArgs: true })
-    createClientSessionInGroup(gameInstanceUUID: GameInstanceUUID, ws: WebSocket): ClientUUID {
-        const clientUUID = generateClientUUID();
-        if (!this.ClientGroups[gameInstanceUUID]) {
-            // create group if doesnt exist
-            this.ClientGroups[gameInstanceUUID] = { [clientUUID]: ws };
-        } else {
+    addOrUpdateClientInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: WebSocket): boolean {
+        if (this.ClientGroups[gameInstanceUUID]) {
             // add to group if exists
-            this.ClientGroups[gameInstanceUUID] = { ...this.ClientGroups[gameInstanceUUID], [clientUUID]: ws };
+            this.ClientGroups[gameInstanceUUID][clientUUID] = ws;
+            return true;
         }
-        return clientUUID;
+        // group does not exist
+        return false;
     }
 
     createNewClientGroup(gameInstanceUUID: GameInstanceUUID) {
         this.ClientGroups[gameInstanceUUID] = {};
     }
 
-    @debugFunc({ noArgs: true })
-    updateClientSessionInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: WebSocket) {
-        if (this.ClientGroups[gameInstanceUUID]) {
-            this.ClientGroups[gameInstanceUUID][clientUUID] = ws;
-        }
-        // TODO error, there is no group
-    }
+    // @debugFunc({ noArgs: true })
+    // updateClientSessionInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: WebSocket) {
+    //     if (this.ClientGroups[gameInstanceUUID]) {
+    //         this.ClientGroups[gameInstanceUUID][clientUUID] = ws;
+    //     }
+    //     // TODO error, there is no group
+    // }
 
     // If groups can be something other than gameInstances, it might be helpful to have typed
     // helper methods for each group type. (different UUID types will have actual unique types in future)
