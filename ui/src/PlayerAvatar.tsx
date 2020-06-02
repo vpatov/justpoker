@@ -13,18 +13,25 @@ import { AnimationState, AnimationType } from './shared/models/animationState';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            backgroundColor: 'rgba(255,255,255,1)',
-            boxShadow: theme.shadows[4],
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            borderRadius: '50%',
-            border: `0.25vmin solid ${grey[900]}`,
+
             overflow: 'hidden',
+            // marginLeft: '-5%',
+            marginRight: '0.3vmin',
+            // flexShrink: 0,
+            height: '100%',
+            width: '6vmin',
+            transform: 'translateY(5%)',
+            // borderRadius: '50%',
+            // boxShadow: theme.shadows[4],
+            // border: `0.25vmin solid ${grey[900]}`,
+            // background: `radial-gradient(${grey[100]} 0%, ${grey[400]})`,
         },
         avatar: {
-            width: `75%`,
-            height: `75%`,
+            width: `90%`,
+            height: `90%`,
         },
         animoji: {
             width: `85%`,
@@ -66,9 +73,10 @@ function PlayerAvatar(props) {
         }
     }, [showReaction, reaction]);
 
-    const background = getPlayerAvatarBackground(position);
+    // const background = getPlayerAvatarBackground(position);
+    const background = `radial-gradient(${grey[800]} 0%, ${grey[900]})`;
     return (
-        <div className={classnames(classes.root, className)} style={{ background: background }}>
+        <div className={classnames(classes.root, className)}>
             {showReaction ? (
                 <Animoji reaction={reaction} className={classes.animoji} />
             ) : (

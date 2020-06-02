@@ -14,13 +14,10 @@ import MoreIcom from '@material-ui/icons/MoreVert';
 import Animoji from './Animoji';
 import PlayerLabel from './PlayerLabel';
 
-const PLAYER_WIDTH = 16;
-const PLAYER_HEIGHT = 12;
-
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: `${PLAYER_WIDTH}vmin`,
-        height: `${PLAYER_HEIGHT}vmin`,
+        width: `${theme.custom.PLAYER_WIDTH}vmin`,
+        height: `${theme.custom.PLAYER_HEIGHT}vmin`,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',

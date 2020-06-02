@@ -17,11 +17,6 @@ const useStyles = makeStyles((theme) => ({
         height: '6vmin',
         alignItems: 'center',
         cursor: 'pointer',
-        border: '0.25vmin solid transparent',
-        '&:hover': {
-            borderColor: theme.palette.secondary.main,
-        },
-
         ...theme.custom.STACK,
     },
     outOfHand: {
@@ -43,13 +38,6 @@ const useStyles = makeStyles((theme) => ({
     },
     nameStackCont: {
         width: '60%',
-    },
-    avatar: {
-        marginLeft: '-11%',
-        marginRight: '0.3vmin',
-        flexShrink: 0,
-        height: '6.8vmin',
-        width: '6.8vmin',
     },
     name: {
         paddingBottom: '0.8vmin',
@@ -102,7 +90,7 @@ function PlayerStack(props) {
                 [classes.outOfHand]: outOfHand,
             })}
         >
-            <PlayerAvatar className={classes.avatar} position={position} playerUUID={playerUUID} />
+            <PlayerAvatar position={position} playerUUID={playerUUID} />
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <div className={classes.nameStackCont}>
                 <Typography variant="h4" className={classes.stack}>
