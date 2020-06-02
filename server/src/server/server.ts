@@ -182,21 +182,21 @@ class Server {
             );
         }
 
-        logger.verbose(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
+        logger.verbose(`Connected to clientUUID: ${currentClientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
 
         // add client to game instance
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
-        this.gameInstanceManager.addClientToGameInstance(gameInstanceUUID, clientUUID);
+        this.gameInstanceManager.addClientToGameInstance(gameInstanceUUID, currentClientUUID);
 
         // send init state to newly connected client
         // TODO can remove server's dependency on stateConverter by processing an event here,
         // the event being a server action like GAME_INIT or something.
-        ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
+        ws.send(JSON.stringify(this.stateConverter.getUIState(currentClientUUID, true)));
 
         // maybe this should be done else where?
-        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameInstanceUUID));
+        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, currentClientUUID, gameInstanceUUID));
         ws.on('close', (data: WebSocket.Data) => {
-            logger.warn('WS CLOSE!');
+            logger.warn(`WS CLOSE! for client ${currentClientUUID} in game ${gameInstanceUUID}`);
         });
     }
 
