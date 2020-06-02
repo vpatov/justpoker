@@ -22,7 +22,7 @@ import { GameParameters } from '../../../ui/src/shared/models/game';
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
 }
-const EXPIRE_GAME_INSTANCE_TIME = 1000 * 11; // 1000 * 60 * 60 * 10; // ten hours in ms
+const EXPIRE_GAME_INSTANCE_TIME = 1000 * 60 * 60 * 2; // expire games after 2 hours of inactivity
 
 @Service()
 export class GameInstanceManager {
@@ -38,7 +38,7 @@ export class GameInstanceManager {
         private readonly timerManager: TimerManager,
         private readonly connectedClientManager: ConnectedClientManager,
     ) {
-        setInterval(this.clearStaleGames.bind(this), 1000); // attempt to expire games every
+        setInterval(this.clearStaleGames.bind(this), 1000 * 60 * 60); // attempt to expire games every hour
     }
 
     @debugFunc()
