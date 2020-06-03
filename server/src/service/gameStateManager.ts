@@ -23,12 +23,12 @@ import { DeckService } from './deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
-import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { PlayerPosition } from '../../../ui/src/shared/models/handLog';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -62,7 +62,6 @@ export class GameStateManager {
     constructor(
         private readonly deckService: DeckService,
         private readonly handSolverService: HandSolverService,
-        private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
     ) {}
 
@@ -123,6 +122,10 @@ export class GameStateManager {
 
     forEveryPlayerUUID(performFn: (playerUUID: PlayerUUID) => void) {
         Object.keys(this.gameState.players).forEach(performFn);
+    }
+
+    forEveryPlayer(performFn: (player: Player) => void) {
+        Object.values(this.gameState.players).forEach(performFn);
     }
 
     forEveryClient(performFn: (client: ConnectedClient) => void) {
@@ -245,6 +248,14 @@ export class GameStateManager {
 
     setStraddleUUID(straddleUUID: PlayerUUID) {
         this.gameState.straddleUUID = straddleUUID;
+    }
+
+    getHandNumber(){
+        return this.gameState.handNumber;
+    }
+
+    incrementHandNumber(){
+        this.gameState.handNumber += 1;
     }
 
     getBoard() {
@@ -439,7 +450,12 @@ export class GameStateManager {
         return seats;
     }
 
-    getPositionRelativeToDealer(playerUUID: PlayerUUID) {
+    getPlayerPosition(playerUUID: PlayerUUID){
+        // TODO
+        return PlayerPosition.BB;
+    }
+
+    getPositionNumberRelativeToDealer(playerUUID: PlayerUUID) {
         const numPlayers = this.getPlayersDealtIn().length;
         return (
             this.getPlayer(playerUUID).seatNumber +
@@ -448,8 +464,8 @@ export class GameStateManager {
     }
 
     comparePositions(playerA: PlayerUUID, playerB: PlayerUUID) {
-        const posA = this.getPositionRelativeToDealer(playerA);
-        const posB = this.getPositionRelativeToDealer(playerB);
+        const posA = this.getPositionNumberRelativeToDealer(playerA);
+        const posB = this.getPositionNumberRelativeToDealer(playerB);
 
         if (playerA === playerB) {
             throw Error(
@@ -695,8 +711,6 @@ export class GameStateManager {
             table: this.initTable(),
             gameParameters: gameParameters,
         };
-        console.log(newGame);
-        this.timerManager.cancelStateTimer();
         this.gameState = newGame;
     }
 

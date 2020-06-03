@@ -2,7 +2,7 @@ import { PlayerUUID, GameInstanceUUID, makeBlankUUID } from "./uuid";
 import { Card } from "./cards";
 import { BettingRoundAction, BettingRoundStage, BettingRoundActionType } from "./game";
 
- enum PlayerPosition {
+ export enum PlayerPosition {
      "SB" = "SB",
      "BB" = "BB",
      "UTG" = "UTG",
@@ -25,10 +25,10 @@ export declare interface GameInstanceLog {
 export declare interface HandLog {
     handNumber: number;
     timeHandStarted: number;
-    allPlayers: PlayerUUID[];
+    allPlayers: Map<PlayerUUID,PlayerSummaryForHandLog>;
     winner: PlayerUUID;
-    actions: Map<BettingRoundStage, BettingRoundStageLog>;
-    lastStage: BettingRoundStage;
+    bettingRounds: Map<BettingRoundStage, BettingRoundStageLog>;
+    lastBettingRound: BettingRoundStage;
 }
 
 export declare interface BettingRoundStageLog {
@@ -65,10 +65,10 @@ export function getCleanHandLog(): HandLog {
     return {
         handNumber: -1,
         timeHandStarted: 0,
-        allPlayers: [],
+        allPlayers: new Map(),
         winner: makeBlankUUID(),
-        actions: new Map(),
-        lastStage: BettingRoundStage.WAITING,
+        bettingRounds: new Map(),
+        lastBettingRound: BettingRoundStage.WAITING,
     };
 }
 

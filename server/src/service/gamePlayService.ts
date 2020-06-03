@@ -20,6 +20,7 @@ import { Hand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
+import { GameInstanceLogService } from './gameInstanceLogService';
 
 @Service()
 export class GamePlayService {
@@ -30,6 +31,7 @@ export class GamePlayService {
         private readonly animationService: AnimationService,
         private readonly ledgerService: LedgerService,
         private readonly validationService: ValidationService,
+        private readonly gameInstanceLogService: GameInstanceLogService,
     ) {}
 
     startGame() {
@@ -331,7 +333,7 @@ export class GamePlayService {
                         this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(playerUUID));
                     }
                 });
-
+                this.gameInstanceLogService.initNewHand();
                 break;
             }
 

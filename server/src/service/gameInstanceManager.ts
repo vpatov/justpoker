@@ -44,6 +44,7 @@ export class GameInstanceManager {
         this.loadGameInstance(gameInstanceUUID);
         this.gameInstanceLogService.initGameInstanceLog(gameInstanceUUID);
         this.gameStateManager.initGame(gameParameters);
+        this.timerManager.cancelStateTimer();
         return gameInstanceUUID;
     }
 

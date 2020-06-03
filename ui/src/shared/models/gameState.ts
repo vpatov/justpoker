@@ -94,6 +94,9 @@ export declare interface GameState {
 
     /** The extra amount put into the pot by an all-in that was below the min-raise. */
     partialAllInLeftOver: number;
+
+    /** The number of the current hand. Starts at 0. */
+    handNumber: number;
 }
 
 export declare interface ConnectedClient {
@@ -106,6 +109,7 @@ export declare interface Pot {
     contestors: Array<PlayerUUID>;
 }
 
+// TODO move out of GameState
 export const enum ServerStateKey {
     GAMESTATE = 'GAMESTATE',
     AUDIO = 'AUDIO',
@@ -154,5 +158,6 @@ export function getCleanGameState(): GameState {
         minRaiseDiff: 0,
         previousRaise: 0,
         partialAllInLeftOver: 0,
+        handNumber: -1,
     };
 }
