@@ -19,6 +19,7 @@ import StartIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
 import UserSettingsIcon from '@material-ui/icons/Person';
 import VolumeOnIcon from '@material-ui/icons/VolumeUp';
+import VolumeOffIcon from '@material-ui/icons/VolumeMute';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 
@@ -68,20 +69,8 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function getIcon(action, iconClass) {
-    const ACTION_TO_ICON = {
-        [UiActionType.GAME_SETTINGS]: <GameSettingsIcon className={iconClass} />,
-        [UiActionType.USER_SETTINGS]: <UserSettingsIcon className={iconClass} />,
-        [UiActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
-        [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
-        [ClientActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
-        [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,
-        [ClientActionType.STARTGAME]: <StartIcon className={iconClass} />,
-    };
-    return ACTION_TO_ICON[action];
-}
-
 function GameMenu(props) {
+    const { mute, SET_mute } = props;
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const menuButtons = useSelector(selectMenuButtons);
@@ -123,6 +112,7 @@ function GameMenu(props) {
                 handleSettingsOpen();
                 break;
             case UiActionType.VOLUME:
+                SET_mute(!mute);
                 break;
             case UiActionType.OPEN_LEDGER:
                 handleOpenLedger();
@@ -139,6 +129,22 @@ function GameMenu(props) {
             default:
                 break;
         }
+    }
+
+    function getIcon(action, iconClass) {
+        if (action === UiActionType.VOLUME) {
+            if (mute) return <VolumeOffIcon className={iconClass} />;
+            return <VolumeOnIcon className={iconClass} />;
+        }
+        const ACTION_TO_ICON = {
+            [UiActionType.GAME_SETTINGS]: <GameSettingsIcon className={iconClass} />,
+            [UiActionType.USER_SETTINGS]: <UserSettingsIcon className={iconClass} />,
+            [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
+            [ClientActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
+            [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,
+            [ClientActionType.STARTGAME]: <StartIcon className={iconClass} />,
+        };
+        return ACTION_TO_ICON[action];
     }
 
     function sendServerAction(action) {
