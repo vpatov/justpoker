@@ -31,9 +31,9 @@ export class ConnectedClientManager {
 
     @debugFunc()
     removeClientFromGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): boolean {
-        if (this.ClientGroups[gameInstanceUUID]?.[clientUUID]) {
+        const ws = this.ClientGroups[gameInstanceUUID]?.[clientUUID];
+        if (ws) {
             // remove from group if is in group
-            const ws = this.ClientGroups[gameInstanceUUID][clientUUID];
             ws.close(1000); // close if not already closed, 1000 indicated normal close
             delete this.ClientGroups[gameInstanceUUID][clientUUID];
             return true;
