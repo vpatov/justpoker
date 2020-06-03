@@ -56,5 +56,5 @@ export function parseHTTPParams(parsedQuery: queryString.ParsedUrl) {
 }
 
 export function getEpochTimeMs(): number {
-    return new Date().getTime();
+    return Date.now();
 }

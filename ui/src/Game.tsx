@@ -8,7 +8,7 @@ import ChatLog from './ChatLog';
 import GameMenu from './GameMenu';
 import GameLabel from './GameLabel';
 import ControllerTimer from './ControllerTimer';
-import GameDisconnetionMessage from './GameDisconnetionMessage';
+import GameDisconnetionMessage from './GameDisconnectionMessage';
 import ReactionPicker from './ReactionPicker';
 
 import { makeStyles } from '@material-ui/core/styles';

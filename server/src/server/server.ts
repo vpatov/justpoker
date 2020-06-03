@@ -154,46 +154,44 @@ class Server {
         });
     }
 
-    onConnectionToGame(ws: WebSocket, gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID) {
+    onConnectionToGame(ws: WebSocket, gameInstanceUUID: GameInstanceUUID, parsedClientUUID: ClientUUID) {
         // if game is not in instanceManager then send 404
         if (!this.gameInstanceManager.doesGameInstanceExist(gameInstanceUUID)) {
             ws.send(JSON.stringify(getDefaultGame404()));
             return;
         }
         // if a uuid was not sent by client (that is there is no session) then create one
-        let currentClientUUID = clientUUID;
-        if (!currentClientUUID) {
-            currentClientUUID = generateClientUUID();
-            // send back clientUUID for client to store
+        const clientUUID = parsedClientUUID || generateClientUUID();
+        if (!parsedClientUUID) {
             ws.send(JSON.stringify({ clientUUID }));
         }
         // this will either add client to group if not in group
         // or if in group will replace old websocket with new websocket
-        const succ = this.connectedClientManager.addOrUpdateClientInGroup(gameInstanceUUID, currentClientUUID, ws);
+        const succ = this.connectedClientManager.addOrUpdateClientInGroup(gameInstanceUUID, clientUUID, ws);
         if (!succ) {
             logger.error(
-                `Group ${gameInstanceUUID} does not exist. Group should have be init on create game. Client ${currentClientUUID} not added.`,
+                `Group ${gameInstanceUUID} does not exist. Group should have be init on create game. Client ${clientUUID} not added.`,
             );
         }
 
-        logger.verbose(`Connected to clientUUID: ${currentClientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
+        logger.verbose(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
 
         // add client to game instance
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
-        this.gameInstanceManager.addClientToGameInstance(gameInstanceUUID, currentClientUUID);
+        this.gameInstanceManager.addClientToGameInstance(gameInstanceUUID, clientUUID);
 
         // send init state to newly connected client
         // TODO can remove server's dependency on stateConverter by processing an event here,
         // the event being a server action like GAME_INIT or something.
-        ws.send(JSON.stringify(this.stateConverter.getUIState(currentClientUUID, true)));
+        ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
 
-        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, currentClientUUID, gameInstanceUUID));
+        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameInstanceUUID));
         ws.on('close', (data: WebSocket.Data) => {
-            logger.verbose(`WS closed for client ${currentClientUUID} in game ${gameInstanceUUID}`);
-            const succ = this.connectedClientManager.removeClientFromGroup(gameInstanceUUID, currentClientUUID);
+            logger.verbose(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
+            const succ = this.connectedClientManager.removeClientFromGroup(gameInstanceUUID, clientUUID);
             if (!succ) {
                 logger.verbose(
-                    `Client ${currentClientUUID} not in group ${gameInstanceUUID}. Cannot remove from group. May have been deleted in other context.`,
+                    `Client ${clientUUID} not in group ${gameInstanceUUID}. Cannot remove from group. May have been deleted in other context.`,
                 );
             }
         });

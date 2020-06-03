@@ -38,7 +38,7 @@ export class GameInstanceManager {
         private readonly timerManager: TimerManager,
         private readonly connectedClientManager: ConnectedClientManager,
     ) {
-        setInterval(this.clearStaleGames.bind(this), 1000 * 60 * 60); // attempt to expire games every hour
+        setInterval(() => this.clearStaleGames(), 1000 * 60 * 60); // attempt to expire games every hour
     }
 
     @debugFunc()

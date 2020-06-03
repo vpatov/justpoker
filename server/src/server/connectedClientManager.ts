@@ -31,10 +31,10 @@ export class ConnectedClientManager {
 
     @debugFunc()
     removeClientFromGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): boolean {
-        if (this.ClientGroups[gameInstanceUUID] && this.ClientGroups[gameInstanceUUID][clientUUID]) {
+        if (this.ClientGroups[gameInstanceUUID]?.[clientUUID]) {
             // remove from group if is in group
             const ws = this.ClientGroups[gameInstanceUUID][clientUUID];
-            ws.close(1000); // close if not already closed
+            ws.close(1000); // close if not already closed, 1000 indicated normal close
             delete this.ClientGroups[gameInstanceUUID][clientUUID];
             return true;
         }
@@ -46,7 +46,7 @@ export class ConnectedClientManager {
         logger.verbose(`removing group ${gameInstanceUUID}`);
         if (this.ClientGroups[gameInstanceUUID]) {
             // close all websockets
-            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((ws) => ws.close(1000));
+            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((ws) => ws.close(1000)); // 1000 indicated normal close
             // remove group if group exists
             delete this.ClientGroups[gameInstanceUUID];
         }
