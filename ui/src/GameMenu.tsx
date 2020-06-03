@@ -69,19 +69,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function getIcon(action, iconClass) {
-    const ACTION_TO_ICON = {
-        [UiActionType.GAME_SETTINGS]: <GameSettingsIcon className={iconClass} />,
-        [UiActionType.USER_SETTINGS]: <UserSettingsIcon className={iconClass} />,
-        [UiActionType.VOLUME]: <VolumeOnIcon className={iconClass} />,
-        [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
-        [ClientActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
-        [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,
-        [ClientActionType.STARTGAME]: <StartIcon className={iconClass} />,
-    };
-    return ACTION_TO_ICON[action];
-}
-
 function GameMenu(props) {
     const { mute, SET_mute } = props;
     const classes = useStyles();
@@ -150,8 +137,8 @@ function GameMenu(props) {
             return <VolumeOnIcon className={iconClass} />;
         }
         const ACTION_TO_ICON = {
-            [UiActionType.ADMIN]: <AdminIcon className={iconClass} />,
-            [UiActionType.SETTINGS]: <SettingsIcon className={iconClass} />,
+            [UiActionType.GAME_SETTINGS]: <GameSettingsIcon className={iconClass} />,
+            [UiActionType.USER_SETTINGS]: <UserSettingsIcon className={iconClass} />,
             [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
             [ClientActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
             [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,

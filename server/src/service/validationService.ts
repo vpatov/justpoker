@@ -525,7 +525,7 @@ export class ValidationService {
     }
 
     validateSetGameParameters(clientUUID: ClientUUID, gameParameters: GameParameters): ValidationResponse {
-        let error = this.ensureClientIsAdmin(clientUUID);
+        const error = this.ensureClientIsAdmin(clientUUID);
         if (error) {
             return error;
         }
