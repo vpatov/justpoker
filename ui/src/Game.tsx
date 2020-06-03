@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
+
 import Table from './Table';
 import Controller from './Controller';
 import AudioModule from './AudioModule';
@@ -41,13 +42,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Game(props) {
+    const [mute, SET_mute] = useState(false);
+
     const classes = useStyles();
     const { wsConnClosed } = props;
     return (
         <>
             {wsConnClosed ? <GameDisconnetionMessage /> : null}
             <div className={classnames(classes.root, { [classes.disabled]: wsConnClosed })}>
-                <GameMenu />
+                <GameMenu mute={mute} SET_mute={SET_mute} />
                 <ReactionPicker />
                 <div className={classes.gameTableCont}>
                     <GameLabel />
