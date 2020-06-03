@@ -58,7 +58,7 @@ function SettingsDialog(props) {
 
     return (
         <Dialog open={open} maxWidth="md" fullWidth>
-            <DialogTitle>{`Settings`}</DialogTitle>
+            <DialogTitle>{`User Settings`}</DialogTitle>
             <DialogContent className={classes.content}>
                 <FormControl>
                     <FormLabel>Suit Color</FormLabel>
