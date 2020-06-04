@@ -59,8 +59,8 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
         },
         iconButton: {
-            height: '5vmin',
-            width: '5vmin',
+            // height: '5vmin',
+            // width: '5vmin',
             borderRadius: '5%',
         },
         icon: {

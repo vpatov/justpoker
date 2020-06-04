@@ -3,14 +3,24 @@ import { useSelector } from 'react-redux';
 import { WsServer } from './api/ws';
 import { ClientActionType } from './shared/models/api';
 import TextFieldWrap from './reuseable/TextFieldWrap';
+import IconPicker from './reuseable/IconPicker';
 
 import { makeStyles } from '@material-ui/core/styles';
-import grey from '@material-ui/core/colors/grey';
 import { ClientWsMessageRequest } from './shared/models/api';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
 import { selectGameParameters } from './store/selectors';
+import { AvatarIds } from './shared/models/assets';
+import Avatar from './Avatar';
 
 const useStyles = makeStyles((theme) => ({
+    nameRow: {
+        width: '100%',
+        display: 'flex',
+    },
+    nameField: {
+        marginLeft: '1vmin',
+        flexGrow: 1,
+    },
     field: {
         marginTop: '3vmin',
         width: '35%',
@@ -21,6 +31,13 @@ const useStyles = makeStyles((theme) => ({
     dialogPaper: {
         height: '80vh',
         maxHeight: 360,
+    },
+    avatarIcon: {
+        width: '6vmin',
+        height: '6vmin',
+    },
+    pickerMenu: {
+        width: '30vmin',
     },
 }));
 
@@ -72,6 +89,12 @@ function OpenSeatDialog(props) {
         }
     }
 
+    function getPickerOptions() {
+        return Object.keys(AvatarIds).map((key, index) => ({
+            icon: <Avatar key={`${key}${index}`} avatarKey={key} className={classes.avatarIcon} />,
+        }));
+    }
+
     return (
         <Dialog
             open={open}
@@ -81,20 +104,25 @@ function OpenSeatDialog(props) {
             classes={{ paper: classes.dialogPaper }}
         >
             <DialogContent>
-                <TextFieldWrap
-                    autoFocus
-                    id="ID_NameField"
-                    label="Name"
-                    type="text"
-                    fullWidth
-                    onChange={(event) => {
-                        setName(event.target.value);
-                        localStorage.setItem(NAME_LOCAL_STORAGE_KEY, event.target.value);
-                    }}
-                    value={name}
-                    variant="standard"
-                    maxChars={24}
-                />
+                <div className={classes.nameRow}>
+                    <IconPicker options={getPickerOptions()} paperClass={classes.pickerMenu} placement="left" />
+
+                    <TextFieldWrap
+                        className={classes.nameField}
+                        autoFocus
+                        id="ID_NameField"
+                        label="Name"
+                        type="text"
+                        fullWidth
+                        onChange={(event) => {
+                            setName(event.target.value);
+                            localStorage.setItem(NAME_LOCAL_STORAGE_KEY, event.target.value);
+                        }}
+                        value={name}
+                        variant="standard"
+                        maxChars={24}
+                    />
+                </div>
                 <TextFieldWrap
                     variant="standard"
                     type="number"
