@@ -18,8 +18,8 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
 
             overflow: 'hidden',
-            // marginLeft: '-5%',
-            marginRight: '0.3vmin',
+            marginLeft: '0.2vmin',
+            marginRight: '0.5vmin',
             // flexShrink: 0,
             height: '100%',
             width: '6vmin',
