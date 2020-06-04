@@ -26,27 +26,34 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function IconPicker(props) {
     const classes = useStyles();
-    const { options, paperClass, placement } = props;
+    const { options, paperClass, placement, initIcon, onSelect } = props;
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
-    function handleClickButton(option) {}
+    function handleClickButton(option) {
+        onSelect(option);
+        setAnchorEl(null);
+    }
 
     const open = Boolean(anchorEl);
     return (
         <>
             <IconButton className={classes.iconButton} onClick={handleClick}>
-                <PersonIcon />
+                {initIcon ? initIcon : <PersonIcon />}
             </IconButton>
             <Popper className={classes.popper} open={open} anchorEl={anchorEl} transition placement={placement}>
                 {({ TransitionProps }) => (
                     <Grow {...TransitionProps} timeout={350}>
                         <Paper className={classnames(classes.root, paperClass)} elevation={24}>
-                            {options.map((option) => (
-                                <IconButton className={classes.iconButton} onClick={() => handleClickButton(option)}>
+                            {options.map((option, i) => (
+                                <IconButton
+                                    key={i}
+                                    className={classes.iconButton}
+                                    onClick={() => handleClickButton(option)}
+                                >
                                     {option.icon}
                                 </IconButton>
                             ))}

@@ -42,11 +42,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const NAME_LOCAL_STORAGE_KEY = 'jp-last-used-name';
+const AVATAR_LOCAL_STORAGE_KEY = 'jp-last-used-avatar';
 
 function OpenSeatDialog(props) {
     const classes = useStyles();
     const { onClose, open, seatNumber } = props;
     const [name, setName] = useState(localStorage.getItem(NAME_LOCAL_STORAGE_KEY) || '');
+    const [avatarKey, SET_avatarKey] = useState(localStorage.getItem(AVATAR_LOCAL_STORAGE_KEY) || '');
     const { maxBuyin, minBuyin } = useSelector(selectGameParameters);
 
     const [buyin, setBuyin] = useState<number | undefined>();
@@ -92,6 +94,7 @@ function OpenSeatDialog(props) {
     function getPickerOptions() {
         return Object.keys(AvatarIds).map((key, index) => ({
             icon: <Avatar key={`${key}${index}`} avatarKey={key} className={classes.avatarIcon} />,
+            avatarKey: key,
         }));
     }
 
@@ -105,7 +108,15 @@ function OpenSeatDialog(props) {
         >
             <DialogContent>
                 <div className={classes.nameRow}>
-                    <IconPicker options={getPickerOptions()} paperClass={classes.pickerMenu} placement="left" />
+                    <IconPicker
+                        options={getPickerOptions()}
+                        paperClass={classes.pickerMenu}
+                        initIcon={<Avatar avatarKey={avatarKey} className={classes.avatarIcon} />}
+                        onSelect={(option) => {
+                            SET_avatarKey(option.avatarKey);
+                        }}
+                        placement="left"
+                    />
 
                     <TextFieldWrap
                         className={classes.nameField}
