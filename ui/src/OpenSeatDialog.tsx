@@ -76,6 +76,7 @@ function OpenSeatDialog(props) {
         WsServer.send({
             actionType: ClientActionType.JOINTABLEANDSITDOWN,
             request: {
+                avatarKey: avatarKey,
                 name,
                 buyin: Number(buyin),
                 seatNumber: seatNumber,

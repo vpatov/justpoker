@@ -44,7 +44,7 @@ const REACTION_TIME = 4000;
 
 function PlayerAvatar(props) {
     const classes = useStyles();
-    const { className, position, playerUUID } = props;
+    const { className, avatarKey, playerUUID } = props;
     const [showReaction, showReactionSet] = useState(false);
     const [reaction, reactionSet] = useState();
     const [timer, timerSet] = useState(0);
@@ -80,7 +80,7 @@ function PlayerAvatar(props) {
             {showReaction ? (
                 <Animoji reaction={reaction} className={classes.animoji} />
             ) : (
-                <Avatar className={classes.avatar} playerUUID={playerUUID} />
+                <Avatar className={classes.avatar} avatarKey={avatarKey} />
             )}
         </div>
     );

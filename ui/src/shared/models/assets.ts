@@ -1,3 +1,5 @@
+import { genRandomInt } from '../util/util';
+
 export enum AvatarIds {
     nun = 'nun',
     welder = 'welder',
@@ -45,4 +47,10 @@ export enum AvatarIds {
     grandfather = 'grandfather',
     'arab-woman' = 'arab-woman',
     shirt = 'shirt',
+}
+
+export function getRandomAvatarKey(): AvatarIds {
+    const AvatarVals = Object.values(AvatarIds);
+    const r = genRandomInt(0, AvatarVals.length - 1);
+    return Object.values(AvatarIds)[r];
 }

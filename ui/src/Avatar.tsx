@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { genRandomInt } from './shared/util/util';
 import AvatarsSvg from './assets/avatars/avatars.svg';
-import { AvatarIds } from './shared/models/assets';
+import { AvatarIds, getRandomAvatarKey } from './shared/models/assets';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -15,8 +15,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const AvatarVals = Object.values(AvatarIds);
-
 function Avatar(props) {
     const classes = useStyles();
     const { className, avatarKey } = props;
@@ -26,8 +24,7 @@ function Avatar(props) {
         if (avatarKey) {
             id = AvatarIds[avatarKey];
         } else {
-            const r = genRandomInt(0, AvatarVals.length - 1);
-            id = Object.values(AvatarIds)[r];
+            id = getRandomAvatarKey();
         }
         return `${AvatarsSvg}#${id}`;
     }
