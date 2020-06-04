@@ -14,8 +14,8 @@ const useStyles = makeStyles((theme: Theme) =>
             overflow: 'auto',
         },
         iconButton: {
-            height: '6vmin',
-            width: '6vmin',
+            height: '5vmin',
+            width: '5vmin',
             borderRadius: '5%',
         },
         popper: {
@@ -26,10 +26,10 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function IconPicker(props) {
     const classes = useStyles();
-    const { options, paperClass, placement, initIcon, onSelect } = props;
+    const { options, paperClass, placement, initIcon, onSelect, size, hoverOpen } = props;
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
@@ -41,7 +41,12 @@ function IconPicker(props) {
     const open = Boolean(anchorEl);
     return (
         <>
-            <IconButton className={classes.iconButton} onClick={handleClick}>
+            <IconButton
+                className={classes.iconButton}
+                onClick={hoverOpen ? undefined : handleOpen}
+                onMouseEnter={hoverOpen ? handleOpen : undefined}
+                style={{ width: size, height: size }}
+            >
                 {initIcon ? initIcon : <PersonIcon />}
             </IconButton>
             <Popper className={classes.popper} open={open} anchorEl={anchorEl} transition placement={placement}>
@@ -53,6 +58,7 @@ function IconPicker(props) {
                                     key={i}
                                     className={classes.iconButton}
                                     onClick={() => handleClickButton(option)}
+                                    style={{ width: size, height: size }}
                                 >
                                     {option.icon}
                                 </IconButton>

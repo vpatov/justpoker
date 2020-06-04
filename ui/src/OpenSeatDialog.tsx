@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
 import { selectGameParameters } from './store/selectors';
 import { AvatarIds } from './shared/models/assets';
 import Avatar from './Avatar';
+import { useStickyState } from './utils';
 
 const useStyles = makeStyles((theme) => ({
     nameRow: {
@@ -47,8 +48,8 @@ const AVATAR_LOCAL_STORAGE_KEY = 'jp-last-used-avatar';
 function OpenSeatDialog(props) {
     const classes = useStyles();
     const { onClose, open, seatNumber } = props;
-    const [name, setName] = useState(localStorage.getItem(NAME_LOCAL_STORAGE_KEY) || '');
-    const [avatarKey, SET_avatarKey] = useState(localStorage.getItem(AVATAR_LOCAL_STORAGE_KEY) || '');
+    const [name, setName] = useStickyState('', NAME_LOCAL_STORAGE_KEY);
+    const [avatarKey, SET_avatarKey] = useStickyState(undefined, AVATAR_LOCAL_STORAGE_KEY);
     const { maxBuyin, minBuyin } = useSelector(selectGameParameters);
 
     const [buyin, setBuyin] = useState<number | undefined>();
@@ -117,18 +118,17 @@ function OpenSeatDialog(props) {
                             SET_avatarKey(option.avatarKey);
                         }}
                         placement="left"
+                        size={'6vmin'}
                     />
 
                     <TextFieldWrap
                         className={classes.nameField}
-                        autoFocus
                         id="ID_NameField"
                         label="Name"
                         type="text"
                         fullWidth
                         onChange={(event) => {
                             setName(event.target.value);
-                            localStorage.setItem(NAME_LOCAL_STORAGE_KEY, event.target.value);
                         }}
                         value={name}
                         variant="standard"
@@ -148,6 +148,7 @@ function OpenSeatDialog(props) {
                     max={maxBuyin}
                     error={invalidBuyin()}
                     helperText={invalidBuyin() ? `Min Buyin is ${minBuyin}` : ''}
+                    autoFocus
                 />
             </DialogContent>
             <DialogActions>

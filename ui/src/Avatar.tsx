@@ -20,12 +20,7 @@ function Avatar(props) {
     const { className, avatarKey } = props;
 
     function getHref() {
-        let id = '';
-        if (avatarKey) {
-            id = AvatarIds[avatarKey];
-        } else {
-            id = getRandomAvatarKey();
-        }
+        const id = AvatarIds?.[avatarKey] || getRandomAvatarKey();
         return `${AvatarsSvg}#${id}`;
     }
 
