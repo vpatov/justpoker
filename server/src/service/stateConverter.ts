@@ -40,6 +40,7 @@ import { ChatService } from './chatService';
 
 import { debugFunc } from '../logger';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
+import { getHoleCardNickname } from '../../../ui/src/shared/models/cards';
 
 declare interface CardInformation {
     hand: {
@@ -325,9 +326,18 @@ export class StateConverter {
                 : { hidden: true };
         });
 
+        let handLabel = undefined;
+        if (isHero && player.holeCards.length > 0) {
+            const shouldAttemptConvertToNickName =
+                player.holeCards.length === 2 &&
+                this.gameStateManager.getBettingRoundStage() === BettingRoundStage.PREFLOP;
+            handLabel = shouldAttemptConvertToNickName
+                ? getHoleCardNickname(player.holeCards[0], player.holeCards[1]) || player.handDescription
+                : player.handDescription;
+        }
         return {
             hand: { cards },
-            handLabel: isHero && player.holeCards.length > 0 ? player.handDescription : undefined,
+            handLabel: handLabel,
         };
     }
 
