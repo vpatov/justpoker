@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
         height: '6vmin',
         alignItems: 'center',
         cursor: 'pointer',
+
         ...theme.custom.STACK,
     },
     outOfHand: {
@@ -65,6 +66,17 @@ const useStyles = makeStyles((theme) => ({
     act: {
         backgroundColor: 'rgba(0, 236, 255, 1)',
     },
+    winnerAnimojiCont: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+    },
+    winnerAnimoji: {
+        width: `100%`,
+        height: '20vmin',
+        position: 'absolute',
+    },
 }));
 
 function usePrevious(value) {
@@ -91,6 +103,9 @@ function PlayerStack(props) {
                 [classes.outOfHand]: outOfHand,
             })}
         >
+            <div className={classes.winnerAnimojiCont}>
+                {winner ? <Animoji reaction={'winner'} className={classes.winnerAnimoji} animated /> : null}
+            </div>
             <PlayerAvatar position={position} playerUUID={uuid} avatarKey={avatarKey} />
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <div className={classes.nameStackCont}>

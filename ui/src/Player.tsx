@@ -47,12 +47,18 @@ const useStyles = makeStyles((theme) => ({
             color: 'black',
         },
     },
+    winnerAnimoji: {
+        width: `${theme.custom.PLAYER_WIDTH}vmin`,
+        height: `${theme.custom.PLAYER_WIDTH}vmin`,
+        position: 'absolute',
+        // zIndex: -1,
+    },
 }));
 
 function Player(props) {
     const classes = useStyles();
     const { className, player, style, setHeroRotation, virtualPositon } = props;
-    const { stack, hand, name, playerTimer, folded, uuid, sittingOut, hero, position } = player;
+    const { stack, hand, name, playerTimer, folded, uuid, sittingOut, hero, winner } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -87,6 +93,7 @@ function Player(props) {
             style={style}
             id={uuid}
         >
+            {/* {winner ? <Animoji reaction={'winner'} className={classes.winnerAnimoji} animated /> : null} */}
             <PlayerMenu
                 handleClose={handleClose}
                 anchorEl={anchorEl}
