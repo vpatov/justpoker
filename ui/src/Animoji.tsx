@@ -20,13 +20,21 @@ function Animoji(props) {
 
     useEffect(() => {
         if (animated) {
-            import(`./assets/animoji/animated/${reaction}.svg`).then((asset) => {
-                SET_asset(asset.default);
-            });
+            import(`./assets/animoji/animated/${reaction}.gif`)
+                .then((asset) => {
+                    SET_asset(asset.default);
+                })
+                .catch(() => {
+                    console.error(`err loading ${reaction}.gif`);
+                });
         } else {
-            import(`./assets/animoji/static/${reaction}.svg`)?.then((asset) => {
-                SET_asset(asset.default);
-            });
+            import(`./assets/animoji/static/${reaction}.svg`)
+                ?.then((asset) => {
+                    SET_asset(asset.default);
+                })
+                .catch(() => {
+                    console.error(`err loading ${reaction}.svg`);
+                });
         }
     }, [reaction]);
 
