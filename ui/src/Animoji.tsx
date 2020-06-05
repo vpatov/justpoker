@@ -28,7 +28,6 @@ function Animoji(props) {
     const { className, reaction, animated } = props;
     const [asset, SET_asset] = useState();
 
-    console.log('render', asset);
     useEffect(() => {
         if (animated) {
             ANIMOJI_ASSET_ANIMATED?.[reaction]?.then((asset) => {
