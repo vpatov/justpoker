@@ -28,7 +28,7 @@ function Animoji(props) {
     const { className, reaction, animated } = props;
     const [asset, SET_asset] = useState();
 
-    console.log('render', reaction);
+    console.log('render', asset);
     useEffect(() => {
         if (animated) {
             ANIMOJI_ASSET_ANIMATED?.[reaction]?.then((asset) => {
@@ -42,7 +42,7 @@ function Animoji(props) {
     }, [reaction]);
 
     if (asset) return <img className={classnames(classes.img, className)} src={asset} alt="" />;
-    return <div className={classnames(classes.img, className)} />;
+    return null;
 }
 
 export default Animoji;
