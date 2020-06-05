@@ -264,7 +264,7 @@ export class StateGraphManager {
         switch (action.actionType) {
             case ClientActionType.BOOTPLAYER: {
                 const playerUUID = [...action.args][0];
-                this.gameStateManager.bootPlayerFromGame(playerUUID);
+                this.gameStateManager.removePlayerFromGame(playerUUID);
                 break;
             }
             case ClientActionType.SETGAMEPARAMETERS: {

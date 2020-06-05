@@ -695,7 +695,7 @@ export class GameStateManager {
             table: this.initTable(),
             gameParameters: gameParameters,
         };
-        console.log(newGame);
+
         this.timerManager.cancelStateTimer();
         this.gameState = newGame;
     }
@@ -737,12 +737,13 @@ export class GameStateManager {
         return connectedClient;
     }
 
-    bootPlayerFromGame(playerUUID: PlayerUUID) {
+    removePlayerFromGame(playerUUID: PlayerUUID) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
                 actionType: ClientActionType.BOOTPLAYER,
                 args: [playerUUID],
             });
+            this.updatePlayer(playerUUID, { quitting: true });
         } else {
             if (this.getPlayer(playerUUID)) {
                 this.removePlayerFromPlayers(playerUUID);

@@ -68,6 +68,7 @@ function Player(props) {
         sittingOut,
         hero,
         position,
+        quitting,
     } = props.player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -79,20 +80,24 @@ function Player(props) {
         setAnchorEl(null);
     };
 
-    function getplayerLabelComponent() {
+    function getPlayerLabelComponent() {
+        if (playerTimer) {
+            return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
+        }
+        if (quitting) {
+            return <Typography className={classes.labelText}>Quitting</Typography>;
+        }
         if (sittingOut) {
             return <Typography className={classes.labelText}>Sitting Out</Typography>;
         }
         if (folded) {
             return <Typography className={classes.labelText}>Folded</Typography>;
         }
-        if (playerTimer) {
-            return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
-        }
+
         return undefined;
     }
 
-    const playerLabelComponent = getplayerLabelComponent();
+    const playerLabelComponent = getPlayerLabelComponent();
 
     return (
         <div

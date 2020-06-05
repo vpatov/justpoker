@@ -161,14 +161,16 @@ export class EventProcessorService {
         },
         [ClientActionType.BOOTPLAYER]: {
             validation: (uuid, req: BootPlayerRequest) => this.validationService.validateBootPlayerAction(uuid, req),
-            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.bootPlayerFromGame(req.playerUUID),
+            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.removePlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
-        // TODO impement leave table
         [ClientActionType.LEAVETABLE]: {
             validation: (uuid, req) => undefined,
-            perform: () => null,
-            updates: [],
+            perform: (uuid) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.removePlayerFromGame(player.uuid);
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),

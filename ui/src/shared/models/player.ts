@@ -30,6 +30,9 @@ export declare interface Player {
     /** Player is at the table but not being dealt in. */
     sittingOut: boolean;
 
+    /** Player will leave table after hand. */
+    quitting: boolean;
+
     /** If this is true, player will straddle when they are in position to do so. */
     willStraddle: boolean;
 
@@ -68,6 +71,7 @@ export function getCleanPlayer(): Player {
         bestHand: null,
         sitting: false,
         sittingOut: false,
+        quitting: false,
         willStraddle: false,
         seatNumber: -1,
         lastActionType: BettingRoundActionType.NOT_IN_HAND,
