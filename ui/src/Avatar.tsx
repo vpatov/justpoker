@@ -21,6 +21,7 @@ function Avatar(props) {
 
     function getHref() {
         const id = AvatarIds?.[avatarKey] || getRandomAvatarKey();
+
         return `${AvatarsSvg}#${id}`;
     }
 

@@ -43,7 +43,6 @@ export function usePrevious<T>(value: T): T {
 export function useStickyState(defaultValue, key) {
     const [value, setValue] = useState(() => {
         const stickyValue = window.localStorage.getItem(key);
-        console.log(stickyValue, stickyValue === '');
         // block crash for parse empty string
         try {
             return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
@@ -57,4 +56,10 @@ export function useStickyState(defaultValue, key) {
     return [value, setValue];
 }
 
-export default usePrevious;
+export function importAllFromRequire(r) {
+    let images = {};
+    r.keys().map((item, index) => {
+        images[item.replace('./', '')] = r(item);
+    });
+    return images;
+}

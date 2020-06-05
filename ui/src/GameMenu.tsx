@@ -175,7 +175,7 @@ function GameMenu(props) {
                 >
                     {open ? (
                         menuButtons.map((button) => (
-                            <Tooltip title={button.label} placement="right">
+                            <Tooltip key={button.label} title={button.label} placement="right">
                                 <IconButton
                                     className={classes.iconButton}
                                     onClick={() => handleClickButton(button.action)}

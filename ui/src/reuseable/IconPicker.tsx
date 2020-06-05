@@ -5,7 +5,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import { Paper, Grow, Popper } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -28,7 +28,7 @@ function IconPicker(props) {
     const classes = useStyles();
     const { options, paperClass, placement, initIcon, onSelect, size, hoverOpen } = props;
 
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
@@ -49,26 +49,34 @@ function IconPicker(props) {
             >
                 {initIcon ? initIcon : <PersonIcon />}
             </IconButton>
-            <Popper className={classes.popper} open={open} anchorEl={anchorEl} transition placement={placement}>
-                {({ TransitionProps }) => (
-                    <Grow {...TransitionProps} timeout={350}>
-                        <Paper className={classnames(classes.root, paperClass)} elevation={24}>
-                            {options.map((option, i) => (
-                                <IconButton
-                                    key={i}
-                                    className={classes.iconButton}
-                                    onClick={() => handleClickButton(option)}
+            {open ? (
+                <Popper className={classes.popper} open={true} anchorEl={anchorEl} transition placement={placement}>
+                    {({ TransitionProps }) => (
+                        <Grow {...TransitionProps} timeout={350}>
+                            <Paper className={classnames(classes.root, paperClass)} elevation={24}>
+                                <Options
+                                    options={options}
+                                    handleClickButton={handleClickButton}
                                     style={{ width: size, height: size }}
-                                >
-                                    {option.icon}
-                                </IconButton>
-                            ))}
-                        </Paper>
-                    </Grow>
-                )}
-            </Popper>
+                                    className={classes.iconButton}
+                                />
+                            </Paper>
+                        </Grow>
+                    )}
+                </Popper>
+            ) : null}
         </>
     );
+}
+
+function Options(props) {
+    const { options, handleClickButton, style, className } = props;
+    console.log('Options map render');
+    return options.map((option, i) => (
+        <IconButton key={i} className={className} onClick={() => handleClickButton(option)} style={style}>
+            {option.icon}
+        </IconButton>
+    ));
 }
 
 export default IconPicker;
