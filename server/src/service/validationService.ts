@@ -461,6 +461,17 @@ export class ValidationService {
         return undefined;
     }
 
+    validateLeaveTableAction(clientUUID: ClientUUID, req: BootPlayerRequest): ValidationResponse {
+        const player = this.gsm.getPlayer(req.playerUUID);
+        if (!player) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} is not at table.`,
+            };
+        }
+        return undefined;
+    }
+
     validateBootPlayerAction(clientUUID: ClientUUID, req: BootPlayerRequest): ValidationResponse {
         const error = this.ensureClientIsAdmin(clientUUID);
         if (error) {
