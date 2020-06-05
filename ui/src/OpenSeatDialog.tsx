@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ClientWsMessageRequest } from './shared/models/api';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
 import { selectGameParameters } from './store/selectors';
-import { AvatarKeys } from './shared/models/assets';
+import { AvatarKeys, getRandomAvatarKey } from './shared/models/assets';
 import Avatar from './Avatar';
 import { useStickyState } from './utils';
 
@@ -49,7 +49,7 @@ function OpenSeatDialog(props) {
     const classes = useStyles();
     const { onClose, open, seatNumber } = props;
     const [name, setName] = useStickyState('', NAME_LOCAL_STORAGE_KEY);
-    const [avatarKey, SET_avatarKey] = useStickyState(undefined, AVATAR_LOCAL_STORAGE_KEY);
+    const [avatarKey, SET_avatarKey] = useStickyState(getRandomAvatarKey(), AVATAR_LOCAL_STORAGE_KEY);
     const { maxBuyin, minBuyin } = useSelector(selectGameParameters);
 
     const [buyin, setBuyin] = useState<number | undefined>();

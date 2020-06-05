@@ -1,5 +1,6 @@
 import { genRandomInt } from '../util/util';
 
+/* eslint-disable @typescript-eslint/camelcase */
 export enum AvatarKeys {
     nun = 'nun',
     welder = 'welder',

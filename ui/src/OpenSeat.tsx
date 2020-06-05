@@ -47,7 +47,7 @@ function OpenSeat(props) {
             >
                 <Typography className={classes.sit}>Sit Here</Typography>
             </IconButton>
-            <OpenSeatDialog open={dialogOpen} onClose={dialogClose} seatNumber={seatNumber} />
+            {dialogOpen ? <OpenSeatDialog open={dialogOpen} onClose={dialogClose} seatNumber={seatNumber} /> : null}
         </Fragment>
     );
 }

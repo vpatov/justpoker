@@ -29,7 +29,7 @@ import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { AvatarIds } from '../../../ui/src/shared/models/assets';
+import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -88,7 +88,7 @@ export class GameStateManager {
         };
     }
 
-    createNewPlayer(name: string, chips: number, avatarKey: AvatarIds): Player {
+    createNewPlayer(name: string, chips: number, avatarKey: AvatarKeys): Player {
         return {
             ...getCleanPlayer(),
             uuid: generatePlayerUUID(),

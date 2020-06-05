@@ -34,7 +34,7 @@ function IconPicker(props) {
         setAnchorEl(anchorEl ? null : event.currentTarget);
         // this is to ensure paper renders first, then we try to render large set of images
         // I can't tell if this is really hacky and bad or sorta clever...
-        setTimeout(() => SET_renderOptions(true), 10);
+        setTimeout(() => SET_renderOptions(true), 50);
     };
 
     function handleClickButton(option) {
@@ -77,7 +77,7 @@ function IconPicker(props) {
 
 function Options(props) {
     const { options, handleClickButton, style, className } = props;
-    console.log('Options map render');
+
     return options.map((option, i) => (
         <IconButton key={i} className={className} onClick={() => handleClickButton(option)} style={style}>
             {option.icon}

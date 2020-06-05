@@ -70,7 +70,7 @@ const RECENTLY_USED_REACTIONS_KEY = 'jp-recent-reaction-keys';
 
 function ReactionPicker(props) {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
+    const [open, SET_open] = React.useState(false);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
     const seated = useSelector(isHeroSeatedSelector);
 
@@ -80,21 +80,19 @@ function ReactionPicker(props) {
     );
 
     const handleOpen = () => {
-        setOpen(true);
+        SET_open(true);
     };
 
     const handleClose = () => {
-        setOpen(false);
+        SET_open(false);
     };
 
     const onSelectReaction = (option) => {
         if (!recentlyUsed.includes(option.reaction)) {
-            recentlyUsed.shift();
-            recentlyUsed.push(option.reaction);
-            SET_recentlyUsed([...recentlyUsed]);
+            SET_recentlyUsed([...recentlyUsed.slice(1), option.reaction]);
         }
         sendServerAction(option.reaction);
-        setOpen(false);
+        SET_open(false);
     };
 
     function sendServerAction(reaction) {
