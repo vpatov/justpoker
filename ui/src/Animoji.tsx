@@ -9,6 +9,7 @@ const useStyles = makeStyles((theme: Theme) =>
         img: {
             width: `100%`,
             height: `100%`,
+            filter: `drop-shadow(0px 0px 3px rgba(0, 0, 0, .7))`,
         },
     }),
 );
