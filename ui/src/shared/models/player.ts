@@ -1,7 +1,7 @@
 import { Card, Hand } from './cards';
 import { BettingRoundActionType } from './game';
 import { PlayerUUID, makeBlankUUID } from './uuid';
-import { AvatarIds } from './assets';
+import { AvatarKeys } from './assets';
 
 export declare interface Player {
     /** Unique identifier for player. */
@@ -59,7 +59,7 @@ export declare interface Player {
     timeBanksLeft: number;
 
     /** Indicates which avatar the player is using */
-    avatarKey: AvatarIds;
+    avatarKey: AvatarKeys;
 }
 
 export function getCleanPlayer(): Player {
@@ -80,6 +80,6 @@ export function getCleanPlayer(): Player {
         chipsAtStartOfHand: 0,
         chipDelta: 0,
         timeBanksLeft: 0,
-        avatarKey: AvatarIds.shark,
+        avatarKey: AvatarKeys.shark,
     };
 }

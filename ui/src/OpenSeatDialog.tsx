@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ClientWsMessageRequest } from './shared/models/api';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
 import { selectGameParameters } from './store/selectors';
-import { AvatarIds } from './shared/models/assets';
+import { AvatarKeys } from './shared/models/assets';
 import Avatar from './Avatar';
 import { useStickyState } from './utils';
 
@@ -94,7 +94,7 @@ function OpenSeatDialog(props) {
     }
 
     function getPickerOptions() {
-        return Object.keys(AvatarIds).map((key, index) => ({
+        return Object.keys(AvatarKeys).map((key, index) => ({
             icon: <Avatar key={`${key}${index}`} avatarKey={key} className={classes.avatarIcon} />,
             avatarKey: key,
         }));

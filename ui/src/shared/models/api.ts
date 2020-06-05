@@ -2,7 +2,7 @@ import { BettingRoundAction, GameType, GameParameters } from './game';
 import { Suit, Card } from './cards';
 import { GameInstanceUUID, ClientUUID, PlayerUUID } from './uuid';
 import { ReactionTrigger } from './animationState';
-import { AvatarIds } from './assets';
+import { AvatarKeys } from './assets';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
@@ -79,7 +79,7 @@ export declare interface SitDownRequest {
 export declare interface JoinTableRequest {
     name: string;
     buyin: number;
-    avatarKey: AvatarIds;
+    avatarKey: AvatarKeys;
     // admin: boolean;
     // sitdown: boolean;
     // password?: string;

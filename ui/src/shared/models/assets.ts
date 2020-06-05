@@ -1,6 +1,6 @@
 import { genRandomInt } from '../util/util';
 
-export enum AvatarIds {
+export enum AvatarKeys {
     nun = 'nun',
     welder = 'welder',
     priest = 'priest',
@@ -226,8 +226,8 @@ export const AnimojiKeysDefaultRecentlyUsed = [
     AnimojiKeys.fishing_pole,
 ];
 
-export function getRandomAvatarKey(): AvatarIds {
-    const AvatarVals = Object.values(AvatarIds);
+export function getRandomAvatarKey(): AvatarKeys {
+    const AvatarVals = Object.values(AvatarKeys);
     const r = genRandomInt(0, AvatarVals.length - 1);
-    return Object.values(AvatarIds)[r];
+    return Object.values(AvatarKeys)[r];
 }

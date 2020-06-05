@@ -16,7 +16,7 @@ import {
     getDefaultGameParameters,
 } from './game';
 import { PlayerUUID, makeBlankUUID } from './uuid';
-import { getRandomAvatarKey, AvatarIds } from './assets';
+import { getRandomAvatarKey, AvatarKeys } from './assets';
 
 export declare interface ErrorDisplay {
     message?: string;
@@ -147,7 +147,7 @@ export declare interface UiPlayer {
     hand: {
         cards: UiCard[];
     };
-    avatarKey: AvatarIds;
+    avatarKey: AvatarKeys;
 }
 
 export enum PositionIndicator {
