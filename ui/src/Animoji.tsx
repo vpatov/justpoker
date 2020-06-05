@@ -13,16 +13,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const ANIMOJI_ASSET_ANIMATED = Object.values(AnimojiKeys).reduce((acc, key) => {
-    acc[key] = import(`./assets/animoji/animated/${key}.gif`);
-    return acc;
-}, {});
-
-const ANIMOJI_ASSET_STATIC = Object.values(AnimojiKeys).reduce((acc, key) => {
-    acc[key] = import(`./assets/animoji/static/${key}.svg`);
-    return acc;
-}, {});
-
 function Animoji(props) {
     const classes = useStyles();
     const { className, reaction, animated } = props;
@@ -30,11 +20,11 @@ function Animoji(props) {
 
     useEffect(() => {
         if (animated) {
-            ANIMOJI_ASSET_ANIMATED?.[reaction]?.then((asset) => {
+            import(`./assets/animoji/animated/${reaction}.svg`).then((asset) => {
                 SET_asset(asset.default);
             });
         } else {
-            ANIMOJI_ASSET_STATIC?.[reaction]?.then((asset) => {
+            import(`./assets/animoji/static/${reaction}.svg`)?.then((asset) => {
                 SET_asset(asset.default);
             });
         }
