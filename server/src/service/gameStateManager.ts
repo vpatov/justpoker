@@ -23,12 +23,12 @@ import { DeckService } from './deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
-import { TimerManager } from './timerManager';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 
 // TODO Re-organize methods in some meaningful way
@@ -63,7 +63,6 @@ export class GameStateManager {
     constructor(
         private readonly deckService: DeckService,
         private readonly handSolverService: HandSolverService,
-        private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
     ) {}
 
@@ -125,6 +124,10 @@ export class GameStateManager {
 
     forEveryPlayerUUID(performFn: (playerUUID: PlayerUUID) => void) {
         Object.keys(this.gameState.players).forEach(performFn);
+    }
+
+    forEveryPlayer(performFn: (player: Player) => void) {
+        Object.values(this.gameState.players).forEach(performFn);
     }
 
     forEveryClient(performFn: (client: ConnectedClient) => void) {
@@ -249,7 +252,15 @@ export class GameStateManager {
         this.gameState.straddleUUID = straddleUUID;
     }
 
-    getBoard() {
+    getHandNumber() {
+        return this.gameState.handNumber;
+    }
+
+    incrementHandNumber() {
+        this.gameState.handNumber += 1;
+    }
+
+    getBoard(): ReadonlyArray<Card> {
         return this.gameState.board;
     }
 
@@ -450,7 +461,26 @@ export class GameStateManager {
         return seats;
     }
 
-    getPositionRelativeToDealer(playerUUID: PlayerUUID) {
+    getPlayerPositionMap(): Map<PlayerUUID, PlayerPosition> {
+        const numPlayers = this.getPlayersDealtIn().length;
+        const positions = PLAYER_POSITIONS_BY_HEADCOUNT[numPlayers];
+        const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
+        const seats = this.getSeats().filter(([seatNumber, uuid]) => this.wasPlayerDealtIn(uuid));
+
+        let currentPlayerUUID = this.getDealerUUID();
+        let currentSeatNumber = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
+        let positionIndex = 0;
+
+        while (positionIndex < numPlayers) {
+            playerPositionMap.set(currentPlayerUUID, positions[positionIndex]);
+            positionIndex += 1;
+            currentSeatNumber = (currentSeatNumber + 1) % seats.length;
+            currentPlayerUUID = seats[currentSeatNumber][1];
+        }
+        return playerPositionMap;
+    }
+
+    getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
         const numPlayers = this.getPlayersDealtIn().length;
         return (
             this.getPlayer(playerUUID).seatNumber +
@@ -459,8 +489,8 @@ export class GameStateManager {
     }
 
     comparePositions(playerA: PlayerUUID, playerB: PlayerUUID) {
-        const posA = this.getPositionRelativeToDealer(playerA);
-        const posB = this.getPositionRelativeToDealer(playerB);
+        const posA = this.getSeatNumberRelativeToDealer(playerA);
+        const posB = this.getSeatNumberRelativeToDealer(playerB);
 
         if (playerA === playerB) {
             throw Error(
@@ -673,9 +703,10 @@ export class GameStateManager {
         return this.deckService.drawCard(this.gameState.deck);
     }
 
-    dealCardsToBoard(amount: number) {
+    dealCardsToBoard(amount: number): Card[] {
         const newCards = [...Array(amount).keys()].map((_) => this.drawCard());
         this.gameState.board.push(...newCards);
+        return newCards;
     }
 
     dealCardsToPlayer(amount: number, playerUUID: PlayerUUID) {
@@ -715,8 +746,6 @@ export class GameStateManager {
             table: this.initTable(),
             gameParameters: gameParameters,
         };
-        console.log(newGame);
-        this.timerManager.cancelStateTimer();
         this.gameState = newGame;
     }
 
@@ -858,7 +887,7 @@ export class GameStateManager {
         );
     }
 
-    setPlayerCardsVisible(playerUUID: PlayerUUID, matchCard: Card) {
+    setPlayerCardVisible(playerUUID: PlayerUUID, matchCard: Card) {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {
             holeCards: player.holeCards.map((holeCard) => {
@@ -918,6 +947,10 @@ export class GameStateManager {
 
     setLastBettingRoundAction(lastBettingRoundAction: BettingRoundAction) {
         this.gameState.lastBettingRoundAction = lastBettingRoundAction;
+    }
+
+    getHoleCards(playerUUID: PlayerUUID): ReadonlyArray<Card> {
+        return this.getPlayer(playerUUID).holeCards;
     }
 
     computeBestHandForPlayer(playerUUID: PlayerUUID): Hand {
@@ -985,6 +1018,10 @@ export class GameStateManager {
         this.getPlayer(playerUUID).betAmount = betAmount;
     }
 
+    getPlayerChipsAtStartOfHand(playerUUID: PlayerUUID): number {
+        return this.getPlayer(playerUUID).chipsAtStartOfHand;
+    }
+
     setPlayerChipDelta(playerUUID: PlayerUUID, chipDelta: number) {
         this.getPlayer(playerUUID).chipDelta = chipDelta;
     }
@@ -996,6 +1033,12 @@ export class GameStateManager {
         }));
     }
 
+    recordPlayerChipsAtStartOfHand() {
+        this.forEveryPlayer((player) => {
+            player.chipsAtStartOfHand = player.chips;
+        });
+    }
+
     clearStateOfHandInfo() {
         this.updatePlayers((_) => ({
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
@@ -1005,6 +1048,8 @@ export class GameStateManager {
             winner: false,
             betAmount: 0,
             timeBanksUsedThisAction: 0,
+            chipDelta: 0,
+            chipsAtStartOfHand: 0,
         }));
 
         // TODO make gameState partial that represents a clean pre-hand state.
