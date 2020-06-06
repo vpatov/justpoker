@@ -17,6 +17,7 @@ import {
     BettingRoundStage,
     BettingRoundAction,
     BettingRoundActionType,
+    MaxBuyinType,
 } from '../../../ui/src/shared/models/game';
 import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
 import { DeckService } from '../cards/deckService';
@@ -30,6 +31,7 @@ import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
 import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/assets';
+import sortBy from 'lodash/sortBy';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -74,6 +76,34 @@ export class GameStateManager {
 
     getGameStage(): GameStage {
         return this.gameState.gameStage;
+    }
+
+    getMaxBuyin(): number {
+        const { maxBuyin, minBuyin, maxBuyinType, dynamicMaxBuyin } = this.gameState.gameParameters;
+        if (!dynamicMaxBuyin) return maxBuyin;
+
+        const sortedPlayer: Player[] = sortBy(
+            Object.values(this.gameState.players),
+            (player: Player) => player.chips * -1,
+        );
+        switch (maxBuyinType) {
+            case MaxBuyinType.TopStack:
+                return Math.max(maxBuyin, sortedPlayer[0]?.chips || 0);
+            case MaxBuyinType.HalfTopStack:
+                return Math.max(maxBuyin, Math.floor((sortedPlayer[0]?.chips || 0) / 2));
+            case MaxBuyinType.SecondStack:
+                return Math.max(maxBuyin, sortedPlayer[1]?.chips || 0);
+            case MaxBuyinType.AverageStack:
+                const playerArr = Object.values(this.gameState.players);
+                const avgStackSize = Math.floor(
+                    playerArr.reduce((sum, player) => sum + player.chips, 0) / playerArr.length,
+                );
+                return Math.max(maxBuyin, avgStackSize || 0);
+
+            default:
+                logger.error('received unsupported maxBuyinType in params: ', this.gameState.gameParameters);
+                return maxBuyin;
+        }
     }
 
     updateGameStage(gameStage: GameStage) {
