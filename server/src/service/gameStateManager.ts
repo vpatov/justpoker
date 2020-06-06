@@ -24,7 +24,14 @@ import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
 import { TimerManager } from './timerManager';
-import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
+import {
+    Hand,
+    Card,
+    cardsAreEqual,
+    convertHandToCardArray,
+    Suit,
+    getHoleCardNickname,
+} from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
@@ -931,6 +938,8 @@ export class GameStateManager {
     }
 
     getStrDescriptionFromHand(hand: Hand): string {
+        // removes wanted characters from the description string: '&,
+        // Two pair, A's & Q's => Two pair As Qs
         return hand.descr.replace(/'/g, '').replace(/&/g, '').replace(/,/g, '');
     }
 
@@ -1079,10 +1088,7 @@ export class GameStateManager {
 
     getWinningHandDescription(): string | undefined {
         const winners = this.getWinners();
-        if (winners?.length) {
-            return this.getStrDescriptionFromHand(this.getPlayerBestHand(winners[0]));
-        }
-        return undefined;
+        return winners.length ? this.getStrDescriptionFromHand(this.getPlayerBestHand(winners[0])) : undefined;
     }
 
     setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {

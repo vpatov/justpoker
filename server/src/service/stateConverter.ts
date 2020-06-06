@@ -328,19 +328,22 @@ export class StateConverter {
                 : { hidden: true };
         });
 
-        let handLabel = undefined;
+        return {
+            hand: { cards },
+            handLabel: this.computeHandLabel(isHero, player),
+        };
+    }
+
+    computeHandLabel(isHero: boolean, player: Player) {
         if (isHero && player.holeCards.length > 0) {
             const shouldAttemptConvertToNickName =
                 player.holeCards.length === 2 &&
                 this.gameStateManager.getBettingRoundStage() === BettingRoundStage.PREFLOP;
-            handLabel = shouldAttemptConvertToNickName
+            return shouldAttemptConvertToNickName
                 ? getHoleCardNickname(player.holeCards[0], player.holeCards[1]) || player.handDescription
                 : player.handDescription;
         }
-        return {
-            hand: { cards },
-            handLabel: handLabel,
-        };
+        return undefined;
     }
 
     transformCommunityCards(): UiCard[] {

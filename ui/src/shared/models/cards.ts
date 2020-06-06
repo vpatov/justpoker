@@ -143,11 +143,11 @@ export function convertHandToCardArray(hand: Hand): Card[] {
 }
 
 export function getHoleCardNickname(cardA: Card, cardB: Card): string | undefined {
-    const ranksToName: Record<string, any> = {
+    const ranksToName: Record<string, string> = {
         // Pairs
         AA: 'Rockets',
         KK: 'Cowboys',
-        QQ: 'Ladies',
+        QQ: 'Pair of Ladies',
         JJ: 'Jaybirds',
         TT: 'Dimes',
         '99': 'Popeyes',
