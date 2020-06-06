@@ -83,12 +83,15 @@ export class GameStateManager {
         const { maxBuyin, minBuyin, maxBuyinType, dynamicMaxBuyin } = this.gameState.gameParameters;
         if (!dynamicMaxBuyin) return maxBuyin;
 
-        const sortedPlayer: Player[] = sortBy(Object.values(this.gameState.players), (player: Player) => player.chips);
+        const sortedPlayer: Player[] = sortBy(
+            Object.values(this.gameState.players),
+            (player: Player) => player.chips * -1,
+        );
         switch (maxBuyinType) {
             case MaxBuyinType.TopStack:
                 return Math.max(minBuyin, sortedPlayer?.[0]?.chips || 0);
             case MaxBuyinType.HalfTopStack:
-                return Math.max(minBuyin, sortedPlayer?.[0]?.chips || 0 / 2);
+                return Math.max(minBuyin, (sortedPlayer?.[0]?.chips || 0) / 2);
             case MaxBuyinType.SecondStack:
                 return Math.max(minBuyin, sortedPlayer?.[1]?.chips || 0);
 

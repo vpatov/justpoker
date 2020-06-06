@@ -40,7 +40,6 @@ export declare interface GameParameters {
 }
 
 export enum MaxBuyinType {
-    None = 'None',
     TopStack = 'TopStack',
     HalfTopStack = 'HalfTopStack',
     SecondStack = 'SecondStack',
@@ -113,7 +112,7 @@ export function getCleanGameParameters() {
         maxBuyin: 0,
         minBuyin: 0,
         dynamicMaxBuyin: false,
-        maxBuyinType: MaxBuyinType.None,
+        maxBuyinType: MaxBuyinType.TopStack,
         timeToAct: 0,
         maxPlayers: 0,
         timeBankTime: 0,
@@ -132,7 +131,7 @@ export function getDefaultGameParameters() {
         maxBuyin: 200,
         minBuyin: 50,
         dynamicMaxBuyin: false,
-        maxBuyinType: MaxBuyinType.None,
+        maxBuyinType: MaxBuyinType.TopStack,
         timeToAct: 30,
         maxPlayers: 9,
         timeBankTime: 30,

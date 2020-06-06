@@ -11,7 +11,7 @@ import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
 
 import { MIN_VALUES, MAX_VALUES } from './shared/util/consts';
-import { GameType } from './shared/models/game';
+import { GameType, MaxBuyinType } from './shared/models/game';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import RadioForm from './reuseable/RadioForm';
 import IconTooltip from './reuseable/IconTooltip';
@@ -63,6 +63,8 @@ function GameParamatersDialog(props) {
         numberTimeBanks,
         timeBankTime,
         allowTimeBanks,
+        dynamicMaxBuyin,
+        maxBuyinType,
     } = curGameParameters;
 
     function onPressEnter(event: any) {
@@ -145,6 +147,39 @@ function GameParamatersDialog(props) {
                         >
                             <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
                             <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="Enables Max Buyin to be computed during the game according to the sizes of other player's stacks."
+                            placement="left"
+                        />
+                        <RadioForm
+                            label="Dynamic Max Buyin"
+                            onChange={(event) =>
+                                setIntoGameParameters('dynamicMaxBuyin', event.target.value === 'true')
+                            }
+                            value={dynamicMaxBuyin + ''}
+                            options={[
+                                { label: 'Dynamic', value: 'true' },
+                                { label: 'Fixed', value: 'false' },
+                            ]}
+                            radioGroupProps={{ row: true }}
+                        />
+                    </div>
+                    <FormControl className={classes.field}>
+                        <InputLabel>Max Buyin Type</InputLabel>
+                        <Select
+                            value={dynamicMaxBuyin ? maxBuyinType : ''}
+                            onChange={(event) =>
+                                setIntoGameParameters('maxBuyinType', event.target.value as MaxBuyinType)
+                            }
+                            disabled={!dynamicMaxBuyin}
+                        >
+                            <MenuItem value={MaxBuyinType.TopStack}>Largest Stack</MenuItem>
+                            <MenuItem value={MaxBuyinType.HalfTopStack}>Half of Largest Stack</MenuItem>
+                            <MenuItem value={MaxBuyinType.SecondStack}>Second Largest Stack</MenuItem>
                         </Select>
                     </FormControl>
                     <TextFieldWrap

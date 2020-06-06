@@ -4,6 +4,7 @@ import {
     BettingRoundActionType,
     BettingRoundAction,
     GameType,
+    MaxBuyinType,
     GameParameters,
 } from '../../../ui/src/shared/models/game';
 import {
