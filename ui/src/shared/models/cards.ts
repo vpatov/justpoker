@@ -166,10 +166,10 @@ export function getHoleCardNickname(cardA: Card, cardB: Card): string | undefine
         A9: 'Rounders',
         A8: "Dead Man's Hand",
         A7: 'Slapshot',
-        A6: 'Mile High Club',
+        A6: 'SixCess',
         A5: 'High Five',
         A4: 'Fake Aces',
-        A3: 'Thrace',
+        A3: 'Thraces',
         A2: 'Little Slick',
 
         // These sorta get stupid, prob dont need
