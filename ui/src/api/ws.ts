@@ -21,7 +21,7 @@ export class WsServer {
 
     static openWs(gameInstanceUUID: GameInstanceUUID) {
         console.log('opening ws...');
-        const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
+        const wsURL = `wss://0.0.0.0:${DEFAULT_WS_PORT}`;
         const wsURI = {
             url: wsURL,
             query: {

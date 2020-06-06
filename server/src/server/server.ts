@@ -2,7 +2,11 @@ import 'reflect-metadata';
 import { Service, Container } from 'typedi';
 
 import * as http from 'http';
+import * as https from 'https';
 import * as WebSocket from 'ws';
+import * as fs from 'fs';
+import * as path from 'path';
+
 import express from 'express';
 import bodyParser from 'body-parser';
 import queryString from 'query-string';
@@ -34,7 +38,7 @@ const enum ExecutionSnippet {
 @Service()
 class Server {
     app: express.Application;
-    server: http.Server;
+    server: https.Server;
     defaultPort = 8080;
     wss: WebSocket.Server;
     performanceMetrics: PerformanceMetrics = {
@@ -201,7 +205,14 @@ class Server {
     init() {
         this.app = express();
         this.initHTTPRoutes();
-        this.server = http.createServer(this.app);
+        this.server = https.createServer(
+            {
+                key: fs.readFileSync(path.resolve(__dirname, './keys/server.key')),
+                cert: fs.readFileSync(path.resolve(__dirname, './keys/server.cert')),
+            },
+            this.app,
+        );
+
         this.initGameWSS();
         this.server.listen(process.env.PORT || this.defaultPort, () => {
             const addressInfo = this.server.address() as AddressInfo;
