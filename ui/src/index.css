@@ -1,14 +1,37 @@
+:root {
+    scrollbar-color: #646464 black;
+    scrollbar-width: thin;
+}
+
 body {
     margin: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    scrollbar-face-color: #646464;
-    scrollbar-base-color: #646464;
-    scrollbar-3dlight-color: #646464;
-    scrollbar-highlight-color: #646464;
-    scrollbar-track-color: #000;
-    scrollbar-arrow-color: #000;
-    scrollbar-shadow-color: #646464;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 3px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #646464;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-track-piece {
+    background-color: black;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+    height: 50px;
+    background-color: #666;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-corner {
+    background-color: #646464;
+}
+::-webkit-resizer {
+    background-color: #666;
 }
 
 @font-face {
@@ -34,28 +57,4 @@ body {
 a {
     text-decoration: none;
     color: unset;
-}
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-::-webkit-scrollbar-button {
-    display: none;
-}
-::-webkit-scrollbar-track {
-    background-color: #646464;
-}
-::-webkit-scrollbar-track-piece {
-    background-color: black;
-}
-::-webkit-scrollbar-thumb {
-    height: 50px;
-    background-color: #666;
-    border-radius: 3px;
-}
-::-webkit-scrollbar-corner {
-    background-color: #646464;
-}
-::-webkit-resizer {
-    background-color: #666;
 }
