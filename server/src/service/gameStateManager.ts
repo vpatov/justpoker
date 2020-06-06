@@ -1073,6 +1073,14 @@ export class GameStateManager {
         return this.filterPlayerUUIDs((playerUUID) => this.getPlayer(playerUUID).winner);
     }
 
+    getWinningHandDescription(): string | undefined {
+        const winners = this.getWinners();
+        if (winners?.length) {
+            return this.getPlayerBestHand(winners[0]).descr;
+        }
+        return undefined;
+    }
+
     setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {
         this.getPlayer(playerUUID).winner = isWinner;
     }

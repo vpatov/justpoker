@@ -89,7 +89,7 @@ export class StateGraphManager {
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
         [GameStage.SHOW_BET_ACTION]: 200,
         [GameStage.FINISH_BETTING_ROUND]: 1200,
-        [GameStage.SHOW_WINNER]: 4000,
+        [GameStage.SHOW_WINNER]: 6500,
         [GameStage.POST_HAND_CLEANUP]: 400,
     };
 

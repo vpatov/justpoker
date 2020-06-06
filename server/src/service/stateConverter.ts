@@ -88,6 +88,7 @@ export class StateConverter {
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
         const board = this.gameStateManager.getBoard();
+        const winners = this.gameStateManager.getWinners();
 
         // TODO put each key into its own function
         const uiState: UiState = {
@@ -111,6 +112,7 @@ export class StateConverter {
                                       ? []
                                       : this.gameStateManager.getInactivePotsValues(),
                               communityCards: this.transformCommunityCards(),
+                              winningHandDescription: this.gameStateManager.getWinningHandDescription(),
                           },
                           players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
                               this.transformPlayer(player, heroPlayerUUID),

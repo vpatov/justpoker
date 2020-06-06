@@ -95,11 +95,11 @@ const useStyles = makeStyles((theme) => ({
     },
     winningHandDescription: {
         zIndex: 5,
-        marginTop: '25vmin',
-        fontSize: '3vmin',
+        marginTop: '27vmin',
+        fontSize: '3.4vmin',
         fontWeight: 'bold',
-        textShadow: `0.2vmin 0.2vmin ${theme.palette.secondary.main}, 0.3vmin 0.3vmin ${theme.palette.primary.main}`,
-        filter: 'drop-shadow(-0.1vmin -0.1vmin 0.2vmin black);',
+        color: 'white',
+        textShadow: `0.2vmin 0.2vmin ${theme.palette.secondary.main}`,
     },
 }));
 
