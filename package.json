@@ -8,5 +8,8 @@
   "devDependencies": {
     "@types/config": "0.0.36",
     "concurrently": "^1.0.0"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.155"
   }
 }

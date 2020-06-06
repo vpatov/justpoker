@@ -164,6 +164,12 @@ export class ValidationService {
                 errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
             };
         }
+        if (request.buyin > this.gsm.getMaxBuyin()) {
+            return {
+                errorString: `Buyin ${request.buyin} buying exceeds gama parameter limit of ${this.gsm.getMaxBuyin()}.`,
+                errorType: ErrorType.ILLEGAL_ACTION,
+            };
+        }
         return undefined;
     }
 
@@ -559,6 +565,12 @@ export class ValidationService {
             ),
         ];
 
+        if (gameParameters.dynamicMaxBuyin && gameParameters.minBuyin === 0) {
+            return {
+                errorType: ErrorType.ILLEGAL_VALUE,
+                errorString: `Dynamic max buyin must have non-zero min buyin`,
+            };
+        }
         return minMaxErrors.find((err) => err !== undefined);
     }
 }
