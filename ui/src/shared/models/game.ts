@@ -43,6 +43,7 @@ export enum MaxBuyinType {
     TopStack = 'TopStack',
     HalfTopStack = 'HalfTopStack',
     SecondStack = 'SecondStack',
+    AverageStack = 'AverageStack',
 }
 
 export enum StraddleType {

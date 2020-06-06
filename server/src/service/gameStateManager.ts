@@ -89,15 +89,21 @@ export class GameStateManager {
         );
         switch (maxBuyinType) {
             case MaxBuyinType.TopStack:
-                return Math.max(minBuyin, sortedPlayer?.[0]?.chips || 0);
+                return Math.max(maxBuyin, sortedPlayer[0]?.chips || 0);
             case MaxBuyinType.HalfTopStack:
-                return Math.max(minBuyin, (sortedPlayer?.[0]?.chips || 0) / 2);
+                return Math.max(maxBuyin, Math.floor((sortedPlayer[0]?.chips || 0) / 2));
             case MaxBuyinType.SecondStack:
-                return Math.max(minBuyin, sortedPlayer?.[1]?.chips || 0);
+                return Math.max(maxBuyin, sortedPlayer[1]?.chips || 0);
+            case MaxBuyinType.AverageStack:
+                const playerArr = Object.values(this.gameState.players);
+                const avgStackSize = Math.floor(
+                    playerArr.reduce((sum, player) => sum + player.chips, 0) / playerArr.length,
+                );
+                return Math.max(maxBuyin, avgStackSize || 0);
 
             default:
                 logger.error('received unsupported maxBuyinType in params: ', this.gameState.gameParameters);
-                return 0;
+                return maxBuyin;
         }
     }
 
