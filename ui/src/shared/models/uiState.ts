@@ -118,6 +118,7 @@ export declare interface Table {
     inactivePots?: number[];
     awardPots?: AwardPot[];
     readonly communityCards: UiCard[];
+    winningHandDescription?: string;
 }
 
 export declare interface AwardPot {
@@ -426,6 +427,7 @@ export const TestGame: UiGameState = {
             { rank: 'T', suit: Suit.CLUBS },
             genRandomCard(),
         ],
+        winningHandDescription: 'Full House, As over 5s',
     },
     players: [
         {
