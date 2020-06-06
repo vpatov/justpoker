@@ -923,13 +923,15 @@ export class GameStateManager {
 
     updatePlayerHandDescription(playerUUID: PlayerUUID) {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
-        // clean up handDescription
-        const handDescription = bestHand.descr.replace(`'`, '').replace(`&`, '');
-        this.getPlayer(playerUUID).handDescription = handDescription;
+        this.getPlayer(playerUUID).handDescription = this.getStrDescriptionFromHand(bestHand);
     }
 
     clearPlayerHandDescription(playerUUID: PlayerUUID) {
         this.getPlayer(playerUUID).handDescription = '';
+    }
+
+    getStrDescriptionFromHand(hand: Hand): string {
+        return hand.descr.replace(`'`, '').replace(`&`, '');
     }
 
     getGameType(): GameType {
@@ -1078,7 +1080,7 @@ export class GameStateManager {
     getWinningHandDescription(): string | undefined {
         const winners = this.getWinners();
         if (winners?.length) {
-            return this.getPlayerBestHand(winners[0]).descr;
+            return this.getStrDescriptionFromHand(this.getPlayerBestHand(winners[0]));
         }
         return undefined;
     }
