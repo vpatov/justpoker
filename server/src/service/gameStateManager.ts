@@ -931,7 +931,7 @@ export class GameStateManager {
     }
 
     getStrDescriptionFromHand(hand: Hand): string {
-        return hand.descr.replace(`'`, '').replace(`&`, '');
+        return hand.descr.replace(/'/g, '').replace(/&/g, '').replace(/,/g, '');
     }
 
     getGameType(): GameType {
