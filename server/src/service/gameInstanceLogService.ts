@@ -1,6 +1,5 @@
 import { Service } from 'typedi';
 import {
-    PlayerPosition,
     GameInstanceLog,
     getCleanGameInstanceLog,
     HandLog,
@@ -9,11 +8,13 @@ import {
     BettingRoundLog,
     getCleanBettingRoundLog,
 } from '../../../ui/src/shared/models/handLog';
+import { PlayerPosition } from '../../../ui/src/shared/models/playerPosition';
 import { GameInstanceUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
 import { GameStateManager } from './gameStateManager';
 import { Player } from '../../../ui/src/shared/models/player';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { BettingRoundStage, BettingRoundAction } from '../../../ui/src/shared/models/game';
+import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 
 @Service()
 export class GameInstanceLogService {
@@ -57,7 +58,7 @@ export class GameInstanceLogService {
         const newHandLog: HandLog = {
             ...getCleanHandLog(),
             handNumber: this.gameStateManager.getHandNumber(),
-            timeHandStarted: Date.now(),
+            timeHandStarted: getEpochTimeMs(),
             playerSummaries,
         };
         this.gameInstanceLog.handLogs.push(newHandLog);
@@ -93,18 +94,29 @@ export class GameInstanceLogService {
     }
 
     updatePlayerChipDelta(playerUUID: PlayerUUID, chipDelta: number) {
-        this.currentHandLog.playerSummaries.get(playerUUID).chipDelta = chipDelta;
+        const playerSummary = this.currentHandLog.playerSummaries.get(playerUUID);
+        if (playerSummary) {
+            playerSummary.chipDelta = chipDelta;
+        }
     }
 
-    addWinnerToCurrentHand(playerUUID: PlayerUUID) {
+    addWinnerToCurrentHand(playerUUID: PlayerUUID, amountWon: number, handDescription?: string) {
         this.currentHandLog.winners.add(playerUUID);
     }
 
     updatePlayerCards(playerUUID: PlayerUUID) {
-        const player = this.currentHandLog.playerSummaries.get(playerUUID);
-        player.holeCards = [...this.gameStateManager.getHoleCards(playerUUID)];
-        player.wasDealtIn = player.holeCards.length > 0;
-        player.position = this.gameStateManager.getPlayerPosition(player.playerUUID);
+        const playerSummary = this.currentHandLog.playerSummaries.get(playerUUID);
+        if (playerSummary) {
+            playerSummary.holeCards = [...this.gameStateManager.getHoleCards(playerUUID)];
+            playerSummary.wasDealtIn = playerSummary.holeCards.length > 0;
+        }
+    }
+
+    updatePlayerPositions() {
+        const positionMap = this.gameStateManager.getPlayerPositionMap();
+        this.currentHandLog.playerSummaries.forEach((playerSummary, playerUUID) => {
+            playerSummary.position = positionMap.get(playerUUID);
+        });
     }
 
     private initNewPlayerSummaryForHandLog(player: Readonly<Player>): PlayerSummary {
@@ -116,7 +128,6 @@ export class GameInstanceLogService {
             wasDealtIn: player.holeCards.length > 0,
             chipDelta: 0,
             position: PlayerPosition.NOT_PLAYING,
-            showedCards: false,
         };
     }
 
@@ -126,14 +137,20 @@ export class GameInstanceLogService {
     ) {
         const processedSummaries: { [key: string]: PlayerSummary } = {};
         playerSummaries.forEach((playerSummary, playerUUID) => {
+            // Only show the hole cards if they were yours, or if they were shown
+            const sanitizedHoleCards =
+                requestorPlayerUUID === playerUUID
+                    ? playerSummary.holeCards
+                    : playerSummary.holeCards.filter((card) => card.visible);
             processedSummaries[playerUUID as string] = {
                 ...playerSummary,
-                holeCards: playerUUID === requestorPlayerUUID ? playerSummary.holeCards : [],
+                holeCards: sanitizedHoleCards,
             };
         });
         return processedSummaries;
     }
 
+    /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
     serializeHandLogs(requestorPlayerUUID: PlayerUUID) {
         const handLogs = this.gameInstanceLog.handLogs.map((handLog) => ({
             ...handLog,

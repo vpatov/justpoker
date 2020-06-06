@@ -162,8 +162,15 @@ export class GameInstanceManager {
 
     // TODO Return UIHandLog when frontend portion is complete.
     getHandLogsForGameInstance(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): Record<string, any> {
+        const gameInstance = this.getGameInstance(gameInstanceUUID);
+        if (!gameInstance) {
+            return undefined;
+        }
         this.loadGameInstance(gameInstanceUUID);
-        const requestorPlayerUUID = this.gameStateManager.getPlayerByClientUUID(clientUUID)?.uuid;
+        const connectedClient = this.gameStateManager.getConnectedClient(clientUUID);
+        const requestorPlayerUUID = connectedClient
+            ? this.gameStateManager.getPlayerByClientUUID(clientUUID)?.uuid
+            : makeBlankUUID();
         return this.gameInstanceLogService.serializeHandLogs(requestorPlayerUUID);
     }
 }

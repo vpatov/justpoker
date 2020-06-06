@@ -14,9 +14,9 @@ import { Pot, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
 
-import { getLoggableGameState } from '../../../ui/src/shared/util/util';
+import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
-import { Hand } from '../../../ui/src/shared/models/cards';
+import { Hand, Card } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
@@ -127,7 +127,7 @@ export class GamePlayService {
         this.gameInstanceLogService.pushBetAction(
             this.gsm.getCurrentPlayerToAct(),
             action,
-            Date.now() - this.gsm.getTimeCurrentPlayerTurnStarted(),
+            getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
         );
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
@@ -350,6 +350,7 @@ export class GamePlayService {
                         this.gameInstanceLogService.updatePlayerCards(playerUUID);
                     }
                 });
+                this.gameInstanceLogService.updatePlayerPositions();
                 break;
             }
 
@@ -419,9 +420,9 @@ export class GamePlayService {
         winningPlayers.sort((playerA, playerB) => this.gsm.comparePositions(playerA, playerB));
         const amountsWon: { [uuid: string]: number } = Object.fromEntries(
             winningPlayers.map((playerUUID) => {
-                this.gameInstanceLogService.addWinnerToCurrentHand(playerUUID);
-                const amount = oddChips ? evenSplit + 1 : evenSplit;
+                const amount = oddChips > 0 ? evenSplit + 1 : evenSplit;
                 oddChips -= 1;
+                this.gameInstanceLogService.addWinnerToCurrentHand(playerUUID, amount);
                 return [playerUUID, amount];
             }),
         );
@@ -429,7 +430,7 @@ export class GamePlayService {
         // show cards
         if (!this.gsm.hasEveryoneButOnePlayerFolded()) {
             // always show winning players hands
-            winningPlayers.map((wp) => this.gsm.setPlayerCardsAllVisible(wp));
+            winningPlayers.map((wp) => this.setPlayerCardsAllVisible(wp));
 
             // sort eligible players by position
             eligiblePlayers.sort(([playerA, _], [playerB, __]) => this.gsm.comparePositions(playerA, playerB));
@@ -448,7 +449,7 @@ export class GamePlayService {
             for (let i = startIndex; i < eligiblePlayers.length + startIndex; i++) {
                 const curPlayer = eligiblePlayers[i % eligiblePlayers.length];
                 if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
-                    this.gsm.setPlayerCardsAllVisible(curPlayer[0]);
+                    this.setPlayerCardsAllVisible(curPlayer[0]);
                     playerToBeat = curPlayer;
                 }
             }
@@ -465,13 +466,25 @@ export class GamePlayService {
         });
     }
 
+    setPlayerCardsAllVisible(playerUUID: PlayerUUID) {
+        this.gsm.setPlayerCardsAllVisible(playerUUID);
+        this.gameInstanceLogService.updatePlayerCards(playerUUID);
+    }
+
+    setPlayerCardVisible(playerUUID: PlayerUUID, card: Card) {
+        this.gsm.setPlayerCardVisible(playerUUID, card);
+        this.gameInstanceLogService.updatePlayerCards(playerUUID);
+    }
+
     // TODO differentiate between chip delta when player is winning a pot, vs chip delta for an entire hand.
     // Do this by picking a clear name for both. (i.e. chipsGained and chipDelta)
     updatePostHandChipDeltas() {
-        this.gsm.forEveryPlayerUUID((playerUUID) => {
-            const delta = this.gsm.getPlayerChips(playerUUID) - this.gsm.getPlayerChipsAtStartOfHand(playerUUID);
-            this.gameInstanceLogService.updatePlayerChipDelta(playerUUID, delta);
-        });
+        this.gsm
+            .filterPlayerUUIDs((playerUUID) => this.gsm.wasPlayerDealtIn(playerUUID))
+            .forEach((playerUUID) => {
+                const delta = this.gsm.getPlayerChips(playerUUID) - this.gsm.getPlayerChipsAtStartOfHand(playerUUID);
+                this.gameInstanceLogService.updatePlayerChipDelta(playerUUID, delta);
+            });
     }
 
     ejectStackedPlayers() {

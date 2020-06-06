@@ -28,7 +28,7 @@ import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/handLog';
+import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 
 // TODO Re-organize methods in some meaningful way
@@ -452,9 +452,23 @@ export class GameStateManager {
         return seats;
     }
 
-    getPlayerPosition(playerUUID: PlayerUUID): PlayerPosition {
-        const index = this.getSeatNumberRelativeToDealer(playerUUID);
-        return PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersDealtIn().length]?.[index] || PlayerPosition.NOT_PLAYING;
+    getPlayerPositionMap(): Map<PlayerUUID, PlayerPosition> {
+        const numPlayers = this.getPlayersDealtIn().length;
+        const positions = PLAYER_POSITIONS_BY_HEADCOUNT[numPlayers];
+        const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
+        const seats = this.getSeats().filter(([seatNumber, uuid]) => this.wasPlayerDealtIn(uuid));
+
+        let currentPlayerUUID = this.getDealerUUID();
+        let currentSeatNumber = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
+        let positionIndex = 0;
+
+        while (positionIndex < numPlayers) {
+            playerPositionMap.set(currentPlayerUUID, positions[positionIndex]);
+            positionIndex += 1;
+            currentSeatNumber = (currentSeatNumber + 1) % seats.length;
+            currentPlayerUUID = seats[currentSeatNumber][1];
+        }
+        return playerPositionMap;
     }
 
     getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
@@ -855,7 +869,7 @@ export class GameStateManager {
         );
     }
 
-    setPlayerCardsVisible(playerUUID: PlayerUUID, matchCard: Card) {
+    setPlayerCardVisible(playerUUID: PlayerUUID, matchCard: Card) {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {
             holeCards: player.holeCards.map((holeCard) => {
