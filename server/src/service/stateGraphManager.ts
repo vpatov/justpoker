@@ -14,6 +14,7 @@ import { GamePlayService } from './gamePlayService';
 import { TimerManager } from './timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
 import { LedgerService } from './ledgerService';
+import { GameInstanceLogService } from './gameInstanceLogService';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -24,6 +25,7 @@ export class StateGraphManager {
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
+        private readonly gameInstanceLogService: GameInstanceLogService,
     ) {}
 
     canContinueGameCondition: Condition = {
@@ -189,10 +191,7 @@ export class StateGraphManager {
 
             // TODO consider renaming this to initialize new hand, and getting rid of the extra state above.
             case GameStage.SHOW_START_OF_HAND: {
-                this.gameStateManager.initializeNewDeck();
-                this.gamePlayService.initializeDealerButton();
-                this.gamePlayService.placeBlinds();
-                this.gameStateManager.setBettingRoundStage(BettingRoundStage.WAITING);
+                this.gamePlayService.initializeNewHand();
                 break;
             }
 
@@ -236,6 +235,7 @@ export class StateGraphManager {
             }
 
             case GameStage.POST_HAND_CLEANUP: {
+                this.gamePlayService.updatePostHandChipDeltas();
                 this.ledgerService.incrementHandsWonForPlayers(
                     [...this.gameStateManager.getHandWinners()].map((playerUUID) =>
                         this.gameStateManager.getClientByPlayerUUID(playerUUID),

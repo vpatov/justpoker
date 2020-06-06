@@ -4,6 +4,7 @@ import {
     BettingRoundActionType,
     BettingRoundAction,
     GameType,
+    MaxBuyinType,
     GameParameters,
 } from '../../../ui/src/shared/models/game';
 import {
@@ -162,6 +163,13 @@ export class ValidationService {
             return {
                 errorString: `Name ${request.name} is too long - exceeds limit of ${MAX_NAME_LENGTH} characters.`,
                 errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
+            };
+        }
+        const { minBuyin } = this.gsm.getGameParameters();
+        if (request.buyin > this.gsm.getMaxBuyin() || request.buyin < minBuyin) {
+            return {
+                errorString: `Buyin ${request.buyin} buying exceeds gama parameter limit of ${this.gsm.getMaxBuyin()}.`,
+                errorType: ErrorType.ILLEGAL_ACTION,
             };
         }
         return undefined;
@@ -540,30 +548,43 @@ export class ValidationService {
         if (error) {
             return error;
         }
+        const { bigBlind, smallBlind, maxBuyin, minBuyin, timeToAct, numberTimeBanks, timeBankTime } = gameParameters;
+
+        if (maxBuyin < minBuyin) {
+            return {
+                errorType: ErrorType.ILLEGAL_VALUE,
+                errorString: `maxBuyin cannot bet less than minBuyin`,
+            };
+        }
+
+        if (minBuyin < smallBlind) {
+            return {
+                errorType: ErrorType.ILLEGAL_VALUE,
+                errorString: `minBuyin must be at least smallBlind amount`,
+            };
+        }
+
+        if (minBuyin < bigBlind) {
+            return {
+                errorType: ErrorType.ILLEGAL_VALUE,
+                errorString: `minBuyin must be at least bigBlind amount`,
+            };
+        }
+
         const minMaxErrors: ValidationResponse[] = [
+            this.validateMinMaxValues(smallBlind, MIN_VALUES.SMALL_BLIND, MAX_VALUES.SMALL_BLIND, 'smallBlind'),
+            this.validateMinMaxValues(bigBlind, MIN_VALUES.BIG_BLIND, MAX_VALUES.BIG_BLIND, 'bigBlind'),
+            this.validateMinMaxValues(maxBuyin, MIN_VALUES.BUY_IN, MAX_VALUES.BUY_IN, 'maxBuyin'),
+            this.validateMinMaxValues(minBuyin, 0, MAX_VALUES.BUY_IN, 'minBuyin'),
+            this.validateMinMaxValues(timeToAct, MIN_VALUES.TIME_TO_ACT, MAX_VALUES.TIME_TO_ACT, 'timeToAct'),
             this.validateMinMaxValues(
-                gameParameters.smallBlind,
-                MIN_VALUES.SMALL_BLIND,
-                MAX_VALUES.SMALL_BLIND,
-                'smallBlind',
-            ),
-            this.validateMinMaxValues(gameParameters.bigBlind, MIN_VALUES.BIG_BLIND, MAX_VALUES.BIG_BLIND, 'bigBlind'),
-            this.validateMinMaxValues(gameParameters.maxBuyin, MIN_VALUES.BUY_IN, MAX_VALUES.BUY_IN, 'maxBuyin'),
-            this.validateMinMaxValues(gameParameters.minBuyin, 0, MAX_VALUES.BUY_IN, 'minBuyin'),
-            this.validateMinMaxValues(
-                gameParameters.timeToAct,
-                MIN_VALUES.TIME_TO_ACT,
-                MAX_VALUES.TIME_TO_ACT,
-                'timeToAct',
-            ),
-            this.validateMinMaxValues(
-                gameParameters.numberTimeBanks,
+                numberTimeBanks,
                 MIN_VALUES.NUMBER_TIME_BANKS,
                 MAX_VALUES.NUMBER_TIME_BANKS,
                 'numberTimeBanks',
             ),
             this.validateMinMaxValues(
-                gameParameters.timeBankTime,
+                timeBankTime,
                 MIN_VALUES.TIME_BANK_TIME,
                 MAX_VALUES.TIME_BANK_TIME,
                 'timeBankTime',

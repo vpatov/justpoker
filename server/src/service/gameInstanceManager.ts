@@ -16,8 +16,10 @@ import {
     ClientUUID,
     generateGameInstanceUUID,
 } from '../../../ui/src/shared/models/uuid';
+import { GameInstanceLogService } from './gameInstanceLogService';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { GameParameters } from '../../../ui/src/shared/models/game';
+import { HandLog } from '../../../ui/src/shared/models/handLog';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -35,6 +37,7 @@ export class GameInstanceManager {
         private readonly animationService: AnimationService,
         private readonly chatService: ChatService,
         private readonly ledgerService: LedgerService,
+        private readonly gameInstanceLogService: GameInstanceLogService,
         private readonly timerManager: TimerManager,
         private readonly connectedClientManager: ConnectedClientManager,
     ) {
@@ -46,7 +49,9 @@ export class GameInstanceManager {
         const gameInstanceUUID = generateGameInstanceUUID();
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
         this.loadGameInstance(gameInstanceUUID);
+        this.gameInstanceLogService.initGameInstanceLog(gameInstanceUUID);
         this.gameStateManager.initGame(gameParameters);
+        this.timerManager.cancelStateTimer();
         return gameInstanceUUID;
     }
 
@@ -99,12 +104,13 @@ export class GameInstanceManager {
 
     @debugFunc()
     saveActiveGameInstance() {
-        const activeGameInstance = {
+        const activeGameInstance: GameInstance = {
             gameState: this.gameStateManager.getGameState(),
             chatLog: this.chatService.getChatState(),
             audioQueue: this.audioService.getAudioQueue(),
             animationState: this.animationService.getAnimationState(),
             ledger: this.ledgerService.getLedger(),
+            gameInstanceLog: this.gameInstanceLogService.getGameInstanceLog(),
             stateTimer: this.timerManager.getStateTimer(),
             lastActive: getEpochTimeMs(),
         };
@@ -133,6 +139,7 @@ export class GameInstanceManager {
         this.animationService.loadAnimationState(gameInstance.animationState);
         this.ledgerService.loadLedger(gameInstance.ledger);
         this.timerManager.loadStateTimer(gameInstance.stateTimer);
+        this.gameInstanceLogService.loadGameInstanceLog(gameInstance.gameInstanceLog);
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 
@@ -149,7 +156,21 @@ export class GameInstanceManager {
         if (!gameInstance) {
             return undefined;
         }
-        const ledgerState = gameInstance.ledger;
+        const ledgerState = this.ledgerService.getLedger();
         return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
+    }
+
+    // TODO Return UIHandLog when frontend portion is complete.
+    getHandLogsForGameInstance(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): Record<string, any> {
+        const gameInstance = this.getGameInstance(gameInstanceUUID);
+        if (!gameInstance) {
+            return undefined;
+        }
+        this.loadGameInstance(gameInstanceUUID);
+        const connectedClient = this.gameStateManager.getConnectedClient(clientUUID);
+        const requestorPlayerUUID = connectedClient
+            ? this.gameStateManager.getPlayerByClientUUID(clientUUID)?.uuid
+            : makeBlankUUID();
+        return this.gameInstanceLogService.serializeHandLogs(requestorPlayerUUID);
     }
 }

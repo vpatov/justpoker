@@ -11,7 +11,7 @@ import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
 
 import { MIN_VALUES, MAX_VALUES } from './shared/util/consts';
-import { GameType } from './shared/models/game';
+import { GameType, MaxBuyinType } from './shared/models/game';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import RadioForm from './reuseable/RadioForm';
 import IconTooltip from './reuseable/IconTooltip';
@@ -63,6 +63,8 @@ function GameParamatersDialog(props) {
         numberTimeBanks,
         timeBankTime,
         allowTimeBanks,
+        dynamicMaxBuyin,
+        maxBuyinType,
     } = curGameParameters;
 
     function onPressEnter(event: any) {
@@ -109,7 +111,7 @@ function GameParamatersDialog(props) {
                     />
                     <TextFieldWrap
                         className={classes.field}
-                        label="Max Buyin"
+                        label={dynamicMaxBuyin ? 'Fixed Max Buyin' : 'Max Buyin'}
                         variant="standard"
                         onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
                         value={maxBuyin}
@@ -124,7 +126,7 @@ function GameParamatersDialog(props) {
                         value={minBuyin}
                         type="number"
                         variant="standard"
-                        min={0}
+                        min={MIN_VALUES.BUY_IN}
                         max={MAX_VALUES.BUY_IN}
                     />
                     <TextFieldWrap
@@ -147,6 +149,47 @@ function GameParamatersDialog(props) {
                             <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
                         </Select>
                     </FormControl>
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="Enables maximum buyin amount to be computed during the game according to the sizes of other player's stacks. Players will always be able to buyin for at least the Fixed Max Buyin."
+                            placement="left"
+                        />
+                        <RadioForm
+                            label="Dynamic Max Buyin"
+                            onChange={(event) =>
+                                setIntoGameParameters('dynamicMaxBuyin', event.target.value === 'true')
+                            }
+                            value={dynamicMaxBuyin + ''}
+                            options={[
+                                { label: 'Dynamic', value: 'true' },
+                                { label: 'Fixed', value: 'false' },
+                            ]}
+                            radioGroupProps={{ row: true }}
+                        />
+                    </div>
+                    <div className={classes.field}>
+                        <IconTooltip
+                            className={classes.iconTip}
+                            title="Indicates how the maximum buyin amount is computed."
+                            placement="left"
+                        />
+                        <FormControl className={classes.field}>
+                            <InputLabel>Max Buyin Type</InputLabel>
+                            <Select
+                                value={dynamicMaxBuyin ? maxBuyinType : ''}
+                                onChange={(event) =>
+                                    setIntoGameParameters('maxBuyinType', event.target.value as MaxBuyinType)
+                                }
+                                disabled={!dynamicMaxBuyin}
+                            >
+                                <MenuItem value={MaxBuyinType.TopStack}>Largest Stack</MenuItem>
+                                <MenuItem value={MaxBuyinType.HalfTopStack}>Half of Largest Stack</MenuItem>
+                                <MenuItem value={MaxBuyinType.SecondStack}>Second Largest Stack</MenuItem>
+                                <MenuItem value={MaxBuyinType.AverageStack}>Average of All Stacks</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
                     <TextFieldWrap
                         className={classes.field}
                         label="Max Players"

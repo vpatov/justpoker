@@ -14,12 +14,13 @@ import { Pot, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
 
-import { getLoggableGameState } from '../../../ui/src/shared/util/util';
+import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
-import { Hand } from '../../../ui/src/shared/models/cards';
+import { Hand, Card } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
+import { GameInstanceLogService } from './gameInstanceLogService';
 
 @Service()
 export class GamePlayService {
@@ -30,6 +31,7 @@ export class GamePlayService {
         private readonly animationService: AnimationService,
         private readonly ledgerService: LedgerService,
         private readonly validationService: ValidationService,
+        private readonly gameInstanceLogService: GameInstanceLogService,
     ) {}
 
     startGame() {
@@ -79,9 +81,9 @@ export class GamePlayService {
         const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
         const error = this.validationService.validateBettingRoundAction(clientUUID, CHECK_ACTION);
         if (!error) {
-            this.check();
+            this.performBettingRoundAction({ type: BettingRoundActionType.CHECK, amount: 0 });
         } else {
-            this.fold();
+            this.performBettingRoundAction({ type: BettingRoundActionType.FOLD, amount: 0 });
             this.gsm.sitOutPlayer(playerUUID);
         }
     }
@@ -122,6 +124,11 @@ export class GamePlayService {
     /* Betting Round Actions */
     performBettingRoundAction(action: BettingRoundAction) {
         this.gsm.setLastBettingRoundAction(action);
+        this.gameInstanceLogService.pushBetAction(
+            this.gsm.getCurrentPlayerToAct(),
+            action,
+            getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
+        );
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
                 this.check();
@@ -250,6 +257,15 @@ export class GamePlayService {
         this.gsm.setDealerUUID(dealerUUID);
     }
 
+    initializeNewHand() {
+        this.gsm.incrementHandNumber();
+        this.gsm.initializeNewDeck();
+        this.initializeDealerButton();
+        this.gsm.recordPlayerChipsAtStartOfHand();
+        this.placeBlinds();
+        this.gameInstanceLogService.initNewHand();
+    }
+
     /*
         TODO ensure that the players have enough to cover the blinds, and if not, put them
         all-in. Don't let a player get this point if they have zero chips, stand them up earlier.
@@ -321,6 +337,8 @@ export class GamePlayService {
 
     initializeBettingRound() {
         const bettingRoundStage = this.gsm.getBettingRoundStage();
+        this.gameInstanceLogService.updateLastBettingRoundStage();
+        this.gameInstanceLogService.initNewBettingRoundLog();
 
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
@@ -329,14 +347,16 @@ export class GamePlayService {
                     if (this.gsm.isPlayerReadyToPlay(playerUUID)) {
                         this.dealHoleCards(playerUUID);
                         this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(playerUUID));
+                        this.gameInstanceLogService.updatePlayerCards(playerUUID);
                     }
                 });
-
+                this.gameInstanceLogService.updatePlayerPositions();
                 break;
             }
 
             case BettingRoundStage.FLOP: {
-                this.gsm.dealCardsToBoard(3);
+                const cards = this.gsm.dealCardsToBoard(3);
+                this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
                 this.gsm.forEveryPlayerUUID((playerUUID) => {
                     if (this.gsm.isPlayerInHand(playerUUID)) {
                         this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(playerUUID));
@@ -346,12 +366,14 @@ export class GamePlayService {
             }
 
             case BettingRoundStage.TURN: {
-                this.gsm.dealCardsToBoard(1);
+                const cards = this.gsm.dealCardsToBoard(1);
+                this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
                 break;
             }
 
             case BettingRoundStage.RIVER: {
-                this.gsm.dealCardsToBoard(1);
+                const cards = this.gsm.dealCardsToBoard(1);
+                this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
                 break;
             }
 
@@ -398,8 +420,9 @@ export class GamePlayService {
         winningPlayers.sort((playerA, playerB) => this.gsm.comparePositions(playerA, playerB));
         const amountsWon: { [uuid: string]: number } = Object.fromEntries(
             winningPlayers.map((playerUUID) => {
-                const amount = oddChips ? evenSplit + 1 : evenSplit;
+                const amount = oddChips > 0 ? evenSplit + 1 : evenSplit;
                 oddChips -= 1;
+                this.gameInstanceLogService.addWinnerToCurrentHand(playerUUID, amount);
                 return [playerUUID, amount];
             }),
         );
@@ -407,7 +430,7 @@ export class GamePlayService {
         // show cards
         if (!this.gsm.hasEveryoneButOnePlayerFolded()) {
             // always show winning players hands
-            winningPlayers.map((wp) => this.gsm.setPlayerCardsAllVisible(wp));
+            winningPlayers.map((wp) => this.setPlayerCardsAllVisible(wp));
 
             // sort eligible players by position
             eligiblePlayers.sort(([playerA, _], [playerB, __]) => this.gsm.comparePositions(playerA, playerB));
@@ -426,7 +449,7 @@ export class GamePlayService {
             for (let i = startIndex; i < eligiblePlayers.length + startIndex; i++) {
                 const curPlayer = eligiblePlayers[i % eligiblePlayers.length];
                 if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
-                    this.gsm.setPlayerCardsAllVisible(curPlayer[0]);
+                    this.setPlayerCardsAllVisible(curPlayer[0]);
                     playerToBeat = curPlayer;
                 }
             }
@@ -441,6 +464,27 @@ export class GamePlayService {
             this.gsm.setPlayerChipDelta(playerUUID, amountsWon[playerUUID]);
             this.gsm.addHandWinner(playerUUID);
         });
+    }
+
+    setPlayerCardsAllVisible(playerUUID: PlayerUUID) {
+        this.gsm.setPlayerCardsAllVisible(playerUUID);
+        this.gameInstanceLogService.updatePlayerCards(playerUUID);
+    }
+
+    setPlayerCardVisible(playerUUID: PlayerUUID, card: Card) {
+        this.gsm.setPlayerCardVisible(playerUUID, card);
+        this.gameInstanceLogService.updatePlayerCards(playerUUID);
+    }
+
+    // TODO differentiate between chip delta when player is winning a pot, vs chip delta for an entire hand.
+    // Do this by picking a clear name for both. (i.e. chipsGained and chipDelta)
+    updatePostHandChipDeltas() {
+        this.gsm
+            .filterPlayerUUIDs((playerUUID) => this.gsm.wasPlayerDealtIn(playerUUID))
+            .forEach((playerUUID) => {
+                const delta = this.gsm.getPlayerChips(playerUUID) - this.gsm.getPlayerChipsAtStartOfHand(playerUUID);
+                this.gameInstanceLogService.updatePlayerChipDelta(playerUUID, delta);
+            });
     }
 
     ejectStackedPlayers() {

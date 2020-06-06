@@ -8,7 +8,7 @@ import IconPicker from './reuseable/IconPicker';
 import { makeStyles } from '@material-ui/core/styles';
 import { ClientWsMessageRequest } from './shared/models/api';
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
-import { selectGameParameters } from './store/selectors';
+import { selectGameParameters, globalGameStateSelector } from './store/selectors';
 import { AvatarKeys, getRandomAvatarKey } from './shared/models/assets';
 import Avatar from './Avatar';
 import { useStickyState } from './utils';
@@ -18,6 +18,11 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         display: 'flex',
     },
+    betRow: {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'end',
+    },
     nameField: {
         marginLeft: '1vmin',
         flexGrow: 1,
@@ -25,9 +30,6 @@ const useStyles = makeStyles((theme) => ({
     field: {
         marginTop: '3vmin',
         width: '35%',
-    },
-    sit: {
-        fontSize: '1.3vmin',
     },
     dialogPaper: {
         height: '80vh',
@@ -40,6 +42,11 @@ const useStyles = makeStyles((theme) => ({
     pickerMenu: {
         width: '30vmin',
     },
+    minMaxButtonCont: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    minMaxButton: {},
 }));
 
 const NAME_LOCAL_STORAGE_KEY = 'jp-last-used-name';
@@ -50,13 +57,10 @@ function OpenSeatDialog(props) {
     const { onClose, open, seatNumber } = props;
     const [name, setName] = useStickyState('', NAME_LOCAL_STORAGE_KEY);
     const [avatarKey, SET_avatarKey] = useStickyState(getRandomAvatarKey(), AVATAR_LOCAL_STORAGE_KEY);
-    const { maxBuyin, minBuyin } = useSelector(selectGameParameters);
+    const { minBuyin } = useSelector(selectGameParameters);
+    let maxBuyin = useSelector(globalGameStateSelector).computedMaxBuyin;
 
-    const [buyin, setBuyin] = useState<number | undefined>();
-
-    function onChangeBuyin(event: any) {
-        setBuyin(event.target.value);
-    }
+    const [buyin, setBuyin] = useState<number>(maxBuyin);
 
     function invalidBuyin() {
         if (buyin === undefined) {
@@ -135,21 +139,32 @@ function OpenSeatDialog(props) {
                         maxChars={24}
                     />
                 </div>
-                <TextFieldWrap
-                    variant="standard"
-                    type="number"
-                    className={classes.field}
-                    value={buyin}
-                    label="Buy In"
-                    onChange={onChangeBuyin}
-                    inputProps={{
-                        step: 1,
-                    }}
-                    max={maxBuyin}
-                    error={invalidBuyin()}
-                    helperText={invalidBuyin() ? `Min Buyin is ${minBuyin}` : ''}
-                    autoFocus
-                />
+                <div className={classes.betRow}>
+                    <TextFieldWrap
+                        variant="standard"
+                        type="number"
+                        className={classes.field}
+                        value={buyin}
+                        label="Buy In"
+                        onChange={(e) => setBuyin(e.target.value)}
+                        inputProps={{
+                            step: 1,
+                        }}
+                        max={maxBuyin}
+                        error={invalidBuyin()}
+                        helperText={invalidBuyin() ? `Min Buyin is ${minBuyin}` : ''}
+                    />
+                    <div className={classes.minMaxButtonCont}>
+                        <Button
+                            className={classes.minMaxButton}
+                            onClick={() => setBuyin(maxBuyin)}
+                        >{`Max: ${maxBuyin}`}</Button>
+                        <Button
+                            className={classes.minMaxButton}
+                            onClick={() => setBuyin(minBuyin)}
+                        >{`Min: ${minBuyin}`}</Button>
+                    </div>
+                </div>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>

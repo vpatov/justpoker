@@ -180,7 +180,7 @@ export class EventProcessorService {
         [ClientActionType.SHOWCARD]: {
             validation: (uuid, req) => this.validationService.validateShowCardAction(uuid, req.cards),
             perform: (uuid, req: ShowCardRequest) =>
-                req.cards.forEach((card) => this.gameStateManager.setPlayerCardsVisible(req.playerUUID, card)),
+                req.cards.forEach((card) => this.gamePlayService.setPlayerCardVisible(req.playerUUID, card)),
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.REACTION]: {
