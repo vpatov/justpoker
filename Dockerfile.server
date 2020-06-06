@@ -1,0 +1,27 @@
+## From main directory of repository, in order to build the container, run:
+## $ sudo docker build -t jpserver -f Dockerfile.server ./
+
+## In order to run the container, run:
+## $ sudo docker run -d -p <PORT>:8080 jpserver
+## where PORT is a port on the host machine that will be bound to the container's internal port (currently 8080)
+
+FROM node:13
+
+WORKDIR /home/dockerapps/jpserver
+
+# Copy all package* files that describe dependencies
+COPY ./server/package*.json ./ 
+
+# Copy ts sources
+COPY server ./server
+COPY ui/src/shared ./ui/src/shared
+
+# Change the WORKDIR to the server directory
+# This is necessary because the server npm scripts assume the build process
+# happens in the server, and the ts sources imports are relative to the server
+# directory (when importing from ui/src/shared)
+WORKDIR /home/dockerapps/jpserver/server
+RUN npm install
+
+# Build and start the server.
+CMD ["npm", "run", "start"]
