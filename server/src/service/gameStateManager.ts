@@ -923,7 +923,9 @@ export class GameStateManager {
 
     updatePlayerHandDescription(playerUUID: PlayerUUID) {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
-        this.getPlayer(playerUUID).handDescription = bestHand.descr;
+        // clean up handDescription
+        const handDescription = bestHand.descr.replace(`'`, '').replace(`&`, '');
+        this.getPlayer(playerUUID).handDescription = handDescription;
     }
 
     clearPlayerHandDescription(playerUUID: PlayerUUID) {
