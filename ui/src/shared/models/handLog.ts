@@ -1,21 +1,21 @@
-import { PlayerUUID, GameInstanceUUID, makeBlankUUID } from "./uuid";
-import { Card } from "./cards";
-import { BettingRoundAction, BettingRoundStage, BettingRoundActionType } from "./game";
+import { PlayerUUID, GameInstanceUUID, makeBlankUUID } from './uuid';
+import { Card } from './cards';
+import { BettingRoundAction, BettingRoundStage, BettingRoundActionType } from './game';
 
- export enum PlayerPosition {
-     "SB" = "SB",
-     "BB" = "BB",
-     "UTG" = "UTG",
-     "UTG+1" = "UTG+1",
-     "UTG+2" = "UTG+2",
-     "MP" = "MP",
-     "MP+1" = "MP+1",
-     "LJ" = "LJ",
-     "HJ" = "HJ",
-     "CUTOFF" = "CUTOFF",
-     "BUTTON" = "BUTTON",
-     "NOT_PLAYING" = "NOT_PLAYING",
- }
+export enum PlayerPosition {
+    'SB' = 'SB',
+    'BB' = 'BB',
+    'UTG' = 'UTG',
+    'UTG+1' = 'UTG+1',
+    'UTG+2' = 'UTG+2',
+    'MP' = 'MP',
+    'MP+1' = 'MP+1',
+    'LJ' = 'LJ',
+    'HJ' = 'HJ',
+    'CUTOFF' = 'CUTOFF',
+    'BUTTON' = 'BUTTON',
+    'NOT_PLAYING' = 'NOT_PLAYING',
+}
 
 export declare interface GameInstanceLog {
     gameInstanceUUID: GameInstanceUUID;
@@ -25,15 +25,15 @@ export declare interface GameInstanceLog {
 export declare interface HandLog {
     handNumber: number;
     timeHandStarted: number;
-    allPlayers: Map<PlayerUUID,PlayerSummaryForHandLog>;
-    winner: PlayerUUID;
-    bettingRounds: Map<BettingRoundStage, BettingRoundStageLog>;
-    lastBettingRound: BettingRoundStage;
+    allPlayers: Map<PlayerUUID, PlayerSummaryForHandLog>;
+    board: Card[];
+    winners: Set<PlayerUUID>;
+    bettingRounds: Map<BettingRoundStage, BettingRoundLog>;
+    lastBettingRoundStage: BettingRoundStage;
 }
 
-export declare interface BettingRoundStageLog {
-    cardsDealtThisStage: Card[];
-    board: Card[];
+export declare interface BettingRoundLog {
+    cardsDealtThisBettingRound: Card[];
     bettingRoundStage: BettingRoundStage;
     handActions: HandActionLog[];
 }
@@ -57,7 +57,7 @@ export declare interface PlayerSummaryForHandLog {
 export function getCleanGameInstanceLog(): GameInstanceLog {
     return {
         gameInstanceUUID: makeBlankUUID(),
-        handLogs: []
+        handLogs: [],
     };
 }
 
@@ -66,25 +66,25 @@ export function getCleanHandLog(): HandLog {
         handNumber: -1,
         timeHandStarted: 0,
         allPlayers: new Map(),
-        winner: makeBlankUUID(),
+        board: [],
+        winners: new Set(),
         bettingRounds: new Map(),
-        lastBettingRound: BettingRoundStage.WAITING,
+        lastBettingRoundStage: BettingRoundStage.WAITING,
     };
 }
 
-export function getCleanBettingRoundStageLog(): BettingRoundStageLog {
+export function getCleanBettingRoundLog(): BettingRoundLog {
     return {
-        cardsDealtThisStage: [],
-        board: [],
+        cardsDealtThisBettingRound: [],
         bettingRoundStage: BettingRoundStage.WAITING,
-        handActions: []
+        handActions: [],
     };
 }
 
 export function getCleanHandActionLog(): HandActionLog {
     return {
         playerUUID: makeBlankUUID(),
-        bettingRoundAction: {type: BettingRoundActionType.NOT_IN_HAND},
+        bettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         timeTookToAct: 0,
     };
 }

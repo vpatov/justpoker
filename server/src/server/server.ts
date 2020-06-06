@@ -97,6 +97,18 @@ class Server {
             }
         });
 
+        router.get('/handlog', (req, res) => {
+            const parsedQuery = queryString.parseUrl(req.url);
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
+            const handLogs = this.gameInstanceManager.getHandLogsForGameInstance(gameInstanceUUID);
+            if (!handLogs) {
+                logger.info(`HandLog not found for ${gameInstanceUUID}`);
+                res.send(getDefaultGame404());
+            } else {
+                res.send({ handLogs: handLogs });
+            }
+        });
+
         this.app.use(bodyParser.json());
         this.app.use(
             bodyParser.urlencoded({

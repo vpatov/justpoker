@@ -124,6 +124,11 @@ export class GamePlayService {
     /* Betting Round Actions */
     performBettingRoundAction(action: BettingRoundAction) {
         this.gsm.setLastBettingRoundAction(action);
+        this.gameInstanceLogService.pushBetAction(
+            this.gsm.getCurrentPlayerToAct(),
+            action,
+            Date.now() - this.gsm.getTimeCurrentPlayerTurnStarted(),
+        );
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
                 this.check();
@@ -323,6 +328,8 @@ export class GamePlayService {
 
     initializeBettingRound() {
         const bettingRoundStage = this.gsm.getBettingRoundStage();
+        this.gameInstanceLogService.updateLastStage();
+        this.gameInstanceLogService.initNewBettingRoundLog();
 
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
@@ -338,7 +345,8 @@ export class GamePlayService {
             }
 
             case BettingRoundStage.FLOP: {
-                this.gsm.dealCardsToBoard(3);
+                const cards = this.gsm.dealCardsToBoard(3);
+                this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
                 this.gsm.forEveryPlayerUUID((playerUUID) => {
                     if (this.gsm.isPlayerInHand(playerUUID)) {
                         this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(playerUUID));
@@ -348,12 +356,14 @@ export class GamePlayService {
             }
 
             case BettingRoundStage.TURN: {
-                this.gsm.dealCardsToBoard(1);
+                const cards = this.gsm.dealCardsToBoard(1);
+                this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
                 break;
             }
 
             case BettingRoundStage.RIVER: {
-                this.gsm.dealCardsToBoard(1);
+                const cards = this.gsm.dealCardsToBoard(1);
+                this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
                 break;
             }
 
@@ -400,6 +410,7 @@ export class GamePlayService {
         winningPlayers.sort((playerA, playerB) => this.gsm.comparePositions(playerA, playerB));
         const amountsWon: { [uuid: string]: number } = Object.fromEntries(
             winningPlayers.map((playerUUID) => {
+                this.gameInstanceLogService.addWinnerToCurrentHand(playerUUID);
                 const amount = oddChips ? evenSplit + 1 : evenSplit;
                 oddChips -= 1;
                 return [playerUUID, amount];

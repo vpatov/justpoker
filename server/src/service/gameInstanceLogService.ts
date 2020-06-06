@@ -1,49 +1,106 @@
 import { Service } from 'typedi';
-import {PlayerPosition, GameInstanceLog, getCleanGameInstanceLog, HandLog, getCleanHandLog, getCleanPlayerSummaryForHandLog, PlayerSummaryForHandLog} from '../../../ui/src/shared/models/handLog';
-import { GameInstanceUUID } from '../../../ui/src/shared/models/uuid';
+import {
+    PlayerPosition,
+    GameInstanceLog,
+    getCleanGameInstanceLog,
+    HandLog,
+    getCleanHandLog,
+    getCleanPlayerSummaryForHandLog,
+    PlayerSummaryForHandLog,
+    BettingRoundLog,
+    getCleanBettingRoundLog,
+} from '../../../ui/src/shared/models/handLog';
+import { GameInstanceUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
 import { GameStateManager } from './gameStateManager';
 import { Player } from '../../../ui/src/shared/models/player';
-
+import { Card } from '../../../ui/src/shared/models/cards';
+import { BettingRoundStage, BettingRoundAction } from '../../../ui/src/shared/models/game';
 
 @Service()
 export class GameInstanceLogService {
-
     private gameInstanceLog: GameInstanceLog;
-    private currentHandLog: HandLog;
 
-    constructor(
-        private readonly gameStateManager: GameStateManager
-    ){}
-
-    initGameInstanceLog(gameInstanceUUID: GameInstanceUUID): void {        
-        this.gameInstanceLog = {
-            ...getCleanGameInstanceLog(),
-            gameInstanceUUID
-        };
-    }
+    constructor(private readonly gameStateManager: GameStateManager) {}
 
     getGameInstanceLog(): GameInstanceLog {
         return this.gameInstanceLog;
+    }
+
+    getHandLogs(): HandLog[] {
+        return this.gameInstanceLog.handLogs;
+    }
+
+    get currentHandLog(): HandLog {
+        const handLogs = this.gameInstanceLog.handLogs;
+        return handLogs[handLogs.length - 1];
+    }
+
+    get currentBettingRoundLog(): BettingRoundLog {
+        return this.currentHandLog.bettingRounds.get(this.currentHandLog.lastBettingRoundStage);
+    }
+
+    get lastBettingRoundStage(): BettingRoundStage {
+        return this.currentHandLog.lastBettingRoundStage;
+    }
+
+    initGameInstanceLog(gameInstanceUUID: GameInstanceUUID): void {
+        this.gameInstanceLog = {
+            ...getCleanGameInstanceLog(),
+            gameInstanceUUID,
+        };
     }
 
     loadGameInstanceLog(gameInstanceLog: GameInstanceLog): void {
         this.gameInstanceLog = gameInstanceLog;
     }
 
-    initNewHand(){
+    initNewHand() {
         const allPlayers = new Map();
         this.gameStateManager.forEveryPlayer((player) => {
-            allPlayers.set(player.uuid,this.initNewPlayerSummaryForHandLog(player));
+            allPlayers.set(player.uuid, this.initNewPlayerSummaryForHandLog(player));
         });
-        this.currentHandLog = {
+        const newHandLog = {
             ...getCleanHandLog(),
             handNumber: this.gameStateManager.getHandNumber(),
             timeHandStarted: Date.now(),
-            allPlayers
+            allPlayers,
         };
+        this.gameInstanceLog.handLogs.push(newHandLog);
     }
 
-    initNewPlayerSummaryForHandLog(player: Player): PlayerSummaryForHandLog{
+    initNewBettingRoundLog() {
+        const newBettingRoundLog = {
+            ...getCleanBettingRoundLog(),
+            bettingRoundStage: this.lastBettingRoundStage,
+        };
+        this.currentHandLog.bettingRounds.set(this.lastBettingRoundStage, newBettingRoundLog);
+    }
+
+    updateLastStage() {
+        this.currentHandLog.lastBettingRoundStage = this.gameStateManager.getBettingRoundStage();
+    }
+
+    updateCardsDealtThisBettingRound(cards: ReadonlyArray<Card>) {
+        this.currentBettingRoundLog.cardsDealtThisBettingRound = [...cards];
+    }
+
+    updateBoard() {
+        this.currentHandLog.board = this.gameStateManager.getBoard();
+    }
+
+    pushBetAction(playerUUID: PlayerUUID, bettingRoundAction: BettingRoundAction, timeTookToAct: number) {
+        this.currentBettingRoundLog.handActions.push({
+            playerUUID,
+            bettingRoundAction,
+            timeTookToAct,
+        });
+    }
+
+    addWinnerToCurrentHand(playerUUID: PlayerUUID) {
+        this.currentHandLog.winners.add(playerUUID);
+    }
+
+    initNewPlayerSummaryForHandLog(player: Player): PlayerSummaryForHandLog {
         return {
             playerUUID: player.uuid,
             startingChips: player.chips,
@@ -56,6 +113,18 @@ export class GameInstanceLogService {
     }
 
     /*
+GameInstanceLog {
+    handLog {
+        bettingRoundStageLog<Map>: {
+            HandActionLog[]
+        }
+        playerSummaryForHandLog
+    }
+}
+
+*/
+
+    /*
     handNumber: number;
     timeHandStarted: number;
     allPlayers: PlayerSummaryForHandLog[];
@@ -63,6 +132,4 @@ export class GameInstanceLogService {
     bettingRounds: Map<BettingRoundStage, BettingRoundStageLog>;
     lastBettingRound: BettingRoundStage;
     */
-
-
 }

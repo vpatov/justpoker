@@ -17,6 +17,7 @@ import {
 } from '../../../ui/src/shared/models/uuid';
 import { GameInstanceLogService } from './gameInstanceLogService';
 import { GameParameters } from '../../../ui/src/shared/models/game';
+import { HandLog } from '../../../ui/src/shared/models/handLog';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -125,5 +126,14 @@ export class GameInstanceManager {
         }
         const ledgerState = gameInstance.ledger;
         return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
+    }
+
+    getHandLogsForGameInstance(gameInstanceUUID: GameInstanceUUID): HandLog[] {
+        const gameInstance = this.getGameInstance(gameInstanceUUID);
+        if (!gameInstance) {
+            return [];
+        }
+        const handLogs = gameInstance.gameInstanceLog.handLogs;
+        return handLogs;
     }
 }

@@ -250,11 +250,11 @@ export class GameStateManager {
         this.gameState.straddleUUID = straddleUUID;
     }
 
-    getHandNumber(){
+    getHandNumber() {
         return this.gameState.handNumber;
     }
 
-    incrementHandNumber(){
+    incrementHandNumber() {
         this.gameState.handNumber += 1;
     }
 
@@ -450,7 +450,7 @@ export class GameStateManager {
         return seats;
     }
 
-    getPlayerPosition(playerUUID: PlayerUUID){
+    getPlayerPosition(playerUUID: PlayerUUID) {
         // TODO
         return PlayerPosition.BB;
     }
@@ -669,9 +669,10 @@ export class GameStateManager {
         return this.deckService.drawCard(this.gameState.deck);
     }
 
-    dealCardsToBoard(amount: number) {
+    dealCardsToBoard(amount: number): Card[] {
         const newCards = [...Array(amount).keys()].map((_) => this.drawCard());
         this.gameState.board.push(...newCards);
+        return newCards;
     }
 
     dealCardsToPlayer(amount: number, playerUUID: PlayerUUID) {
@@ -913,6 +914,10 @@ export class GameStateManager {
 
     setLastBettingRoundAction(lastBettingRoundAction: BettingRoundAction) {
         this.gameState.lastBettingRoundAction = lastBettingRoundAction;
+    }
+
+    getHoleCards(playerUUID: PlayerUUID): ReadonlyArray<Card> {
+        return this.getPlayer(playerUUID).holeCards;
     }
 
     computeBestHandForPlayer(playerUUID: PlayerUUID): Hand {
