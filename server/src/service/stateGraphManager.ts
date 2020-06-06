@@ -191,11 +191,7 @@ export class StateGraphManager {
 
             // TODO consider renaming this to initialize new hand, and getting rid of the extra state above.
             case GameStage.SHOW_START_OF_HAND: {
-                this.gameStateManager.incrementHandNumber();
-                this.gameStateManager.initializeNewDeck();
-                this.gamePlayService.initializeDealerButton();
-                this.gamePlayService.placeBlinds();
-                this.gameInstanceLogService.initNewHand();
+                this.gamePlayService.initializeNewHand();
                 break;
             }
 
@@ -239,6 +235,7 @@ export class StateGraphManager {
             }
 
             case GameStage.POST_HAND_CLEANUP: {
+                this.gamePlayService.updatePostHandChipDeltas();
                 this.ledgerService.incrementHandsWonForPlayers(
                     [...this.gameStateManager.getHandWinners()].map((playerUUID) =>
                         this.gameStateManager.getClientByPlayerUUID(playerUUID),

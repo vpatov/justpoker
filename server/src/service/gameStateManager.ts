@@ -28,7 +28,7 @@ import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { PlayerPosition } from '../../../ui/src/shared/models/handLog';
+import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/handLog';
 import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 
 // TODO Re-organize methods in some meaningful way
@@ -260,7 +260,7 @@ export class GameStateManager {
         this.gameState.handNumber += 1;
     }
 
-    getBoard() {
+    getBoard(): ReadonlyArray<Card> {
         return this.gameState.board;
     }
 
@@ -452,12 +452,12 @@ export class GameStateManager {
         return seats;
     }
 
-    getPlayerPosition(playerUUID: PlayerUUID) {
-        // TODO
-        return PlayerPosition.BB;
+    getPlayerPosition(playerUUID: PlayerUUID): PlayerPosition {
+        const index = this.getSeatNumberRelativeToDealer(playerUUID);
+        return PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersDealtIn().length]?.[index] || PlayerPosition.NOT_PLAYING;
     }
 
-    getPositionNumberRelativeToDealer(playerUUID: PlayerUUID) {
+    getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
         const numPlayers = this.getPlayersDealtIn().length;
         return (
             this.getPlayer(playerUUID).seatNumber +
@@ -466,8 +466,8 @@ export class GameStateManager {
     }
 
     comparePositions(playerA: PlayerUUID, playerB: PlayerUUID) {
-        const posA = this.getPositionNumberRelativeToDealer(playerA);
-        const posB = this.getPositionNumberRelativeToDealer(playerB);
+        const posA = this.getSeatNumberRelativeToDealer(playerA);
+        const posB = this.getSeatNumberRelativeToDealer(playerB);
 
         if (playerA === playerB) {
             throw Error(
@@ -986,6 +986,10 @@ export class GameStateManager {
         this.getPlayer(playerUUID).betAmount = betAmount;
     }
 
+    getPlayerChipsAtStartOfHand(playerUUID: PlayerUUID): number {
+        return this.getPlayer(playerUUID).chipsAtStartOfHand;
+    }
+
     setPlayerChipDelta(playerUUID: PlayerUUID, chipDelta: number) {
         this.getPlayer(playerUUID).chipDelta = chipDelta;
     }
@@ -997,6 +1001,12 @@ export class GameStateManager {
         }));
     }
 
+    recordPlayerChipsAtStartOfHand() {
+        this.forEveryPlayer((player) => {
+            player.chipsAtStartOfHand = player.chips;
+        });
+    }
+
     clearStateOfHandInfo() {
         this.updatePlayers((_) => ({
             lastActionType: BettingRoundActionType.NOT_IN_HAND,
@@ -1006,6 +1016,8 @@ export class GameStateManager {
             winner: false,
             betAmount: 0,
             timeBanksUsedThisAction: 0,
+            chipDelta: 0,
+            chipsAtStartOfHand: 0,
         }));
 
         // TODO make gameState partial that represents a clean pre-hand state.

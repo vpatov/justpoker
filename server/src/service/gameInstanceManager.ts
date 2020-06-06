@@ -156,16 +156,14 @@ export class GameInstanceManager {
         if (!gameInstance) {
             return undefined;
         }
-        const ledgerState = gameInstance.ledger;
+        const ledgerState = this.ledgerService.getLedger();
         return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
     }
 
-    getHandLogsForGameInstance(gameInstanceUUID: GameInstanceUUID): HandLog[] {
-        const gameInstance = this.getGameInstance(gameInstanceUUID);
-        if (!gameInstance) {
-            return [];
-        }
-        const handLogs = gameInstance.gameInstanceLog.handLogs;
-        return handLogs;
+    // TODO Return UIHandLog when frontend portion is complete.
+    getHandLogsForGameInstance(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): Record<string, any> {
+        this.loadGameInstance(gameInstanceUUID);
+        const requestorPlayerUUID = this.gameStateManager.getPlayerByClientUUID(clientUUID)?.uuid;
+        return this.gameInstanceLogService.serializeHandLogs(requestorPlayerUUID);
     }
 }

@@ -81,9 +81,9 @@ export class GamePlayService {
         const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
         const error = this.validationService.validateBettingRoundAction(clientUUID, CHECK_ACTION);
         if (!error) {
-            this.check();
+            this.performBettingRoundAction({ type: BettingRoundActionType.CHECK, amount: 0 });
         } else {
-            this.fold();
+            this.performBettingRoundAction({ type: BettingRoundActionType.FOLD, amount: 0 });
             this.gsm.sitOutPlayer(playerUUID);
         }
     }
@@ -257,6 +257,15 @@ export class GamePlayService {
         this.gsm.setDealerUUID(dealerUUID);
     }
 
+    initializeNewHand() {
+        this.gsm.incrementHandNumber();
+        this.gsm.initializeNewDeck();
+        this.initializeDealerButton();
+        this.gsm.recordPlayerChipsAtStartOfHand();
+        this.placeBlinds();
+        this.gameInstanceLogService.initNewHand();
+    }
+
     /*
         TODO ensure that the players have enough to cover the blinds, and if not, put them
         all-in. Don't let a player get this point if they have zero chips, stand them up earlier.
@@ -328,7 +337,7 @@ export class GamePlayService {
 
     initializeBettingRound() {
         const bettingRoundStage = this.gsm.getBettingRoundStage();
-        this.gameInstanceLogService.updateLastStage();
+        this.gameInstanceLogService.updateLastBettingRoundStage();
         this.gameInstanceLogService.initNewBettingRoundLog();
 
         switch (bettingRoundStage) {
@@ -338,9 +347,9 @@ export class GamePlayService {
                     if (this.gsm.isPlayerReadyToPlay(playerUUID)) {
                         this.dealHoleCards(playerUUID);
                         this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(playerUUID));
+                        this.gameInstanceLogService.updatePlayerCards(playerUUID);
                     }
                 });
-                this.gameInstanceLogService.initNewHand();
                 break;
             }
 
@@ -453,6 +462,15 @@ export class GamePlayService {
             this.gsm.setIsPlayerWinner(playerUUID, true);
             this.gsm.setPlayerChipDelta(playerUUID, amountsWon[playerUUID]);
             this.gsm.addHandWinner(playerUUID);
+        });
+    }
+
+    // TODO differentiate between chip delta when player is winning a pot, vs chip delta for an entire hand.
+    // Do this by picking a clear name for both. (i.e. chipsGained and chipDelta)
+    updatePostHandChipDeltas() {
+        this.gsm.forEveryPlayerUUID((playerUUID) => {
+            const delta = this.gsm.getPlayerChips(playerUUID) - this.gsm.getPlayerChipsAtStartOfHand(playerUUID);
+            this.gameInstanceLogService.updatePlayerChipDelta(playerUUID, delta);
         });
     }
 
