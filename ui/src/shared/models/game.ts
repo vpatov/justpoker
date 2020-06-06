@@ -27,13 +27,23 @@ export declare interface GameParameters {
     timeToAct: number;
 
     // advanced params
+
     maxPlayers: number;
+    dynamicMaxBuyin: boolean;
+    maxBuyinType: MaxBuyinType;
     minBuyin: number;
     allowTimeBanks: boolean;
     timeBankTime: number;
     numberTimeBanks: number;
     allowStraddle: boolean;
     canShowHeadsUp: boolean;
+}
+
+export enum MaxBuyinType {
+    TopStack = 'TopStack',
+    HalfTopStack = 'HalfTopStack',
+    SecondStack = 'SecondStack',
+    AverageStack = 'AverageStack',
 }
 
 export enum StraddleType {
@@ -102,6 +112,8 @@ export function getCleanGameParameters() {
         gameType: GameType.NLHOLDEM,
         maxBuyin: 0,
         minBuyin: 0,
+        dynamicMaxBuyin: false,
+        maxBuyinType: MaxBuyinType.TopStack,
         timeToAct: 0,
         maxPlayers: 0,
         timeBankTime: 0,
@@ -119,6 +131,8 @@ export function getDefaultGameParameters() {
         gameType: GameType.NLHOLDEM,
         maxBuyin: 200,
         minBuyin: 50,
+        dynamicMaxBuyin: false,
+        maxBuyinType: MaxBuyinType.TopStack,
         timeToAct: 30,
         maxPlayers: 9,
         timeBankTime: 30,
