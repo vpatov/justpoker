@@ -1,4 +1,4 @@
-import { getCleanGame, UiGameState, TestGame } from "../shared/models/uiState";
+import { getCleanGame, UiGameState, TestGame } from '../shared/models/uiState';
 
 const rootReducer = (state = getCleanGame(), action): UiGameState => {
     switch (action.type) {

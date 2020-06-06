@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import classnames from 'classnames';
 
 import Table from './Table';
 import Controller from './Controller';
@@ -8,6 +9,7 @@ import ChatLog from './ChatLog';
 import GameMenu from './GameMenu';
 import GameLabel from './GameLabel';
 import ControllerTimer from './ControllerTimer';
+import GameDisconnetionMessage from './GameDisconnectionMessage';
 import ReactionPicker from './ReactionPicker';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -32,26 +34,36 @@ const useStyles = makeStyles((theme) => ({
         height: '15%',
         width: '100%',
     },
+    disabled: {
+        transition: 'opacity 0.15s linear',
+        opacity: 0.3,
+        pointerEvents: 'none',
+    },
 }));
 
 function Game(props) {
+    const [mute, SET_mute] = useState(false);
+
     const classes = useStyles();
-
+    const { wsConnClosed } = props;
     return (
-        <div className={classes.root}>
-            <GameMenu />
-            <ReactionPicker />
-            <div className={classes.gameTableCont}>
-                <GameLabel />
-                <Table className={classes.table} />
-                <ControllerTimer />
-                <Controller className={classes.controller} />
-            </div>
-            <ChatLog className={classes.chatlog} />
+        <>
+            {wsConnClosed ? <GameDisconnetionMessage /> : null}
+            <div className={classnames(classes.root, { [classes.disabled]: wsConnClosed })}>
+                <GameMenu mute={mute} SET_mute={SET_mute} />
+                <ReactionPicker />
+                <div className={classes.gameTableCont}>
+                    <GameLabel />
+                    <Table className={classes.table} />
+                    <ControllerTimer />
+                    <Controller className={classes.controller} />
+                </div>
+                <ChatLog className={classes.chatlog} />
 
-            <AudioModule />
-            <AnimiationModule />
-        </div>
+                <AudioModule />
+                <AnimiationModule />
+            </div>
+        </>
     );
 }
 

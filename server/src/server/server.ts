@@ -17,7 +17,7 @@ import { ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
-import { GameInstanceUUID, ClientUUID } from '../../../ui/src/shared/models/uuid';
+import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/src/shared/models/uuid';
 import { GameParameters } from '../../../ui/src/shared/models/game';
 
 declare interface PerformanceMetrics {
@@ -166,23 +166,26 @@ class Server {
         });
     }
 
-    onConnectionToGame(ws: WebSocket, gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID) {
+    onConnectionToGame(ws: WebSocket, gameInstanceUUID: GameInstanceUUID, parsedClientUUID: ClientUUID) {
         // if game is not in instanceManager then send 404
-        // TODO implement FE for this
         if (!this.gameInstanceManager.doesGameInstanceExist(gameInstanceUUID)) {
             ws.send(JSON.stringify(getDefaultGame404()));
             return;
         }
         // if a uuid was not sent by client (that is there is no session) then create one
-        if (!clientUUID) {
-            clientUUID = this.connectedClientManager.createClientSessionInGroup(gameInstanceUUID, ws);
-            // send back clientUUID for client to store
+        const clientUUID = parsedClientUUID || generateClientUUID();
+        if (!parsedClientUUID) {
             ws.send(JSON.stringify({ clientUUID }));
-        } else {
-            // if there is a session replace old websocket
-            // TODO define app behavior in scenario when user accesses same game in two browser tabs.
-            this.connectedClientManager.updateClientSessionInGroup(gameInstanceUUID, clientUUID, ws);
         }
+        // this will either add client to group if not in group
+        // or if in group will replace old websocket with new websocket
+        const succ = this.connectedClientManager.addOrUpdateClientInGroup(gameInstanceUUID, clientUUID, ws);
+        if (!succ) {
+            logger.error(
+                `Group ${gameInstanceUUID} does not exist. Group should have be init on create game. Client ${clientUUID} not added.`,
+            );
+        }
+
         logger.verbose(`Connected to clientUUID: ${clientUUID}, gameInstanceUUID: ${gameInstanceUUID}`);
 
         // add client to game instance
@@ -194,8 +197,16 @@ class Server {
         // the event being a server action like GAME_INIT or something.
         ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
 
-        // maybe this should be done else where?
         ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameInstanceUUID));
+        ws.on('close', (data: WebSocket.Data) => {
+            logger.verbose(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
+            const succ = this.connectedClientManager.removeClientFromGroup(gameInstanceUUID, clientUUID);
+            if (!succ) {
+                logger.verbose(
+                    `Client ${clientUUID} not in group ${gameInstanceUUID}. Cannot remove from group. May have been deleted in other context.`,
+                );
+            }
+        });
     }
 
     //refactor this mess of a function

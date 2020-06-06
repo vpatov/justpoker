@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import { SoundByte } from './shared/models/audioQueue';
 import { WsServer } from './api/ws';
 
@@ -15,20 +15,24 @@ const AUDIO_PATHS = Object.entries(SoundByte).map(([soundByte, filename], _) => 
 
 const AUDIO_MAP = {};
 for (const [action, path] of AUDIO_PATHS) {
-    AUDIO_MAP[action] = new Howl({ src: [path] });
+    if (action !== SoundByte.NONE) AUDIO_MAP[action] = new Howl({ src: [path] });
 }
 
 function AudioModule(props) {
+    const { mute } = props;
+
     useEffect(() => {
         WsServer.subscribe('audio', onReceiveNewAudioState);
     }, []);
+
+    useEffect(() => {
+        Howler.mute(mute);
+    }, [mute]);
 
     const onReceiveNewAudioState = (soundByte: SoundByte) => {
         const audio = AUDIO_MAP[soundByte];
         if (audio) {
             audio.play();
-        } else {
-            console.log(`No audio file provided for ${soundByte}`);
         }
     };
 

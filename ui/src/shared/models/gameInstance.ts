@@ -4,6 +4,7 @@ import { AudioQueue, getCleanAudioQueue } from './audioQueue';
 import { ChatLog, getCleanChatLog } from './chat';
 import { ServerLedger, getCleanLedger } from './ledger';
 import { GameInstanceLog, getCleanGameInstanceLog } from './handLog';
+import { getEpochTimeMs } from '../util/util';
 
 export declare interface GameInstance {
     gameState: GameState;
@@ -13,6 +14,7 @@ export declare interface GameInstance {
     ledger: ServerLedger;
     gameInstanceLog: GameInstanceLog;
     stateTimer: NodeJS.Timer | null;
+    lastActive: number; // last epoch time game instance was accessed, used for expire
 }
 
 export function getCleanGameInstance(): GameInstance {
@@ -24,5 +26,6 @@ export function getCleanGameInstance(): GameInstance {
         ledger: getCleanLedger(),
         gameInstanceLog: getCleanGameInstanceLog(),
         stateTimer: null,
+        lastActive: getEpochTimeMs(),
     };
 }

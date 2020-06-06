@@ -32,6 +32,7 @@ function GameContainer(props): any {
     const dispatch = useDispatch();
     const [gameLoaded, setGameLoaded] = useState(false);
     const [error, setError] = useState<ErrorDisplay | undefined>();
+    const [wsConnClosed, SET_wsConnClosed] = useState(false);
 
     const queryParams = parseHTTPParams(queryString.parseUrl(get(props, 'location.search', '')));
 
@@ -44,9 +45,14 @@ function GameContainer(props): any {
             if (succ) {
                 WsServer.subscribe('game', onReceiveNewGame);
                 WsServer.subscribe('error', onReceiveError);
+                WsServer.subscribe('onclose', onWSClosed);
             }
         }
     }, []);
+
+    const onWSClosed = () => {
+        SET_wsConnClosed(true);
+    };
 
     const onReceiveError = (error: any) => {
         setError(error);
@@ -62,7 +68,7 @@ function GameContainer(props): any {
     }
 
     function renderGame() {
-        return <Game />;
+        return <Game wsConnClosed={wsConnClosed} />;
     }
 
     function renderLoading() {

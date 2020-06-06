@@ -1,3 +1,5 @@
+import { AnimojiKeys } from './assets';
+
 export declare interface AnimationState {
     animationType: AnimationType;
     trigger?: AnimationTrigger;
@@ -13,15 +15,7 @@ export enum AnimationType {
 }
 
 export declare type EmptyTrigger = 'EmptyTrigger';
-
-export enum ReactionTrigger {
-    WOW = 'Wow',
-    LOL = 'Lol',
-    WINK = 'Wink',
-    PUKE = 'Puke',
-    MONEY = 'Money',
-    BANANA = 'Banana',
-}
+export declare type ReactionTrigger = AnimojiKeys;
 
 export enum GameplayTrigger {
     DEAL_CARDS = 'DEAL_CARDS',

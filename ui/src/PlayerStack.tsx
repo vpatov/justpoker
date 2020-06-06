@@ -17,10 +17,6 @@ const useStyles = makeStyles((theme) => ({
         height: '6vmin',
         alignItems: 'center',
         cursor: 'pointer',
-        border: '0.25vmin solid transparent',
-        '&:hover': {
-            borderColor: theme.palette.secondary.main,
-        },
 
         ...theme.custom.STACK,
     },
@@ -43,13 +39,6 @@ const useStyles = makeStyles((theme) => ({
     },
     nameStackCont: {
         width: '60%',
-    },
-    avatar: {
-        marginLeft: '-11%',
-        marginRight: '0.3vmin',
-        flexShrink: 0,
-        height: '6.8vmin',
-        width: '6.8vmin',
     },
     name: {
         paddingBottom: '0.8vmin',
@@ -77,6 +66,17 @@ const useStyles = makeStyles((theme) => ({
     act: {
         backgroundColor: 'rgba(0, 236, 255, 1)',
     },
+    winnerAnimojiCont: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+    },
+    winnerAnimoji: {
+        width: `100%`,
+        height: '20vmin',
+        position: 'absolute',
+    },
 }));
 
 function usePrevious(value) {
@@ -89,8 +89,9 @@ function usePrevious(value) {
 
 function PlayerStack(props) {
     const classes = useStyles();
-    const { stack, name, positionIndicator, winner, toAct, outOfHand, position, playerUUID, onClickStack } = props;
-
+    const { player, onClickStack } = props;
+    const { stack, name, toAct, winner, positionIndicator, folded, uuid, sittingOut, avatarKey, position } = player;
+    const outOfHand = sittingOut || folded;
     const prevStack = usePrevious(stack);
 
     return (
@@ -102,7 +103,10 @@ function PlayerStack(props) {
                 [classes.outOfHand]: outOfHand,
             })}
         >
-            <PlayerAvatar className={classes.avatar} position={position} playerUUID={playerUUID} />
+            <div className={classes.winnerAnimojiCont}>
+                {winner ? <Animoji reaction={'winner'} className={classes.winnerAnimoji} animated /> : null}
+            </div>
+            <PlayerAvatar position={position} playerUUID={uuid} avatarKey={avatarKey} />
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <div className={classes.nameStackCont}>
                 <Typography variant="h4" className={classes.stack}>
