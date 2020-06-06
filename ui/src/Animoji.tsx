@@ -1,38 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import classnames from 'classnames';
-import wink from './assets/animoji/wink.gif';
-import money from './assets/animoji/money.gif';
-import banana from './assets/animoji/banana.gif';
-import puke from './assets/animoji/puke.gif';
-import wow from './assets/animoji/wow.gif';
-import lol from './assets/animoji/lol.gif';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { ReactionTrigger } from './shared/models/animationState';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         img: {
             width: `100%`,
             height: `100%`,
+            filter: `drop-shadow(0px 0px 3px rgba(0, 0, 0, .7))`,
         },
     }),
 );
 
-const ANIMOJI_ASSET = {
-    [ReactionTrigger.WINK]: wink,
-    [ReactionTrigger.MONEY]: money,
-    [ReactionTrigger.BANANA]: banana,
-    [ReactionTrigger.PUKE]: puke,
-    [ReactionTrigger.WOW]: wow,
-    [ReactionTrigger.LOL]: lol,
-};
-
 function Animoji(props) {
     const classes = useStyles();
-    const { className, reaction } = props;
+    const { className, reaction, animated } = props;
+    const [asset, SET_asset] = useState();
 
-    return <img className={classnames(classes.img, className)} src={ANIMOJI_ASSET[reaction]} alt="" />;
+    useEffect(() => {
+        if (animated) {
+            import(`./assets/animoji/animated/${reaction}.gif`)
+                .then((asset) => {
+                    SET_asset(asset.default);
+                })
+                .catch(() => {
+                    console.error(`err loading ${reaction}.gif`);
+                });
+        } else {
+            import(`./assets/animoji/static/${reaction}.svg`)
+                ?.then((asset) => {
+                    SET_asset(asset.default);
+                })
+                .catch(() => {
+                    console.error(`err loading ${reaction}.svg`);
+                });
+        }
+    }, [reaction]);
+
+    if (asset) return <img className={classnames(classes.img, className)} src={asset} alt="" />;
+    return null;
 }
 
 export default Animoji;

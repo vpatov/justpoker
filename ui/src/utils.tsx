@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const SUITS = {
     HEARTS: 'HEARTS',
@@ -40,4 +40,26 @@ export function usePrevious<T>(value: T): T {
     return ref.current as T;
 }
 
-export default usePrevious;
+export function useStickyState(defaultValue, key) {
+    const [value, setValue] = useState(() => {
+        const stickyValue = window.localStorage.getItem(key);
+        // block crash for parse empty string
+        try {
+            return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
+        } catch (e) {
+            return stickyValue;
+        }
+    });
+    useEffect(() => {
+        window.localStorage.setItem(key, JSON.stringify(value));
+    }, [key, value]);
+    return [value, setValue];
+}
+
+export function importAllFromRequire(r) {
+    let images = {};
+    r.keys().map((item, index) => {
+        images[item.replace('./', '')] = r(item);
+    });
+    return images;
+}

@@ -22,7 +22,7 @@ const TABLE_HEIGHT = 39;
 const TABLE_WIDTH = 71;
 
 const PLAYER_HEIGHT = 58;
-const PLAYER_WIDTH = 91;
+const PLAYER_WIDTH = 93;
 
 const BET_HEIGHT = 30;
 const BET_WIDTH = 60;

@@ -15,7 +15,7 @@ const AUDIO_PATHS = Object.entries(SoundByte).map(([soundByte, filename], _) => 
 
 const AUDIO_MAP = {};
 for (const [action, path] of AUDIO_PATHS) {
-    AUDIO_MAP[action] = new Howl({ src: [path] });
+    if (action !== SoundByte.NONE) AUDIO_MAP[action] = new Howl({ src: [path] });
 }
 
 function AudioModule(props) {

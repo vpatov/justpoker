@@ -16,6 +16,7 @@ import {
     getDefaultGameParameters,
 } from './game';
 import { PlayerUUID, makeBlankUUID } from './uuid';
+import { getRandomAvatarKey, AvatarKeys } from './assets';
 
 export declare interface ErrorDisplay {
     message?: string;
@@ -146,6 +147,7 @@ export declare interface UiPlayer {
     hand: {
         cards: UiCard[];
     };
+    avatarKey: AvatarKeys;
 }
 
 export enum PositionIndicator {
@@ -441,6 +443,7 @@ export const TestGame: UiGameState = {
             hand: {
                 cards: [{ ...genRandomCard() }, genRandomCard()],
             },
+            avatarKey: getRandomAvatarKey(),
         },
         {
             name: 'Marty Shakus',
@@ -451,6 +454,7 @@ export const TestGame: UiGameState = {
             hand: {
                 cards: [{ hidden: true }, { hidden: true }, { hidden: true }, { hidden: true }],
             },
+            avatarKey: getRandomAvatarKey(),
         },
         {
             name: 'Dean Markus',
@@ -465,6 +469,7 @@ export const TestGame: UiGameState = {
                     { ...genRandomCard(), partOfWinningHand: true },
                 ],
             },
+            avatarKey: getRandomAvatarKey(),
         },
         // {
         //     name: "Johnny Bones",
@@ -474,6 +479,7 @@ export const TestGame: UiGameState = {
         //     hand: {
         //         cards: [{ hidden: true }, { hidden: true }],
         //     },
+        //     avatarKey: getRandomAvatarKey(),
         // },
 
         {
@@ -486,6 +492,7 @@ export const TestGame: UiGameState = {
             hand: {
                 cards: [genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard()],
             },
+            avatarKey: getRandomAvatarKey(),
         },
         {
             name: 'Lenny',
@@ -494,6 +501,7 @@ export const TestGame: UiGameState = {
             hand: {
                 cards: [],
             },
+            avatarKey: getRandomAvatarKey(),
         },
         {
             name: 'Jimmy Dean',
@@ -505,6 +513,7 @@ export const TestGame: UiGameState = {
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
+            avatarKey: getRandomAvatarKey(),
         },
         {
             name: 'Nicki Lam',
@@ -512,10 +521,10 @@ export const TestGame: UiGameState = {
             position: positions[7],
             sittingOut: true,
             bet: genRandomInt(0, MAX_VALUES.PLAYER_STACK),
-
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
+            avatarKey: getRandomAvatarKey(),
         },
         {
             name: 'Tommy Bones',
@@ -526,6 +535,7 @@ export const TestGame: UiGameState = {
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },
+            avatarKey: getRandomAvatarKey(),
         },
     ],
 };

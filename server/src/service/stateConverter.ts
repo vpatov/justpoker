@@ -380,6 +380,7 @@ export class StateConverter {
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
             bet: player.betAmount,
+            avatarKey: player.avatarKey,
             positionIndicator: this.getPlayerPositionIndicator(player.uuid),
             winner: player.winner,
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
