@@ -5,22 +5,16 @@ import Hand from './Hand';
 import PlayerStack from './PlayerStack';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import blueGrey from '@material-ui/core/colors/blueGrey';
 import grey from '@material-ui/core/colors/grey';
 
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
-import MoreIcom from '@material-ui/icons/MoreVert';
-import Animoji from './Animoji';
 import PlayerLabel from './PlayerLabel';
-
-const PLAYER_WIDTH = 16;
-const PLAYER_HEIGHT = 12;
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        width: `${PLAYER_WIDTH}vmin`,
-        height: `${PLAYER_HEIGHT}vmin`,
+        width: `${theme.custom.PLAYER_WIDTH}vmin`,
+        height: `${theme.custom.PLAYER_HEIGHT}vmin`,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
@@ -54,22 +48,8 @@ const useStyles = makeStyles((theme) => ({
 
 function Player(props) {
     const classes = useStyles();
-    const { className, style, setHeroRotation, virtualPositon } = props;
-    const {
-        stack,
-        hand,
-        name,
-        toAct,
-        playerTimer,
-        winner,
-        positionIndicator,
-        folded,
-        uuid,
-        sittingOut,
-        hero,
-        position,
-        quitting,
-    } = props.player;
+    const { className, player, style, setHeroRotation, virtualPositon } = props;
+    const { stack, hand, name, playerTimer, folded, uuid, sittingOut, hero, quitting } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -120,17 +100,7 @@ function Player(props) {
 
             <Hand hand={hand} folded={folded} hero={hero} />
 
-            <PlayerStack
-                onClickStack={handleClick}
-                toAct={toAct}
-                name={name}
-                stack={stack}
-                outOfHand={folded || sittingOut}
-                positionIndicator={positionIndicator}
-                winner={winner}
-                position={position}
-                playerUUID={uuid}
-            />
+            <PlayerStack onClickStack={handleClick} player={player} />
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>
     );

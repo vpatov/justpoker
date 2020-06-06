@@ -59,8 +59,6 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
         },
         iconButton: {
-            height: '5vmin',
-            width: '5vmin',
             borderRadius: '5%',
         },
         icon: {
@@ -175,7 +173,7 @@ function GameMenu(props) {
                 >
                     {open ? (
                         menuButtons.map((button) => (
-                            <Tooltip title={button.label} placement="right">
+                            <Tooltip key={button.label} title={button.label} placement="right">
                                 <IconButton
                                     className={classes.iconButton}
                                     onClick={() => handleClickButton(button.action)}

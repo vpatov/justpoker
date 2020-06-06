@@ -29,6 +29,7 @@ import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -87,12 +88,13 @@ export class GameStateManager {
         };
     }
 
-    createNewPlayer(name: string, chips: number): Player {
+    createNewPlayer(name: string, chips: number, avatarKey: AvatarKeys): Player {
         return {
             ...getCleanPlayer(),
             uuid: generatePlayerUUID(),
             name,
             chips,
+            avatarKey,
             timeBanksLeft: this.getGameParameters().numberTimeBanks,
         };
     }
@@ -770,9 +772,8 @@ export class GameStateManager {
     }
 
     addNewPlayerToGame(clientUUID: ClientUUID, request: JoinTableRequest) {
-        const name = request.name;
-        const buyin = request.buyin;
-        const player = this.createNewPlayer(name, buyin);
+        const { name, buyin, avatarKey } = request;
+        const player = this.createNewPlayer(name, buyin, avatarKey);
 
         // TODO remove temporary logic
         // this deletes previous player association and replaces it

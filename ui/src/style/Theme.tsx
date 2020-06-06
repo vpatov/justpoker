@@ -63,6 +63,8 @@ export const CUSTOM_THEME = {
             boxShadow: '0 2px 6px 3px rgba(40,40,40,0.4)',
             background: `radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%)`,
         },
+        PLAYER_WIDTH: 19,
+        PLAYER_HEIGHT: 12,
         STACK: {
             color: 'black',
             backgroundColor: blueGrey[200],
