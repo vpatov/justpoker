@@ -165,7 +165,7 @@ export class EventProcessorService {
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.LEAVETABLE]: {
-            validation: (uuid, req) => this.validationService.validateLeaveTableAction(uuid, req),
+            validation: (uuid, req) => this.validationService.validateLeaveTableAction(uuid),
             perform: (uuid) => {
                 const player = this.gameStateManager.getPlayerByClientUUID(uuid);
                 this.gameStateManager.removePlayerFromGame(player.uuid);
