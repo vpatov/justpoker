@@ -23,6 +23,9 @@ import { BettingRoundActionType } from './shared/models/game';
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
+import { BettingRoundActionButton } from './shared/models/uiState';
+import red from '@material-ui/core/colors/red';
+import Color from 'color';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -58,7 +61,7 @@ const useStyles = makeStyles((theme: Theme) =>
             flexDirection: 'column',
             alignItems: 'flex-end',
             marginRight: '2vw',
-            minWidth: '12vw',
+            minWidth: '14vw',
         },
         additionalGamePlayTopButtons: {
             display: 'flex',
@@ -104,6 +107,10 @@ const useStyles = makeStyles((theme: Theme) =>
             },
         },
         ...theme.custom.ACTION_BUTTONS,
+        semiDisabledFold: {
+            borderColor: Color(theme.custom.ACTION_BUTTONS.FOLD.borderColor).desaturate(0.7).darken(0.5).string(),
+            color: Color(theme.custom.ACTION_BUTTONS.FOLD.color).desaturate(0.7).darken(0.5).string(),
+        },
     }),
 );
 
@@ -125,6 +132,7 @@ function ControllerComp(props: ControllerProps) {
         timeBanks,
         willStraddle,
         showWarningOnFold,
+        callAmount,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
@@ -137,6 +145,13 @@ function ControllerComp(props: ControllerProps) {
     const [queuedActionType, setQueuedActionType] = useState('');
 
     const [warning, setWarning] = useState(false);
+
+    // if there is selected betAmt and min changes rest betAmt
+    useEffect(() => {
+        if (betAmt !== 0 && betAmt < min) {
+            setBetAmt(0);
+        }
+    }, [min, betAmt, setBetAmt]);
 
     useEffect(() => {
         for (const actionType of bettingRoundActionTypesToUnqueue) {
@@ -227,6 +242,22 @@ function ControllerComp(props: ControllerProps) {
         setQueuedActionType('');
     }
 
+    function getBetActionButtonText(button: BettingRoundActionButton): string {
+        switch (button.action) {
+            case BettingRoundActionType.CALL:
+                return `${button.label} ${callAmount || ''}`;
+            case BettingRoundActionType.BET:
+                return `${button.label} ${betAmt || ''}`;
+            case BettingRoundActionType.CHECK:
+                return button.label;
+            case BettingRoundActionType.FOLD:
+                return button.label;
+
+            default:
+                return button.label;
+        }
+    }
+
     return (
         <div
             className={classnames(classes.root, className, {
@@ -252,11 +283,15 @@ function ControllerComp(props: ControllerProps) {
                                 variant="outlined"
                                 className={classnames(classes.actionButton, classes[button.action], {
                                     [classes[`${button.action}_QUEUED`]]: button.action === queuedActionType,
+                                    [classes.semiDisabledFold]:
+                                        button.action === BettingRoundActionType.FOLD && showWarningOnFold,
                                 })}
-                                disabled={button.disabled}
+                                disabled={
+                                    button.disabled || (button.action === BettingRoundActionType.BET && betAmt === 0)
+                                }
                                 onClick={() => onClickActionButton(button.action)}
                             >
-                                {button.label}
+                                {getBetActionButtonText(button)}
                             </Button>
                         );
                     })}

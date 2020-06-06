@@ -253,6 +253,15 @@ export class GameStateManager {
         return this.gameState.board;
     }
 
+    getCallAmount(playerUUID: PlayerUUID): number {
+        if (!this.isPlayerFacingBet(playerUUID)) {
+            return 0;
+        }
+        const chips = this.getPlayerChips(playerUUID);
+        const callAmount = this.getPreviousRaise() > chips ? chips : this.getPreviousRaise();
+        return callAmount;
+    }
+
     playerBuyinAddChips(playerUUID: PlayerUUID, addChips: number) {
         if (addChips <= 0) {
             logger.error(
@@ -483,6 +492,15 @@ export class GameStateManager {
 
     gameIsWaitingForBetAction() {
         return this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
+    }
+
+    isGameStageInBetweenHands(): boolean {
+        return (
+            this.gameState.gameStage === GameStage.NOT_IN_PROGRESS ||
+            this.gameState.gameStage === GameStage.INITIALIZE_NEW_HAND ||
+            this.gameState.gameStage === GameStage.SHOW_WINNER ||
+            this.gameState.gameStage === GameStage.POST_HAND_CLEANUP
+        );
     }
 
     getMinimumBetSize() {
