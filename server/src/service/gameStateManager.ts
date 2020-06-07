@@ -339,6 +339,10 @@ export class GameStateManager {
         this.getPlayer(playerUUID).chips = chips;
     }
 
+    setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean) {
+        this.getPlayer(playerUUID).quitting = quitting;
+    }
+
     // returns time in milliseconds
     getTimeCurrentPlayerTurnStarted() {
         return this.gameState.timeCurrentPlayerTurnStarted;
@@ -804,12 +808,13 @@ export class GameStateManager {
         return connectedClient;
     }
 
-    bootPlayerFromGame(playerUUID: PlayerUUID) {
+    removePlayerFromGame(playerUUID: PlayerUUID) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
                 actionType: ClientActionType.BOOTPLAYER,
                 args: [playerUUID],
             });
+            this.setPlayerQuitting(playerUUID, true);
         } else {
             if (this.getPlayer(playerUUID)) {
                 this.removePlayerFromPlayers(playerUUID);

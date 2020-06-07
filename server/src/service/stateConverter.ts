@@ -21,6 +21,7 @@ import {
     LEDGER_BUTTON,
     PositionIndicator,
     ShowCardButton,
+    LEAVE_TABLE_BUTTON,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
 import { GameStateManager } from './gameStateManager';
@@ -272,7 +273,11 @@ export class StateConverter {
             }
         }
 
-        // TODO leave table button
+        // if player is in game they can leave
+        if (heroPlayer && !heroPlayer.quitting) {
+            menuButtons.push(LEAVE_TABLE_BUTTON);
+        }
+
         return menuButtons;
     }
 
@@ -382,6 +387,7 @@ export class StateConverter {
                   }
                 : undefined,
             name: player.name,
+            quitting: player.quitting,
             toAct: herosTurnToAct,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
