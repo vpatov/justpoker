@@ -41,14 +41,14 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         gameInfoCont: {
             marginLeft: '2vw',
-            width: '8vw',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
+            width: '20%',
         },
         sizeAndBetActionsCont: {
-            width: '50%',
+            width: '60%',
             height: '100%',
             display: 'flex',
             flexDirection: 'row',
@@ -56,12 +56,12 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
         },
         additionalGamePlayCont: {
+            width: '20%',
             display: 'flex',
             justifyContent: 'center',
             flexDirection: 'column',
             alignItems: 'flex-end',
             marginRight: '2vw',
-            minWidth: '14vw',
         },
         additionalGamePlayTopButtons: {
             display: 'flex',
@@ -95,6 +95,9 @@ const useStyles = makeStyles((theme: Theme) =>
             marginTop: '2vmin',
             fontSize: '1.8vmin',
             color: theme.palette.primary.main,
+        },
+        handLabelSmaller: {
+            fontSize: '1.6vmin',
         },
         toActLabel: {
             fontSize: '1.8vmin',
@@ -266,7 +269,11 @@ function ControllerComp(props: ControllerProps) {
         >
             <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
             <div className={classes.gameInfoCont}>
-                <Typography className={classes.handLabel}>{heroHandLabel}</Typography>
+                <Typography
+                    className={classnames(classes.handLabel, { [classes.handLabelSmaller]: heroHandLabel.length > 25 })}
+                >
+                    {heroHandLabel}
+                </Typography>
                 {toAct ? <Typography className={classes.toActLabel}>{'☉ Your Turn'}</Typography> : null}
             </div>
             <div className={classes.sizeAndBetActionsCont}>

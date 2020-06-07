@@ -446,7 +446,7 @@ export const TestGame: UiGameState = {
                 timeElapsed: 11.5,
                 timeLimit: 30,
             },
-            handLabel: 'Set of Kings',
+            handLabel: 'Full House, Queens over Threes',
             bet: genRandomInt(0, 10),
             hand: {
                 cards: [{ ...genRandomCard() }, genRandomCard()],
