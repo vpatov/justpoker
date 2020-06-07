@@ -7,7 +7,7 @@
 
 FROM node:13
 
-WORKDIR /home/dockerapps/jpserver
+WORKDIR /jpserver
 
 # Copy all package* files that describe dependencies
 COPY ./server/package*.json ./ 
@@ -20,7 +20,7 @@ COPY ui/src/shared ./ui/src/shared
 # This is necessary because the server npm scripts assume the build process
 # happens in the server, and the ts sources imports are relative to the server
 # directory (when importing from ui/src/shared)
-WORKDIR /home/dockerapps/jpserver/server
+WORKDIR /jpserver/server
 RUN npm install
 
 # Build and start the server.
