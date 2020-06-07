@@ -203,3 +203,20 @@ export function getHoleCardNickname(cardA: Card, cardB: Card): string | undefine
     else if (cardB.rank === 'A') return ranksToName[cardB.rank + cardA.rank];
     return undefined;
 }
+
+export const RankAbbrToFullString: Record<string, string> = {
+    // Pairs
+    A: 'Aces',
+    K: 'Kings',
+    Q: 'Queens',
+    J: 'Jacks',
+    T: 'Tens',
+    '9': 'Nines',
+    '8': 'Eights',
+    '7': 'Sevens',
+    '6': 'Sixes',
+    '5': 'Fives',
+    '4': 'Fours',
+    '3': 'Threes',
+    '2': 'Twos',
+};

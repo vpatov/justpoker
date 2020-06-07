@@ -29,8 +29,7 @@ import {
     Card,
     cardsAreEqual,
     convertHandToCardArray,
-    Suit,
-    getHoleCardNickname,
+    RankAbbrToFullString,
 } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
@@ -938,9 +937,19 @@ export class GameStateManager {
     }
 
     getStrDescriptionFromHand(hand: Hand): string {
-        // removes wanted characters from the description string: '&,
-        // Two pair, A's & Q's => Two pair As Qs
-        return hand.descr.replace(/'/g, '').replace(/&/g, '').replace(/,/g, '');
+        // removes wanted characters from the description string
+
+        // Two pair, A's & Q's
+        if (hand.name === 'Two Pair') {
+            let str = hand.descr.split(',')[1]; // `A's & Q's`
+            str = str.replace(/'s|&| /g, ''); // `AQ`
+            let firstCard = str.charAt(0); // `A`
+            let secondCard = str.charAt(0); // `Q`
+            firstCard = RankAbbrToFullString[firstCard]; // `Aces`
+            secondCard = RankAbbrToFullString[firstCard]; // `Queens`
+            return `${hand.name}, ${firstCard} & ${secondCard}`;
+        }
+        return hand.descr;
     }
 
     getGameType(): GameType {
