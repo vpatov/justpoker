@@ -214,7 +214,7 @@ export class GameStateManager {
     }
 
     areOpenSeats(): boolean {
-        return this.getMaxPlayers() !== this.getSittingPlayers().length;
+        return this.getMaxPlayers() > Object.values(this.getPlayers()).length;
     }
 
     // TODO when branded types can be used as index signatures, replace string with PlayerUUID
