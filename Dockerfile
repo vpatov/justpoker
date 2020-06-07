@@ -23,4 +23,4 @@ WORKDIR /justpoker/server
 RUN npm install
 
 # Build and start the server.
-CMD ["ROOT_SERVER_DIR=/justpoker", "npm", "run", "start"]
+CMD ["npm", "run", "prod-start"]
