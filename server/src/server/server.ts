@@ -97,6 +97,20 @@ class Server {
             }
         });
 
+        // TODO replace with UIHandLog response when frontend and models are complete
+        router.get('/handlog', (req, res) => {
+            const parsedQuery = queryString.parseUrl(req.url);
+            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
+            const clientUUID = parsedQuery.query.clientUUID as ClientUUID;
+            const handLogs = this.gameInstanceManager.getHandLogsForGameInstance(gameInstanceUUID, clientUUID);
+            if (!handLogs) {
+                logger.info(`HandLog not found for ${gameInstanceUUID}`);
+                res.send(getDefaultGame404());
+            } else {
+                res.send({ handLogs: handLogs });
+            }
+        });
+
         this.app.use(bodyParser.json());
         this.app.use(
             bodyParser.urlencoded({

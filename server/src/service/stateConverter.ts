@@ -146,6 +146,7 @@ export class StateConverter {
                 gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
+            computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
         };
 
         return global;
