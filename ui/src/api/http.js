@@ -7,11 +7,11 @@ const api = axios.create({
 // onSuccess = (response) => {}
 // onError = (err) => {}
 export const createGame = (data, onSuccess, onError) => {
-    const url = '/createGame';
+    const url = '/api/createGame';
     return api.post(url, data).then(onSuccess).catch(onError);
 };
 
 export const getLedger = (gameInstanceUUID, onSuccess, onError) => {
-    const url = `/ledger?gameInstanceUUID=${gameInstanceUUID}`;
+    const url = `/api/ledger?gameInstanceUUID=${gameInstanceUUID}`;
     return api.get(url).then(onSuccess).catch(onError);
 };

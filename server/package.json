@@ -12,6 +12,7 @@
         "build": "tsc",
         "prestart": "npm run build",
         "start": "node ./dist/server/server/src/server/server.js",
+        "prod-start": "env ROOT_SERVER_DIR=${ROOT_SERVER_DIR} npm run start",
         "debug": "npm run build && node inspect ./dist/server/server/src/server/server.js",
         "start-d": "npm run build && LOG_LEVEL=debug node ./dist/server/server/src/server/server.js",
         "test": "echo \"Error: no test specified\" && exit 1"
