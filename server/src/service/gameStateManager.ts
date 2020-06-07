@@ -999,20 +999,25 @@ export class GameStateManager {
         this.getPlayer(playerUUID).handDescription = '';
     }
 
+    // removes wanted characters from the description string
+    // and in full names of cards
     getStrDescriptionFromHand(hand: Hand): string {
-        // removes wanted characters from the description string
-
+        // K High
         // Two pair, A's & Q's
-        if (hand.name === 'Two Pair') {
-            let str = hand.descr.split(',')[1]; // `A's & Q's`
-            str = str.replace(/'s|&| /g, ''); // `AQ`
-            let firstCard = str.charAt(0); // `A`
-            let secondCard = str.charAt(0); // `Q`
-            firstCard = RankAbbrToFullString[firstCard]; // `Aces`
-            secondCard = RankAbbrToFullString[firstCard]; // `Queens`
-            return `${hand.name}, ${firstCard} & ${secondCard}`;
-        }
-        return hand.descr;
+        // Three of a Kind, 6's
+        // Pair, 3's
+        // Full House, 5's over 4's
+        // Flush, Ah High
+        // Straight, 8 High
+        let description = hand.descr;
+        Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
+            const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
+            const regex = new RegExp(regexStr, 'g');
+            description = description.replace(regex, fullStr);
+        });
+        description = description.replace(/'s/g, 's').replace(/Sixs/g, 'Sixes');
+
+        return description;
     }
 
     getGameType(): GameType {

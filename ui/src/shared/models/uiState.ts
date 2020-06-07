@@ -430,7 +430,7 @@ export const TestGame: UiGameState = {
             { rank: 'T', suit: Suit.CLUBS },
             genRandomCard(),
         ],
-        winningHandDescription: 'Full House, As over 5s',
+        winningHandDescription: 'Full House, Queens over Threes',
     },
     players: [
         {

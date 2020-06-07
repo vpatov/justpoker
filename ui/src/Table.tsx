@@ -96,7 +96,8 @@ const useStyles = makeStyles((theme) => ({
     winningHandDescription: {
         zIndex: 5,
         marginTop: '27vmin',
-        fontSize: '3.4vmin',
+        letterSpacing: '-0.8px',
+        fontSize: '3.1vmin',
         fontWeight: 'bold',
         color: 'white',
         textShadow: `0.2vmin 0.2vmin ${theme.palette.secondary.main}`,
