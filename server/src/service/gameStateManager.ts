@@ -35,7 +35,11 @@ import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/playerPosition';
+import {
+    PlayerPosition,
+    PLAYER_POSITIONS_BY_HEADCOUNT,
+    PlayerPositionString,
+} from '../../../ui/src/shared/models/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 import sortBy from 'lodash/sortBy';
 
@@ -518,6 +522,10 @@ export class GameStateManager {
             currentPlayerUUID = seats[currentSeatNumber][1];
         }
         return playerPositionMap;
+    }
+
+    getPlayerPositionString(playerUUID: PlayerUUID): string {
+        return PlayerPositionString[this.getPlayerPositionMap().get(playerUUID)];
     }
 
     getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {

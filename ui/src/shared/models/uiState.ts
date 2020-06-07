@@ -77,6 +77,7 @@ export declare interface Controller {
     lastBettingRoundAction: BettingRoundAction;
     showWarningOnFold: boolean;
     callAmount: number;
+    playerPositionString?: string;
 }
 
 export declare interface SizingButton {
@@ -387,6 +388,7 @@ export const TestGame: UiGameState = {
         callAmount: 54323,
         timeBanks: 2,
         dealInNextHand: false,
+        playerPositionString: 'Hijack',
         showCardButtons: [
             { rank: genRandomCard().rank, suit: genRandomCard().suit },
             { rank: genRandomCard().rank, suit: genRandomCard().suit },

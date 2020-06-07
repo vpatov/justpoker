@@ -213,6 +213,7 @@ export class StateConverter {
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
             timeBanks: hero.timeBanksLeft,
+            playerPositionString: this.gameStateManager.getPlayerPositionString(heroPlayerUUID),
             showWarningOnFold:
                 !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ||
                 this.gameStateManager.getAllCommitedBets() === 0,
