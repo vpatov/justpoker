@@ -24,7 +24,13 @@ import { DeckService } from './deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from './handSolverService';
-import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
+import {
+    Hand,
+    Card,
+    cardsAreEqual,
+    convertHandToCardArray,
+    RankAbbrToFullString,
+} from '../../../ui/src/shared/models/cards';
 import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
@@ -986,11 +992,32 @@ export class GameStateManager {
 
     updatePlayerHandDescription(playerUUID: PlayerUUID) {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
-        this.getPlayer(playerUUID).handDescription = bestHand.descr;
+        this.getPlayer(playerUUID).handDescription = this.getStrDescriptionFromHand(bestHand);
     }
 
     clearPlayerHandDescription(playerUUID: PlayerUUID) {
         this.getPlayer(playerUUID).handDescription = '';
+    }
+
+    // removes wanted characters from the description string
+    // and in full names of cards
+    getStrDescriptionFromHand(hand: Hand): string {
+        // K High
+        // Two pair, A's & Q's
+        // Three of a Kind, 6's
+        // Pair, 3's
+        // Full House, 5's over 4's
+        // Flush, Ah High
+        // Straight, 8 High
+        let description = hand.descr;
+        Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
+            const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
+            const regex = new RegExp(regexStr, 'g');
+            description = description.replace(regex, fullStr);
+        });
+        description = description.replace(/'s/g, 's').replace(/Sixs/g, 'Sixes');
+
+        return description;
     }
 
     getGameType(): GameType {
@@ -1146,6 +1173,11 @@ export class GameStateManager {
 
     getWinners() {
         return this.filterPlayerUUIDs((playerUUID) => this.getPlayer(playerUUID).winner);
+    }
+
+    getWinningHandDescription(): string | undefined {
+        const winners = this.getWinners();
+        return winners.length ? this.getStrDescriptionFromHand(this.getPlayerBestHand(winners[0])) : undefined;
     }
 
     setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {

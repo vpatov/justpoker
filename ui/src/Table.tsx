@@ -14,6 +14,7 @@ import { WsServer } from './api/ws';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import { Typography, Zoom } from '@material-ui/core';
 
 const W_UNIT = 'vmin';
 const H_UNIT = 'vmin';
@@ -92,6 +93,15 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 5,
         fontSize: '4vmin',
     },
+    winningHandDescription: {
+        zIndex: 5,
+        marginTop: '27vmin',
+        letterSpacing: '-0.8px',
+        fontSize: '3.1vmin',
+        fontWeight: 'bold',
+        color: 'white',
+        textShadow: `0.2vmin 0.2vmin ${theme.palette.secondary.main}`,
+    },
 }));
 
 function mod(n, m) {
@@ -103,7 +113,9 @@ function Table(props) {
     const { className } = props;
     const { canStartGame, heroIsSeated, isGameInProgress, areOpenSeats } = useSelector(globalGameStateSelector);
     const { maxPlayers } = useSelector(selectGameParameters);
-    const { communityCards, spots, activePot, fullPot, inactivePots, awardPots } = useSelector(tableSelector);
+    const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
+        tableSelector,
+    );
     const players = useSelector(playersSelector);
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
 
@@ -228,7 +240,11 @@ function Table(props) {
                 ) : null}
                 {players.length < 2 && !isGameInProgress ? <TableCopyLink /> : null}
             </div>
-
+            {winningHandDescription ? (
+                <Zoom in={true}>
+                    <Typography className={classes.winningHandDescription}>{winningHandDescription}</Typography>
+                </Zoom>
+            ) : null}
             <div className={classes.playersCont}>{createSpotsAtTable()}</div>
             <div className={classes.betCont}>{createBetsAtTable()}</div>
         </div>
