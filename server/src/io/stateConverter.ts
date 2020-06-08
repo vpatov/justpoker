@@ -91,6 +91,8 @@ export class StateConverter {
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
         const board = this.gameStateManager.getBoard();
         const winners = this.gameStateManager.getWinners();
+        console.log(this.gameStateManager.getGameState().activeConnections);
+        console.log(this.gameStateManager.getGameState().admins);
 
         // TODO put each key into its own function
         const uiState: UiState = {

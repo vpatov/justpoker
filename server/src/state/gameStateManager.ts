@@ -800,6 +800,14 @@ export class GameStateManager {
     }
 
     removePlayerAdmin(playerUUID: PlayerUUID) {
+        // if last admin, make all players admin, then remove
+        if (this.gameState.admins.length === 1) {
+            this.gameState.admins.push(
+                ...Object.keys(this.getPlayers()).map((playerUUID) =>
+                    this.getClientByPlayerUUID(playerUUID as PlayerUUID),
+                ),
+            );
+        }
         this.gameState.admins = this.gameState.admins.filter(
             (clientUUID) => clientUUID !== this.getClientByPlayerUUID(playerUUID),
         );
