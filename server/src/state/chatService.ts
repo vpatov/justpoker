@@ -3,7 +3,7 @@ import { ChatMessage, ChatLog } from '../../../ui/src/shared/models/chat';
 import { ClientChatMessage } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
-import { ValidationService } from './validationService';
+import { ValidationService } from '../logic/validationService';
 import { ClientUUID } from '../../../ui/src/shared/models/uuid';
 
 const changeNameCommandRegEx = /\/name\s(.+)$/;

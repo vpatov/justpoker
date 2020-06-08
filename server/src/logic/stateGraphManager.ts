@@ -9,12 +9,12 @@ import {
 } from '../../../ui/src/shared/models/stateGraph';
 import { GameStage, QueuedServerAction } from '../../../ui/src/shared/models/gameState';
 import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/api';
-import { GameStateManager } from './gameStateManager';
+import { GameStateManager } from '../state/gameStateManager';
 import { GamePlayService } from './gamePlayService';
-import { TimerManager } from './timerManager';
+import { TimerManager } from '../state/timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
-import { LedgerService } from './ledgerService';
-import { GameInstanceLogService } from './gameInstanceLogService';
+import { LedgerService } from '../stats/ledgerService';
+import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 const MAX_CONDITION_DEPTH = 3;
 
