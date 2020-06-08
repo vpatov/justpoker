@@ -154,21 +154,21 @@ function LogPanel(props: LogPanelProps) {
     }
 
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
+        if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
+            return;
+        }
         setHandLogEntries((oldHandLogEntries) => {
-            // If we received more than one handLogEntry, replace the entire list
-            if (incomingHandLogEntries.length > 1){
-                return incomingHandLogEntries;
-            }
-            // Otherwise just update the most recent entry
-            else if (incomingHandLogEntries.length === 1){
+            // update the most recent entry
+            if (incomingHandLogEntries.length === 1){
                 const handLogEntry = incomingHandLogEntries[0];
                 const handNumber = handLogEntry.handNumber;
                 oldHandLogEntries[handNumber] = handLogEntry;
                 return [...oldHandLogEntries];
             }
-            else {
-                return oldHandLogEntries;
-            }
+
+            // If we received more than one handLogEntry, replace the entire list
+            return incomingHandLogEntries;
+
         })
     }
 

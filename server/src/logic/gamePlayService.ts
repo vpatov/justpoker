@@ -124,11 +124,7 @@ export class GamePlayService {
     /* Betting Round Actions */
     performBettingRoundAction(action: BettingRoundAction) {
         this.gsm.setLastBettingRoundAction(action);
-        this.gameInstanceLogService.pushBetAction(
-            this.gsm.getCurrentPlayerToAct(),
-            action,
-            getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
-        );
+        let betAmount = action.amount;
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
                 this.check();
@@ -140,15 +136,23 @@ export class GamePlayService {
                 break;
             }
 
+            /** bet and callBet have logic that authoritatively determine the betAmounts. */
             case BettingRoundActionType.BET: {
-                this.bet(action.amount);
+                betAmount = this.bet(action.amount);
                 break;
             }
 
             case BettingRoundActionType.CALL: {
-                this.callBet();
+                betAmount = this.callBet();
+                break;
             }
         }
+
+        this.gameInstanceLogService.pushBetAction(
+            this.gsm.getCurrentPlayerToAct(),
+            { type: action.type, amount: betAmount },
+            getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
+        );
     }
 
     // if the validation layer takes care of most things,
@@ -228,6 +232,8 @@ export class GamePlayService {
         });
 
         this.audioService.playBetSFX();
+
+        return actualBetAmount;
     }
 
     callBet() {
@@ -245,6 +251,8 @@ export class GamePlayService {
             currentPlayerToAct,
             isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
         );
+
+        return callAmount;
     }
 
     initializeDealerButton() {

@@ -151,7 +151,6 @@ export class GameInstanceLogService {
         return processedSummaries;
     }
 
-    /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
     serializeAllHandLogEntries(requestorPlayerUUID: PlayerUUID): UiHandLogEntry[] {
         const handLogs = this.gameInstanceLog.handLogEntries.map((handLogEntry) =>
             this.serializeHandLogEntry(requestorPlayerUUID, handLogEntry),
@@ -159,7 +158,8 @@ export class GameInstanceLogService {
         return handLogs;
     }
 
-    serializeHandLogEntry(requestorPlayerUUID: PlayerUUID, handLogEntry: HandLogEntry): UiHandLogEntry {
+    /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
+    private serializeHandLogEntry(requestorPlayerUUID: PlayerUUID, handLogEntry: HandLogEntry): UiHandLogEntry {
         return {
             ...handLogEntry,
             winners: Array.from(handLogEntry.winners),

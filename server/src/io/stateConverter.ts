@@ -128,7 +128,11 @@ export class StateConverter {
             animation: this.animationUpdated() || sendAll ? this.animationService.getAnimationState() : undefined,
             // TODO refactor to send entire chatlog on init.
             chat: this.chatUpdated() || sendAll ? this.transformChatMessage() : undefined,
-            handLogEntries: this.gameUpdated() && handLogEntry ? [handLogEntry] : [],
+            handLogEntries: sendAll
+                ? this.gameInstanceLogService.serializeAllHandLogEntries(heroPlayerUUID)
+                : this.gameUpdated() && handLogEntry
+                ? [handLogEntry]
+                : [],
         };
         return uiState;
     }
