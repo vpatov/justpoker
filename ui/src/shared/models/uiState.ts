@@ -62,6 +62,7 @@ export declare interface Global {
     areOpenSeats: boolean;
     gameParametersWillChangeAfterHand: boolean;
     computedMaxBuyin: number;
+    adminNames: string[];
 }
 
 export declare interface Controller {
@@ -289,6 +290,7 @@ export function getCleanGlobal(): Global {
         unqueueAllBettingRoundActions: true,
         areOpenSeats: true,
         computedMaxBuyin: 1,
+        adminNames: [],
     };
 }
 
@@ -378,6 +380,7 @@ export const TestGame: UiGameState = {
         areOpenSeats: true,
         gameParametersWillChangeAfterHand: true,
         computedMaxBuyin: 1000,
+        adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
     },
     controller: {
         showWarningOnFold: true,

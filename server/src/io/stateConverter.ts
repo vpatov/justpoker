@@ -148,6 +148,7 @@ export class StateConverter {
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
+            adminNames: this.gameStateManager.getAdmins().map((player) => player.name),
         };
 
         return global;

@@ -1168,6 +1168,12 @@ export class GameStateManager {
         }, 0);
     }
 
+    getAdmins(): Player[] {
+        return Object.values(this.getPlayers()).filter((player) =>
+            this.isPlayerAdmin(this.getClientByPlayerUUID(player.uuid)),
+        );
+    }
+
     isPlayerAdmin(clientUUID: ClientUUID): boolean {
         return this.getAdminUUID() === clientUUID;
     }
