@@ -13,6 +13,7 @@ import GameDisconnetionMessage from './GameDisconnectionMessage';
 import ReactionPicker from './ReactionPicker';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { useStickyState } from './utils';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,8 +42,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const MUTE_LOCAL_STORAGE_KEY = 'jp-last-used-mute';
+
 function Game(props) {
-    const [mute, SET_mute] = useState(false);
+    const [mute, SET_mute] = useStickyState(false, MUTE_LOCAL_STORAGE_KEY);
 
     const classes = useStyles();
     const { wsConnClosed } = props;
@@ -60,7 +63,7 @@ function Game(props) {
                 </div>
                 <ChatLog className={classes.chatlog} />
 
-                <AudioModule />
+                <AudioModule mute={mute} />
                 <AnimiationModule />
             </div>
         </>
