@@ -119,6 +119,7 @@ export declare interface Table {
     inactivePots?: number[];
     awardPots?: AwardPot[];
     readonly communityCards: UiCard[];
+    winningHandDescription?: string;
 }
 
 export declare interface AwardPot {
@@ -138,6 +139,7 @@ export declare interface UiPlayer {
     uuid?: string;
     hero?: boolean;
     sittingOut?: boolean;
+    quitting?: boolean;
     folded?: boolean;
     toAct?: boolean;
     positionIndicator?: PositionIndicator;
@@ -429,6 +431,7 @@ export const TestGame: UiGameState = {
             { rank: 'T', suit: Suit.CLUBS },
             genRandomCard(),
         ],
+        winningHandDescription: 'Full House, Queens over Threes',
     },
     players: [
         {
@@ -453,6 +456,7 @@ export const TestGame: UiGameState = {
             position: positions[1],
             stack: 425320,
             uuid: 'TEST_UUID_1',
+            quitting: true,
             bet: genRandomInt(0, 100),
             hand: {
                 cards: [{ hidden: true }, { hidden: true }, { hidden: true }, { hidden: true }],

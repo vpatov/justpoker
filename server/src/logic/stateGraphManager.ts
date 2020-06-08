@@ -91,7 +91,7 @@ export class StateGraphManager {
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
         [GameStage.SHOW_BET_ACTION]: 200,
         [GameStage.FINISH_BETTING_ROUND]: 1200,
-        [GameStage.SHOW_WINNER]: 4000,
+        [GameStage.SHOW_WINNER]: 6500,
         [GameStage.POST_HAND_CLEANUP]: 400,
     };
 
@@ -264,7 +264,7 @@ export class StateGraphManager {
         switch (action.actionType) {
             case ClientActionType.BOOTPLAYER: {
                 const playerUUID = [...action.args][0];
-                this.gameStateManager.bootPlayerFromGame(playerUUID);
+                this.gameStateManager.removePlayerFromGame(playerUUID);
                 break;
             }
             case ClientActionType.SETGAMEPARAMETERS: {
