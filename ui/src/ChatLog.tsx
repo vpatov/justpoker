@@ -15,6 +15,7 @@ import { WsServer } from './api/ws';
 import { UiChatMessage } from './shared/models/uiState';
 import { getPlayerNameColor } from './style/colors';
 import { useStickyState } from './utils';
+import { ButtonGroup } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,7 +30,18 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '15%',
             ...theme.custom.CHAT,
         },
-        chatLog: {
+        chatLogRoot: {
+            zIndex: 5,
+            height: '100%',
+            display: 'flex',
+            flexShrink: '0',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'column',
+            width: '15%',
+            ...theme.custom.CHAT,
+        },
+        chatLogMessages: {
             paddingTop: '1vh',
             display: 'flex',
             flexDirection: 'column',
@@ -38,7 +50,8 @@ const useStyles = makeStyles((theme: Theme) =>
             overflowY: 'auto',
             overflowWrap: 'anywhere',
         },
-        chatInputSection: {
+
+        chatLogInputSection: {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-evenly',
@@ -79,12 +92,14 @@ const useStyles = makeStyles((theme: Theme) =>
         messageContent: {
             color: 'rgb(220,210,230)',
         },
-        hideButton: {
-            fontSize: '1vmin',
+        hideButtonGroup: {
             zIndex: 5,
             position: 'absolute',
             bottom: '18%',
             right: 15,
+        },
+        hideButton: {
+            fontSize: '1vmin',
         },
         unread: {
             borderColor: theme.palette.secondary.main,
@@ -98,13 +113,15 @@ interface ChatLogProps {
 }
 
 const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
+const HANDLOG_OPEN_LOCAL_STORAGE_KEY = 'jp-handlog-open';
 
 function ChatLog(props: ChatLogProps) {
     const classes = useStyles();
 
     const { className } = props;
 
-    const [hideChat, setHideChat] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
+    const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
+    const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
     const [messages, setMessages] = useState([] as any);
     const [draftMessage, setDraftMessage] = useState('');
     const [unreadChats, setUnreadChats] = useState(false);
@@ -115,7 +132,7 @@ function ChatLog(props: ChatLogProps) {
         (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(scrollToBottom, [messages, hideChat]);
+    useEffect(scrollToBottom, [messages, hideChatLog]);
 
     useEffect(() => {
         WsServer.subscribe('chat', onReceiveNewChatMessage);
@@ -141,20 +158,46 @@ function ChatLog(props: ChatLogProps) {
         setMessages((oldMessages) => [...oldMessages, chatMessage]);
     }
 
+    function renderMessagePanelButtons() {
+        return (
+            <ButtonGroup
+                orientation="vertical"
+                className={classnames(classes.hideButtonGroup)}
+                style={hideHandLog && hideChatLog ? {} : { right: 'calc(15% + 15px)' }}
+            >
+                {renderHideHandLogButton()}
+                {renderHideChatButton()}
+            </ButtonGroup>
+        )
+    }
+
+    function renderHideHandLogButton() {
+        return (
+            <Button
+                variant="outlined"
+                className={classnames(classes.hideButton)}
+                onClick={(e) => {
+                    setHideHandLog(!hideHandLog);
+                }}
+            >
+                {`${hideHandLog ? 'Show' : 'Hide'} Hand Log`}
+            </Button>
+        );
+    }
+
     function renderHideChatButton() {
         return (
             <Button
                 variant="outlined"
                 className={classnames(classes.hideButton, {
-                    [classes.unread]: unreadChats && hideChat,
+                    [classes.unread]: unreadChats && hideChatLog,
                 })}
                 onClick={(e) => {
                     setUnreadChats(false);
-                    setHideChat(!hideChat);
+                    setHideChatLog(!hideChatLog);
                 }}
-                style={hideChat ? {} : { right: 'calc(15% + 15px)' }}
             >
-                {`${hideChat ? 'Show' : 'Hide'} Chat`}
+                {`${hideChatLog ? 'Show' : 'Hide'} Chat`}
             </Button>
         );
     }
@@ -162,10 +205,29 @@ function ChatLog(props: ChatLogProps) {
         setDraftMessage(draftMessage + emoji.native);
     };
 
-    function renderChat() {
+    function renderSharedLogPanel() {
         return (
             <div className={classnames(classes.root, className)}>
-                <div className={classes.chatLog}>
+                {hideHandLog ? null : renderHandLog()}
+                {hideChatLog ? null : renderChatLog()}
+            </div>
+        )
+    }
+
+    function renderHandLog() {
+        return (
+            <div>
+                <div>
+                    <label>Handlog placeholder</label>
+                </div>
+            </div>
+        );
+    }
+
+    function renderChatLog() {
+        return (
+            <div className={classnames(classes.chatLogRoot, className)}>
+                <div className={classes.chatLogMessages}>
                     {messages.map((message) => (
                         <Typography key={message.timestamp} className={classes.chatMessage}>
                             <span
@@ -179,7 +241,7 @@ function ChatLog(props: ChatLogProps) {
                     ))}
                     <div ref={messagesRef} />
                 </div>
-                <div className={classes.chatInputSection}>
+                <div className={classes.chatLogInputSection}>
                     <TextFieldWrap
                         placeholder="Send Message"
                         value={draftMessage}
@@ -222,15 +284,15 @@ function ChatLog(props: ChatLogProps) {
                         useButton={false}
                     />
                 </div>
-                {renderHideChatButton()}
+                {renderMessagePanelButtons()}
             </div>
         );
     }
 
-    if (!hideChat) {
-        return renderChat();
+    if (!hideChatLog) {
+        return renderChatLog();
     } else {
-        return renderHideChatButton();
+        return renderMessagePanelButtons();
     }
 }
 
