@@ -128,5 +128,5 @@ async function SitDownPlayersAtOneTable(n) {
 }
 
 // PlayThreeTablesThreePlayers();
-PlayOneTableNinePlayers();
-// SitDownPlayersAtOneTable(7);
+// PlayOneTableNinePlayers();
+SitDownPlayersAtOneTable(4);
