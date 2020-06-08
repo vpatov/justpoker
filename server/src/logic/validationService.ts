@@ -530,6 +530,45 @@ export class ValidationService {
         return undefined;
     }
 
+    validateRemoveAdminAction(clientUUID: ClientUUID, req: AddAdminRequest): ValidationResponse {
+        const error = this.ensureClientIsAdmin(clientUUID);
+        if (error) {
+            return error;
+        }
+
+        const rmAdminPlayer = this.gsm.getPlayer(req.playerUUID);
+        if (!rmAdminPlayer) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
+        if (!this.gsm.isPlayerAdmin(rmAdminPlayer.uuid)) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is not an admin.`,
+            };
+        }
+
+        const requestingPlayer = this.gsm.getPlayerByClientUUID(clientUUID);
+        if (requestingPlayer && requestingPlayer.uuid !== rmAdminPlayer.uuid) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Admins can only remove self as admin.`,
+            };
+        }
+
+        if (this.gsm.getAdminClientUUIDs().length === 1) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `This is the last admin. Cannot remove.`,
+            };
+        }
+
+        return undefined;
+    }
+
     validateUseTimeBankAction(clientUUID: ClientUUID) {
         const { allowTimeBanks } = this.gsm.getGameParameters();
         if (!allowTimeBanks) {

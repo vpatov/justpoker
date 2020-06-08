@@ -784,7 +784,6 @@ export class GameStateManager {
     }
 
     isClientAdmin(clientUUID: ClientUUID): boolean {
-        console.log('admins', this.gameState.admins, clientUUID, this.gameState.admins.includes(clientUUID));
         return this.gameState.admins.includes(clientUUID);
     }
 
@@ -798,6 +797,12 @@ export class GameStateManager {
 
     addClientAdmin(clientUUID: ClientUUID) {
         this.gameState.admins.push(clientUUID);
+    }
+
+    removePlayerAdmin(playerUUID: PlayerUUID) {
+        this.gameState.admins = this.gameState.admins.filter(
+            (clientUUID) => clientUUID !== this.getClientByPlayerUUID(playerUUID),
+        );
     }
 
     @debugFunc()
@@ -856,6 +861,9 @@ export class GameStateManager {
             this.setPlayerQuitting(playerUUID, true);
         } else {
             if (this.getPlayer(playerUUID)) {
+                if (this.isPlayerAdmin(playerUUID)) {
+                    this.removePlayerAdmin(playerUUID);
+                }
                 this.removePlayerFromPlayers(playerUUID);
                 this.deassociateClientAndPlayer(playerUUID);
             }

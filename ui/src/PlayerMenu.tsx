@@ -44,6 +44,11 @@ function PlayerMenu(props) {
         handleClose();
     };
 
+    const handleRemoveAdmin = () => {
+        WsServer.sendRemoveAdminMessage(uuid);
+        handleClose();
+    };
+
     return (
         <Menu
             className={classes.root}
@@ -55,7 +60,9 @@ function PlayerMenu(props) {
             <AddChipDialog open={chipsDialog} handleClose={handleCloseDialog} name={name} stack={stack} uuid={uuid} />
             {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
             {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
-            {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
+            {isHeroAdmin && heroPlayerUUID === uuid ? (
+                <MenuItem onClick={handleRemoveAdmin}>Remove as Admin</MenuItem>
+            ) : null}
             {isHeroAdmin && heroPlayerUUID !== uuid ? (
                 <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
             ) : null}

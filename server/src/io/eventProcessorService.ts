@@ -11,6 +11,8 @@ import {
     ShowCardRequest,
     PlayerReactionRequest,
     SetGameParametersRequest,
+    RemoveAdminRequest,
+    AddAdminRequest,
 } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { ValidationService } from '../logic/validationService';
@@ -165,8 +167,13 @@ export class EventProcessorService {
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.ADDADMIN]: {
-            validation: (uuid, req: BootPlayerRequest) => this.validationService.validateBootPlayerAction(uuid, req),
-            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.addPlayerAdmin(req.playerUUID),
+            validation: (uuid, req: AddAdminRequest) => this.validationService.validateAddAdminAction(uuid, req),
+            perform: (uuid, req: AddAdminRequest) => this.gameStateManager.addPlayerAdmin(req.playerUUID),
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.REMOVEADMIN]: {
+            validation: (uuid, req: RemoveAdminRequest) => this.validationService.validateRemoveAdminAction(uuid, req),
+            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.removePlayerAdmin(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.LEAVETABLE]: {
