@@ -129,6 +129,7 @@ export class GameInstanceLogService {
             wasDealtIn: player.holeCards.length > 0,
             chipDelta: 0,
             position: PlayerPosition.NOT_PLAYING,
+            seatNumber: player.seatNumber,
         };
     }
 

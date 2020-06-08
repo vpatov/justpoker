@@ -42,6 +42,7 @@ export declare interface PlayerSummary {
     holeCards: Card[];
     startingChips: number;
     chipDelta: number;
+    seatNumber: number;
 }
 
 /** Clean interface instantiators. */
@@ -82,5 +83,6 @@ export function getCleanPlayerSummary(): PlayerSummary {
         holeCards: [],
         startingChips: 0,
         chipDelta: 0,
+        seatNumber: -1,
     };
 }

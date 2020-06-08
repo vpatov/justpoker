@@ -12,16 +12,19 @@ import Button from '@material-ui/core/Button';
 import EmojiPicker from './EmojiPicker';
 
 import { WsServer } from './api/ws';
-import { UiChatMessage, UiHandLogEntry } from './shared/models/uiState';
+import { UiChatMessage, UiHandLogEntry, UiCard } from './shared/models/uiState';
 import { getPlayerNameColor } from './style/colors';
-import { useStickyState } from './utils';
-import { ButtonGroup, IconButton } from '@material-ui/core';
+import { useStickyState, generateStringFromRank } from './utils';
+import { ButtonGroup, IconButton, Divider } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import { PlayerSummary } from './shared/models/handLog';
+import { PlayerSummary, BettingRoundLog } from './shared/models/handLog';
 import { PlayerPositionString } from './shared/models/playerPosition';
+import Suit from './Suit';
+
+import blueGrey from '@material-ui/core/colors/blueGrey';
 
 
 
@@ -32,11 +35,13 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '100%',
             maxHeight: '100%',
             width: '15%',
-            ...theme.custom.CHAT,
+            ...theme.custom.LOGPANEL,
         },
         handLogContainer: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexDirection: 'column',
             height: '100%',
-            backgroundColor: '#180b36',
         },
         handLogControls: {
             display: 'flex',
@@ -52,21 +57,48 @@ const useStyles = makeStyles((theme: Theme) =>
         handNumberString: {
             fontSize: '1.6vmin',
         },
+        timeHandStartedLabel: {
+            fontSize: '1.4vmin',
+        },
         handLogContents: {
+            margin: '0.2vh 0.40vw',
+            '& > *':{
+                marginBottom: '1.2vh'    
+            },
+            color: 'rgb(220,210,230)',
+            overflowY: 'auto',
+            overflowWrap: 'anywhere',
+        },
+        handLogSectionLabel: {
+            textTransform: 'uppercase',
+            fontSize: '2.2vmin',
+            color: blueGrey[700],
+        },
+        handLogInlineCards: {
+            display: 'flex',
+            alignItems: 'center',
 
+            fontSize: '2.2vmin',
+            '& > *':{
+                marginRight: '0.3vw'    
+            }
+        },
+        suit: {
+            width: '2.2vmin',
+            height: '2.2vmin',
+            marginLeft: '0.1vw',
         },
         handLogPlayerSummary: {
             fontSize: '1.8vmin',
-            margin: '0.2vh 0.40vw'
         },
+        logPanelDivider: {},
         chatLogContainer: {
             display: 'flex',
             height: '100%',
-            flexShrink: '0',
+            flexShrink: 0,
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'column',
-            ...theme.custom.CHAT,
         },
         chatLogMessages: {
             paddingTop: '1vh',
@@ -254,6 +286,14 @@ function LogPanel(props: LogPanelProps) {
         setDraftChatMessage(draftChatMessage + emoji.native);
     };
 
+    function renderLogPanelDivider() {
+        return !hideHandLog && !hideChatLog ?
+            <div className={classnames(classes.logPanelDivider)}>
+                <Divider />
+            </div> :
+            null;
+    }
+
     function renderSharedLogPanel() {
         return (
             <div className={classnames(classes.root, className)}>
@@ -333,21 +373,76 @@ function LogPanel(props: LogPanelProps) {
                         <SkipNextIcon></SkipNextIcon>
                     </IconButton>
                 </div>
-                
-                
             </div>
         )
     }
 
     function renderPlayerPosition(playerSummary: PlayerSummary){
-
         return playerSummary.wasDealtIn ? (
             <Typography className={classnames(classes.handLogPlayerSummary)}>
-                {`${PlayerPositionString[playerSummary.position]}: ${playerSummary.playerName}`}
+                <span>
+                    {`${PlayerPositionString[playerSummary.position]}: `}
+                </span>
+                <span style={{ color: getPlayerNameColor(playerSummary.seatNumber) }}>
+                    {`${playerSummary.playerName}`}
+                </span>
             </Typography>
         ) : null;
     }
-    
+
+    function renderPlayerPositions(playerSummaries: PlayerSummary[]){
+        return (
+            <div>
+                <Typography className={classes.handLogSectionLabel}>
+                    Players
+                </Typography>
+                <Divider />
+                {playerSummaries.map((playerSummary) => (renderPlayerPosition(playerSummary)))}
+            </div>
+        );
+    }
+
+    function renderCardsInline(cards: UiCard[]){
+        return (
+            <Typography className={classes.handLogInlineCards}>
+                {cards.map((card) => (
+                    <>
+                        {generateStringFromRank(card.rank)}
+                        <Suit className={classes.suit} suit={card.suit}></Suit>
+                    </>
+                ))}
+            </Typography>
+        );
+    }
+
+    function renderBoard(board: UiCard[]){
+        return board?.length ? (
+            <div>
+                <Typography className={classes.handLogSectionLabel}>
+                    Board
+                </Typography>
+                <Divider />
+                {renderCardsInline(board)}   
+            </div>
+        ) : null;
+    }
+
+    function renderBettingRoundLog(bettingRoundLog: BettingRoundLog){
+
+    }
+
+    function renderBettingRoundLogs(bettingRounds: BettingRoundLog[]){
+
+    }
+
+    function renderTimeHandStarted(timeHandStarted: number){
+        return timeHandStarted ? 
+            <Typography className={classes.timeHandStartedLabel}>
+                {new Date(timeHandStarted).toLocaleString().replace(',','')}
+            </Typography> : 
+        null;
+    }
+
     function renderHandLogEntry() {
         if (handLogEntries.length === 0){
             return null;
@@ -360,13 +455,12 @@ function LogPanel(props: LogPanelProps) {
 
         return (
             <div className={classnames(classes.handLogContents)}>
-                <div>
-                    {handLogEntry.playerSummaries.map((playerSummary) => (renderPlayerPosition(playerSummary)))}
-                </div>
+                {renderTimeHandStarted(handLogEntry.timeHandStarted)}
+                {renderPlayerPositions(handLogEntry.playerSummaries)}
+                {renderBoard(handLogEntry.board)}
+                {renderBettingRoundLogs(handLogEntry.bettingRounds)}
             </div>
-           
         );
-        // renderPlayerPositions(handLogEntry.playerSummaries);
         
     }
 
@@ -376,8 +470,11 @@ function LogPanel(props: LogPanelProps) {
                 className={classnames(classes.handLogContainer, className)}
                 style={!hideChatLog ? {height: '50%'} : { }}
             >
-                {renderHandLogControls()}
-                {renderHandLogEntry()}
+                <div>
+                    {renderHandLogControls()}
+                    {renderHandLogEntry()}
+                </div>
+                {!hideChatLog ? renderLogPanelDivider(): null}
             </div>
         );
     }

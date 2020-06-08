@@ -93,7 +93,7 @@ export const CUSTOM_THEME = {
             border: '1px solid white',
             backgroundColor: teal[200],
         },
-        CHAT: {
+        LOGPANEL: {
             backgroundColor: grey[800],
             background: `linear-gradient(360deg, rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.63) 100%);`,
             boxShadow: ` 0 0 0.4vmin 0.4vmin rgba(30,30,30,0.5)`,
