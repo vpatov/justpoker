@@ -21,10 +21,11 @@ import {
     LEDGER_BUTTON,
     PositionIndicator,
     ShowCardButton,
+    LEAVE_TABLE_BUTTON,
 } from '../../../ui/src/shared/models/uiState';
 import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
-import { GameStateManager } from './gameStateManager';
-import { AudioService } from './audioService';
+import { GameStateManager } from '../state/gameStateManager';
+import { AudioService } from '../state/audioService';
 
 import {
     Global,
@@ -35,11 +36,12 @@ import {
     COMMON_POT_SIZINGS,
 } from '../../../ui/src/shared/models/uiState';
 import { SoundByte } from '../../../ui/src/shared/models/audioQueue';
-import { AnimationService } from './animationService';
-import { ChatService } from './chatService';
+import { AnimationService } from '../state/animationService';
+import { ChatService } from '../state/chatService';
 
 import { debugFunc } from '../logger';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
+import { getHoleCardNickname } from '../../../ui/src/shared/models/cards';
 
 declare interface CardInformation {
     hand: {
@@ -88,6 +90,7 @@ export class StateConverter {
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
         const board = this.gameStateManager.getBoard();
+        const winners = this.gameStateManager.getWinners();
 
         // TODO put each key into its own function
         const uiState: UiState = {
@@ -111,6 +114,7 @@ export class StateConverter {
                                       ? []
                                       : this.gameStateManager.getInactivePotsValues(),
                               communityCards: this.transformCommunityCards(),
+                              winningHandDescription: this.gameStateManager.getWinningHandDescription(),
                           },
                           players: Object.entries(this.gameStateManager.getPlayers()).map(([uuid, player]) =>
                               this.transformPlayer(player, heroPlayerUUID),
@@ -209,7 +213,11 @@ export class StateConverter {
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
             timeBanks: hero.timeBanksLeft,
-            showWarningOnFold: !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID),
+            playerPositionString: this.gameStateManager.getPlayerPositionString(heroPlayerUUID),
+            showWarningOnFold:
+                !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ||
+                this.gameStateManager.getAllCommitedBets() === 0,
+            callAmount: this.gameStateManager.computeCallAmount(heroPlayerUUID),
         };
 
         return controller;
@@ -235,7 +243,8 @@ export class StateConverter {
 
         if (
             this.gameStateManager.isPlayerAllIn(heroPlayerUUID) ||
-            !this.gameStateManager.isPlayerInHand(heroPlayerUUID)
+            !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
+            this.gameStateManager.isGameStageInBetweenHands()
         ) {
             return [this.disableButton(FOLD_BUTTON), this.disableButton(CHECK_BUTTON), this.disableButton(BET_BUTTON)];
         }
@@ -243,6 +252,7 @@ export class StateConverter {
         const buttons = [] as BettingRoundActionButton[];
         // player can always queue a bet or fold action but we decide if it is check or call
         buttons.push(FOLD_BUTTON);
+
         buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
         buttons.push(BET_BUTTON);
         return buttons;
@@ -269,7 +279,11 @@ export class StateConverter {
             }
         }
 
-        // TODO leave table button
+        // if player is in game they can leave
+        if (heroPlayer && !heroPlayer.quitting) {
+            menuButtons.push(LEAVE_TABLE_BUTTON);
+        }
+
         return menuButtons;
     }
 
@@ -328,8 +342,20 @@ export class StateConverter {
 
         return {
             hand: { cards },
-            handLabel: isHero && player.holeCards.length > 0 ? player.handDescription : undefined,
+            handLabel: this.computeHandLabel(isHero, player),
         };
+    }
+
+    computeHandLabel(isHero: boolean, player: Player) {
+        if (isHero && player.holeCards.length > 0) {
+            const shouldAttemptConvertToNickName =
+                player.holeCards.length === 2 &&
+                this.gameStateManager.getBettingRoundStage() === BettingRoundStage.PREFLOP;
+            return shouldAttemptConvertToNickName
+                ? getHoleCardNickname(player.holeCards[0], player.holeCards[1]) || player.handDescription
+                : player.handDescription;
+        }
+        return undefined;
     }
 
     transformCommunityCards(): UiCard[] {
@@ -367,6 +393,7 @@ export class StateConverter {
                   }
                 : undefined,
             name: player.name,
+            quitting: player.quitting,
             toAct: herosTurnToAct,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,

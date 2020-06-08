@@ -20,16 +20,26 @@ import {
     MaxBuyinType,
 } from '../../../ui/src/shared/models/game';
 import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
-import { DeckService } from './deckService';
+import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
-import { HandSolverService } from './handSolverService';
-import { Hand, Card, cardsAreEqual, convertHandToCardArray, Suit } from '../../../ui/src/shared/models/cards';
-import { LedgerService } from './ledgerService';
+import { HandSolverService } from '../cards/handSolverService';
+import { LedgerService } from '../stats/ledgerService';
+import {
+    Hand,
+    Card,
+    cardsAreEqual,
+    convertHandToCardArray,
+    RankAbbrToFullString,
+} from '../../../ui/src/shared/models/cards';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/playerPosition';
+import {
+    PlayerPosition,
+    PLAYER_POSITIONS_BY_HEADCOUNT,
+    PlayerPositionString,
+} from '../../../ui/src/shared/models/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 import sortBy from 'lodash/sortBy';
 
@@ -214,7 +224,7 @@ export class GameStateManager {
     }
 
     areOpenSeats(): boolean {
-        return this.getMaxPlayers() !== this.getSittingPlayers().length;
+        return this.getMaxPlayers() > Object.values(this.getPlayers()).length;
     }
 
     // TODO when branded types can be used as index signatures, replace string with PlayerUUID
@@ -294,6 +304,15 @@ export class GameStateManager {
         return this.gameState.board;
     }
 
+    computeCallAmount(playerUUID: PlayerUUID): number {
+        if (!this.isPlayerFacingBet(playerUUID)) {
+            return 0;
+        }
+        const chips = this.getPlayerChips(playerUUID);
+        const callAmount = this.getPreviousRaise() > chips ? chips : this.getPreviousRaise();
+        return callAmount;
+    }
+
     playerBuyinAddChips(playerUUID: PlayerUUID, addChips: number) {
         if (addChips <= 0) {
             logger.error(
@@ -331,6 +350,10 @@ export class GameStateManager {
 
     setPlayerChips(playerUUID: PlayerUUID, chips: number) {
         this.getPlayer(playerUUID).chips = chips;
+    }
+
+    setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean) {
+        this.getPlayer(playerUUID).quitting = quitting;
     }
 
     // returns time in milliseconds
@@ -501,6 +524,10 @@ export class GameStateManager {
         return playerPositionMap;
     }
 
+    getPlayerPositionString(playerUUID: PlayerUUID): string | undefined {
+        return PlayerPositionString[this.getPlayerPositionMap().get(playerUUID)];
+    }
+
     getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
         const numPlayers = this.getPlayersDealtIn().length;
         return (
@@ -543,6 +570,15 @@ export class GameStateManager {
 
     gameIsWaitingForBetAction() {
         return this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
+    }
+
+    isGameStageInBetweenHands(): boolean {
+        return (
+            this.gameState.gameStage === GameStage.NOT_IN_PROGRESS ||
+            this.gameState.gameStage === GameStage.INITIALIZE_NEW_HAND ||
+            this.gameState.gameStage === GameStage.SHOW_WINNER ||
+            this.gameState.gameStage === GameStage.POST_HAND_CLEANUP
+        );
     }
 
     getMinimumBetSize() {
@@ -798,12 +834,13 @@ export class GameStateManager {
         return connectedClient;
     }
 
-    bootPlayerFromGame(playerUUID: PlayerUUID) {
+    removePlayerFromGame(playerUUID: PlayerUUID) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
                 actionType: ClientActionType.BOOTPLAYER,
                 args: [playerUUID],
             });
+            this.setPlayerQuitting(playerUUID, true);
         } else {
             if (this.getPlayer(playerUUID)) {
                 this.removePlayerFromPlayers(playerUUID);
@@ -986,11 +1023,32 @@ export class GameStateManager {
 
     updatePlayerHandDescription(playerUUID: PlayerUUID) {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
-        this.getPlayer(playerUUID).handDescription = bestHand.descr;
+        this.getPlayer(playerUUID).handDescription = this.getStrDescriptionFromHand(bestHand);
     }
 
     clearPlayerHandDescription(playerUUID: PlayerUUID) {
         this.getPlayer(playerUUID).handDescription = '';
+    }
+
+    // removes wanted characters from the description string
+    // and in full names of cards
+    getStrDescriptionFromHand(hand: Hand): string {
+        // K High
+        // Two pair, A's & Q's
+        // Three of a Kind, 6's
+        // Pair, 3's
+        // Full House, 5's over 4's
+        // Flush, Ah High
+        // Straight, 8 High
+        let description = hand.descr;
+        Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
+            const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
+            const regex = new RegExp(regexStr, 'g');
+            description = description.replace(regex, fullStr);
+        });
+        description = description.replace(/'s/g, 's').replace(/Sixs/g, 'Sixes');
+
+        return description;
     }
 
     getGameType(): GameType {
@@ -1146,6 +1204,11 @@ export class GameStateManager {
 
     getWinners() {
         return this.filterPlayerUUIDs((playerUUID) => this.getPlayer(playerUUID).winner);
+    }
+
+    getWinningHandDescription(): string | undefined {
+        const winners = this.getWinners();
+        return winners.length ? this.getStrDescriptionFromHand(this.getPlayerBestHand(winners[0])) : undefined;
     }
 
     setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {

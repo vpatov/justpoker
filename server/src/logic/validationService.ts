@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { GameStateManager } from './gameStateManager';
+import { GameStateManager } from '../state/gameStateManager';
 import {
     BettingRoundActionType,
     BettingRoundAction,
@@ -464,6 +464,17 @@ export class ValidationService {
             return {
                 errorType: ErrorType.NOT_ADMIN,
                 errorString: `Only admins can perform that action.`,
+            };
+        }
+        return undefined;
+    }
+
+    validateLeaveTableAction(clientUUID: ClientUUID): ValidationResponse {
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
+        if (!player) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${clientUUID} is not at table.`,
             };
         }
         return undefined;

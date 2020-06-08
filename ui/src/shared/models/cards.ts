@@ -141,3 +141,82 @@ export function convertHandToCardArray(hand: Hand): Card[] {
         rank: pokerSolverCard.value,
     }));
 }
+
+export function getHoleCardNickname(cardA: Card, cardB: Card): string | undefined {
+    const ranksToName: Record<string, string> = {
+        // Pairs
+        AA: 'Rockets',
+        KK: 'Cowboys',
+        QQ: 'Pair of Ladies',
+        JJ: 'Jaybirds',
+        TT: 'Dimes',
+        '99': 'Popeyes',
+        '88': 'Snowmen',
+        '77': 'Honey Sticks',
+        '66': 'Boots',
+        '55': 'Nickels',
+        '44': 'Sail Boats',
+        '33': 'Crabs',
+        '22': 'Deuces',
+        // A-X
+        AK: 'Big Slick',
+        AQ: 'Ms. Slick',
+        AJ: 'Apple Jacks',
+        AT: 'Bookends',
+        A9: 'Rounders',
+        A8: "Dead Man's Hand",
+        A7: 'Slapshot',
+        A6: "Devil's Ace",
+        A5: 'High Five',
+        A4: 'Fake Aces',
+        A3: 'Thraces',
+        A2: 'Little Slick',
+
+        // These sorta get stupid, prob dont need
+        // // K-X
+        // KQ: 'Marriage',
+        // KJ: 'Kojak',
+        // KT: 'Kens',
+        // K9: 'Canine',
+        // K8: 'Kates',
+        // K7: 'Kevins',
+        // K6: 'Kicks',
+        // K5: 'Knives',
+        // K4: 'Forks',
+        // K3: 'King Crab',
+        // K2: 'The Zepik',
+
+        // // Q-X
+        // QJ: 'Maverick',
+        // QT: 'Q-Tips',
+        // Q9: 'Quinine',
+        // Q8: 'Kuwait',
+        // Q7: 'Computer Hand',
+        // Q6: 'Nesquik',
+        // Q5: 'Granny May',
+        // Q4: 'Forks',
+        // Q3: 'King Crab',
+        // Q2: 'Daisies',
+    };
+
+    if (cardA.rank === 'A' || cardA.rank === cardB.rank) return ranksToName[cardA.rank + cardB.rank];
+    else if (cardB.rank === 'A') return ranksToName[cardB.rank + cardA.rank];
+    return undefined;
+}
+
+export const RankAbbrToFullString: Record<string, string> = {
+    // Pairs
+    A: 'Ace',
+    K: 'King',
+    Q: 'Queen',
+    J: 'Jack',
+    '10': 'Ten',
+    '9': 'Nine',
+    '8': 'Eight',
+    '7': 'Seven',
+    '6': 'Six',
+    '5': 'Five',
+    '4': 'Four',
+    '3': 'Three',
+    '2': 'Two',
+};

@@ -12,19 +12,19 @@ import {
     PlayerReactionRequest,
     SetGameParametersRequest,
 } from '../../../ui/src/shared/models/api';
-import { GameStateManager } from './gameStateManager';
-import { ValidationService } from './validationService';
+import { GameStateManager } from '../state/gameStateManager';
+import { ValidationService } from '../logic/validationService';
 import { Service } from 'typedi';
-import { GamePlayService } from './gamePlayService';
+import { GamePlayService } from '../logic/gamePlayService';
 import { ValidationResponse, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
 import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
-import { ChatService } from './chatService';
-import { StateGraphManager } from './stateGraphManager';
-import { GameInstanceManager } from './gameInstanceManager';
+import { ChatService } from '../state/chatService';
+import { StateGraphManager } from '../logic/stateGraphManager';
+import { GameInstanceManager } from '../state/gameInstanceManager';
 import { logger, debugFunc } from '../logger';
-import { ConnectedClientManager } from '..//server/connectedClientManager';
+import { ConnectedClientManager } from '../server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/uuid';
-import { AnimationService } from './animationService';
+import { AnimationService } from '../state/animationService';
 
 declare interface ActionProcessor {
     validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -161,14 +161,16 @@ export class EventProcessorService {
         },
         [ClientActionType.BOOTPLAYER]: {
             validation: (uuid, req: BootPlayerRequest) => this.validationService.validateBootPlayerAction(uuid, req),
-            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.bootPlayerFromGame(req.playerUUID),
+            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.removePlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
-        // TODO impement leave table
         [ClientActionType.LEAVETABLE]: {
-            validation: (uuid, req) => undefined,
-            perform: () => null,
-            updates: [],
+            validation: (uuid, req) => this.validationService.validateLeaveTableAction(uuid),
+            perform: (uuid) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.removePlayerFromGame(player.uuid);
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),

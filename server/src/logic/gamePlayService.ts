@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { GameStateManager } from './gameStateManager';
+import { GameStateManager } from '../state/gameStateManager';
 import {
     BettingRoundAction,
     BettingRoundActionType,
@@ -8,19 +8,19 @@ import {
     GameType,
 } from '../../../ui/src/shared/models/game';
 
-import { HandSolverService } from './handSolverService';
+import { HandSolverService } from '../cards/handSolverService';
 import { Pot, ServerStateKey } from '../../../ui/src/shared/models/gameState';
 
-import { AudioService } from './audioService';
-import { AnimationService } from './animationService';
+import { AudioService } from '../state/audioService';
+import { AnimationService } from '../state/animationService';
 
 import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
 import { Hand, Card } from '../../../ui/src/shared/models/cards';
-import { LedgerService } from './ledgerService';
+import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
-import { GameInstanceLogService } from './gameInstanceLogService';
+import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 @Service()
 export class GamePlayService {
@@ -236,8 +236,7 @@ export class GamePlayService {
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
         // TODO find the cleanest way to do this. Should that logic be handled in setPlayerBetAmount, or here?
-        const chips = this.gsm.getPlayerChips(currentPlayerToAct);
-        const callAmount = this.gsm.getPreviousRaise() > chips ? chips : this.gsm.getPreviousRaise();
+        const callAmount = this.gsm.computeCallAmount(currentPlayerToAct);
         this.gsm.setPlayerBetAmount(currentPlayerToAct, callAmount);
 
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);

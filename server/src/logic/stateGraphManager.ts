@@ -9,12 +9,12 @@ import {
 } from '../../../ui/src/shared/models/stateGraph';
 import { GameStage, QueuedServerAction } from '../../../ui/src/shared/models/gameState';
 import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/api';
-import { GameStateManager } from './gameStateManager';
+import { GameStateManager } from '../state/gameStateManager';
 import { GamePlayService } from './gamePlayService';
-import { TimerManager } from './timerManager';
+import { TimerManager } from '../state/timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game';
-import { LedgerService } from './ledgerService';
-import { GameInstanceLogService } from './gameInstanceLogService';
+import { LedgerService } from '../stats/ledgerService';
+import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -91,7 +91,7 @@ export class StateGraphManager {
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
         [GameStage.SHOW_BET_ACTION]: 200,
         [GameStage.FINISH_BETTING_ROUND]: 1200,
-        [GameStage.SHOW_WINNER]: 4000,
+        [GameStage.SHOW_WINNER]: 6500,
         [GameStage.POST_HAND_CLEANUP]: 400,
     };
 
@@ -264,7 +264,7 @@ export class StateGraphManager {
         switch (action.actionType) {
             case ClientActionType.BOOTPLAYER: {
                 const playerUUID = [...action.args][0];
-                this.gameStateManager.bootPlayerFromGame(playerUUID);
+                this.gameStateManager.removePlayerFromGame(playerUUID);
                 break;
             }
             case ClientActionType.SETGAMEPARAMETERS: {

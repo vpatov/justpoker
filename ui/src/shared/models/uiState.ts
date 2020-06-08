@@ -76,6 +76,8 @@ export declare interface Controller {
     willStraddle: boolean;
     lastBettingRoundAction: BettingRoundAction;
     showWarningOnFold: boolean;
+    callAmount: number;
+    playerPositionString?: string;
 }
 
 export declare interface SizingButton {
@@ -119,6 +121,7 @@ export declare interface Table {
     inactivePots?: number[];
     awardPots?: AwardPot[];
     readonly communityCards: UiCard[];
+    winningHandDescription?: string;
 }
 
 export declare interface AwardPot {
@@ -138,6 +141,7 @@ export declare interface UiPlayer {
     uuid?: string;
     hero?: boolean;
     sittingOut?: boolean;
+    quitting?: boolean;
     folded?: boolean;
     toAct?: boolean;
     positionIndicator?: PositionIndicator;
@@ -270,6 +274,7 @@ export function getCleanController(): Controller {
         bettingRoundActionButtons: [],
         timeBanks: 0,
         showWarningOnFold: false,
+        callAmount: 0,
     };
 }
 
@@ -380,8 +385,10 @@ export const TestGame: UiGameState = {
         lastBettingRoundAction: CHECK_ACTION,
         min: 25,
         max: 43000,
+        callAmount: 54323,
         timeBanks: 2,
         dealInNextHand: false,
+        playerPositionString: 'Hijack',
         showCardButtons: [
             { rank: genRandomCard().rank, suit: genRandomCard().suit },
             { rank: genRandomCard().rank, suit: genRandomCard().suit },
@@ -429,6 +436,7 @@ export const TestGame: UiGameState = {
             { rank: 'T', suit: Suit.CLUBS },
             genRandomCard(),
         ],
+        winningHandDescription: 'Full House, Queens over Threes',
     },
     players: [
         {
@@ -441,7 +449,7 @@ export const TestGame: UiGameState = {
                 timeElapsed: 11.5,
                 timeLimit: 30,
             },
-            handLabel: 'Set of Kings',
+            handLabel: 'Full House, Queens over Threes',
             bet: genRandomInt(0, 10),
             hand: {
                 cards: [{ ...genRandomCard() }, genRandomCard()],
@@ -453,6 +461,7 @@ export const TestGame: UiGameState = {
             position: positions[1],
             stack: 425320,
             uuid: 'TEST_UUID_1',
+            quitting: true,
             bet: genRandomInt(0, 100),
             hand: {
                 cards: [{ hidden: true }, { hidden: true }, { hidden: true }, { hidden: true }],

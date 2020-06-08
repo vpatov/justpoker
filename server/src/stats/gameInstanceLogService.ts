@@ -10,7 +10,7 @@ import {
 } from '../../../ui/src/shared/models/handLog';
 import { PlayerPosition } from '../../../ui/src/shared/models/playerPosition';
 import { GameInstanceUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { GameStateManager } from './gameStateManager';
+import { GameStateManager } from '../state/gameStateManager';
 import { Player } from '../../../ui/src/shared/models/player';
 import { Card } from '../../../ui/src/shared/models/cards';
 import { BettingRoundStage, BettingRoundAction } from '../../../ui/src/shared/models/game';

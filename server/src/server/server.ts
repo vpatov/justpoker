@@ -9,9 +9,9 @@ import bodyParser from 'body-parser';
 import queryString from 'query-string';
 
 import { AddressInfo } from 'net';
-import { EventProcessorService } from '../service/eventProcessorService';
-import { StateConverter } from '../service/stateConverter';
-import { GameInstanceManager } from '../service/gameInstanceManager';
+import { EventProcessorService } from '../io/eventProcessorService';
+import { StateConverter } from '../io/stateConverter';
+import { GameInstanceManager } from '../state/gameInstanceManager';
 
 import { ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src/shared/models/api';
 
