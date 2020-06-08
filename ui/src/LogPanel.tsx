@@ -12,11 +12,10 @@ import Button from '@material-ui/core/Button';
 import EmojiPicker from './EmojiPicker';
 
 import { WsServer } from './api/ws';
-import { UiChatMessage } from './shared/models/uiState';
+import { UiChatMessage, UiHandLogEntry } from './shared/models/uiState';
 import { getPlayerNameColor } from './style/colors';
 import { useStickyState } from './utils';
 import { ButtonGroup } from '@material-ui/core';
-import SplitPane from 'react-split-pane';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -120,7 +119,7 @@ function LogPanel(props: LogPanelProps) {
     const { className } = props;
 
     const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
-    const [handLogEntries, setHandLogEntries] = useState([]);
+    const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
     const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
     const [draftChatMessage, setDraftChatMessage] = useState('');
@@ -136,6 +135,7 @@ function LogPanel(props: LogPanelProps) {
 
     useEffect(() => {
         WsServer.subscribe('chat', onReceiveNewChatMessage);
+        WsServer.subscribe('handLog', onReceiveNewHandLogEntries);
     }, []);
 
     function sendMessage() {
@@ -151,6 +151,25 @@ function LogPanel(props: LogPanelProps) {
             event.preventDefault();
             sendMessage();
         }
+    }
+
+    function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
+        setHandLogEntries((oldHandLogEntries) => {
+            // If we received more than one handLogEntry, replace the entire list
+            if (incomingHandLogEntries.length > 1){
+                return incomingHandLogEntries;
+            }
+            // Otherwise just update the most recent entry
+            else if (incomingHandLogEntries.length === 1){
+                const handLogEntry = incomingHandLogEntries[0];
+                const handNumber = handLogEntry.handNumber;
+                oldHandLogEntries[handNumber] = handLogEntry;
+                return [...oldHandLogEntries];
+            }
+            else {
+                return oldHandLogEntries;
+            }
+        })
     }
 
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
