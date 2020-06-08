@@ -120,9 +120,10 @@ function LogPanel(props: LogPanelProps) {
     const { className } = props;
 
     const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
+    const [handLogEntries, setHandLogEntries] = useState([]);
     const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
-    const [messages, setMessages] = useState([] as any);
-    const [draftMessage, setDraftMessage] = useState('');
+    const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
+    const [draftChatMessage, setDraftChatMessage] = useState('');
     const [unreadChats, setUnreadChats] = useState(false);
 
     const messagesRef = useRef(null);
@@ -131,17 +132,17 @@ function LogPanel(props: LogPanelProps) {
         (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(scrollToBottom, [messages, hideChatLog]);
+    useEffect(scrollToBottom, [chatMessages, hideChatLog]);
 
     useEffect(() => {
         WsServer.subscribe('chat', onReceiveNewChatMessage);
     }, []);
 
     function sendMessage() {
-        const trimmedMessage = draftMessage.trim();
+        const trimmedMessage = draftChatMessage.trim();
         if (trimmedMessage) {
             WsServer.sendChatMessage(trimmedMessage);
-            setDraftMessage('');
+            setDraftChatMessage('');
         }
     }
 
@@ -154,7 +155,7 @@ function LogPanel(props: LogPanelProps) {
 
     function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
         setUnreadChats(true);
-        setMessages((oldMessages) => [...oldMessages, chatMessage]);
+        setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
     }
 
     function renderMessagePanelButtons() {
@@ -201,7 +202,7 @@ function LogPanel(props: LogPanelProps) {
         );
     }
     const addEmoji = (emoji) => {
-        setDraftMessage(draftMessage + emoji.native);
+        setDraftChatMessage(draftChatMessage + emoji.native);
     };
 
     function renderSharedLogPanel() {
@@ -231,7 +232,7 @@ function LogPanel(props: LogPanelProps) {
                 style={!hideHandLog ? {height: '50%'} : { }}
             >
                 <div className={classes.chatLogMessages}>
-                    {messages.map((message) => (
+                    {chatMessages.map((message) => (
                         <Typography key={message.timestamp} className={classes.chatMessage}>
                             <span
                                 className={classes.senderName}
@@ -247,10 +248,10 @@ function LogPanel(props: LogPanelProps) {
                 <div className={classes.chatLogInputSection}>
                     <TextFieldWrap
                         placeholder="Send Message"
-                        value={draftMessage}
+                        value={draftChatMessage}
                         className={classes.messageTextField}
                         onChange={(event) => {
-                            setDraftMessage(event.target.value);
+                            setDraftChatMessage(event.target.value);
                         }}
                         InputProps={{ classes: { input: classes.messageInput } }}
                         onKeyPress={(event) => onTextAreaPressEnter(event)}

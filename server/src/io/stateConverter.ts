@@ -38,6 +38,7 @@ import {
 import { SoundByte } from '../../../ui/src/shared/models/audioQueue';
 import { AnimationService } from '../state/animationService';
 import { ChatService } from '../state/chatService';
+import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 import { debugFunc } from '../logger';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
@@ -63,6 +64,7 @@ export class StateConverter {
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
         private readonly chatService: ChatService,
+        private readonly gameInstanceLogService: GameInstanceLogService,
     ) {}
 
     gameUpdated(): boolean {
@@ -89,8 +91,7 @@ export class StateConverter {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
-        const board = this.gameStateManager.getBoard();
-        const winners = this.gameStateManager.getWinners();
+        const handLogEntry = this.gameInstanceLogService.getMostRecentHandLogEntry(heroPlayerUUID);
 
         // TODO put each key into its own function
         const uiState: UiState = {
@@ -127,6 +128,7 @@ export class StateConverter {
             animation: this.animationUpdated() || sendAll ? this.animationService.getAnimationState() : undefined,
             // TODO refactor to send entire chatlog on init.
             chat: this.chatUpdated() || sendAll ? this.transformChatMessage() : undefined,
+            handLogEntries: this.gameUpdated() && handLogEntry ? [handLogEntry] : [],
         };
         return uiState;
     }

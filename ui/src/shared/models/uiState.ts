@@ -14,9 +14,11 @@ import {
     GameParameters,
     getCleanGameParameters,
     getDefaultGameParameters,
+    BettingRoundStage,
 } from './game';
 import { PlayerUUID, makeBlankUUID } from './uuid';
 import { getRandomAvatarKey, AvatarKeys } from './assets';
+import { HandLogEntry, PlayerSummary, BettingRoundLog } from './handLog';
 
 export declare interface ErrorDisplay {
     message?: string;
@@ -41,6 +43,7 @@ export declare interface UiState {
     chat: UiChatMessage;
     animation: AnimationState;
     userPreferences?: UserPreferences;
+    handLogEntries: UiHandLogEntry[];
 }
 
 export declare interface UiGameState {
@@ -169,6 +172,16 @@ export declare interface UiChatMessage {
 
 export declare interface UiChatLog {
     messages: UiChatMessage[];
+}
+
+export declare interface UiHandLogEntry {
+    handNumber: number;
+    timeHandStarted: number;
+    playerSummaries: { [key: string]: PlayerSummary };
+    board: UiCard[];
+    winners: PlayerUUID[];
+    bettingRounds: { [key in BettingRoundStage]: BettingRoundLog };
+    lastBettingRoundStage: BettingRoundStage;
 }
 
 /* Action Buttons */
@@ -320,6 +333,7 @@ export const CleanRootState: UiState = {
     audio: SoundByte.NONE,
     chat: getCleanChatMessage(),
     animation: getCleanAnimationState(),
+    handLogEntries: [],
 };
 
 export const testUiChatLog: UiChatLog = {

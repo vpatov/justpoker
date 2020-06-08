@@ -6,11 +6,11 @@ import { PlayerPosition } from './playerPosition';
 /** Container object for logs for a game instance. */
 export declare interface GameInstanceLog {
     gameInstanceUUID: GameInstanceUUID;
-    handLogs: HandLog[];
+    handLogEntries: HandLogEntry[];
 }
 
 /** Contains a complete record of one played hand. */
-export declare interface HandLog {
+export declare interface HandLogEntry {
     handNumber: number;
     timeHandStarted: number;
     playerSummaries: Map<PlayerUUID, PlayerSummary>;
@@ -49,11 +49,11 @@ export declare interface PlayerSummary {
 export function getCleanGameInstanceLog(): GameInstanceLog {
     return {
         gameInstanceUUID: makeBlankUUID(),
-        handLogs: [],
+        handLogEntries: [],
     };
 }
 
-export function getCleanHandLog(): HandLog {
+export function getCleanHandLogEntry(): HandLogEntry {
     return {
         handNumber: -1,
         timeHandStarted: 0,
