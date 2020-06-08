@@ -16,29 +16,28 @@ import { UiChatMessage } from './shared/models/uiState';
 import { getPlayerNameColor } from './style/colors';
 import { useStickyState } from './utils';
 import { ButtonGroup } from '@material-ui/core';
+import SplitPane from 'react-split-pane';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             zIndex: 5,
             height: '100%',
-            display: 'flex',
-            flexShrink: '0',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexDirection: 'column',
+            maxHeight: '100%',
             width: '15%',
             ...theme.custom.CHAT,
         },
-        chatLogRoot: {
-            zIndex: 5,
+        handLogContainer: {
             height: '100%',
+            backgroundColor: '#ddaadd',
+        },
+        chatLogContainer: {
             display: 'flex',
+            height: '100%',
             flexShrink: '0',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'column',
-            width: '15%',
             ...theme.custom.CHAT,
         },
         chatLogMessages: {
@@ -108,14 +107,14 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-interface ChatLogProps {
+interface LogPanelProps {
     className?: string;
 }
 
 const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
 const HANDLOG_OPEN_LOCAL_STORAGE_KEY = 'jp-handlog-open';
 
-function ChatLog(props: ChatLogProps) {
+function LogPanel(props: LogPanelProps) {
     const classes = useStyles();
 
     const { className } = props;
@@ -210,23 +209,27 @@ function ChatLog(props: ChatLogProps) {
             <div className={classnames(classes.root, className)}>
                 {hideHandLog ? null : renderHandLog()}
                 {hideChatLog ? null : renderChatLog()}
+                {renderMessagePanelButtons()}
             </div>
         )
     }
 
     function renderHandLog() {
         return (
-            <div>
-                <div>
-                    <label>Handlog placeholder</label>
-                </div>
+            <div
+                className={classnames(classes.handLogContainer, className)}
+                style={!hideChatLog ? {height: '50%'} : { }}
+            >
             </div>
         );
     }
 
     function renderChatLog() {
         return (
-            <div className={classnames(classes.chatLogRoot, className)}>
+            <div
+                className={classnames(classes.chatLogContainer, className)}
+                style={!hideHandLog ? {height: '50%'} : { }}
+            >
                 <div className={classes.chatLogMessages}>
                     {messages.map((message) => (
                         <Typography key={message.timestamp} className={classes.chatMessage}>
@@ -289,11 +292,11 @@ function ChatLog(props: ChatLogProps) {
         );
     }
 
-    if (!hideChatLog) {
-        return renderChatLog();
+    if (!hideChatLog || !hideHandLog) {
+        return renderSharedLogPanel();
     } else {
         return renderMessagePanelButtons();
     }
 }
 
-export default ChatLog;
+export default LogPanel;
