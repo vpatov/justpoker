@@ -15,7 +15,13 @@ import { WsServer } from './api/ws';
 import { UiChatMessage, UiHandLogEntry } from './shared/models/uiState';
 import { getPlayerNameColor } from './style/colors';
 import { useStickyState } from './utils';
-import { ButtonGroup } from '@material-ui/core';
+import { ButtonGroup, IconButton } from '@material-ui/core';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+import SkipNextIcon from '@material-ui/icons/SkipNext';
+import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
+
+
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,6 +35,20 @@ const useStyles = makeStyles((theme: Theme) =>
         handLogContainer: {
             height: '100%',
             backgroundColor: '#ddaadd',
+        },
+        handLogControls: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        handLogIconButton: {
+            borderRadius: '25%',
+        },
+        handLogIcon: {
+            fontSize: '2.5vmin',
+        },
+        handNumberString: {
+            fontSize: '1.6vmin',
         },
         chatLogContainer: {
             display: 'flex',
@@ -114,12 +134,14 @@ const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
 const HANDLOG_OPEN_LOCAL_STORAGE_KEY = 'jp-handlog-open';
 
 function LogPanel(props: LogPanelProps) {
+    console.log("function LogPanel");
     const classes = useStyles();
 
     const { className } = props;
 
     const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
+    const [currentHandNumber, setCurrentHandNumber] = useState(0);
     const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
     const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
     const [draftChatMessage, setDraftChatMessage] = useState('');
@@ -135,7 +157,8 @@ function LogPanel(props: LogPanelProps) {
 
     useEffect(() => {
         WsServer.subscribe('chat', onReceiveNewChatMessage);
-        WsServer.subscribe('handLog', onReceiveNewHandLogEntries);
+        WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
+        WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
     }, []);
 
     function sendMessage() {
@@ -154,10 +177,12 @@ function LogPanel(props: LogPanelProps) {
     }
 
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
+        console.log("handLogEntries", handLogEntries);
         if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
             return;
         }
         setHandLogEntries((oldHandLogEntries) => {
+            console.log("updating hand log entries");
             // update the most recent entry
             if (incomingHandLogEntries.length === 1){
                 const handLogEntry = incomingHandLogEntries[0];
@@ -168,7 +193,6 @@ function LogPanel(props: LogPanelProps) {
 
             // If we received more than one handLogEntry, replace the entire list
             return incomingHandLogEntries;
-
         })
     }
 
@@ -234,13 +258,83 @@ function LogPanel(props: LogPanelProps) {
         )
     }
 
+    function getHandNumberString(){
+        if (handLogEntries.length === 0){
+            return 'No entries';
+        }
+        return `${currentHandNumber + 1} of ${handLogEntries.length}`;
+
+    }
+
+    function handleClickSkipPreviousButton() {
+        
+    }
+
+    function handleClickSkipNextButton() {
+        if (handLogEntries.length){
+            setCurrentHandNumber(handLogEntries.length - 1);
+        }
+    }
+
+    function handleClickNextButton(){
+        if (currentHandNumber >= handLogEntries.length - 1){
+            return;
+        }
+        setCurrentHandNumber((currentHandNumber) => currentHandNumber + 1);
+    }
+
+    function handleClickPreviousButton(){
+
+    }
+
     function renderHandLog() {
+        console.log("renderHandLog");
+        const handNumberString = getHandNumberString();
         return (
             <div
                 className={classnames(classes.handLogContainer, className)}
                 style={!hideChatLog ? {height: '50%'} : { }}
             >
+                <div className={classnames(classes.handLogControls)}>
+                    <div>
+                        <IconButton
+                            className={classes.handLogIconButton}
+                            onClick={() => handleClickSkipPreviousButton()}
+                        >
+                            <SkipPreviousIcon></SkipPreviousIcon>
+                        </IconButton>
+                        <IconButton
+                            className={classes.handLogIconButton}
+                            onClick={() => handleClickPreviousButton()}
+                        >
+                            <NavigateBeforeIcon></NavigateBeforeIcon>
+                        </IconButton>
+                    </div>
+                    <Typography
+                        className={classes.handNumberString}
+                        style={handNumberString.length >= 11 ? {fontSize: '1.3vmin'} : {}}
+                        >
+                        {handNumberString}
+                    </Typography>
+                    <div>
+                        <IconButton
+                            className={classes.handLogIconButton}
+                            onClick={() => handleClickNextButton()}
+                        >
+                            <NavigateNextIcon></NavigateNextIcon>
+                        </IconButton>
+                        <IconButton
+                            className={classes.handLogIconButton}
+                            onClick={() => handleClickSkipNextButton()}
+                        >
+                            <SkipNextIcon></SkipNextIcon>
+                        </IconButton>
+                    </div>
+                    
+                   
+                </div>
             </div>
+
         );
     }
 
