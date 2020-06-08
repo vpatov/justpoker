@@ -20,10 +20,11 @@ import {
     MaxBuyinType,
 } from '../../../ui/src/shared/models/game';
 import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
-import { DeckService } from './deckService';
+import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
-import { HandSolverService } from './handSolverService';
+import { HandSolverService } from '../cards/handSolverService';
+import { LedgerService } from '../stats/ledgerService';
 import {
     Hand,
     Card,
@@ -31,7 +32,6 @@ import {
     convertHandToCardArray,
     RankAbbrToFullString,
 } from '../../../ui/src/shared/models/cards';
-import { LedgerService } from './ledgerService';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';

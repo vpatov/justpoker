@@ -6,7 +6,7 @@ import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
 import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
-import { LedgerService } from './ledgerService';
+import { LedgerService } from '../stats/ledgerService';
 import { TimerManager } from './timerManager';
 import { UILedger } from '../../../ui/src/shared/models/ledger';
 import { logger, debugFunc } from '../logger';
@@ -16,7 +16,7 @@ import {
     ClientUUID,
     generateGameInstanceUUID,
 } from '../../../ui/src/shared/models/uuid';
-import { GameInstanceLogService } from './gameInstanceLogService';
+import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { GameParameters } from '../../../ui/src/shared/models/game';
 import { HandLog } from '../../../ui/src/shared/models/handLog';

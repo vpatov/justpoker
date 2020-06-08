@@ -21,7 +21,7 @@
         "src/**/*",
         "../shared/service/**/*",
         "../shared/util/**/*",
-        "../shared/models/**/*"
+        "../shared/models/**/*", "test/clientTest"
     ],
     "exclude": [
       "dist",

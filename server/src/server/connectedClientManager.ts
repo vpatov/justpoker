@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { StateConverter } from '../service/stateConverter';
+import { StateConverter } from '../io/stateConverter';
 import * as WebSocket from 'ws';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/uuid';

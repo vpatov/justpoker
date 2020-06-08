@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { GameStateManager } from './gameStateManager';
+import { GameStateManager } from '../state/gameStateManager';
 import {
     BettingRoundActionType,
     BettingRoundAction,

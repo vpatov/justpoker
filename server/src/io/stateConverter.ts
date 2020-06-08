@@ -23,9 +23,9 @@ import {
     ShowCardButton,
     LEAVE_TABLE_BUTTON,
 } from '../../../ui/src/shared/models/uiState';
-import { BettingRoundStage, GameType, BETTING_ROUND_STAGES } from '../../../ui/src/shared/models/game';
-import { GameStateManager } from './gameStateManager';
-import { AudioService } from './audioService';
+import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
+import { GameStateManager } from '../state/gameStateManager';
+import { AudioService } from '../state/audioService';
 
 import {
     Global,
@@ -36,8 +36,8 @@ import {
     COMMON_POT_SIZINGS,
 } from '../../../ui/src/shared/models/uiState';
 import { SoundByte } from '../../../ui/src/shared/models/audioQueue';
-import { AnimationService } from './animationService';
-import { ChatService } from './chatService';
+import { AnimationService } from '../state/animationService';
+import { ChatService } from '../state/chatService';
 
 import { debugFunc } from '../logger';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';

@@ -12,19 +12,19 @@ import {
     PlayerReactionRequest,
     SetGameParametersRequest,
 } from '../../../ui/src/shared/models/api';
-import { GameStateManager } from './gameStateManager';
-import { ValidationService } from './validationService';
+import { GameStateManager } from '../state/gameStateManager';
+import { ValidationService } from '../logic/validationService';
 import { Service } from 'typedi';
-import { GamePlayService } from './gamePlayService';
+import { GamePlayService } from '../logic/gamePlayService';
 import { ValidationResponse, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
 import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
-import { ChatService } from './chatService';
-import { StateGraphManager } from './stateGraphManager';
-import { GameInstanceManager } from './gameInstanceManager';
+import { ChatService } from '../state/chatService';
+import { StateGraphManager } from '../logic/stateGraphManager';
+import { GameInstanceManager } from '../state/gameInstanceManager';
 import { logger, debugFunc } from '../logger';
-import { ConnectedClientManager } from '..//server/connectedClientManager';
+import { ConnectedClientManager } from '../server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/uuid';
-import { AnimationService } from './animationService';
+import { AnimationService } from '../state/animationService';
 
 declare interface ActionProcessor {
     validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
