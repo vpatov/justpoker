@@ -177,10 +177,10 @@ export declare interface UiChatLog {
 export declare interface UiHandLogEntry {
     handNumber: number;
     timeHandStarted: number;
-    playerSummaries: { [key: string]: PlayerSummary };
+    playerSummaries: PlayerSummary[];
     board: UiCard[];
     winners: PlayerUUID[];
-    bettingRounds: { [key in BettingRoundStage]: BettingRoundLog };
+    bettingRounds: BettingRoundLog[];
     lastBettingRoundStage: BettingRoundStage;
 }
 

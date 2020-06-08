@@ -20,6 +20,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
+import { PlayerSummary } from './shared/models/handLog';
 
 
 
@@ -134,7 +135,6 @@ const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
 const HANDLOG_OPEN_LOCAL_STORAGE_KEY = 'jp-handlog-open';
 
 function LogPanel(props: LogPanelProps) {
-    console.log("function LogPanel");
     const classes = useStyles();
 
     const { className } = props;
@@ -177,12 +177,10 @@ function LogPanel(props: LogPanelProps) {
     }
 
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
-        console.log("handLogEntries", handLogEntries);
         if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
             return;
         }
         setHandLogEntries((oldHandLogEntries) => {
-            console.log("updating hand log entries");
             // update the most recent entry
             if (incomingHandLogEntries.length === 1){
                 const handLogEntry = incomingHandLogEntries[0];
@@ -267,7 +265,7 @@ function LogPanel(props: LogPanelProps) {
     }
 
     function handleClickSkipPreviousButton() {
-        
+        setCurrentHandNumber(0);
     }
 
     function handleClickSkipNextButton() {
@@ -284,57 +282,77 @@ function LogPanel(props: LogPanelProps) {
     }
 
     function handleClickPreviousButton(){
+        if (currentHandNumber >= 0){
+            setCurrentHandNumber((currentHandNumber) => currentHandNumber - 1);
+        }
+    }
 
+    function renderHandLogControls() {
+        const handNumberString = getHandNumberString();
+        return (
+            <div className={classnames(classes.handLogControls)}>
+                <div>
+                    <IconButton
+                        className={classes.handLogIconButton}
+                        onClick={() => handleClickSkipPreviousButton()}
+                    >
+                        <SkipPreviousIcon></SkipPreviousIcon>
+                    </IconButton>
+                    <IconButton
+                        className={classes.handLogIconButton}
+                        onClick={() => handleClickPreviousButton()}
+                    >
+                        <NavigateBeforeIcon></NavigateBeforeIcon>
+                    </IconButton>
+                </div>
+                <Typography
+                    className={classes.handNumberString}
+                    style={handNumberString.length >= 11 ? {fontSize: '1.3vmin'} : {}}
+                    >
+                    {handNumberString}
+                </Typography>
+                <div>
+                    <IconButton
+                        className={classes.handLogIconButton}
+                        onClick={() => handleClickNextButton()}
+                    >
+                        <NavigateNextIcon></NavigateNextIcon>
+                    </IconButton>
+                    <IconButton
+                        className={classes.handLogIconButton}
+                        onClick={() => handleClickSkipNextButton()}
+                    >
+                        <SkipNextIcon></SkipNextIcon>
+                    </IconButton>
+                </div>
+                
+                
+            </div>
+        )
+    }
+
+    function renderPlayerPositions(playerSummaryMap:  { [key: string]: PlayerSummary }) {
+        // const playerSummaries = Object.entries()
+    }
+
+    function renderHandLogEntry() {
+        if (handLogEntries.length === 0){
+            return null;
+        }
+        return (
+            null
+        );
     }
 
     function renderHandLog() {
-        console.log("renderHandLog");
-        const handNumberString = getHandNumberString();
         return (
             <div
                 className={classnames(classes.handLogContainer, className)}
                 style={!hideChatLog ? {height: '50%'} : { }}
             >
-                <div className={classnames(classes.handLogControls)}>
-                    <div>
-                        <IconButton
-                            className={classes.handLogIconButton}
-                            onClick={() => handleClickSkipPreviousButton()}
-                        >
-                            <SkipPreviousIcon></SkipPreviousIcon>
-                        </IconButton>
-                        <IconButton
-                            className={classes.handLogIconButton}
-                            onClick={() => handleClickPreviousButton()}
-                        >
-                            <NavigateBeforeIcon></NavigateBeforeIcon>
-                        </IconButton>
-                    </div>
-                    <Typography
-                        className={classes.handNumberString}
-                        style={handNumberString.length >= 11 ? {fontSize: '1.3vmin'} : {}}
-                        >
-                        {handNumberString}
-                    </Typography>
-                    <div>
-                        <IconButton
-                            className={classes.handLogIconButton}
-                            onClick={() => handleClickNextButton()}
-                        >
-                            <NavigateNextIcon></NavigateNextIcon>
-                        </IconButton>
-                        <IconButton
-                            className={classes.handLogIconButton}
-                            onClick={() => handleClickSkipNextButton()}
-                        >
-                            <SkipNextIcon></SkipNextIcon>
-                        </IconButton>
-                    </div>
-                    
-                   
-                </div>
+                {renderHandLogControls()}
+                {renderHandLogEntry()}
             </div>
-
         );
     }
 

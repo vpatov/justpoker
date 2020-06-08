@@ -46,3 +46,7 @@ export const PLAYER_POSITIONS_BY_HEADCOUNT: { [key: number]: PlayerPosition[] } 
     10: [PP.DEALER, PP.SB, PP.BB, PP.UTG, PP['UTG+1'], PP.MP, PP['MP+1'], PP.LJ, PP.HJ, PP.CUTOFF],
     11: [PP.DEALER, PP.SB, PP.BB, PP.UTG, PP['UTG+1'], PP['UTG+2'], PP.MP, PP['MP+1'], PP.LJ, PP.HJ, PP.CUTOFF],
 };
+
+export function getPositionIndex(position: PlayerPosition, headCount: number) {
+    return PLAYER_POSITIONS_BY_HEADCOUNT[headCount].findIndex((pos) => pos === position);
+}

@@ -8,12 +8,12 @@ import {
     BettingRoundLog,
     getCleanBettingRoundLog,
 } from '../../../ui/src/shared/models/handLog';
-import { PlayerPosition } from '../../../ui/src/shared/models/playerPosition';
+import { PlayerPosition, getPositionIndex } from '../../../ui/src/shared/models/playerPosition';
 import { GameInstanceUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
 import { GameStateManager } from '../state/gameStateManager';
 import { Player } from '../../../ui/src/shared/models/player';
 import { Card } from '../../../ui/src/shared/models/cards';
-import { BettingRoundStage, BettingRoundAction } from '../../../ui/src/shared/models/game';
+import { BettingRoundStage, BettingRoundAction, getBettingRoundStageIndex } from '../../../ui/src/shared/models/game';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { UiHandLogEntry } from '../../../ui/src/shared/models/uiState';
 
@@ -136,18 +136,22 @@ export class GameInstanceLogService {
         playerSummaries: Map<PlayerUUID, PlayerSummary>,
         requestorPlayerUUID: PlayerUUID,
     ) {
-        const processedSummaries: { [key: string]: PlayerSummary } = {};
+        const processedSummaries: PlayerSummary[] = [];
         playerSummaries.forEach((playerSummary, playerUUID) => {
             // Only show the hole cards if they were yours, or if they were shown
             const sanitizedHoleCards =
                 requestorPlayerUUID === playerUUID
                     ? playerSummary.holeCards
                     : playerSummary.holeCards.filter((card) => card.visible);
-            processedSummaries[playerUUID as string] = {
+            processedSummaries.push({
                 ...playerSummary,
                 holeCards: sanitizedHoleCards,
-            };
+            });
         });
+        const headCount = processedSummaries.length;
+        processedSummaries.sort(
+            (a, b) => getPositionIndex(a.position, headCount) - getPositionIndex(b.position, headCount),
+        );
         return processedSummaries;
     }
 
@@ -156,6 +160,18 @@ export class GameInstanceLogService {
             this.serializeHandLogEntry(requestorPlayerUUID, handLogEntry),
         );
         return handLogs;
+    }
+
+    private serializeBettingRounds(bettingRounds: Map<BettingRoundStage, BettingRoundLog>) {
+        const processedBettingRounds: BettingRoundLog[] = [];
+        bettingRounds.forEach((bettingRoundLog, bettingRoundStage) => {
+            processedBettingRounds.push(bettingRoundLog);
+        });
+
+        processedBettingRounds.sort(
+            (a, b) => getBettingRoundStageIndex(a.bettingRoundStage) - getBettingRoundStageIndex(b.bettingRoundStage),
+        );
+        return processedBettingRounds;
     }
 
     /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
@@ -167,9 +183,7 @@ export class GameInstanceLogService {
                 handLogEntry.playerSummaries,
                 requestorPlayerUUID,
             ),
-            bettingRounds: Object.fromEntries(handLogEntry.bettingRounds.entries()) as {
-                [key in BettingRoundStage]: BettingRoundLog;
-            },
+            bettingRounds: this.serializeBettingRounds(handLogEntry.bettingRounds),
         };
     }
 
