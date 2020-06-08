@@ -18,7 +18,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function PlayerMenu(props) {
     const classes = useStyles();
-    const { anchorEl, handleClose, stack, name, uuid, setHeroRotation, virtualPositon } = props;
+    const { anchorEl, handleClose, setHeroRotation, virtualPositon, player } = props;
+    const { stack, name, uuid, admin } = player;
     const [chipsDialog, setChipsDialog] = useState(false);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
@@ -36,7 +37,12 @@ function PlayerMenu(props) {
     const handleBootPlayer = () => {
         WsServer.sendBootPlayerMessage(uuid);
         handleClose();
-    }
+    };
+
+    const handleAddAdmin = () => {
+        WsServer.sendAddAdminMessage(uuid);
+        handleClose();
+    };
 
     return (
         <Menu
@@ -48,7 +54,11 @@ function PlayerMenu(props) {
         >
             <AddChipDialog open={chipsDialog} handleClose={handleCloseDialog} name={name} stack={stack} uuid={uuid} />
             {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
-            {(isHeroAdmin && heroPlayerUUID !== uuid) ? <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem> : null}
+            {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
+            {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
+            {isHeroAdmin && heroPlayerUUID !== uuid ? (
+                <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
+            ) : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
             <MenuItem onClick={handleClose}>Mute</MenuItem>
         </Menu>

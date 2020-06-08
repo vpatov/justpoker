@@ -139,7 +139,7 @@ export class StateConverter {
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
-            heroIsAdmin: this.gameStateManager.isPlayerAdmin(clientUUID),
+            heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
             heroIsSeated: clientPlayerIsSeated,
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
@@ -148,7 +148,9 @@ export class StateConverter {
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
-            adminNames: this.gameStateManager.getAdmins().map((player) => player.name),
+            adminNames: this.gameStateManager
+                .getAdminClientUUIDs()
+                .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
         };
 
         return global;
@@ -268,7 +270,7 @@ export class StateConverter {
 
         const menuButtons = [USER_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
 
-        if (this.gameStateManager.isPlayerAdmin(clientUUID)) {
+        if (this.gameStateManager.isClientAdmin(clientUUID)) {
             menuButtons.push(GAME_SETTINGS_BUTTON);
             if (
                 (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) ||
@@ -404,6 +406,7 @@ export class StateConverter {
             winner: player.winner,
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
+            admin: this.gameStateManager.isPlayerAdmin(player.uuid),
         };
         return uiPlayer;
     }

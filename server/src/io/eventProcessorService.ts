@@ -164,6 +164,11 @@ export class EventProcessorService {
             perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.removePlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ClientActionType.ADDADMIN]: {
+            validation: (uuid, req: BootPlayerRequest) => this.validationService.validateBootPlayerAction(uuid, req),
+            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.addPlayerAdmin(req.playerUUID),
+            updates: [ServerStateKey.GAMESTATE],
+        },
         [ClientActionType.LEAVETABLE]: {
             validation: (uuid, req) => this.validationService.validateLeaveTableAction(uuid),
             perform: (uuid) => {

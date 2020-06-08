@@ -150,6 +150,7 @@ export declare interface UiPlayer {
     bet?: number;
     handLabel?: string;
     playerTimer?: PlayerTimer;
+    admin: boolean;
     hand: {
         cards: UiCard[];
     };
@@ -458,6 +459,7 @@ export const TestGame: UiGameState = {
                 cards: [{ ...genRandomCard() }, genRandomCard()],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: true,
         },
         {
             name: 'Marty Shakus',
@@ -470,6 +472,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }, { hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Dean Markus',
@@ -485,6 +488,7 @@ export const TestGame: UiGameState = {
                 ],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         // {
         //     name: "Johnny Bones",
@@ -495,6 +499,7 @@ export const TestGame: UiGameState = {
         //         cards: [{ hidden: true }, { hidden: true }],
         //     },
         //     avatarKey: getRandomAvatarKey(),
+        //     admin: false,
         // },
 
         {
@@ -508,6 +513,7 @@ export const TestGame: UiGameState = {
                 cards: [genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard()],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Lenny',
@@ -517,6 +523,7 @@ export const TestGame: UiGameState = {
                 cards: [],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: true,
         },
         {
             name: 'Jimmy Dean',
@@ -529,6 +536,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Nicki Lam',
@@ -540,6 +548,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Tommy Bones',
@@ -551,6 +560,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
     ],
 };

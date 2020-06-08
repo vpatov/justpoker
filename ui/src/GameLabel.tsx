@@ -31,14 +31,6 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'relative',
             zIndex: 10,
         },
-        blink: {
-            animation: '$blinking 0.8s linear 1;',
-        },
-        '@keyframes blinking': {
-            '50%': {
-                color: theme.palette.primary.main,
-            },
-        },
     }),
 );
 
@@ -51,10 +43,6 @@ function GameLabel(props) {
     );
     const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
 
-    useEffect(() => {
-        SET_blink(false);
-        SET_blink(true);
-    }, [adminNames]);
     return (
         <div className={classes.root}>
             {gameParametersWillChangeAfterHand ? (
@@ -64,15 +52,13 @@ function GameLabel(props) {
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
 
-            <Typography className={classes.gameText}>
-                <IconTooltip
-                    className={classnames(classes.adminIcon, { [classes.blink]: blink })}
-                    title={`Admin${adminNames.length > 1 ? 's' : ''}: ${adminNames.join(', ')}`}
-                    icon={<AdminIcon />}
-                    placement="left"
-                />
-                {`${gameType}  ${smallBlind}/${bigBlind}`}
-            </Typography>
+            <Typography className={classes.gameText}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
+            <IconTooltip
+                className={classnames(classes.adminIcon)}
+                title={`Admin${adminNames.length > 1 ? 's' : ''}: ${adminNames.join(', ')}`}
+                icon={<AdminIcon />}
+                placement="left"
+            />
         </div>
     );
 }

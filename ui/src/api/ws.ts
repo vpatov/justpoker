@@ -7,6 +7,7 @@ import {
     ClientActionType,
     ClientWsMessageRequest,
     BootPlayerRequest,
+    AddAdminRequest,
 } from '../shared/models/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
 
@@ -76,6 +77,14 @@ export class WsServer {
         const clientWsMessage: ClientWsMessage = {
             actionType: ClientActionType.BOOTPLAYER,
             request: ({ playerUUID } as BootPlayerRequest) as ClientWsMessageRequest,
+        };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendAddAdminMessage(playerUUID: PlayerUUID) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.ADDADMIN,
+            request: ({ playerUUID } as AddAdminRequest) as ClientWsMessageRequest,
         };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }

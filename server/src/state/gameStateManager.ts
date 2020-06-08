@@ -659,7 +659,7 @@ export class GameStateManager {
             this.isPlayerReadyToPlay(playerUUID) &&
             this.getPlayersReadyToPlay().length >= 2 &&
             !this.isGameInProgress() &&
-            this.isPlayerAdmin(this.getClientByPlayerUUID(playerUUID))
+            this.isPlayerAdmin(playerUUID)
         );
     }
 
@@ -770,8 +770,8 @@ export class GameStateManager {
     initConnectedClient(clientUUID: ClientUUID) {
         const client = this.gameState.activeConnections.get(clientUUID);
         if (!client) {
-            if (!this.gameState.admin) {
-                this.initAdmin(clientUUID);
+            if (this.gameState.admins.length === 0) {
+                this.addClientAdmin(clientUUID);
             }
             const newClient = this.createConnectedClient(clientUUID);
             this.gameState.activeConnections.set(clientUUID, newClient);
@@ -779,12 +779,25 @@ export class GameStateManager {
         }
     }
 
-    initAdmin(clientUUID: ClientUUID) {
-        this.gameState.admin = clientUUID;
+    isPlayerAdmin(playerUUID: PlayerUUID): boolean {
+        return this.gameState.admins.includes(this.getClientByPlayerUUID(playerUUID));
     }
 
-    getAdminUUID() {
-        return this.gameState.admin;
+    isClientAdmin(clientUUID: ClientUUID): boolean {
+        console.log('admins', this.gameState.admins, clientUUID, this.gameState.admins.includes(clientUUID));
+        return this.gameState.admins.includes(clientUUID);
+    }
+
+    getAdminClientUUIDs(): ClientUUID[] {
+        return this.gameState.admins;
+    }
+
+    addPlayerAdmin(playerUUID: PlayerUUID) {
+        this.addClientAdmin(this.getClientByPlayerUUID(playerUUID));
+    }
+
+    addClientAdmin(clientUUID: ClientUUID) {
+        this.gameState.admins.push(clientUUID);
     }
 
     @debugFunc()
@@ -1166,16 +1179,6 @@ export class GameStateManager {
         return playersInHand.reduce((max, player) => {
             return player.betAmount > max ? player.betAmount : max;
         }, 0);
-    }
-
-    getAdmins(): Player[] {
-        return Object.values(this.getPlayers()).filter((player) =>
-            this.isPlayerAdmin(this.getClientByPlayerUUID(player.uuid)),
-        );
-    }
-
-    isPlayerAdmin(clientUUID: ClientUUID): boolean {
-        return this.getAdminUUID() === clientUUID;
     }
 
     isPlayerAllIn(playerUUID: PlayerUUID): boolean {
