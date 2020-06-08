@@ -304,7 +304,7 @@ export class GameStateManager {
         return this.gameState.board;
     }
 
-    getCallAmount(playerUUID: PlayerUUID): number {
+    computeCallAmount(playerUUID: PlayerUUID): number {
         if (!this.isPlayerFacingBet(playerUUID)) {
             return 0;
         }
@@ -524,7 +524,7 @@ export class GameStateManager {
         return playerPositionMap;
     }
 
-    getPlayerPositionString(playerUUID: PlayerUUID): string {
+    getPlayerPositionString(playerUUID: PlayerUUID): string | undefined {
         return PlayerPositionString[this.getPlayerPositionMap().get(playerUUID)];
     }
 

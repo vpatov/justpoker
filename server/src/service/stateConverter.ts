@@ -217,7 +217,7 @@ export class StateConverter {
             showWarningOnFold:
                 !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ||
                 this.gameStateManager.getAllCommitedBets() === 0,
-            callAmount: this.gameStateManager.getCallAmount(heroPlayerUUID),
+            callAmount: this.gameStateManager.computeCallAmount(heroPlayerUUID),
         };
 
         return controller;
