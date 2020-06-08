@@ -83,15 +83,20 @@ export class StateConverter {
         return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.ANIMATION);
     }
 
+    sendAll(): boolean {
+        return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.SEND_ALL);
+    }
+
     // Hero refers to the player who is receiving this particular UiState.
     @debugFunc({ noResult: true })
-    transformGameStateToUIState(clientUUID: ClientUUID, sendAll: boolean): UiState {
+    transformGameStateToUIState(clientUUID: ClientUUID, forceSendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
         const handLogEntry = this.gameInstanceLogService.getMostRecentHandLogEntry(heroPlayerUUID);
+        const sendAll = forceSendAll || this.sendAll();
 
         // TODO put each key into its own function
         const uiState: UiState = {

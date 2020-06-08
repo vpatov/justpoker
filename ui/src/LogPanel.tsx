@@ -21,6 +21,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import { PlayerSummary } from './shared/models/handLog';
+import { PlayerPositionString } from './shared/models/playerPosition';
 
 
 
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         handLogContainer: {
             height: '100%',
-            backgroundColor: '#ddaadd',
+            backgroundColor: '#180b36',
         },
         handLogControls: {
             display: 'flex',
@@ -50,6 +51,13 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         handNumberString: {
             fontSize: '1.6vmin',
+        },
+        handLogContents: {
+
+        },
+        handLogPlayerSummary: {
+            fontSize: '1.8vmin',
+            margin: '0.2vh 0.40vw'
         },
         chatLogContainer: {
             display: 'flex',
@@ -331,17 +339,35 @@ function LogPanel(props: LogPanelProps) {
         )
     }
 
-    function renderPlayerPositions(playerSummaryMap:  { [key: string]: PlayerSummary }) {
-        // const playerSummaries = Object.entries()
-    }
+    function renderPlayerPosition(playerSummary: PlayerSummary){
 
+        return playerSummary.wasDealtIn ? (
+            <Typography className={classnames(classes.handLogPlayerSummary)}>
+                {`${PlayerPositionString[playerSummary.position]}: ${playerSummary.playerName}`}
+            </Typography>
+        ) : null;
+    }
+    
     function renderHandLogEntry() {
         if (handLogEntries.length === 0){
             return null;
         }
+
+        const handLogEntry = handLogEntries[currentHandNumber];
+        if (!handLogEntry){
+            return null;
+        }
+
         return (
-            null
+            <div className={classnames(classes.handLogContents)}>
+                <div>
+                    {handLogEntry.playerSummaries.map((playerSummary) => (renderPlayerPosition(playerSummary)))}
+                </div>
+            </div>
+           
         );
+        // renderPlayerPositions(handLogEntry.playerSummaries);
+        
     }
 
     function renderHandLog() {
