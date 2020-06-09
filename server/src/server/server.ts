@@ -20,13 +20,18 @@ import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
 import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/src/shared/models/uuid';
 import { GameParameters } from '../../../ui/src/shared/models/game';
+import { CONFIGS, Config, ENVIRONMENT } from '../../../ui/src/shared/models/config';
+
+console.log(process.env.NODE_SERVER_ENVIRONMENT);
 
 @Service()
 class Server {
     app: express.Application;
     server: http.Server;
-    defaultPort = 8080;
     wss: WebSocket.Server;
+
+    config: Config = process.env.NODE_SERVER_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+
     rootServerDir = process.env.ROOT_SERVER_DIR || '';
 
     constructor(
@@ -184,13 +189,13 @@ class Server {
         });
     }
 
-    //refactor this mess of a function
     init() {
+        console.log(this.config);
         this.app = express();
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
         this.initGameWSS();
-        this.server.listen(process.env.PORT || this.defaultPort, () => {
+        this.server.listen(this.config.SERVER_PORT, () => {
             const addressInfo = this.server.address() as AddressInfo;
             logger.info(`Server started on address `, addressInfo);
         });

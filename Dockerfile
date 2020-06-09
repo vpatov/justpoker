@@ -12,6 +12,8 @@ COPY . ./
 
 WORKDIR /justpoker/ui
 
+# set env for react front-end
+RUN echo REACT_APP_ENVIRONMENT="PROD" > .env
 RUN npm install
 RUN npm run build
 
@@ -22,6 +24,8 @@ RUN npm run build
 WORKDIR /justpoker/server
 RUN npm install
 
+# set env for node back-end
+ENV NODE_SERVER_ENVIRONMENT="PROD"
 ENV ROOT_SERVER_DIR="/justpoker"
 # Build and start the server.
 CMD ["npm", "start"]

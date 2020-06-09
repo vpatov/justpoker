@@ -10,10 +10,15 @@ import {
 } from '../shared/models/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
 
+import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config';
+
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
-const DEFAULT_WS_PORT = 8080;
 
+const config: Config = process.env.REACT_APP_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+
+console.log(process.env);
+console.log(config);
 export class WsServer {
     static clientUUID: ClientUUID | null = null;
     static ws: WebSocket;
@@ -21,7 +26,7 @@ export class WsServer {
 
     static openWs(gameInstanceUUID: GameInstanceUUID) {
         console.log('opening ws...');
-        const wsURL = `ws://0.0.0.0:${DEFAULT_WS_PORT}`;
+        const wsURL = `ws://${config.SERVER_URL}:${config.SERVER_PORT}`;
         const wsURI = {
             url: wsURL,
             query: {
