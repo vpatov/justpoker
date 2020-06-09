@@ -79,6 +79,8 @@ class Server {
             }
         });
 
+        // This is necessary because the server npm scripts assume the build process happens in the server,
+        // and the ts sources imports are relative to the server directory (when importing from ui/src/shared)
         if (this.rootServerDir) {
             logger.info('Serving static react files.');
 
@@ -190,7 +192,6 @@ class Server {
     }
 
     init() {
-        console.log(this.config);
         this.app = express();
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
