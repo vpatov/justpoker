@@ -284,7 +284,15 @@ export class GamePlayService {
         const willPlayerStraddle = this.gsm.willPlayerStraddle(straddleUUID);
         const placeStraddle = willPlayerStraddle && numPlayersReadyToPlay > 2;
 
+        // this.bet() is a setter, not adder, so we proceed by placing smallest blinds first
+        // and larger blinds will then take priority as desired.
         this.bet(SB, smallBlindUUID);
+
+        this.gsm.getPlayersThatWillPostBlind().forEach((player) => {
+            this.bet(BB, player.uuid);
+            this.gsm.setPlayerWillPostBlind(player.uuid, false);
+        });
+
         this.bet(BB, bigBlindUUID);
         if (placeStraddle) {
             this.bet(BB * 2, straddleUUID);

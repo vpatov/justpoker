@@ -885,6 +885,17 @@ export class GameStateManager {
 
         this.ledgerService.addAlias(clientUUID, name);
         this.ledgerService.addBuyin(clientUUID, buyin);
+        if (this.isGameInProgress()) {
+            this.setPlayerWillPostBlind(player.uuid, true);
+        }
+    }
+
+    setPlayerWillPostBlind(playerUUID: PlayerUUID, value: boolean) {
+        this.gameState.players[playerUUID].willPostBlind = value;
+    }
+
+    getPlayersThatWillPostBlind(): Player[] {
+        return Object.values(this.gameState.players).filter((player: Player) => player.willPostBlind);
     }
 
     setWillPlayerStraddle(playerUUID: PlayerUUID, willStraddle: boolean) {
