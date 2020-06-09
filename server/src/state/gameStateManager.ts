@@ -1133,6 +1133,7 @@ export class GameStateManager {
                 cards: [],
             },
             handWinners: new Set<PlayerUUID>(),
+            winningHand: undefined,
             smallBlindUUID: makeBlankUUID(),
             bigBlindUUID: makeBlankUUID(),
             straddleUUID: makeBlankUUID(),
@@ -1207,8 +1208,11 @@ export class GameStateManager {
     }
 
     getWinningHandDescription(): string | undefined {
-        const winners = this.getWinners();
-        return winners.length ? this.getStrDescriptionFromHand(this.getPlayerBestHand(winners[0])) : undefined;
+        return this.gameState.winningHand ? this.getStrDescriptionFromHand(this.gameState.winningHand) : undefined;
+    }
+
+    setWinningHand(hand: Hand | undefined) {
+        this.gameState.winningHand = hand;
     }
 
     setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {

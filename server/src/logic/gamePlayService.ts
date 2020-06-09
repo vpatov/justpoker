@@ -431,6 +431,9 @@ export class GamePlayService {
             // always show winning players hands
             winningPlayers.map((wp) => this.setPlayerCardsAllVisible(wp));
 
+            // show banner for winning hands, any winning hand will do
+            this.gsm.setWinningHand(winningHands[0]);
+
             // sort eligible players by position
             eligiblePlayers.sort(([playerA, _], [playerB, __]) => this.gsm.comparePositions(playerA, playerB));
 
