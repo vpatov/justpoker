@@ -31,6 +31,7 @@ import {
     cardsAreEqual,
     convertHandToCardArray,
     RankAbbrToFullString,
+    getStrDescriptionFromHand,
 } from '../../../ui/src/shared/models/cards';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
@@ -341,6 +342,14 @@ export class GameStateManager {
 
     setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean) {
         this.getPlayer(playerUUID).quitting = quitting;
+    }
+
+    getPlayerName(playerUUID: PlayerUUID) {
+        return this.getPlayer(playerUUID).name;
+    }
+
+    getPlayerSeatNumber(playerUUID: PlayerUUID) {
+        return this.getPlayer(playerUUID).seatNumber;
     }
 
     // returns time in milliseconds
@@ -997,32 +1006,15 @@ export class GameStateManager {
 
     updatePlayerHandDescription(playerUUID: PlayerUUID) {
         const bestHand = this.computeBestHandForPlayer(playerUUID);
-        this.getPlayer(playerUUID).handDescription = this.getStrDescriptionFromHand(bestHand);
+        this.getPlayer(playerUUID).handDescription = getStrDescriptionFromHand(bestHand.descr);
+    }
+
+    getPlayerHandDescription(playerUUID: PlayerUUID) {
+        return this.getPlayer(playerUUID).handDescription;
     }
 
     clearPlayerHandDescription(playerUUID: PlayerUUID) {
         this.getPlayer(playerUUID).handDescription = '';
-    }
-
-    // removes wanted characters from the description string
-    // and in full names of cards
-    getStrDescriptionFromHand(hand: Hand): string {
-        // K High
-        // Two pair, A's & Q's
-        // Three of a Kind, 6's
-        // Pair, 3's
-        // Full House, 5's over 4's
-        // Flush, Ah High
-        // Straight, 8 High
-        let description = hand.descr;
-        Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
-            const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
-            const regex = new RegExp(regexStr, 'g');
-            description = description.replace(regex, fullStr);
-        });
-        description = description.replace(/'s/g, 's').replace(/Sixs/g, 'Sixes');
-
-        return description;
     }
 
     getGameType(): GameType {
@@ -1182,7 +1174,7 @@ export class GameStateManager {
 
     getWinningHandDescription(): string | undefined {
         const winners = this.getWinners();
-        return winners.length ? this.getStrDescriptionFromHand(this.getPlayerBestHand(winners[0])) : undefined;
+        return winners.length ? getStrDescriptionFromHand(this.getPlayerBestHand(winners[0]).descr) : undefined;
     }
 
     setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {

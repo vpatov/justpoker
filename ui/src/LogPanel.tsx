@@ -20,11 +20,13 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import { PlayerSummary, BettingRoundLog } from './shared/models/handLog';
+import { PlayerSummary, BettingRoundLog, BetActionRecord, PotSummary } from './shared/models/handLog';
 import { PlayerPositionString } from './shared/models/playerPosition';
 import Suit from './Suit';
 
 import blueGrey from '@material-ui/core/colors/blueGrey';
+import { BettingRoundActionType } from './shared/models/game';
+import { PlayerUUID } from './shared/models/uuid';
 
 
 
@@ -38,21 +40,31 @@ const useStyles = makeStyles((theme: Theme) =>
             ...theme.custom.LOGPANEL,
         },
         handLogContainer: {
+            backgroundColor: 'rgba(12,0,12,0.1)',
             display: 'flex',
             justifyContent: 'space-between',
             flexDirection: 'column',
             height: '100%',
+            overflowY: 'auto',
         },
         handLogControls: {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
         },
+        handLogControlButtonSection: {
+            display: 'flex',
+        },
         handLogIconButton: {
             borderRadius: '25%',
         },
+        handLogBettingRoundAction: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontSize: '1.8vmin',
+        },
         handLogIcon: {
-            fontSize: '2.5vmin',
+            fontSize: '2.0vmin',
         },
         handNumberString: {
             fontSize: '1.6vmin',
@@ -66,8 +78,6 @@ const useStyles = makeStyles((theme: Theme) =>
                 marginBottom: '1.2vh'    
             },
             color: 'rgb(220,210,230)',
-            overflowY: 'auto',
-            overflowWrap: 'anywhere',
         },
         handLogSectionLabel: {
             textTransform: 'uppercase',
@@ -82,6 +92,12 @@ const useStyles = makeStyles((theme: Theme) =>
             '& > *':{
                 marginRight: '0.3vw'    
             }
+        },
+        handLogPotSummary: {
+            fontSize: '1.8vmin',
+        },
+        playerNameWithColor: {
+            fontSize: '1.8vmin',
         },
         suit: {
             width: '2.2vmin',
@@ -339,7 +355,7 @@ function LogPanel(props: LogPanelProps) {
         const handNumberString = getHandNumberString();
         return (
             <div className={classnames(classes.handLogControls)}>
-                <div>
+                <div className={classnames(classes.handLogControlButtonSection)}>
                     <IconButton
                         className={classes.handLogIconButton}
                         onClick={() => handleClickSkipPreviousButton()}
@@ -359,7 +375,7 @@ function LogPanel(props: LogPanelProps) {
                     >
                     {handNumberString}
                 </Typography>
-                <div>
+                <div className={classnames(classes.handLogControlButtonSection)}>
                     <IconButton
                         className={classes.handLogIconButton}
                         onClick={() => handleClickNextButton()}
@@ -383,9 +399,8 @@ function LogPanel(props: LogPanelProps) {
                 <span>
                     {`${PlayerPositionString[playerSummary.position]}: `}
                 </span>
-                <span style={{ color: getPlayerNameColor(playerSummary.seatNumber) }}>
-                    {`${playerSummary.playerName}`}
-                </span>
+                {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                <span>{` (${playerSummary.startingChips})`}</span>
             </Typography>
         ) : null;
     }
@@ -396,7 +411,7 @@ function LogPanel(props: LogPanelProps) {
                 <Typography className={classes.handLogSectionLabel}>
                     Players
                 </Typography>
-                <Divider />
+                <Divider/>
                 {playerSummaries.map((playerSummary) => (renderPlayerPosition(playerSummary)))}
             </div>
         );
@@ -427,11 +442,84 @@ function LogPanel(props: LogPanelProps) {
         ) : null;
     }
 
-    function renderBettingRoundLog(bettingRoundLog: BettingRoundLog){
+    function getBetActionVerbString(bettingRoundAction: BettingRoundActionType, amount?: number){
+        switch (bettingRoundAction){
+            case BettingRoundActionType.CHECK: {
+                return 'checks.';
+            }
+            case BettingRoundActionType.FOLD: {
+                return 'folds.';
+            }
+            case BettingRoundActionType.BET: {
+                return `bets ${amount !== undefined ? amount : 'unknown value'}.`;
+            }
+            case BettingRoundActionType.CALL: {
+                return `calls ${amount !== undefined ? amount : 'unknown value'}.`;
+            }
+            default: {
+                return '';
+            }
+        }
+    }
+    
+    function renderBettingRoundAction(action: BetActionRecord){
+        return (
+            ` ${getBetActionVerbString(action.bettingRoundAction.type, action.bettingRoundAction.amount)}`
+        );
+    }
 
+    function renderPlayerName(seatNumber: number, name: string){
+        return  (
+            <span 
+                className={classnames(classes.playerNameWithColor)}
+                style={{ color: getPlayerNameColor(seatNumber) }}
+            >
+                {`${name}`}
+            </span>
+        );
+    }
+
+    function renderTimeTookToAct(timeTookToAct: number){
+        // 1512 -> (1.5s)
+        return `(${Math.round(timeTookToAct / 100) / 10}s)`;
+    }
+
+    function renderBettingRoundActions(actions: BetActionRecord[]){
+        return (
+            <>
+                {actions.map((action) => {
+                    return (
+                    <Typography className={classnames(classes.handLogBettingRoundAction)}>
+                        <span>
+                            {renderPlayerName(action.seatNumber, action.playerName)}
+                            {renderBettingRoundAction(action)}
+                        </span>
+                        <span>{renderTimeTookToAct(action.timeTookToAct)}</span>
+                    </Typography>);
+                })}
+            </>
+        )
+    }
+
+    function renderBettingRoundLog(bettingRoundLog: BettingRoundLog){
+        return (
+            <div>
+                <Typography className={classes.handLogSectionLabel}>
+                    {bettingRoundLog.bettingRoundStage}
+                </Typography>
+                <Divider />
+                {renderCardsInline(bettingRoundLog.cardsDealtThisBettingRound)}
+                {renderBettingRoundActions(bettingRoundLog.actions)}
+            </div>
+        )
     }
 
     function renderBettingRoundLogs(bettingRounds: BettingRoundLog[]){
+        return (
+            <> 
+                {bettingRounds.map((bettingRound) => renderBettingRoundLog(bettingRound))}
+            </>
+        );
 
     }
 
@@ -441,6 +529,25 @@ function LogPanel(props: LogPanelProps) {
                 {new Date(timeHandStarted).toLocaleString().replace(',','')}
             </Typography> : 
         null;
+    }
+
+    function renderPotSummaries(potSummaries: PotSummary[]){
+        return (
+            <div>
+                <Typography className={classes.handLogSectionLabel}>
+                    Winners
+                </Typography>
+                <Divider />
+                {potSummaries.map((potSummary) => (
+                    <Typography className={classnames(classes.handLogPotSummary)}>
+                        {renderPlayerName(potSummary.seatNumber, potSummary.playerName)}
+                        {` wins pot of ${potSummary.amount}, ` +
+                           (potSummary.handDescription.length > 0 ? `with ${potSummary.handDescription}` : "doesn't show.")
+                        }
+                    </Typography>
+                ))}
+            </div>
+        );
     }
 
     function renderHandLogEntry() {
@@ -459,6 +566,7 @@ function LogPanel(props: LogPanelProps) {
                 {renderPlayerPositions(handLogEntry.playerSummaries)}
                 {renderBoard(handLogEntry.board)}
                 {renderBettingRoundLogs(handLogEntry.bettingRounds)}
+                {renderPotSummaries(handLogEntry.potSummaries)}
             </div>
         );
         
@@ -468,7 +576,7 @@ function LogPanel(props: LogPanelProps) {
         return (
             <div
                 className={classnames(classes.handLogContainer, className)}
-                style={!hideChatLog ? {height: '50%'} : { }}
+                style={!hideChatLog ? {height: '50%', maxHeight: '50%'} : { }}
             >
                 <div>
                     {renderHandLogControls()}

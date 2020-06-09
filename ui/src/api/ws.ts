@@ -64,6 +64,9 @@ export class WsServer {
     }
 
     static ping(){
+        if (!WsServer.ws){
+            return;
+        }
         const pingMessage = {
             actionType: ClientActionType.PINGSTATE,
             request: {}

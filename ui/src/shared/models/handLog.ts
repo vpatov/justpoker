@@ -15,9 +15,17 @@ export declare interface HandLogEntry {
     timeHandStarted: number;
     playerSummaries: Map<PlayerUUID, PlayerSummary>;
     board: Card[];
-    winners: Set<PlayerUUID>;
+    potSummaries: PotSummary[];
     bettingRounds: Map<BettingRoundStage, BettingRoundLog>;
     lastBettingRoundStage: BettingRoundStage;
+}
+
+export declare interface PotSummary {
+    amount: number;
+    winner: PlayerUUID;
+    playerName: string;
+    seatNumber: number;
+    handDescription: string;
 }
 
 /** Contains a record of the actions completed during a betting round. */
@@ -30,6 +38,8 @@ export declare interface BettingRoundLog {
 /**  */
 export declare interface BetActionRecord {
     playerUUID: PlayerUUID;
+    playerName: string;
+    seatNumber: number;
     bettingRoundAction: BettingRoundAction;
     timeTookToAct: number;
 }
@@ -60,7 +70,7 @@ export function getCleanHandLogEntry(): HandLogEntry {
         timeHandStarted: 0,
         playerSummaries: new Map(),
         board: [],
-        winners: new Set(),
+        potSummaries: [],
         bettingRounds: new Map(),
         lastBettingRoundStage: BettingRoundStage.WAITING,
     };

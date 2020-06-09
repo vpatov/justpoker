@@ -16,7 +16,7 @@ import { AnimationService } from '../state/animationService';
 
 import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
-import { Hand, Card } from '../../../ui/src/shared/models/cards';
+import { Hand, Card, getStrDescriptionFromHand } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
@@ -430,7 +430,6 @@ export class GamePlayService {
             winningPlayers.map((playerUUID) => {
                 const amount = oddChips > 0 ? evenSplit + 1 : evenSplit;
                 oddChips -= 1;
-                this.gameInstanceLogService.addWinnerToCurrentHand(playerUUID, amount);
                 return [playerUUID, amount];
             }),
         );
@@ -466,11 +465,17 @@ export class GamePlayService {
         this.gsm.clearWinnersAndDeltas();
 
         winningPlayers.forEach((playerUUID) => {
+            const amountWon = amountsWon[playerUUID];
             this.audioService.playHeroWinSFX(playerUUID);
-            this.gsm.addPlayerChips(playerUUID, amountsWon[playerUUID]);
+            this.gsm.addPlayerChips(playerUUID, amountWon);
             this.gsm.setIsPlayerWinner(playerUUID, true);
-            this.gsm.setPlayerChipDelta(playerUUID, amountsWon[playerUUID]);
+            this.gsm.setPlayerChipDelta(playerUUID, amountWon);
             this.gsm.addHandWinner(playerUUID);
+            this.gameInstanceLogService.addPotSummaryToCurrentHand(
+                playerUUID,
+                amountWon,
+                getStrDescriptionFromHand(this.gsm.getPlayerHandDescription(playerUUID)),
+            );
         });
     }
 

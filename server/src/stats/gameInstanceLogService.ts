@@ -7,6 +7,7 @@ import {
     PlayerSummary,
     BettingRoundLog,
     getCleanBettingRoundLog,
+    PotSummary,
 } from '../../../ui/src/shared/models/handLog';
 import { PlayerPosition, getPositionIndex } from '../../../ui/src/shared/models/playerPosition';
 import { GameInstanceUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
@@ -91,6 +92,8 @@ export class GameInstanceLogService {
             playerUUID,
             bettingRoundAction,
             timeTookToAct,
+            playerName: this.gameStateManager.getPlayerName(playerUUID),
+            seatNumber: this.gameStateManager.getPlayerSeatNumber(playerUUID),
         });
     }
 
@@ -101,8 +104,14 @@ export class GameInstanceLogService {
         }
     }
 
-    addWinnerToCurrentHand(playerUUID: PlayerUUID, amountWon: number, handDescription?: string) {
-        this.currentHandLogEntry.winners.add(playerUUID);
+    addPotSummaryToCurrentHand(winner: PlayerUUID, amount: number, handDescription: string) {
+        this.currentHandLogEntry.potSummaries.push({
+            amount,
+            winner,
+            playerName: this.gameStateManager.getPlayerName(winner),
+            handDescription,
+            seatNumber: this.gameStateManager.getPlayerSeatNumber(winner),
+        });
     }
 
     updatePlayerCards(playerUUID: PlayerUUID) {
@@ -133,10 +142,7 @@ export class GameInstanceLogService {
         };
     }
 
-    private sanitizeAndSerializePlayerSummaries(
-        playerSummaries: Map<PlayerUUID, PlayerSummary>,
-        requestorPlayerUUID: PlayerUUID,
-    ) {
+    private sanitizePlayerSummaries(playerSummaries: Map<PlayerUUID, PlayerSummary>, requestorPlayerUUID: PlayerUUID) {
         const processedSummaries: PlayerSummary[] = [];
         playerSummaries.forEach((playerSummary, playerUUID) => {
             // Only show the hole cards if they were yours, or if they were shown
@@ -166,7 +172,9 @@ export class GameInstanceLogService {
     private serializeBettingRounds(bettingRounds: Map<BettingRoundStage, BettingRoundLog>) {
         const processedBettingRounds: BettingRoundLog[] = [];
         bettingRounds.forEach((bettingRoundLog, bettingRoundStage) => {
-            processedBettingRounds.push(bettingRoundLog);
+            processedBettingRounds.push({
+                ...bettingRoundLog,
+            });
         });
 
         processedBettingRounds.sort(
@@ -175,15 +183,24 @@ export class GameInstanceLogService {
         return processedBettingRounds;
     }
 
+    private sanitizePotSummaries(potSummaries: PotSummary[], requestorPlayerUUID: PlayerUUID): PotSummary[] {
+        return potSummaries.map((potSummary) => ({
+            ...potSummary,
+            handDescription:
+                this.currentHandLogEntry.playerSummaries
+                    .get(potSummary.winner)
+                    .holeCards.every((card) => card.visible) || requestorPlayerUUID === potSummary.winner
+                    ? potSummary.handDescription
+                    : '',
+        }));
+    }
+
     /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
     private serializeHandLogEntry(requestorPlayerUUID: PlayerUUID, handLogEntry: HandLogEntry): UiHandLogEntry {
         return {
             ...handLogEntry,
-            winners: Array.from(handLogEntry.winners),
-            playerSummaries: this.sanitizeAndSerializePlayerSummaries(
-                handLogEntry.playerSummaries,
-                requestorPlayerUUID,
-            ),
+            potSummaries: this.sanitizePotSummaries(handLogEntry.potSummaries, requestorPlayerUUID),
+            playerSummaries: this.sanitizePlayerSummaries(handLogEntry.playerSummaries, requestorPlayerUUID),
             bettingRounds: this.serializeBettingRounds(handLogEntry.bettingRounds),
         };
     }

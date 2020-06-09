@@ -18,7 +18,7 @@ import {
 } from './game';
 import { PlayerUUID, makeBlankUUID } from './uuid';
 import { getRandomAvatarKey, AvatarKeys } from './assets';
-import { HandLogEntry, PlayerSummary, BettingRoundLog } from './handLog';
+import { PlayerSummary, BettingRoundLog, PotSummary } from './handLog';
 
 export declare interface ErrorDisplay {
     message?: string;
@@ -179,7 +179,7 @@ export declare interface UiHandLogEntry {
     timeHandStarted: number;
     playerSummaries: PlayerSummary[];
     board: UiCard[];
-    winners: PlayerUUID[];
+    potSummaries: PotSummary[];
     bettingRounds: BettingRoundLog[];
     lastBettingRoundStage: BettingRoundStage;
 }
