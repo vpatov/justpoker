@@ -241,6 +241,7 @@ export class StateGraphManager {
                         this.gameStateManager.getClientByPlayerUUID(playerUUID),
                     ),
                 );
+                this.gamePlayService.savePreviousHandInfo();
                 this.gameStateManager.clearStateOfHandInfo();
                 this.gamePlayService.ejectStackedPlayers();
 

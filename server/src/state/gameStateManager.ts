@@ -292,6 +292,14 @@ export class GameStateManager {
         this.gameState.straddleUUID = straddleUUID;
     }
 
+    setPrevBigBlindUUID(playerUUID: PlayerUUID) {
+        this.gameState.prevBigBlindUUID = playerUUID;
+    }
+
+    getPrevBigBlindUUID(): PlayerUUID {
+        return this.gameState.prevBigBlindUUID;
+    }
+
     getHandNumber() {
         return this.gameState.handNumber;
     }
@@ -736,6 +744,25 @@ export class GameStateManager {
             throw Error(`Went through all players and didnt find the next player ready in hand.`);
         }
         return nextPlayerUUID;
+    }
+
+    getPlayerInBetween(firstPlayerUUID: PlayerUUID, secondPlayerUUID: PlayerUUID): PlayerUUID[] {
+        const seats = this.getSeats();
+        const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === firstPlayerUUID);
+        // find the next player that is in the hand
+        let nextIndex = (currentIndex + 1) % seats.length;
+        let [_, nextPlayerUUID] = seats[nextIndex];
+        let counted = 0;
+
+        const playersInBetween: PlayerUUID[] = [];
+        while (nextPlayerUUID !== secondPlayerUUID && counted < seats.length) {
+            playersInBetween.push(nextPlayerUUID);
+            nextIndex = (nextIndex + 1) % seats.length;
+            [_, nextPlayerUUID] = seats[nextIndex];
+            counted += 1;
+        }
+
+        return playersInBetween;
     }
 
     isSeatTaken(seatNumber: number) {

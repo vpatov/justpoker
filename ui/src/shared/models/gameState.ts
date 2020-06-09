@@ -45,6 +45,9 @@ export declare interface GameState {
 
     straddleUUID: PlayerUUID;
 
+    // used to see who should post blinds
+    prevBigBlindUUID: PlayerUUID;
+
     // playerUUID of last player to bet or raise
     lastAggressorUUID: PlayerUUID;
 
@@ -139,6 +142,7 @@ export function getCleanGameState(): GameState {
         smallBlindUUID: makeBlankUUID(),
         bigBlindUUID: makeBlankUUID(),
         straddleUUID: makeBlankUUID(),
+        prevBigBlindUUID: makeBlankUUID(),
         lastAggressorUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: makeBlankUUID(),

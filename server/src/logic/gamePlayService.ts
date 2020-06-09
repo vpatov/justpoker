@@ -260,6 +260,7 @@ export class GamePlayService {
         this.gsm.incrementHandNumber();
         this.gsm.initializeNewDeck();
         this.initializeDealerButton();
+
         this.gsm.recordPlayerChipsAtStartOfHand();
         this.placeBlinds();
         this.gameInstanceLogService.initNewHand();
@@ -284,13 +285,23 @@ export class GamePlayService {
         const willPlayerStraddle = this.gsm.willPlayerStraddle(straddleUUID);
         const placeStraddle = willPlayerStraddle && numPlayersReadyToPlay > 2;
 
+        // if you are sitting out and in between the prevBigBlindUUID & bigBlindUUID
+        // then you missed a big blind and must most a big blind when you rejoin
+        const prevBigBlindUUID = this.gsm.getPrevBigBlindUUID();
+        if (prevBigBlindUUID) {
+            this.gsm.getPlayerInBetween(prevBigBlindUUID, bigBlindUUID).forEach((playerUUID) => {
+                if (this.gsm.getPlayer(playerUUID).sittingOut) this.gsm.setPlayerWillPostBlind(playerUUID, true);
+            });
+        }
         // this.bet() is a setter, not adder, so we proceed by placing smallest blinds first
         // and larger blinds will then take priority as desired.
         this.bet(SB, smallBlindUUID);
 
         this.gsm.getPlayersThatWillPostBlind().forEach((player) => {
-            this.bet(BB, player.uuid);
-            this.gsm.setPlayerWillPostBlind(player.uuid, false);
+            if (!player.sittingOut) {
+                this.bet(BB, player.uuid);
+                this.gsm.setPlayerWillPostBlind(player.uuid, false);
+            }
         });
 
         this.bet(BB, bigBlindUUID);
@@ -570,5 +581,9 @@ export class GamePlayService {
             this.gsm.subtractBetAmountFromChips(playerUUID);
             this.gsm.setPlayerBetAmount(playerUUID, 0);
         });
+    }
+
+    savePreviousHandInfo() {
+        this.gsm.setPrevBigBlindUUID(this.gsm.getBigBlindUUID());
     }
 }
