@@ -22,5 +22,6 @@ RUN npm run build
 WORKDIR /justpoker/server
 RUN npm install
 
+ENV ROOT_SERVER_DIR="/justpoker"
 # Build and start the server.
-CMD ["npm", "run", "prod-start"]
+CMD ["npm", "start"]
