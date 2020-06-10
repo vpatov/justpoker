@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import classnames from 'classnames';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
@@ -30,17 +30,24 @@ function IconPicker(props) {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [renderOptions, SET_renderOptions] = useState(false);
+    const [timer, SET_timer] = useState(0);
+
     const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
         // this is to ensure paper renders first, then we try to render large set of images
         // I can't tell if this is really hacky and bad or sorta clever...
-        setTimeout(() => SET_renderOptions(true), 50);
+        clearTimeout(timer);
+        SET_timer(window.setTimeout(() => SET_renderOptions(true), 50));
     };
 
     function handleClickButton(option) {
         onSelect(option);
         setAnchorEl(null);
     }
+
+    useEffect(() => {
+        return clearTimeout(timer);
+    }, []);
 
     const open = Boolean(anchorEl);
     return (

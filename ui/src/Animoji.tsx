@@ -19,10 +19,11 @@ function Animoji(props) {
     const [asset, SET_asset] = useState();
 
     useEffect(() => {
+        let abort = false;
         if (animated) {
             import(`./assets/animoji/animated/${reaction}.gif`)
                 .then((asset) => {
-                    SET_asset(asset.default);
+                    if (!abort) SET_asset(asset.default);
                 })
                 .catch(() => {
                     console.error(`err loading ${reaction}.gif`);
@@ -30,12 +31,16 @@ function Animoji(props) {
         } else {
             import(`./assets/animoji/static/${reaction}.svg`)
                 ?.then((asset) => {
-                    SET_asset(asset.default);
+                    if (!abort) SET_asset(asset.default);
                 })
                 .catch(() => {
                     console.error(`err loading ${reaction}.svg`);
                 });
         }
+
+        return () => {
+            abort = true;
+        };
     }, [reaction]);
 
     if (asset) return <img className={classnames(classes.img, className)} src={asset} alt="" />;
