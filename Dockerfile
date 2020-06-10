@@ -2,15 +2,15 @@
 
 
 ## $ sudo docker build --build-arg build_env=PROD -t justpoker ./
-## build_env=(DEV|PROD), dev by default
+## build_env=(DEV|PROD)
 
 ## In order to run the container, run:
 ## $ sudo docker run -d -p <PORT>:8080 justpoker
 ## where PORT is a port on the host machine that will be bound to the container's internal port (currently 8080)
 FROM node:13.12.0-alpine
 
-# set build_env by default
-ARG build_env=DEV
+# set build_env default
+ARG build_env=PROD
 
 # root
 # copy shared files

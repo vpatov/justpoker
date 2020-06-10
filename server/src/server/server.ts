@@ -44,6 +44,10 @@ class Server {
     private initHTTPRoutes(): void {
         const router = express.Router();
 
+        router.get('/health', (req, res) => {
+            res.send({ health: 'great :)' });
+        });
+
         router.post('/api/createGame', (req, res) => {
             const gameParameters: GameParameters = req.body.gameParameters;
             const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
