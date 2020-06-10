@@ -22,8 +22,6 @@ import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/sr
 import { GameParameters } from '../../../ui/src/shared/models/game';
 import { CONFIGS, Config, ENVIRONMENT } from '../../../ui/src/shared/models/config';
 
-console.log(process.env.NODE_SERVER_ENVIRONMENT);
-
 @Service()
 class Server {
     app: express.Application;
@@ -45,7 +43,12 @@ class Server {
         const router = express.Router();
 
         router.get('/health', (req, res) => {
-            res.send({ health: 'great :)' });
+            res.send({ health: 'Great :)' });
+        });
+
+        router.get('/gameInstanceCount', (req, res) => {
+            const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
+            res.send({ count: instanceUUIDs.length, instanceList: instanceUUIDs });
         });
 
         router.post('/api/createGame', (req, res) => {
