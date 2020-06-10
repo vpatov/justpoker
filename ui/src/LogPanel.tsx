@@ -531,6 +531,21 @@ function LogPanel(props: LogPanelProps) {
         null;
     }
 
+    // TODO instead of current handlog visualization, consider this:
+    // SHOWDOWN
+    // vas shows full house, tens over threes
+    // jules shows straight, ace high
+    // WINNERS
+    // vas wins pot of 22
+    // ---
+    // the difference is, break out the hand description + showing into showdown
+    
+    // flow for folding:
+    // RIVER
+    // ....
+    // WINNERS
+    // Everyone folds to vas.
+    // vas wins pot of 34.
     function renderPotSummaries(potSummaries: PotSummary[]){
         return (
             <div>
