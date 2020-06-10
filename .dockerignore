@@ -1,0 +1,15 @@
+.gitignore
+.git
+.vscode
+node_modules
+build
+.dockerignore
+Dockerfile
+Dockerfile.prod
+ui/build
+ui/node_modules
+server/node_modules
+server/dist
+server/build
+server/test
+test
