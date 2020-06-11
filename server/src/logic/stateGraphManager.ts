@@ -223,6 +223,7 @@ export class StateGraphManager {
 
             case GameStage.FINISH_BETTING_ROUND: {
                 this.gamePlayService.placeBetsInPot();
+                this.gamePlayService.flipCardsIfAllInRunOut();
                 this.gameStateManager.clearCurrentPlayerToAct();
                 break;
             }

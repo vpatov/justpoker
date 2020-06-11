@@ -586,6 +586,21 @@ export class GamePlayService {
         });
     }
 
+    flipCardsIfAllInRunOut() {
+        const playersInHand = this.gsm.getPlayersInHand();
+        const numberPlayersAllIn = playersInHand.reduce(
+            (count, playerUUID) => (this.gsm.isPlayerAllIn(playerUUID) ? count + 1 : count),
+            0,
+        );
+
+        // one person might not be all in still do runout
+        if (numberPlayersAllIn >= playersInHand.length - 1) {
+            this.gsm.getPlayersInHand().forEach((playerUUID) => {
+                this.gsm.setPlayerCardsAllVisible(playerUUID);
+            });
+        }
+    }
+
     savePreviousHandInfo() {
         this.gsm.setPrevBigBlindUUID(this.gsm.getBigBlindUUID());
     }
