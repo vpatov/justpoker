@@ -332,6 +332,7 @@ export class StateConverter {
             return holeCard.visible || isHero
                 ? {
                       ...holeCard,
+                      isBeingShow: holeCard.visible,
                       partOfWinningHand:
                           isWinner &&
                           shouldHighlightWinningCards &&

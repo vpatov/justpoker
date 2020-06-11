@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { usePrevious } from './utils';
+import { flipCard } from './AnimiationModule';
 import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Suit from './Suit';
+import { Tooltip } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        zIndex: -1,
         borderRadius: 6,
         textAlign: 'center',
         position: 'relative',
@@ -72,8 +74,8 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '20%',
         fontSize: '3vmin',
     },
-    partOfWinningHand: {
-        ...theme.custom.WINNING_CARD,
+    isBeingShownAndHero: {
+        boxShadow: `0vmin 0px 0.4vmin 0.25vmin ${theme.palette.secondary.main}`,
     },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
@@ -91,7 +93,15 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, partOfWinningHand, shouldFlex } = props;
+    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShow, hero } = props;
+    const cardId = `${suit}-${rank}`;
+    const prevIsBeingShow = usePrevious(isBeingShow);
+
+    useEffect(() => {
+        if (!prevIsBeingShow && isBeingShow) {
+            flipCard(cardId);
+        }
+    }, [isBeingShow, prevIsBeingShow]);
 
     if (hidden) {
         return (
@@ -102,13 +112,15 @@ function CardSmall(props) {
             </div>
         );
     }
-    return (
+
+    const visiableCardComponet = (
         <div
             className={classnames(classes.root, classes[suit], className, {
-                [classes.partOfWinningHand]: partOfWinningHand,
                 ['ani_notWinningCard']: !partOfWinningHand,
                 [classes.sideCard]: shouldFlex,
+                [classes.isBeingShownAndHero]: isBeingShow && hero,
             })}
+            id={cardId}
         >
             <Typography
                 className={shouldFlex ? classes.sideRank : classes.rank}
@@ -119,6 +131,15 @@ function CardSmall(props) {
             <Suit suit={suit} className={shouldFlex ? classes.sideSuit : classes.suit} />
         </div>
     );
+
+    if (isBeingShow && hero) {
+        return (
+            <Tooltip placement="top" title="This card is flipped and is visible to all players.">
+                {visiableCardComponet}
+            </Tooltip>
+        );
+    }
+    return visiableCardComponet;
 }
 
 export default CardSmall;

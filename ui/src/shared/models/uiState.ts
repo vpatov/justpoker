@@ -112,6 +112,7 @@ export declare interface UiCard {
     rank?: string;
     hidden?: boolean;
     partOfWinningHand?: boolean;
+    isBeingShow?: boolean;
 }
 
 export declare interface Table {
@@ -452,7 +453,7 @@ export const TestGame: UiGameState = {
             handLabel: 'Full House, Queens over Threes',
             bet: genRandomInt(0, 10),
             hand: {
-                cards: [{ ...genRandomCard() }, genRandomCard()],
+                cards: [{ ...genRandomCard(), isBeingShow: true }, genRandomCard()],
             },
             avatarKey: getRandomAvatarKey(),
         },
