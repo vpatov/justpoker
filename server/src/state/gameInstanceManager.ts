@@ -76,6 +76,10 @@ export class GameInstanceManager {
         return this.gameInstances[gameInstanceUUID];
     }
 
+    getAllGameInstanceUUIDs(): GameInstanceUUID[] {
+        return Object.keys(this.gameInstances).map((uuid) => uuid as GameInstanceUUID);
+    }
+
     getActiveGameInstance(): GameInstance | undefined {
         return this.gameInstances[this.activeGameInstanceUUID];
     }

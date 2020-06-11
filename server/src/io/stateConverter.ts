@@ -224,7 +224,11 @@ export class StateConverter {
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
             timeBanks: hero.timeBanksLeft,
-            showWarningOnFold: !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID),
+            playerPositionString: this.gameStateManager.getPlayerPositionString(heroPlayerUUID),
+            showWarningOnFold:
+                !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ||
+                this.gameStateManager.getAllCommitedBets() === 0,
+            callAmount: this.gameStateManager.computeCallAmount(heroPlayerUUID),
         };
 
         return controller;
@@ -250,7 +254,8 @@ export class StateConverter {
 
         if (
             this.gameStateManager.isPlayerAllIn(heroPlayerUUID) ||
-            !this.gameStateManager.isPlayerInHand(heroPlayerUUID)
+            !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
+            this.gameStateManager.isGameStageInBetweenHands()
         ) {
             return [this.disableButton(FOLD_BUTTON), this.disableButton(CHECK_BUTTON), this.disableButton(BET_BUTTON)];
         }
@@ -258,6 +263,7 @@ export class StateConverter {
         const buttons = [] as BettingRoundActionButton[];
         // player can always queue a bet or fold action but we decide if it is check or call
         buttons.push(FOLD_BUTTON);
+
         buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
         buttons.push(BET_BUTTON);
         return buttons;

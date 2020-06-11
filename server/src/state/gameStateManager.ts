@@ -36,7 +36,11 @@ import {
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { PlayerPosition, PLAYER_POSITIONS_BY_HEADCOUNT } from '../../../ui/src/shared/models/playerPosition';
+import {
+    PlayerPosition,
+    PLAYER_POSITIONS_BY_HEADCOUNT,
+    PlayerPositionString,
+} from '../../../ui/src/shared/models/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/assets';
 import sortBy from 'lodash/sortBy';
 
@@ -301,6 +305,15 @@ export class GameStateManager {
         return this.gameState.board;
     }
 
+    computeCallAmount(playerUUID: PlayerUUID): number {
+        if (!this.isPlayerFacingBet(playerUUID)) {
+            return 0;
+        }
+        const chips = this.getPlayerChips(playerUUID);
+        const callAmount = this.getPreviousRaise() > chips ? chips : this.getPreviousRaise();
+        return callAmount;
+    }
+
     playerBuyinAddChips(playerUUID: PlayerUUID, addChips: number) {
         if (addChips <= 0) {
             logger.error(
@@ -520,6 +533,10 @@ export class GameStateManager {
         return playerPositionMap;
     }
 
+    getPlayerPositionString(playerUUID: PlayerUUID): string | undefined {
+        return PlayerPositionString[this.getPlayerPositionMap().get(playerUUID)];
+    }
+
     getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
         const numPlayers = this.getPlayersDealtIn().length;
         return (
@@ -562,6 +579,15 @@ export class GameStateManager {
 
     gameIsWaitingForBetAction() {
         return this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
+    }
+
+    isGameStageInBetweenHands(): boolean {
+        return (
+            this.gameState.gameStage === GameStage.NOT_IN_PROGRESS ||
+            this.gameState.gameStage === GameStage.INITIALIZE_NEW_HAND ||
+            this.gameState.gameStage === GameStage.SHOW_WINNER ||
+            this.gameState.gameStage === GameStage.POST_HAND_CLEANUP
+        );
     }
 
     getMinimumBetSize() {
@@ -1099,6 +1125,7 @@ export class GameStateManager {
                 cards: [],
             },
             handWinners: new Set<PlayerUUID>(),
+            winningHand: undefined,
             smallBlindUUID: makeBlankUUID(),
             bigBlindUUID: makeBlankUUID(),
             straddleUUID: makeBlankUUID(),
@@ -1173,8 +1200,11 @@ export class GameStateManager {
     }
 
     getWinningHandDescription(): string | undefined {
-        const winners = this.getWinners();
-        return winners.length ? getStrDescriptionFromHand(this.getPlayerBestHand(winners[0]).descr) : undefined;
+        return this.gameState.winningHand ? getStrDescriptionFromHand(this.gameState.winningHand.descr) : undefined;
+    }
+
+    setWinningHand(hand: Hand | undefined) {
+        this.gameState.winningHand = hand;
     }
 
     setIsPlayerWinner(playerUUID: PlayerUUID, isWinner: boolean) {

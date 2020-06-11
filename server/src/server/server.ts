@@ -4,6 +4,7 @@ import { Service, Container } from 'typedi';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import express from 'express';
+import path from 'path';
 import bodyParser from 'body-parser';
 import queryString from 'query-string';
 
@@ -19,31 +20,17 @@ import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
 import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/src/shared/models/uuid';
 import { GameParameters } from '../../../ui/src/shared/models/game';
-
-declare interface PerformanceMetrics {
-    // sum, count (used for average)
-    snippets: { [key in ExecutionSnippet]: [number, number] };
-}
-
-const enum ExecutionSnippet {
-    PROCESS_MSG = 'MESSAGE_SERVICE_PROCESS_MESSAGE',
-    SEND_UPDATES = 'SEND_UPDATES_WITH_TRANSFORM_FOR_ALL',
-    TOTAL_WS_MESSAGE_PROCESS = 'TOTAL_WS_MESSAGE_PROCESS',
-}
+import { CONFIGS, Config, ENVIRONMENT } from '../../../ui/src/shared/models/config';
 
 @Service()
 class Server {
     app: express.Application;
     server: http.Server;
-    defaultPort = 8080;
     wss: WebSocket.Server;
-    performanceMetrics: PerformanceMetrics = {
-        snippets: {
-            MESSAGE_SERVICE_PROCESS_MESSAGE: [0, 0],
-            SEND_UPDATES_WITH_TRANSFORM_FOR_ALL: [0, 0],
-            TOTAL_WS_MESSAGE_PROCESS: [0, 0],
-        },
-    };
+
+    config: Config = process.env.NODE_SERVER_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+
+    rootServerDir = process.env.ROOT_SERVER_DIR || '';
 
     constructor(
         private eventProcessorService: EventProcessorService,
@@ -52,31 +39,19 @@ class Server {
         private readonly connectedClientManager: ConnectedClientManager,
     ) {}
 
-    updateSnippet(snippet: ExecutionSnippet, ms: number) {
-        this.performanceMetrics.snippets[snippet][0] += ms;
-        this.performanceMetrics.snippets[snippet][1] += 1;
-    }
-
-    logAverages() {
-        Object.entries(this.performanceMetrics.snippets).forEach(([snippet, [sum, count]]) => {
-            if (count === 0) {
-                return;
-            }
-            // dont flood the console
-            if (count % 10 === 0) {
-                logger.debug(`${snippet}: Average over ${count} samples: ${sum / count}`);
-            }
-        });
-    }
-
     private initHTTPRoutes(): void {
         const router = express.Router();
 
-        router.get('/', (req, res) => {
-            res.send('Poker Web.');
+        router.get('/health', (req, res) => {
+            res.send({ health: 'Great :)' });
         });
 
-        router.post('/createGame', (req, res) => {
+        router.get('/gameInstanceCount', (req, res) => {
+            const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
+            res.send({ count: instanceUUIDs.length, instanceList: instanceUUIDs });
+        });
+
+        router.post('/api/createGame', (req, res) => {
             const gameParameters: GameParameters = req.body.gameParameters;
             const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
             this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
@@ -85,7 +60,7 @@ class Server {
             res.send({ gameInstanceUUID: gameInstanceUUID });
         });
 
-        router.get('/ledger', (req, res) => {
+        router.get('/api/ledger', (req, res) => {
             const parsedQuery = queryString.parseUrl(req.url);
             const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
             const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
@@ -98,7 +73,7 @@ class Server {
         });
 
         // TODO replace with UIHandLog response when frontend and models are complete
-        router.get('/handlog', (req, res) => {
+        router.get('/api/handlog', (req, res) => {
             const parsedQuery = queryString.parseUrl(req.url);
             const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
             const clientUUID = parsedQuery.query.clientUUID as ClientUUID;
@@ -110,6 +85,18 @@ class Server {
                 res.send({ handLogs: handLogs });
             }
         });
+
+        // This is necessary because the server npm scripts assume the build process happens in the server,
+        // and the ts sources imports are relative to the server directory (when importing from ui/src/shared)
+        if (this.rootServerDir) {
+            logger.info('Serving static react files.');
+
+            // Important that this is last, otherwise other get endpoints won't work.
+            router.get('*', (req, res) => {
+                res.sendFile(path.join(this.rootServerDir, 'ui', 'build', 'index.html'));
+            });
+            this.app.use(express.static(path.join(this.rootServerDir, 'ui', 'build')));
+        }
 
         this.app.use(bodyParser.json());
         this.app.use(
@@ -211,13 +198,12 @@ class Server {
         });
     }
 
-    //refactor this mess of a function
     init() {
         this.app = express();
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
         this.initGameWSS();
-        this.server.listen(process.env.PORT || this.defaultPort, () => {
+        this.server.listen(this.config.SERVER_PORT, () => {
             const addressInfo = this.server.address() as AddressInfo;
             logger.info(`Server started on address `, addressInfo);
         });

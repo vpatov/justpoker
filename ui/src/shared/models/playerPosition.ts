@@ -27,8 +27,8 @@ export const PlayerPositionString: { [key in PlayerPosition]: string } = {
     [PP['UTG+2']]: 'Under The Gun +2',
     [PP.MP]: 'Middle Position',
     [PP['MP+1']]: 'Late Middle Position',
-    [PP.LJ]: 'LoJack',
-    [PP.HJ]: 'HiJack',
+    [PP.LJ]: 'Lojack',
+    [PP.HJ]: 'Hijack',
     [PP.CUTOFF]: 'Cutoff',
     [PP.NOT_PLAYING]: 'Not Playing',
 };

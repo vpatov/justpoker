@@ -1,6 +1,6 @@
 import { GameParameters, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
 import { Player } from './player';
-import { Card, Deck } from './cards';
+import { Card, Deck, Hand } from './cards';
 import { ClientActionType } from './api';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from './uuid';
 import { getCleanGameParameters } from './game';
@@ -65,6 +65,8 @@ export declare interface GameState {
 
     /** After pots are awarded and the hand is over, this contains set of player uuids that have won a pot. */
     handWinners: Set<PlayerUUID>;
+
+    winningHand?: Hand;
 
     /**
      * This variable is checked before initializing a new hand. If it's true, and there are enough players, the

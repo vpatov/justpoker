@@ -242,8 +242,7 @@ export class GamePlayService {
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
         // TODO find the cleanest way to do this. Should that logic be handled in setPlayerBetAmount, or here?
-        const chips = this.gsm.getPlayerChips(currentPlayerToAct);
-        const callAmount = this.gsm.getPreviousRaise() > chips ? chips : this.gsm.getPreviousRaise();
+        const callAmount = this.gsm.computeCallAmount(currentPlayerToAct);
         this.gsm.setPlayerBetAmount(currentPlayerToAct, callAmount);
 
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
@@ -438,6 +437,9 @@ export class GamePlayService {
         if (!this.gsm.hasEveryoneButOnePlayerFolded()) {
             // always show winning players hands
             winningPlayers.map((wp) => this.setPlayerCardsAllVisible(wp));
+
+            // show banner for winning hands, any winning hand will do
+            this.gsm.setWinningHand(winningHands[0]);
 
             // sort eligible players by position
             eligiblePlayers.sort(([playerA, _], [playerB, __]) => this.gsm.comparePositions(playerA, playerB));
