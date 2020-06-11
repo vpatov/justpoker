@@ -292,6 +292,14 @@ export class GameStateManager {
         this.gameState.straddleUUID = straddleUUID;
     }
 
+    setPrevBigBlindUUID(playerUUID: PlayerUUID) {
+        this.gameState.prevBigBlindUUID = playerUUID;
+    }
+
+    getPrevBigBlindUUID(): PlayerUUID {
+        return this.gameState.prevBigBlindUUID;
+    }
+
     getHandNumber() {
         return this.gameState.handNumber;
     }
@@ -738,6 +746,25 @@ export class GameStateManager {
         return nextPlayerUUID;
     }
 
+    getPlayerInBetween(firstPlayerUUID: PlayerUUID, secondPlayerUUID: PlayerUUID): PlayerUUID[] {
+        const seats = this.getSeats();
+        const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === firstPlayerUUID);
+        // find the next player that is in the hand
+        let nextIndex = (currentIndex + 1) % seats.length;
+        let [_, nextPlayerUUID] = seats[nextIndex];
+        let counted = 0;
+
+        const playersInBetween: PlayerUUID[] = [];
+        while (nextPlayerUUID !== secondPlayerUUID && counted < seats.length) {
+            playersInBetween.push(nextPlayerUUID);
+            nextIndex = (nextIndex + 1) % seats.length;
+            [_, nextPlayerUUID] = seats[nextIndex];
+            counted += 1;
+        }
+
+        return playersInBetween;
+    }
+
     isSeatTaken(seatNumber: number) {
         return Object.entries(this.gameState.players).some(([uuid, player]) => player.seatNumber === seatNumber);
     }
@@ -885,6 +912,17 @@ export class GameStateManager {
 
         this.ledgerService.addAlias(clientUUID, name);
         this.ledgerService.addBuyin(clientUUID, buyin);
+        if (this.isGameInProgress()) {
+            this.setPlayerWillPostBlind(player.uuid, true);
+        }
+    }
+
+    setPlayerWillPostBlind(playerUUID: PlayerUUID, value: boolean) {
+        this.gameState.players[playerUUID].willPostBlind = value;
+    }
+
+    getPlayersThatWillPostBlind(): Player[] {
+        return Object.values(this.gameState.players).filter((player: Player) => player.willPostBlind);
     }
 
     setWillPlayerStraddle(playerUUID: PlayerUUID, willStraddle: boolean) {
