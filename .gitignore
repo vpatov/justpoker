@@ -5,6 +5,7 @@ server/node_modules
 server/dist
 
 test/node_modules
+test/build
 
 ui/node_modules
 ui/src/shared/node_modules
