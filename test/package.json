@@ -4,10 +4,20 @@
   "description": "",
   "main": "selenium_test.js",
   "scripts": {
-    "start": "node ./src/selenium_test.js"
+    "build": "npx tsc",
+    "start": "node ./src/selenium_test.js",
+    "stresstest": "npm run build; node ./build/test/src/stressTest.js",
+    "playtest": "npm run build; node ./build/test/src/selenium_test.js"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "chromedriver": "^83.0.0",
-    "selenium-webdriver": "^4.0.0-alpha.7"
+    "lodash": "^4.17.15",
+    "query-string": "^6.13.0",
+    "selenium-webdriver": "^4.0.0-alpha.7",
+    "ws": "^7.3.0"
   }
 }
