@@ -199,6 +199,7 @@ class Server {
     }
 
     init() {
+        logger.info('config', this.config);
         this.app = express();
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
