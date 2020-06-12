@@ -23,7 +23,7 @@ export const CONFIGS: Configs = {
 
     PROD: {
         SERVER_URL: 'justpoker.games',
-        SERVER_PORT: 8080,
+        SERVER_PORT: 80,
         CLIENT_NEED_PORT: false,
     },
 };
