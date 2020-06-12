@@ -9,23 +9,12 @@
         "sourceMap": true,
         "outDir": "./dist/server",
         "baseUrl": ".",
-        "typeRoots":[
-          "node_modules/@types"
-        ],
+        "typeRoots": ["node_modules/@types"],
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "lib": ["es6", "dom", "esnext"],
-        "types": ["reflect-metadata"],
+        "types": ["reflect-metadata"]
     },
-    "include": [
-        "src/**/*",
-        "../shared/service/**/*",
-        "../shared/util/**/*",
-        "../shared/models/**/*", "test/clientTest"
-    ],
-    "exclude": [
-      "dist",
-      "node_modules"
-    ]
+    "include": ["src/**/*"],
+    "exclude": ["dist", "node_modules"]
 }
-
