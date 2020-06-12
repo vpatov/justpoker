@@ -93,15 +93,15 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShow, hero } = props;
+    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero } = props;
     const cardId = `${suit}-${rank}`;
-    const prevIsBeingShow = usePrevious(isBeingShow);
+    const prevIsBeingShown = usePrevious(isBeingShown);
 
     useEffect(() => {
-        if (!prevIsBeingShow && isBeingShow) {
+        if (!prevIsBeingShown && isBeingShown) {
             flipCard(cardId);
         }
-    }, [isBeingShow, prevIsBeingShow]);
+    }, [isBeingShown, prevIsBeingShown]);
 
     if (hidden) {
         return (
@@ -113,12 +113,12 @@ function CardSmall(props) {
         );
     }
 
-    const visiableCardComponet = (
+    const visibleCardComponent = (
         <div
             className={classnames(classes.root, classes[suit], className, {
                 ['ani_notWinningCard']: !partOfWinningHand,
                 [classes.sideCard]: shouldFlex,
-                [classes.isBeingShownAndHero]: isBeingShow && hero,
+                [classes.isBeingShownAndHero]: isBeingShown && hero,
             })}
             id={cardId}
         >
@@ -132,14 +132,14 @@ function CardSmall(props) {
         </div>
     );
 
-    if (isBeingShow && hero) {
+    if (isBeingShown && hero) {
         return (
             <Tooltip placement="top" title="This card is flipped and is visible to all players.">
-                {visiableCardComponet}
+                {visibleCardComponent}
             </Tooltip>
         );
     }
-    return visiableCardComponet;
+    return visibleCardComponent;
 }
 
 export default CardSmall;
