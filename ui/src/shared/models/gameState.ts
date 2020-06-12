@@ -83,7 +83,7 @@ export declare interface GameState {
     deck: Deck;
 
     /** Sensitive field. */
-    admin: ClientUUID;
+    admins: ClientUUID[];
 
     /** Sensitive field. */
     activeConnections: Map<ClientUUID, ConnectedClient>;
@@ -148,7 +148,7 @@ export function getCleanGameState(): GameState {
         lastAggressorUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: makeBlankUUID(),
-        admin: makeBlankUUID(),
+        admins: [],
         currentPlayerToAct: makeBlankUUID(),
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,

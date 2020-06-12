@@ -13,6 +13,7 @@ import {
     ClientWsMessageRequest,
     ClientChatMessage,
     BootPlayerRequest,
+    AddAdminRequest,
 } from '../../../ui/src/shared/models/api';
 import { printObj } from '../../../ui/src/shared/util/util';
 import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/validation';
@@ -460,7 +461,7 @@ export class ValidationService {
     }
 
     ensureClientIsAdmin(clientUUID: ClientUUID): ValidationResponse {
-        if (this.gsm.getAdminUUID() !== clientUUID) {
+        if (!this.gsm.isClientAdmin(clientUUID)) {
             return {
                 errorType: ErrorType.NOT_ADMIN,
                 errorString: `Only admins can perform that action.`,
@@ -499,6 +500,69 @@ export class ValidationService {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `Admin cannot boot themselves.`,
+            };
+        }
+
+        return undefined;
+    }
+
+    validateAddAdminAction(clientUUID: ClientUUID, req: AddAdminRequest): ValidationResponse {
+        const error = this.ensureClientIsAdmin(clientUUID);
+        if (error) {
+            return error;
+        }
+
+        const newAdminPlayer = this.gsm.getPlayer(req.playerUUID);
+        if (!newAdminPlayer) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
+        if (this.gsm.isPlayerAdmin(newAdminPlayer.uuid)) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is already an admin.`,
+            };
+        }
+
+        return undefined;
+    }
+
+    validateRemoveAdminAction(clientUUID: ClientUUID, req: AddAdminRequest): ValidationResponse {
+        const error = this.ensureClientIsAdmin(clientUUID);
+        if (error) {
+            return error;
+        }
+
+        const rmAdminPlayer = this.gsm.getPlayer(req.playerUUID);
+        if (!rmAdminPlayer) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
+        if (!this.gsm.isPlayerAdmin(rmAdminPlayer.uuid)) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player is not an admin.`,
+            };
+        }
+
+        const requestingPlayer = this.gsm.getPlayerByClientUUID(clientUUID);
+        if (requestingPlayer && requestingPlayer.uuid !== rmAdminPlayer.uuid) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Admins can only remove self as admin.`,
+            };
+        }
+
+        if (this.gsm.getAdminClientUUIDs().length === 1) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `This is the last admin. Cannot remove.`,
             };
         }
 

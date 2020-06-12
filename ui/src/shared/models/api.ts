@@ -58,6 +58,8 @@ export enum ClientActionType {
     SHOWCARD = 'SHOWCARD',
     REACTION = 'REACTION',
     SETGAMEPARAMETERS = 'SETGAMEPARAMETERS',
+    ADDADMIN = 'ADDADMIN',
+    REMOVEADMIN = 'REMOVEADMIN',
 }
 
 export enum ServerActionType {
@@ -91,6 +93,14 @@ export declare interface AddChipsRequest {
 
 export declare interface SetChipsRequest {
     chipAmount: number;
+    playerUUID: PlayerUUID;
+}
+
+export declare interface AddAdminRequest {
+    playerUUID: PlayerUUID;
+}
+
+export declare interface RemoveAdminRequest {
     playerUUID: PlayerUUID;
 }
 
@@ -131,7 +141,9 @@ export type ClientWsMessageRequest = SitDownRequest &
     BootPlayerRequest &
     ShowCardRequest &
     PlayerReactionRequest &
-    SetGameParametersRequest;
+    SetGameParametersRequest &
+    AddAdminRequest &
+    RemoveAdminRequest;
 
 export declare interface ClientWsMessage {
     actionType: ClientActionType;
