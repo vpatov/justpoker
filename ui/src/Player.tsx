@@ -91,9 +91,7 @@ function Player(props) {
             <PlayerMenu
                 handleClose={handleClose}
                 anchorEl={anchorEl}
-                uuid={uuid}
-                name={name}
-                stack={stack}
+                player={player}
                 setHeroRotation={setHeroRotation}
                 virtualPositon={virtualPositon}
             />
