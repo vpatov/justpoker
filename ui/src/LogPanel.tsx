@@ -357,7 +357,7 @@ function LogPanel(props: LogPanelProps) {
     }
 
     function handleClickPreviousButton(){
-        if (currentHandNumber >= 0){
+        if (currentHandNumber > 0){
             setCurrentHandNumber((currentHandNumber) => currentHandNumber - 1);
         }
     }
