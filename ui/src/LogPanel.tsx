@@ -23,6 +23,9 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '15%',
             ...theme.custom.LOGPANEL,
         },
+        noDisplay: {
+            display: 'none'
+        },
         handLogContainer: {
             backgroundColor: 'rgba(12,0,12,0.1)',
             display: 'flex',
@@ -191,40 +194,6 @@ function LogPanel(props: LogPanelProps) {
     const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
     const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
     const [unreadChats, setUnreadChats] = useState(false);
-    const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
-    const [draftChatMessage, setDraftChatMessage] = useState('');
-
-    const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
-    const [currentHandNumber, setCurrentHandNumber] = useState(0);
-
-    useEffect(() => {
-        WsServer.subscribe('chat', onReceiveNewChatMessage);
-        WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
-        WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
-    }, []);
-
-    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
-        setUnreadChats(true);
-        setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
-    }
-
-    function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
-        if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
-            return;
-        }
-        setHandLogEntries((oldHandLogEntries) => {
-            // update the most recent entry
-            if (incomingHandLogEntries.length === 1){
-                const handLogEntry = incomingHandLogEntries[0];
-                const handNumber = handLogEntry.handNumber;
-                oldHandLogEntries[handNumber] = handLogEntry;
-                return [...oldHandLogEntries];
-            }
-
-            // If we received more than one handLogEntry, replace the entire list
-            return incomingHandLogEntries;
-        })
-    }
 
     function renderMessagePanelButtons() {
         return (
@@ -276,10 +245,6 @@ function LogPanel(props: LogPanelProps) {
             <HandLog
                 hideChatLog={hideChatLog}
                 hideHandLog={hideHandLog}
-                handLogEntries={handLogEntries}
-                setHandLogEntries={setHandLogEntries}
-                currentHandNumber={currentHandNumber}
-                setCurrentHandNumber={setCurrentHandNumber}
             />
         );
     }
@@ -290,12 +255,7 @@ function LogPanel(props: LogPanelProps) {
             <ChatLog
                 hideChatLog={hideChatLog}
                 hideHandLog={hideHandLog}
-                unreadChats={unreadChats}
                 setUnreadChats={setUnreadChats}
-                chatMessages={chatMessages}
-                setChatMessages={setChatMessages}
-                draftChatMessage={draftChatMessage}
-                setDraftChatMessage={setDraftChatMessage}
             />
         );
     }
@@ -303,8 +263,8 @@ function LogPanel(props: LogPanelProps) {
     function renderSharedLogPanel() {
         return (
             <div className={classnames(classes.root, className)}>
-                {hideHandLog ? null : renderHandLog()}
-                {hideChatLog ? null : renderChatLog()}
+                {renderHandLog()}
+                {renderChatLog()}
                 {renderMessagePanelButtons()}
             </div>
         )

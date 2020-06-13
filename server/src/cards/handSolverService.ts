@@ -4,7 +4,7 @@ import {
     Hand,
     SUIT_ABBREVIATIONS,
     getTwoCardCombinations,
-    makeNiceHandDescription,
+    reformatHandDescription,
 } from '../../../ui/src/shared/models/cards';
 import { Hand as HandSolver } from 'pokersolver';
 import { logger } from '../logger';
@@ -20,7 +20,7 @@ export class HandSolverService {
 
     computeBestHandFromStrCards(cards: string[]): Hand {
         const hand = HandSolver.solve(cards);
-        hand.descr = makeNiceHandDescription(hand.descr);
+        hand.descr = reformatHandDescription(hand.descr);
         return HandSolver.solve(cards);
     }
 

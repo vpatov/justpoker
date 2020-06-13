@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -100,24 +100,35 @@ declare type Setter<T> = React.Dispatch<React.SetStateAction<T>>;
 interface ChatLogProps {
     hideChatLog: boolean;
     hideHandLog: boolean;
-    unreadChats: boolean;
     setUnreadChats: Setter<boolean>;
-    chatMessages: UiChatMessage[];
-    setChatMessages: Setter<UiChatMessage[]>;
-    draftChatMessage: string;
-    setDraftChatMessage: Setter<string>;
 }
 
 function ChatLog(props: ChatLogProps) {
-    const {hideChatLog, hideHandLog, unreadChats, setUnreadChats, chatMessages, setChatMessages, draftChatMessage, setDraftChatMessage} = props;
+    const {hideChatLog, hideHandLog, setUnreadChats} = props;
     const classes = useStyles();
 
+
+    const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
+    const [draftChatMessage, setDraftChatMessage] = useState('');
+
+
+    useEffect(() => {
+        WsServer.subscribe('chat', onReceiveNewChatMessage);
+        WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
+    }, []);
+
+    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
+        setUnreadChats(true);
+        setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
+    }
+    
     const messagesRef = useRef(null);
     const scrollToBottom = () => {
         (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
     };
 
     useEffect(scrollToBottom, [chatMessages, hideChatLog]);
+
 
     function sendMessage() {
         const trimmedMessage = draftChatMessage.trim();

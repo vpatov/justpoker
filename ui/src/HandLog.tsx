@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -20,6 +20,7 @@ import Suit from './Suit';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import { BettingRoundActionType } from './shared/models/game';
 import { PlayerUUID } from './shared/models/uuid';
+import { WsServer } from './api/ws';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -87,9 +88,6 @@ const useStyles = makeStyles((theme: Theme) =>
                 marginRight: '0.3vw'    
             }
         },
-        handLogPotSummary: {
-            fontSize: '1.8vmin',
-        },
         playerNameWithColor: {
             fontSize: '1.8vmin',
         },
@@ -113,16 +111,39 @@ declare type Setter<T> = React.Dispatch<React.SetStateAction<T>>;
 interface HandLogProps {
     hideChatLog: boolean;
     hideHandLog: boolean;
-    handLogEntries: UiHandLogEntry[];
-    setHandLogEntries: Setter<UiHandLogEntry[]>
-    currentHandNumber: number;
-    setCurrentHandNumber: Setter<number>;
 }
 
 function HandLog(props: HandLogProps) {
     const classes = useStyles();
-    const {hideChatLog, hideHandLog, handLogEntries, setHandLogEntries, currentHandNumber, setCurrentHandNumber} = props;
+    const {hideChatLog, hideHandLog} = props;
 
+
+    const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
+    const [currentHandNumber, setCurrentHandNumber] = useState(0);
+
+    useEffect(() => {
+        WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
+        WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
+    }, []);
+
+
+    function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
+        if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
+            return;
+        }
+        setHandLogEntries((oldHandLogEntries) => {
+            // update the most recent entry
+            if (incomingHandLogEntries.length === 1){
+                const handLogEntry = incomingHandLogEntries[0];
+                const handNumber = handLogEntry.handNumber;
+                oldHandLogEntries[handNumber] = handLogEntry;
+                return [...oldHandLogEntries];
+            }
+
+            // If we received more than one handLogEntry, replace the entire list
+            return incomingHandLogEntries;
+        })
+    }
 
 
     function getHandNumberString(){
@@ -144,6 +165,7 @@ function HandLog(props: HandLogProps) {
     }
 
     function handleClickNextButton(){
+        console.log("handleClicknextButton", currentHandNumber);
         if (currentHandNumber >= handLogEntries.length - 1){
             return;
         }
@@ -198,10 +220,10 @@ function HandLog(props: HandLogProps) {
         )
     }
 
-    function renderPlayerPosition(playerUUID: PlayerUUID){
+    function renderPlayerPosition(playerUUID: PlayerUUID, index:number){
         const playerSummary = handLogEntries[currentHandNumber].playerSummaries[playerUUID];
         return playerSummary.wasDealtIn ? (
-            <Typography className={classnames(classes.handLogPlayerSummary)}>
+            <Typography className={classnames(classes.handLogPlayerSummary)} key={index}>
                 <span>
                     {`${PlayerPositionString[playerSummary.position]}: `}
                 </span>
@@ -218,7 +240,7 @@ function HandLog(props: HandLogProps) {
                     Players
                 </Typography>
                 <Divider/>
-                {playersSortedByPosition.map((playerPosition) => (renderPlayerPosition(playerPosition)))}
+                {playersSortedByPosition.map((playerPosition,index) => (renderPlayerPosition(playerPosition,index)))}
             </div>
         );
     }
@@ -232,7 +254,7 @@ function HandLog(props: HandLogProps) {
                         <Suit className={classes.suit} suit={card.suit}></Suit>
                     </>
                 ))}
-            </Typography>
+            </Typography>  
         );
     }
 
@@ -294,10 +316,10 @@ function HandLog(props: HandLogProps) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <>
-                {actions.map((action) => {
+                {actions.map((action, index) => {
                     const playerSummary = playerSummaries[action.playerUUID];
                     return (
-                    <Typography className={classnames(classes.handLogBettingRoundAction)}>
+                    <Typography className={classnames(classes.handLogBettingRoundAction)} key={index}>
                         <span>
                             {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                             {renderBettingRoundAction(action)}
@@ -309,9 +331,9 @@ function HandLog(props: HandLogProps) {
         )
     }
 
-    function renderBettingRoundLog(bettingRoundLog: BettingRoundLog){
+    function renderBettingRoundLog(bettingRoundLog: BettingRoundLog, index: number){
         return (
-            <div>
+            <div key={index}>
                 <Typography className={classes.handLogSectionLabel}>
                     {bettingRoundLog.bettingRoundStage}
                 </Typography>
@@ -325,7 +347,7 @@ function HandLog(props: HandLogProps) {
     function renderBettingRoundLogs(bettingRounds: BettingRoundLog[]){
         return (
             <> 
-                {bettingRounds.map((bettingRound) => renderBettingRoundLog(bettingRound))}
+                {bettingRounds.map((bettingRound, index) => renderBettingRoundLog(bettingRound, index))}
             </>
         );
 
@@ -361,10 +383,10 @@ function HandLog(props: HandLogProps) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <>
-              {winners.map((winner) => {
+              {winners.map((winner, index) => {
                   const playerSummary = playerSummaries[winner.playerUUID];
                   return (
-                      <Typography className={classnames(classes.handLogContentLabel)}>
+                      <Typography className={classnames(classes.handLogContentLabel)} key={index}>
                           {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                           {` wins ${winner.amount}`}
                       </Typography>
@@ -383,13 +405,17 @@ function HandLog(props: HandLogProps) {
                     Result
                 </Typography>
                 <Divider />
-                {potSummaries.map((potSummary) => {
+                {potSummaries.map((potSummary, index) => {
                     return (
-                        <Typography className={classnames(classes.handLogPotSummary)}>
-                            Pot: {potSummary.amount}
-                            {renderPlayerHands(potSummary.playerHands)}
-                            {renderPotWinners(potSummary.winners)}
-                        </Typography>
+                        <React.Fragment key={index}>
+                            <Typography className={classnames(classes.handLogContentLabel)}>
+                                Pot: {potSummary.amount}
+                            </Typography>
+                            <>
+                                {renderPlayerHands(potSummary.playerHands)}
+                                {renderPotWinners(potSummary.winners)}
+                            </>
+                        </React.Fragment>
                     );
                 })}
             </div>
@@ -407,7 +433,7 @@ function HandLog(props: HandLogProps) {
         }
 
         return (
-            <div className={classnames(classes.handLogContents)}>
+            <div className={classnames(classes.handLogContents)} style={hideHandLog ? {display:'none'} : {}}>
                 {renderTimeHandStarted(handLogEntry.timeHandStarted)}
                 {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
                 {renderBoard(handLogEntry.board)}

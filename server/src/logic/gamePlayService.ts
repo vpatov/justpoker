@@ -16,7 +16,7 @@ import { AnimationService } from '../state/animationService';
 
 import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
-import { Hand, Card, makeNiceHandDescription } from '../../../ui/src/shared/models/cards';
+import { Hand, Card, reformatHandDescription } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';

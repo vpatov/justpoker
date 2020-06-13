@@ -31,7 +31,7 @@ import {
     cardsAreEqual,
     convertHandToCardArray,
     RankAbbrToFullString,
-    makeNiceHandDescription as reformatHandDescription,
+    reformatHandDescription,
 } from '../../../ui/src/shared/models/cards';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
