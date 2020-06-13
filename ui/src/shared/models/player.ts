@@ -16,9 +16,6 @@ export declare interface Player {
     /** Player's hole cards. */
     holeCards: ReadonlyArray<Card>;
 
-    /** Label describing the best hand the player current holds. */
-    handDescription: string;
-
     /** Cards that make up the player's best hand.*/
     bestHand: Hand | null;
 
@@ -71,7 +68,6 @@ export function getCleanPlayer(): Player {
         name: '',
         chips: 0,
         holeCards: [],
-        handDescription: '',
         bestHand: null,
         sitting: false,
         sittingOut: false,

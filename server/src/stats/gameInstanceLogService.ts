@@ -17,6 +17,7 @@ import { Card } from '../../../ui/src/shared/models/cards';
 import { BettingRoundStage, BettingRoundAction, getBettingRoundStageIndex } from '../../../ui/src/shared/models/game';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { UiHandLogEntry } from '../../../ui/src/shared/models/uiState';
+import { HandSolverService } from 'src/cards/handSolverService';
 
 @Service()
 export class GameInstanceLogService {
@@ -35,6 +36,11 @@ export class GameInstanceLogService {
 
     private get lastBettingRoundStage(): BettingRoundStage {
         return this.currentHandLogEntry.lastBettingRoundStage;
+    }
+
+    private get currentPotSummary(): PotSummary {
+        const potSummaries = this.currentHandLogEntry.potSummaries;
+        return potSummaries[potSummaries.length - 1];
     }
 
     getGameInstanceLog(): GameInstanceLog {
@@ -92,25 +98,35 @@ export class GameInstanceLogService {
             playerUUID,
             bettingRoundAction,
             timeTookToAct,
-            playerName: this.gameStateManager.getPlayerName(playerUUID),
-            seatNumber: this.gameStateManager.getPlayerSeatNumber(playerUUID),
         });
     }
 
     updatePlayerChipDelta(playerUUID: PlayerUUID, chipDelta: number) {
         const playerSummary = this.currentHandLogEntry.playerSummaries.get(playerUUID);
         if (playerSummary) {
-            playerSummary.chipDelta = chipDelta;
+            playerSummary.totalChipDeltaForHand = chipDelta;
         }
     }
 
-    addPotSummaryToCurrentHand(winner: PlayerUUID, amount: number, handDescription: string) {
+    initializePotSummary(amount: number) {
         this.currentHandLogEntry.potSummaries.push({
             amount,
-            winner,
-            playerName: this.gameStateManager.getPlayerName(winner),
+            winners: [],
+            playerHands: [],
+        });
+    }
+
+    addPlayerHandToPotSummary(playerUUID: PlayerUUID, handDescription: string | undefined) {
+        this.currentPotSummary.playerHands.push({
+            playerUUID,
             handDescription,
-            seatNumber: this.gameStateManager.getPlayerSeatNumber(winner),
+        });
+    }
+
+    addWinnerToPotSummary(playerUUID: PlayerUUID, amount: number) {
+        this.currentPotSummary.winners.push({
+            playerUUID,
+            amount,
         });
     }
 
@@ -136,29 +152,25 @@ export class GameInstanceLogService {
             startingChips: player.chips,
             holeCards: [...player.holeCards],
             wasDealtIn: player.holeCards.length > 0,
-            chipDelta: 0,
+            totalChipDeltaForHand: 0,
             position: PlayerPosition.NOT_PLAYING,
             seatNumber: player.seatNumber,
         };
     }
 
     private sanitizePlayerSummaries(playerSummaries: Map<PlayerUUID, PlayerSummary>, requestorPlayerUUID: PlayerUUID) {
-        const processedSummaries: PlayerSummary[] = [];
+        const processedSummaries: { [key: string]: PlayerSummary } = {};
         playerSummaries.forEach((playerSummary, playerUUID) => {
             // Only show the hole cards if they were yours, or if they were shown
             const sanitizedHoleCards =
                 requestorPlayerUUID === playerUUID
                     ? playerSummary.holeCards
                     : playerSummary.holeCards.filter((card) => card.visible);
-            processedSummaries.push({
+            processedSummaries[playerUUID] = {
                 ...playerSummary,
                 holeCards: sanitizedHoleCards,
-            });
+            };
         });
-        const headCount = processedSummaries.length;
-        processedSummaries.sort(
-            (a, b) => getPositionIndex(a.position, headCount) - getPositionIndex(b.position, headCount),
-        );
         return processedSummaries;
     }
 
@@ -183,16 +195,34 @@ export class GameInstanceLogService {
         return processedBettingRounds;
     }
 
+    private areAllHoleCardsVisible(playerUUID: PlayerUUID) {
+        return this.currentHandLogEntry.playerSummaries.get(playerUUID).holeCards.every((card) => card.visible);
+    }
+
     private sanitizePotSummaries(potSummaries: PotSummary[], requestorPlayerUUID: PlayerUUID): PotSummary[] {
         return potSummaries.map((potSummary) => ({
-            ...potSummary,
-            handDescription:
-                this.currentHandLogEntry.playerSummaries
-                    .get(potSummary.winner)
-                    .holeCards.every((card) => card.visible) || requestorPlayerUUID === potSummary.winner
-                    ? potSummary.handDescription
-                    : '',
+            amount: potSummary.amount,
+            winners: potSummary.winners,
+            playerHands: potSummary.playerHands.map((playerHand) => ({
+                playerUUID: playerHand.playerUUID,
+                handDescription: this.areAllHoleCardsVisible(playerHand.playerUUID)
+                    ? playerHand.handDescription
+                    : undefined,
+            })),
         }));
+    }
+
+    private serializePlayersSortedByPosition(playerSummaries: Map<PlayerUUID, PlayerSummary>) {
+        const dealtInPlayers: PlayerUUID[] = [];
+        playerSummaries.forEach((playerSummary, playerUUID) => {
+            dealtInPlayers.push(playerUUID);
+        });
+        const headCount = dealtInPlayers.length;
+        return dealtInPlayers.sort(
+            (a, b) =>
+                getPositionIndex(playerSummaries.get(a).position, headCount) -
+                getPositionIndex(playerSummaries.get(b).position, headCount),
+        );
     }
 
     /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
@@ -202,6 +232,7 @@ export class GameInstanceLogService {
             potSummaries: this.sanitizePotSummaries(handLogEntry.potSummaries, requestorPlayerUUID),
             playerSummaries: this.sanitizePlayerSummaries(handLogEntry.playerSummaries, requestorPlayerUUID),
             bettingRounds: this.serializeBettingRounds(handLogEntry.bettingRounds),
+            playersSortedByPosition: this.serializePlayersSortedByPosition(handLogEntry.playerSummaries),
         };
     }
 

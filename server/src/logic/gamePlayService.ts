@@ -16,7 +16,7 @@ import { AnimationService } from '../state/animationService';
 
 import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
-import { Hand, Card, getStrDescriptionFromHand } from '../../../ui/src/shared/models/cards';
+import { Hand, Card, makeNiceHandDescription } from '../../../ui/src/shared/models/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
@@ -88,11 +88,11 @@ export class GamePlayService {
         }
     }
 
-    updateHandDescriptions() {
+    updatePlayersBestHands() {
         this.gsm.forEveryPlayerUUID((playerUUID) => {
             this.gsm.isPlayerInHand(playerUUID)
-                ? this.gsm.updatePlayerHandDescription(playerUUID)
-                : this.gsm.clearPlayerHandDescription(playerUUID);
+                ? this.gsm.updatePlayerBestHand(playerUUID)
+                : this.gsm.clearPlayerBestHand(playerUUID);
         });
     }
 
@@ -103,7 +103,7 @@ export class GamePlayService {
         }
         this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPartialAllInLeftOver(0);
-        this.updateHandDescriptions();
+        this.updatePlayersBestHands();
     }
 
     resetBettingRoundActions() {
@@ -396,9 +396,11 @@ export class GamePlayService {
     showDown() {
         const playersHands: [PlayerUUID, any][] = this.gsm
             .getPlayersInHand()
-            .map((playerUUID) => [playerUUID, this.gsm.computeBestHandForPlayer(playerUUID)]);
+            .map((playerUUID) => [playerUUID, this.gsm.getPlayerBestHand(playerUUID)]);
 
         const pot = this.gsm.popPot();
+
+        this.gameInstanceLogService.initializePotSummary(pot.value);
 
         const eligiblePlayers: [PlayerUUID, Hand][] = playersHands.filter(([uuid, hand]) =>
             pot.contestors.includes(uuid),
@@ -454,13 +456,14 @@ export class GamePlayService {
 
             // start with startingPlayer continue left, circularly
             // only show if your hand is the best seen thus far, break if we hit a winning hand
-            let playerToBeat = eligiblePlayers[startIndex];
+            let [playerToBeatUUID, handToBeatUUID] = eligiblePlayers[startIndex];
             for (let i = startIndex; i < eligiblePlayers.length + startIndex; i++) {
-                const curPlayer = eligiblePlayers[i % eligiblePlayers.length];
-                if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
-                    this.setPlayerCardsAllVisible(curPlayer[0]);
-                    playerToBeat = curPlayer;
+                const [currentPlayerUUID, currentPlayerHand] = eligiblePlayers[i % eligiblePlayers.length];
+                if (this.handSolverService.compareHands(handToBeatUUID, currentPlayerHand) <= 0) {
+                    this.setPlayerCardsAllVisible(currentPlayerUUID);
+                    [playerToBeatUUID, handToBeatUUID] = [currentPlayerUUID, currentPlayerHand];
                 }
+                this.gameInstanceLogService.addPlayerHandToPotSummary(currentPlayerUUID, currentPlayerHand.descr);
             }
         }
 
@@ -473,11 +476,7 @@ export class GamePlayService {
             this.gsm.setIsPlayerWinner(playerUUID, true);
             this.gsm.setPlayerChipDelta(playerUUID, amountWon);
             this.gsm.addHandWinner(playerUUID);
-            this.gameInstanceLogService.addPotSummaryToCurrentHand(
-                playerUUID,
-                amountWon,
-                getStrDescriptionFromHand(this.gsm.getPlayerHandDescription(playerUUID)),
-            );
+            this.gameInstanceLogService.addWinnerToPotSummary(playerUUID, amountWon);
         });
     }
 

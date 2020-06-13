@@ -1,5 +1,11 @@
 import { Service } from 'typedi';
-import { Card, Hand, SUIT_ABBREVIATIONS, getTwoCardCombinations } from '../../../ui/src/shared/models/cards';
+import {
+    Card,
+    Hand,
+    SUIT_ABBREVIATIONS,
+    getTwoCardCombinations,
+    makeNiceHandDescription,
+} from '../../../ui/src/shared/models/cards';
 import { Hand as HandSolver } from 'pokersolver';
 import { logger } from '../logger';
 
@@ -13,6 +19,8 @@ export class HandSolverService {
     }
 
     computeBestHandFromStrCards(cards: string[]): Hand {
+        const hand = HandSolver.solve(cards);
+        hand.descr = makeNiceHandDescription(hand.descr);
         return HandSolver.solve(cards);
     }
 

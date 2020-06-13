@@ -22,10 +22,18 @@ export declare interface HandLogEntry {
 
 export declare interface PotSummary {
     amount: number;
-    winner: PlayerUUID;
-    playerName: string;
-    seatNumber: number;
-    handDescription: string;
+    playerHands: ShowdownHand[];
+    winners: PotWinner[];
+}
+
+export declare interface PotWinner {
+    playerUUID: PlayerUUID;
+    amount: number;
+}
+
+export declare interface ShowdownHand {
+    playerUUID: PlayerUUID;
+    handDescription: string | undefined;
 }
 
 /** Contains a record of the actions completed during a betting round. */
@@ -38,8 +46,6 @@ export declare interface BettingRoundLog {
 /**  */
 export declare interface BetActionRecord {
     playerUUID: PlayerUUID;
-    playerName: string;
-    seatNumber: number;
     bettingRoundAction: BettingRoundAction;
     timeTookToAct: number;
 }
@@ -51,7 +57,7 @@ export declare interface PlayerSummary {
     wasDealtIn: boolean;
     holeCards: Card[];
     startingChips: number;
-    chipDelta: number;
+    totalChipDeltaForHand: number;
     seatNumber: number;
 }
 
@@ -92,7 +98,7 @@ export function getCleanPlayerSummary(): PlayerSummary {
         wasDealtIn: false,
         holeCards: [],
         startingChips: 0,
-        chipDelta: 0,
+        totalChipDeltaForHand: 0,
         seatNumber: -1,
     };
 }

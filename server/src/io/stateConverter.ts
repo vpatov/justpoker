@@ -346,7 +346,7 @@ export class StateConverter {
                       partOfWinningHand:
                           isWinner &&
                           shouldHighlightWinningCards &&
-                          this.gameStateManager.isCardInPlayersBestHand(player.uuid, holeCard),
+                          this.gameStateManager.isCardInPlayerBestHand(player.uuid, holeCard),
                   }
                 : { hidden: true };
         });
@@ -363,8 +363,8 @@ export class StateConverter {
                 player.holeCards.length === 2 &&
                 this.gameStateManager.getBettingRoundStage() === BettingRoundStage.PREFLOP;
             return shouldAttemptConvertToNickName
-                ? getHoleCardNickname(player.holeCards[0], player.holeCards[1]) || player.handDescription
-                : player.handDescription;
+                ? getHoleCardNickname(player.holeCards[0], player.holeCards[1]) || player.bestHand.descr
+                : player.bestHand.descr;
         }
         return undefined;
     }
@@ -378,7 +378,7 @@ export class StateConverter {
             const winnerUUID = winners[0];
             return board.map((card) => ({
                 ...card,
-                partOfWinningHand: this.gameStateManager.isCardInPlayersBestHand(winnerUUID, card),
+                partOfWinningHand: this.gameStateManager.isCardInPlayerBestHand(winnerUUID, card),
             }));
         } else {
             return [...board];

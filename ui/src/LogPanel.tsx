@@ -20,7 +20,7 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import { PlayerSummary, BettingRoundLog, BetActionRecord, PotSummary } from './shared/models/handLog';
+import { PlayerSummary, BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from './shared/models/handLog';
 import { PlayerPositionString } from './shared/models/playerPosition';
 import Suit from './Suit';
 
@@ -195,6 +195,7 @@ function LogPanel(props: LogPanelProps) {
 
     const { className } = props;
 
+
     const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
@@ -204,6 +205,7 @@ function LogPanel(props: LogPanelProps) {
     const [unreadChats, setUnreadChats] = useState(false);
 
     const messagesRef = useRef(null);
+    const playerSummaryMap: {[uuid: string]: PlayerSummary} = {};
 
     const scrollToBottom = () => {
         (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
@@ -393,7 +395,8 @@ function LogPanel(props: LogPanelProps) {
         )
     }
 
-    function renderPlayerPosition(playerSummary: PlayerSummary){
+    function renderPlayerPosition(playerUUID: PlayerUUID){
+        const playerSummary = handLogEntries[currentHandNumber].playerSummaries[playerUUID];
         return playerSummary.wasDealtIn ? (
             <Typography className={classnames(classes.handLogPlayerSummary)}>
                 <span>
@@ -405,14 +408,14 @@ function LogPanel(props: LogPanelProps) {
         ) : null;
     }
 
-    function renderPlayerPositions(playerSummaries: PlayerSummary[]){
+    function renderPlayerPositions(playersSortedByPosition: PlayerUUID[]){
         return (
             <div>
                 <Typography className={classes.handLogSectionLabel}>
                     Players
                 </Typography>
                 <Divider/>
-                {playerSummaries.map((playerSummary) => (renderPlayerPosition(playerSummary)))}
+                {playersSortedByPosition.map((playerPosition) => (renderPlayerPosition(playerPosition)))}
             </div>
         );
     }
@@ -485,13 +488,15 @@ function LogPanel(props: LogPanelProps) {
     }
 
     function renderBettingRoundActions(actions: BetActionRecord[]){
+        const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <>
                 {actions.map((action) => {
+                    const playerSummary = playerSummaries[action.playerUUID];
                     return (
                     <Typography className={classnames(classes.handLogBettingRoundAction)}>
                         <span>
-                            {renderPlayerName(action.seatNumber, action.playerName)}
+                            {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                             {renderBettingRoundAction(action)}
                         </span>
                         <span>{renderTimeTookToAct(action.timeTookToAct)}</span>
@@ -531,36 +536,67 @@ function LogPanel(props: LogPanelProps) {
         null;
     }
 
-    // TODO instead of current handlog visualization, consider this:
-    // SHOWDOWN
-    // vas shows full house, tens over threes
-    // jules shows straight, ace high
-    // WINNERS
-    // vas wins pot of 22
-    // ---
-    // the difference is, break out the hand description + showing into showdown
-    
-    // flow for folding:
-    // RIVER
-    // ....
-    // WINNERS
-    // Everyone folds to vas.
-    // vas wins pot of 34.
+    function renderPlayerHands(playerHands: ShowdownHand[]){
+        const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
+        return (
+            <>
+                {playerHands.map((playerHand) => {
+                    const playerSummary = playerSummaries[playerHand.playerUUID];
+                    return (
+                        <Typography>
+                            {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                            {playerHand.handDescription ? ` shows ${playerHand.handDescription}.` : ` doesn't show.`}
+                        </Typography>
+                    );
+                })}
+            </>
+        )
+
+    }
+
+
+
+// export declare interface PotWinner {
+//     playerUUID: PlayerUUID;
+//     amount: number;
+// }
+
+    function renderPotWinners(winners: PotWinner[]){
+        const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
+        return (
+            <>
+              {winners.map((winner) => {
+                  const playerSummary = playerSummaries[winner.playerUUID];
+                  return (
+                      <Typography>
+                          {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                          {` wins ${winner.amount}`}
+                      </Typography>
+                  );
+              })}
+            </>
+        );
+
+    }
+
     function renderPotSummaries(potSummaries: PotSummary[]){
+        const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <div>
                 <Typography className={classes.handLogSectionLabel}>
-                    Winners
+                    Result
                 </Typography>
                 <Divider />
-                {potSummaries.map((potSummary) => (
-                    <Typography className={classnames(classes.handLogPotSummary)}>
-                        {renderPlayerName(potSummary.seatNumber, potSummary.playerName)}
-                        {` wins pot of ${potSummary.amount}, ` +
-                           (potSummary.handDescription.length > 0 ? `with ${potSummary.handDescription}` : "doesn't show.")
-                        }
-                    </Typography>
-                ))}
+                {potSummaries.map((potSummary) => {
+                    // const playerSummary = playerSummaries[potSumamry]
+                    return (
+                        <Typography className={classnames(classes.handLogPotSummary)}>
+                            <div>Pot: {potSummary.amount}</div>
+                            {renderPlayerHands(potSummary.playerHands)}
+                            {renderPotWinners(potSummary.winners)}
+                        </Typography>
+                    );
+                })}
             </div>
         );
     }
@@ -578,10 +614,10 @@ function LogPanel(props: LogPanelProps) {
         return (
             <div className={classnames(classes.handLogContents)}>
                 {renderTimeHandStarted(handLogEntry.timeHandStarted)}
-                {renderPlayerPositions(handLogEntry.playerSummaries)}
+                {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
                 {renderBoard(handLogEntry.board)}
                 {renderBettingRoundLogs(handLogEntry.bettingRounds)}
-                {renderPotSummaries(handLogEntry.potSummaries)}
+                {handLogEntry.potSummaries.length ? renderPotSummaries(handLogEntry.potSummaries) : null}
             </div>
         );
         
