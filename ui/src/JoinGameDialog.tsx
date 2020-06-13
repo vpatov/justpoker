@@ -7,7 +7,7 @@ import IconPicker from './reuseable/IconPicker';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { ClientWsMessageRequest } from './shared/models/api';
-import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core';
+import { Dialog, DialogContent, DialogActions, Button, DialogTitle } from '@material-ui/core';
 import { selectGameParameters, globalGameStateSelector } from './store/selectors';
 import { AvatarKeys, getRandomAvatarKey } from './shared/models/assets';
 import Avatar from './Avatar';
@@ -52,9 +52,9 @@ const useStyles = makeStyles((theme) => ({
 const NAME_LOCAL_STORAGE_KEY = 'jp-last-used-name';
 const AVATAR_LOCAL_STORAGE_KEY = 'jp-last-used-avatar';
 
-function OpenSeatDialog(props) {
+function JoinGameDialog(props) {
     const classes = useStyles();
-    const { onClose, open, seatNumber } = props;
+    const { handleClose, open } = props;
     const [name, setName] = useStickyState('', NAME_LOCAL_STORAGE_KEY);
     const [avatarKey, SET_avatarKey] = useStickyState(getRandomAvatarKey(), AVATAR_LOCAL_STORAGE_KEY);
     const { minBuyin } = useSelector(selectGameParameters);
@@ -77,23 +77,20 @@ function OpenSeatDialog(props) {
         return invalidBuyin() || invalidName() || buyin === undefined;
     }
 
-    function onSubmitSitDownForm() {
-        WsServer.send({
-            actionType: ClientActionType.JOINTABLEANDSITDOWN,
-            request: {
-                avatarKey: avatarKey,
-                name,
-                buyin: Number(buyin),
-                seatNumber: seatNumber,
-            } as ClientWsMessageRequest,
-        });
-        onClose();
+    function onJoin() {
+        WsServer.sendJoinGameMessage(name, buyin, avatarKey);
+        handleClose();
+    }
+
+    function onJoinAndSit() {
+        WsServer.sendJoinGameAndJoinTableMessage(name, buyin, avatarKey);
+        handleClose();
     }
 
     function onPressEnter(event: any) {
         if (event.key === 'Enter' && !formInvalid()) {
             event.preventDefault();
-            onSubmitSitDownForm();
+            onJoinAndSit();
         }
     }
 
@@ -112,6 +109,7 @@ function OpenSeatDialog(props) {
             onKeyPress={(event) => onPressEnter(event)}
             classes={{ paper: classes.dialogPaper }}
         >
+            <DialogTitle>Join Game</DialogTitle>
             <DialogContent>
                 <div className={classes.nameRow}>
                     <IconPicker
@@ -167,13 +165,16 @@ function OpenSeatDialog(props) {
                 </div>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button id="ID_SitDownButton" disabled={formInvalid()} onClick={onSubmitSitDownForm} color="primary">
-                    Sit Down
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button id="ID_SitDownButton" disabled={formInvalid()} onClick={onJoin}>
+                    Join
+                </Button>
+                <Button id="ID_SitDownButton" disabled={formInvalid()} onClick={onJoinAndSit} color="primary">
+                    Join and Sit
                 </Button>
             </DialogActions>
         </Dialog>
     );
 }
 
-export default OpenSeatDialog;
+export default JoinGameDialog;

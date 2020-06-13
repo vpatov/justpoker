@@ -65,10 +65,10 @@ export declare interface Global {
     adminNames: string[];
     isSpectator: boolean;
     isHeroAtTable: boolean;
+    heroTotalChips: number;
 }
 
 export declare interface Controller {
-    totalChips: number;
     min: number;
     max: number;
     timeBanks: number;
@@ -275,7 +275,6 @@ export function getCleanUiChatLog(): UiChatLog {
 /* Clean Controller for init. */
 export function getCleanController(): Controller {
     return {
-        totalChips: 0,
         toAct: false,
         lastBettingRoundAction: NOT_IN_HAND,
         min: 0,
@@ -292,6 +291,7 @@ export function getCleanController(): Controller {
 
 export function getCleanGlobal(): Global {
     return {
+        heroTotalChips: 0,
         heroIsAdmin: false,
         isGameInProgress: false,
         canStartGame: false,
@@ -410,11 +410,11 @@ export const TestGame: UiGameState = {
         gameParametersWillChangeAfterHand: true,
         computedMaxBuyin: 1000,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
-        isSpectator: false,
+        isSpectator: true,
         isHeroAtTable: false,
+        heroTotalChips: 17,
     },
     controller: {
-        totalChips: 57743,
         showWarningOnFold: true,
         toAct: true,
         lastBettingRoundAction: CHECK_ACTION,

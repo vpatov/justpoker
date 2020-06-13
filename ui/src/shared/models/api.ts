@@ -44,8 +44,9 @@ export enum ClientActionType {
     STANDUP = 'STANDUP',
     SITIN = 'SITIN',
     SITOUT = 'SITOUT',
+    JOINGAME = 'JOINGAME',
     JOINTABLE = 'JOINTABLE',
-    JOINTABLEANDSITDOWN = 'JOINTABLEANDSITDOWN',
+    JOINGAMEANDJOINTABLE = 'JOINGAMEANDJOINTABLE',
     PINGSTATE = 'PINGSTATE',
     CHAT = 'CHAT',
     ADDCHIPS = 'ADDCHIPS',
@@ -76,16 +77,16 @@ export enum UiActionType {
 
 export declare interface SitDownRequest {
     seatNumber: number;
-    // waitForBlind: boolean;
 }
 
 export declare interface JoinTableRequest {
+    playerUUID: PlayerUUID;
+}
+
+export declare interface JoinGameRequest {
     name: string;
     buyin: number;
     avatarKey: AvatarKeys;
-    // admin: boolean;
-    // sitdown: boolean;
-    // password?: string;
 }
 
 export declare interface AddChipsRequest {
@@ -133,6 +134,7 @@ export declare interface SetGameParametersRequest {
 
 export type ClientWsMessageRequest = SitDownRequest &
     JoinTableRequest &
+    JoinGameRequest &
     (SitDownRequest & JoinTableRequest) &
     BettingRoundAction &
     AddChipsRequest &

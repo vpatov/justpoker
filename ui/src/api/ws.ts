@@ -9,10 +9,14 @@ import {
     BootPlayerRequest,
     AddAdminRequest,
     RemoveAdminRequest,
+    JoinTableRequest,
+    JoinGameRequest,
+    SetChipsRequest,
 } from '../shared/models/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
 
 import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config';
+import { AvatarKeys } from '../shared/models/assets';
 
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
@@ -98,6 +102,39 @@ export class WsServer {
             actionType: ClientActionType.REMOVEADMIN,
             request: ({ playerUUID } as RemoveAdminRequest) as ClientWsMessageRequest,
         };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendJoinGameMessage(name: string, buyin: number, avatarKey: AvatarKeys) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.JOINGAME,
+            request: ({ name, buyin, avatarKey } as JoinGameRequest) as ClientWsMessageRequest,
+        };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendJoinTableMessage(playerUUID: PlayerUUID) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.JOINTABLE,
+            request: ({ playerUUID } as JoinTableRequest) as ClientWsMessageRequest,
+        };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendJoinGameAndJoinTableMessage(name: string, buyin: number, avatarKey: AvatarKeys) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.JOINGAMEANDJOINTABLE,
+            request: ({ name, buyin, avatarKey } as JoinGameRequest) as ClientWsMessageRequest,
+        };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendSetChipsMessage(playerUUID: PlayerUUID, chipAmount: number) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.SETCHIPS,
+            request: ({ playerUUID, chipAmount } as SetChipsRequest) as ClientWsMessageRequest,
+        };
+
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 

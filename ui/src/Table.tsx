@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import Player from './Player';
 import OpenSeat from './OpenSeat';
 import EmptySeat from './EmptySeat';
@@ -8,7 +8,7 @@ import TableCopyLink from './TableCopyLink';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { tableSelector, playersSelector, globalGameStateSelector, selectGameParameters } from './store/selectors';
+import { tableSelector, playersSelector, globalGameStateSelector } from './store/selectors';
 import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
 import { WsServer } from './api/ws';
 
@@ -112,7 +112,6 @@ function Table(props) {
     const classes = useStyles();
     const { className } = props;
     const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats } = useSelector(globalGameStateSelector);
-    const { maxPlayers } = useSelector(selectGameParameters);
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
         tableSelector,
     );

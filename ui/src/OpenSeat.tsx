@@ -1,12 +1,14 @@
 import React, { useState, Fragment } from 'react';
 import classnames from 'classnames';
-
-import OpenSeatDialog from './OpenSeatDialog';
+import { heroPlayerUUIDSelector } from './store/selectors';
+import { useSelector } from 'react-redux';
+import { WsServer } from './api/ws';
 
 import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
 import grey from '@material-ui/core/colors/grey';
 import Typography from '@material-ui/core/Typography';
+import BuyChipsDialog from './BuyChipsDialog';
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -26,10 +28,15 @@ const useStyles = makeStyles((theme) => ({
 
 function OpenSeat(props) {
     const classes = useStyles();
-    const { className, style, seatNumber } = props;
+    const { className, style } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
+    const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
+    const handleCancel = () => {
+        setDialogOpen(false);
+    };
 
-    const dialogClose = () => {
+    const handleBuy = () => {
+        WsServer.sendJoinTableMessage(heroPlayerUUID);
         setDialogOpen(false);
     };
 
@@ -47,7 +54,14 @@ function OpenSeat(props) {
             >
                 <Typography className={classes.sit}>Sit Here</Typography>
             </IconButton>
-            {dialogOpen ? <OpenSeatDialog open={dialogOpen} onClose={dialogClose} seatNumber={seatNumber} /> : null}
+            {dialogOpen ? (
+                <BuyChipsDialog
+                    open={dialogOpen}
+                    handleCancel={handleCancel}
+                    handleBuy={handleBuy}
+                    sitDownOnBuy={true}
+                />
+            ) : null}
         </Fragment>
     );
 }

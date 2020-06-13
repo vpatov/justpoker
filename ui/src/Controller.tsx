@@ -146,13 +146,12 @@ function ControllerComp(props: ControllerProps) {
         showWarningOnFold,
         callAmount,
         playerPositionString,
-        totalChips,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
-    const { isSpectator, isHeroAtTable } = useSelector(globalGameStateSelector);
+    const { isSpectator, isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
 
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
@@ -294,7 +293,7 @@ function ControllerComp(props: ControllerProps) {
                     <Tooltip title="Your current total chips." placement="right">
                         <Typography
                             className={classes.totalChips}
-                        >{`Chips: ${totalChips.toLocaleString()}`}</Typography>
+                        >{`Chips: ${heroTotalChips.toLocaleString()}`}</Typography>
                     </Tooltip>
                 ) : null}
                 {heroHandLabel ? (

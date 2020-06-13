@@ -1,5 +1,6 @@
 import { UiGameState, Table, Controller, UiPlayer, Global, PlayerTimer, MenuButton } from '../shared/models/uiState';
 import { BettingRoundActionType, ALL_BETTING_ROUND_ACTION_TYPES, GameParameters } from '../shared/models/game';
+import { PlayerUUID } from '../shared/models/uuid';
 
 export const tableSelector = (gs: UiGameState): Table => gs.table;
 export const controllerSelector = (gs: UiGameState): Controller => gs.controller;
@@ -22,9 +23,11 @@ export const canStartGameSelector = (gs: UiGameState): boolean => gs.global.canS
 export const globalGameStateSelector = (gs: UiGameState): Global => gs.global;
 export const heroPlayerTimerSelector = (gs: UiGameState): PlayerTimer =>
     (gs.players.find((p) => p.hero) || {}).playerTimer || { timeElapsed: 0, timeLimit: 0 };
-export const heroPlayerUUIDSelector = (gs: UiGameState): string => gs.players.find((p) => p.hero)?.uuid || '';
+export const heroPlayerUUIDSelector = (gs: UiGameState): PlayerUUID =>
+    (gs.players.find((p) => p.hero)?.uuid || '') as PlayerUUID;
 export const playerListSelector = (gs: UiGameState): UiPlayer[] => gs.players;
 export const heroPlayerToAct = (gs: UiGameState): boolean => (gs.players.find((p) => p.hero) || {}).toAct || false;
 export const isHeroAdminSelector = (gs: UiGameState): boolean => gs.global.heroIsAdmin;
 export const selectMenuButtons = (gs: UiGameState): MenuButton[] => gs.menu;
 export const selectGameParameters = (gs: UiGameState): GameParameters => gs.gameParameters;
+export const heroPlayerSelector = (gs: UiGameState): UiPlayer | undefined => gs.players.find((p) => p.hero);

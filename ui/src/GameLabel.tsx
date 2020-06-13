@@ -27,6 +27,10 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.3vmin',
             color: theme.palette.error.contrastText,
         },
+        spectating: {
+            fontSize: '1.8vmin',
+            color: theme.palette.error.contrastText,
+        },
         adminIcon: {
             marginTop: '.3vmin',
             position: 'relative',
@@ -52,7 +56,7 @@ function GameLabel(props) {
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
             <Typography className={classes.gameText}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
-            {isSpectator ? <Typography className={classes.pause}>{`You are spectating.`}</Typography> : null}
+            {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
             <IconTooltip
                 className={classnames(classes.adminIcon)}
                 title={`Admin${adminNames.length > 1 ? 's' : ''}: ${adminNames.join(', ')}`}
