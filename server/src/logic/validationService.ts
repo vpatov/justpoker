@@ -14,6 +14,7 @@ import {
     ClientChatMessage,
     BootPlayerRequest,
     AddAdminRequest,
+    JoinGameRequest,
 } from '../../../ui/src/shared/models/api';
 import { printObj } from '../../../ui/src/shared/util/util';
 import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/validation';
@@ -148,31 +149,27 @@ export class ValidationService {
         return undefined;
     }
 
-    validateJoinTableRequest(clientUUID: ClientUUID, request: JoinTableRequest): ValidationResponse {
-        // TODO return this logic later
-        // const error = this.ensureClientIsNotInGame(clientUUID);
-        // if (error) {
-        //     return error;
+    validateJoinGameRequest(clientUUID: ClientUUID, request: JoinGameRequest): ValidationResponse {
+        // TODO;
+        // if (!this.gsm.areOpenSeats()) {
+        //     return {
+        //         errorString: `There are no open seats left at this table`,
+        //         errorType: ErrorType.NO_OPEN_SEATS,
+        //     };
         // }
-        if (!this.gsm.areOpenSeats()) {
-            return {
-                errorString: `There are no open seats left at this table`,
-                errorType: ErrorType.NO_OPEN_SEATS,
-            };
-        }
-        if (request.name.length > MAX_NAME_LENGTH) {
-            return {
-                errorString: `Name ${request.name} is too long - exceeds limit of ${MAX_NAME_LENGTH} characters.`,
-                errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
-            };
-        }
-        const { minBuyin } = this.gsm.getGameParameters();
-        if (request.buyin > this.gsm.getMaxBuyin() || request.buyin < minBuyin) {
-            return {
-                errorString: `Buyin ${request.buyin} buying exceeds gama parameter limit of ${this.gsm.getMaxBuyin()}.`,
-                errorType: ErrorType.ILLEGAL_ACTION,
-            };
-        }
+        // if (request.name.length > MAX_NAME_LENGTH) {
+        //     return {
+        //         errorString: `Name ${request.name} is too long - exceeds limit of ${MAX_NAME_LENGTH} characters.`,
+        //         errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
+        //     };
+        // }
+        // const { minBuyin } = this.gsm.getGameParameters();
+        // if (request.buyin > this.gsm.getMaxBuyin() || request.buyin < minBuyin) {
+        //     return {
+        //         errorString: `Buyin ${request.buyin} buying exceeds gama parameter limit of ${this.gsm.getMaxBuyin()}.`,
+        //         errorType: ErrorType.ILLEGAL_ACTION,
+        //     };
+        // }
         return undefined;
     }
 

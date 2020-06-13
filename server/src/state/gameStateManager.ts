@@ -22,7 +22,7 @@ import {
 import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
+import { JoinTableRequest, ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
 import {
@@ -922,7 +922,7 @@ export class GameStateManager {
         this.gameState.activeConnections.set(clientUUID, this.createConnectedClient(clientUUID));
     }
 
-    addNewPlayerToGame(clientUUID: ClientUUID, request: JoinTableRequest) {
+    addNewPlayerToGame(clientUUID: ClientUUID, request: JoinGameRequest) {
         const { name, buyin, avatarKey } = request;
         const player = this.createNewPlayer(name, buyin, avatarKey);
 

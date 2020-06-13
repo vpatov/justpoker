@@ -62,14 +62,6 @@ export class EventProcessorService {
             perform: (uuid, req) => this.gamePlayService.stopGame(),
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ClientActionType.SITDOWN]: {
-            validation: (uuid, req) => this.validationService.validateSitDownRequest(uuid, req),
-            perform: (uuid, req) => {
-                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
-            },
-            updates: [ServerStateKey.GAMESTATE],
-        },
         [ClientActionType.SITOUT]: {
             validation: (uuid, req) => this.validationService.validateSitOutAction(uuid),
             perform: (uuid, req) => {
@@ -87,6 +79,15 @@ export class EventProcessorService {
             updates: [ServerStateKey.GAMESTATE],
         },
 
+        // these action types should be deprecated VVVV
+        [ClientActionType.SITDOWN]: {
+            validation: (uuid, req) => this.validationService.validateSitDownRequest(uuid, req),
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
         [ClientActionType.STANDUP]: {
             validation: (uuid, req) => this.validationService.validateStandUpRequest(uuid),
             perform: (uuid, req) => {
@@ -95,30 +96,36 @@ export class EventProcessorService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
+        // these action types should be deprecated ^^^^
+
+        // these action should be reimplemented VVVV
+        [ClientActionType.JOINGAME]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.QUITGAME]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            updates: [],
+        },
         [ClientActionType.JOINTABLE]: {
-            validation: (uuid, req) => this.validationService.validateJoinTableRequest(uuid, req),
-            perform: (uuid, req) => this.gameStateManager.addNewPlayerToGame(uuid, req),
-            updates: [ServerStateKey.GAMESTATE],
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            updates: [],
         },
-        [ClientActionType.JOINTABLEANDSITDOWN]: {
-            validation: (uuid, req) => {
-                const error = this.validationService.validateJoinTableRequest(uuid, req);
-                if (error) {
-                    return error;
-                }
-                // TODO either remove jointableandsitdown or change code path to allow for
-                // jointable validation, jointable, and then sitdown validation (because sitdown
-                // validation depends on jointable being completed)
-                return error;
-                // return this.validationService.validateSitDownRequest(uuid, req);
-            },
-            perform: (uuid, req) => {
-                this.gameStateManager.addNewPlayerToGame(uuid, req);
-                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
-            },
-            updates: [ServerStateKey.GAMESTATE],
+        [ClientActionType.LEAVETABLE]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            updates: [],
         },
+        [ClientActionType.JOINGAMEANDJOINTABLE]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            updates: [],
+        },
+        // these action should be reimplemented  ^^^^
+
         [ClientActionType.PINGSTATE]: {
             validation: (uuid, req) => undefined,
             perform: (uuid, req) => {},
@@ -176,19 +183,7 @@ export class EventProcessorService {
             perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.removePlayerAdmin(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
-        [ClientActionType.LEAVETABLE]: {
-            validation: (uuid, req) => this.validationService.validateLeaveTableAction(uuid),
-            perform: (uuid) => {
-                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.removePlayerFromGame(player.uuid);
-            },
-            updates: [ServerStateKey.GAMESTATE],
-        },
-        [ClientActionType.QUITGAME]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid) => NOT_IMPLEMENTED_YET,
-            updates: [],
-        },
+
         [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),
             perform: () => this.gamePlayService.useTimeBankAction(),
