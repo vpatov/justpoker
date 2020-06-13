@@ -7,7 +7,7 @@ import {
     heroHandLabelSelector,
     selectGameParameters,
     bettingRoundActionTypesToUnqueueSelector,
-    isHeroSeatedSelector,
+    globalGameStateSelector,
     heroPlayerUUIDSelector,
 } from './store/selectors';
 
@@ -20,6 +20,7 @@ import { ClientActionType, ClientWsMessageRequest, ClientStraddleRequest } from 
 import { Typography, Tooltip } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game';
 
+import ControllerSpectator from './ControllerSpectator';
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
@@ -147,7 +148,8 @@ function ControllerComp(props: ControllerProps) {
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
-    const heroSeated = useSelector(isHeroSeatedSelector);
+    const { heroIsSeated, isSpectator } = useSelector(globalGameStateSelector);
+
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
     const [betAmt, setBetAmt] = useState(0);
@@ -267,6 +269,15 @@ function ControllerComp(props: ControllerProps) {
         }
     }
 
+    if (isSpectator)
+        return (
+            <ControllerSpectator
+                className={classnames(classes.root, className, {
+                    [classes.rootToAct]: toAct,
+                })}
+            />
+        );
+
     return (
         <div
             className={classnames(classes.root, className, {
@@ -337,7 +348,7 @@ function ControllerComp(props: ControllerProps) {
                     {showCardButtons?.length ? (
                         <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
                     ) : null}
-                    {heroSeated && allowTimeBanks ? (
+                    {heroIsSeated && allowTimeBanks ? (
                         <Button
                             className={classnames(classes.timeBankButton, 'ani_timeBank')}
                             variant="outlined"

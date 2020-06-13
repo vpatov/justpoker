@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: theme.palette.error.contrastText,
         },
         adminIcon: {
+            marginTop: '.3vmin',
             position: 'relative',
             zIndex: 10,
         },
@@ -37,8 +38,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function GameLabel(props) {
     const classes = useStyles();
 
-    const [blink, SET_blink] = useState(false);
-    const { gameWillStopAfterHand, gameParametersWillChangeAfterHand, adminNames } = useSelector(
+    const { gameWillStopAfterHand, gameParametersWillChangeAfterHand, adminNames, isSpectator } = useSelector(
         globalGameStateSelector,
     );
     const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
@@ -51,8 +51,8 @@ function GameLabel(props) {
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
-
             <Typography className={classes.gameText}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
+            {isSpectator ? <Typography className={classes.pause}>{`You are spectating.`}</Typography> : null}
             <IconTooltip
                 className={classnames(classes.adminIcon)}
                 title={`Admin${adminNames.length > 1 ? 's' : ''}: ${adminNames.join(', ')}`}

@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { heroPlayerUUIDSelector, isHeroSeatedSelector } from './store/selectors';
+import { heroPlayerUUIDSelector, globalGameStateSelector } from './store/selectors';
 import { WsServer } from './api/ws';
 import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
 import IconPicker from './reuseable/IconPicker';
@@ -72,7 +72,7 @@ function ReactionPicker(props) {
     const classes = useStyles();
     const [open, SET_open] = React.useState(false);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
-    const seated = useSelector(isHeroSeatedSelector);
+    const { heroIsSeated, isSpectator } = useSelector(globalGameStateSelector);
 
     const [recentlyUsed, SET_recentlyUsed] = useStickyState(
         AnimojiKeysDefaultRecentlyUsed,
@@ -112,7 +112,7 @@ function ReactionPicker(props) {
         }));
     }
 
-    if (!seated) return null;
+    if (!heroIsSeated || isSpectator) return null;
 
     return (
         <div className={classes.hoverArea} onMouseOver={handleOpen} onMouseLeave={handleClose}>
