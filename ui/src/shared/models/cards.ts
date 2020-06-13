@@ -223,7 +223,7 @@ export const RankAbbrToFullString: Record<string, string> = {
 
 // removes unwanted characters from the description string
 // and in full names of cards
-export function makeNiceHandDescription(handDescription: string): string {
+export function reformatHandDescription(handDescription: string): string {
     // K High
     // Two pair, A's & Q's
     // Three of a Kind, 6's

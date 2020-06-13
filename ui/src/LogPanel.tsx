@@ -288,7 +288,7 @@ function LogPanel(props: LogPanelProps) {
                     setHideHandLog(!hideHandLog);
                 }}
             >
-                {`${hideHandLog ? 'Show' : 'Hide'} Hand Log`}
+                {`${hideHandLog ? 'Show' : 'Hide'}  Log`}
             </Button>
         );
     }
@@ -562,13 +562,6 @@ function LogPanel(props: LogPanelProps) {
         )
 
     }
-
-
-
-// export declare interface PotWinner {
-//     playerUUID: PlayerUUID;
-//     amount: number;
-// }
 
     function renderPotWinners(winners: PotWinner[]){
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;

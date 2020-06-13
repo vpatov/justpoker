@@ -31,7 +31,7 @@ import {
     cardsAreEqual,
     convertHandToCardArray,
     RankAbbrToFullString,
-    makeNiceHandDescription,
+    makeNiceHandDescription as reformatHandDescription,
 } from '../../../ui/src/shared/models/cards';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
@@ -1198,7 +1198,7 @@ export class GameStateManager {
     }
 
     getWinningHandDescription(): string | undefined {
-        return this.gameState.winningHand ? makeNiceHandDescription(this.gameState.winningHand.descr) : undefined;
+        return this.gameState.winningHand ? reformatHandDescription(this.gameState.winningHand.descr) : undefined;
     }
 
     setWinningHand(hand: Hand | undefined) {

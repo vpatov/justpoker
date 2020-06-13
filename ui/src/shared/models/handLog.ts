@@ -43,7 +43,6 @@ export declare interface BettingRoundLog {
     actions: BetActionRecord[];
 }
 
-/**  */
 export declare interface BetActionRecord {
     playerUUID: PlayerUUID;
     bettingRoundAction: BettingRoundAction;
