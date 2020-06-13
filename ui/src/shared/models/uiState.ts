@@ -66,6 +66,7 @@ export declare interface Global {
     isSpectator: boolean;
     isHeroAtTable: boolean;
     heroTotalChips: number;
+    numberOfSpectators: number;
 }
 
 export declare interface Controller {
@@ -303,6 +304,7 @@ export function getCleanGlobal(): Global {
         adminNames: [],
         isSpectator: true,
         isHeroAtTable: false,
+        numberOfSpectators: 0,
     };
 }
 
@@ -413,6 +415,7 @@ export const TestGame: UiGameState = {
         isSpectator: true,
         isHeroAtTable: false,
         heroTotalChips: 17,
+        numberOfSpectators: 4,
     },
     controller: {
         showWarningOnFold: true,

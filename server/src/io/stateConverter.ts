@@ -150,6 +150,7 @@ export class StateConverter {
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
             isHeroAtTable: true, // to be implemented
             isSpectator: false, // to be implemented
+            numberOfSpectators: 0, // to be implemented
             adminNames: this.gameStateManager
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
