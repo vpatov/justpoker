@@ -50,6 +50,7 @@ export declare interface UiGameState {
     players: UiPlayer[];
     menu: MenuButton[];
     gameParameters: GameParameters;
+    ratHole: RatHolePlayer[];
 }
 
 export declare interface Global {
@@ -157,6 +158,12 @@ export declare interface UiPlayer {
     hand: {
         cards: UiCard[];
     };
+    avatarKey: AvatarKeys;
+}
+
+export declare interface RatHolePlayer {
+    name: string;
+    stack: number;
     avatarKey: AvatarKeys;
 }
 
@@ -313,6 +320,7 @@ export function getCleanGame(): UiGameState {
             communityCards: [],
         },
         players: [],
+        ratHole: [],
         gameParameters: getCleanGameParameters(),
     };
 }
@@ -377,6 +385,23 @@ shuffle(positions);
 export const TestGame: UiGameState = {
     menu: ALL_MENU_BUTTONS,
     gameParameters: getDefaultGameParameters(),
+    ratHole: [
+        {
+            name: 'Ratty Ratman',
+            stack: 100,
+            avatarKey: getRandomAvatarKey(),
+        },
+        {
+            name: 'Mark Anthony',
+            stack: 100,
+            avatarKey: getRandomAvatarKey(),
+        },
+        {
+            name: 'Othello',
+            stack: 100,
+            avatarKey: getRandomAvatarKey(),
+        },
+    ],
     global: {
         heroIsSeated: true,
         heroIsAdmin: true,
