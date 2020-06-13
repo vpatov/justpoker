@@ -121,6 +121,7 @@ export class StateConverter {
                           ),
                           menu: this.getValidMenuButtons(clientUUID),
                           gameParameters: this.gameStateManager.getGameParameters(),
+                          ratHole: [], // to be implemented
                       }
                     : undefined,
             audio: this.audioUpdated() || sendAll ? this.transformAudioForPlayer(heroPlayerUUID) : undefined,
@@ -148,6 +149,8 @@ export class StateConverter {
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
+            isAtTable: true, // to be implemented
+            isSpectator: false, // to be implemented
             adminNames: this.gameStateManager
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
@@ -221,6 +224,7 @@ export class StateConverter {
                 !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ||
                 this.gameStateManager.getAllCommitedBets() === 0,
             callAmount: this.gameStateManager.computeCallAmount(heroPlayerUUID),
+            totalChips: hero.chips,
         };
 
         return controller;
