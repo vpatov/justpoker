@@ -55,7 +55,6 @@ export declare interface UiGameState {
 
 export declare interface Global {
     heroIsAdmin: boolean;
-    heroIsSeated: boolean;
     isGameInProgress: boolean;
     canStartGame: boolean;
     gameWillStopAfterHand: boolean;
@@ -65,7 +64,7 @@ export declare interface Global {
     computedMaxBuyin: number;
     adminNames: string[];
     isSpectator: boolean;
-    isAtTable: boolean;
+    isHeroAtTable: boolean;
 }
 
 export declare interface Controller {
@@ -294,7 +293,6 @@ export function getCleanController(): Controller {
 export function getCleanGlobal(): Global {
     return {
         heroIsAdmin: false,
-        heroIsSeated: false,
         isGameInProgress: false,
         canStartGame: false,
         gameWillStopAfterHand: false,
@@ -304,7 +302,7 @@ export function getCleanGlobal(): Global {
         computedMaxBuyin: 1,
         adminNames: [],
         isSpectator: true,
-        isAtTable: false,
+        isHeroAtTable: false,
     };
 }
 
@@ -403,7 +401,6 @@ export const TestGame: UiGameState = {
         },
     ],
     global: {
-        heroIsSeated: true,
         heroIsAdmin: true,
         isGameInProgress: true,
         canStartGame: false,
@@ -413,8 +410,8 @@ export const TestGame: UiGameState = {
         gameParametersWillChangeAfterHand: true,
         computedMaxBuyin: 1000,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
-        isSpectator: true,
-        isAtTable: true,
+        isSpectator: false,
+        isHeroAtTable: false,
     },
     controller: {
         totalChips: 57743,

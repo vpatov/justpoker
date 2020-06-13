@@ -72,7 +72,7 @@ function ReactionPicker(props) {
     const classes = useStyles();
     const [open, SET_open] = React.useState(false);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
-    const { heroIsSeated, isSpectator } = useSelector(globalGameStateSelector);
+    const { isHeroAtTable, isSpectator } = useSelector(globalGameStateSelector);
 
     const [recentlyUsed, SET_recentlyUsed] = useStickyState(
         AnimojiKeysDefaultRecentlyUsed,
@@ -112,7 +112,7 @@ function ReactionPicker(props) {
         }));
     }
 
-    if (!heroIsSeated || isSpectator) return null;
+    if (!isHeroAtTable || isSpectator) return null;
 
     return (
         <div className={classes.hoverArea} onMouseOver={handleOpen} onMouseLeave={handleClose}>

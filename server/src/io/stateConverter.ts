@@ -141,7 +141,6 @@ export class StateConverter {
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
-            heroIsSeated: clientPlayerIsSeated,
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
             unqueueAllBettingRoundActions:
@@ -149,7 +148,7 @@ export class StateConverter {
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
-            isAtTable: true, // to be implemented
+            isHeroAtTable: true, // to be implemented
             isSpectator: false, // to be implemented
             adminNames: this.gameStateManager
                 .getAdminClientUUIDs()

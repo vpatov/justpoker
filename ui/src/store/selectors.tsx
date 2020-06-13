@@ -3,7 +3,6 @@ import { BettingRoundActionType, ALL_BETTING_ROUND_ACTION_TYPES, GameParameters 
 
 export const tableSelector = (gs: UiGameState): Table => gs.table;
 export const controllerSelector = (gs: UiGameState): Controller => gs.controller;
-export const heroIsSeatedSelector = (gs: UiGameState): boolean => gs.global.heroIsSeated;
 export const playersSelector = (gs: UiGameState): UiPlayer[] => gs.players;
 export const heroHandLabelSelector = (gs: UiGameState): string =>
     (gs.players.find((p) => p.hero) || {}).handLabel || '';
@@ -27,6 +26,5 @@ export const heroPlayerUUIDSelector = (gs: UiGameState): string => gs.players.fi
 export const playerListSelector = (gs: UiGameState): UiPlayer[] => gs.players;
 export const heroPlayerToAct = (gs: UiGameState): boolean => (gs.players.find((p) => p.hero) || {}).toAct || false;
 export const isHeroAdminSelector = (gs: UiGameState): boolean => gs.global.heroIsAdmin;
-export const isHeroSeatedSelector = (gs: UiGameState): boolean => gs.global.heroIsSeated;
 export const selectMenuButtons = (gs: UiGameState): MenuButton[] => gs.menu;
 export const selectGameParameters = (gs: UiGameState): GameParameters => gs.gameParameters;

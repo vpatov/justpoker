@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'self-start',
-            justifyContent: 'flex-end',
+            justifyContent: 'center',
         },
         sizeAndBetActionsCont: {
             width: '60%',
@@ -96,7 +96,10 @@ const useStyles = makeStyles((theme: Theme) =>
         handLabel: {
             fontSize: '1.8vmin',
             color: theme.palette.primary.main,
-            marginBottom: '4.9vmin',
+        },
+        totalChips: {
+            fontSize: '1.8vmin',
+            color: theme.palette.primary.main,
         },
         handLabelSmaller: {
             fontSize: '1.6vmin',
@@ -143,12 +146,13 @@ function ControllerComp(props: ControllerProps) {
         showWarningOnFold,
         callAmount,
         playerPositionString,
+        totalChips,
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
-    const { heroIsSeated, isSpectator } = useSelector(globalGameStateSelector);
+    const { isSpectator, isHeroAtTable } = useSelector(globalGameStateSelector);
 
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
@@ -286,9 +290,22 @@ function ControllerComp(props: ControllerProps) {
         >
             <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
             <div className={classes.gameInfoCont}>
-                {toAct ? (
-                    <Tooltip title="You should probably raise." placement="right">
-                        <Typography className={classes.toActLabel}>{'☉ Your Turn'}</Typography>
+                {!isHeroAtTable ? (
+                    <Tooltip title="Your current total chips." placement="right">
+                        <Typography
+                            className={classes.totalChips}
+                        >{`Chips: ${totalChips.toLocaleString()}`}</Typography>
+                    </Tooltip>
+                ) : null}
+                {heroHandLabel ? (
+                    <Tooltip title="Your current best hand." placement="right">
+                        <Typography
+                            className={classnames(classes.handLabel, {
+                                [classes.handLabelSmaller]: heroHandLabel.length > 22,
+                            })}
+                        >
+                            {heroHandLabel}
+                        </Typography>
                     </Tooltip>
                 ) : null}
                 {playerPositionString ? (
@@ -296,15 +313,6 @@ function ControllerComp(props: ControllerProps) {
                         <Typography className={classes.playerPositonString}>{playerPositionString}</Typography>
                     </Tooltip>
                 ) : null}
-                <Tooltip title="Your current best hand." placement="right">
-                    <Typography
-                        className={classnames(classes.handLabel, {
-                            [classes.handLabelSmaller]: heroHandLabel.length > 22,
-                        })}
-                    >
-                        {heroHandLabel}
-                    </Typography>
-                </Tooltip>
             </div>
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
@@ -348,7 +356,7 @@ function ControllerComp(props: ControllerProps) {
                     {showCardButtons?.length ? (
                         <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
                     ) : null}
-                    {heroIsSeated && allowTimeBanks ? (
+                    {isHeroAtTable && allowTimeBanks ? (
                         <Button
                             className={classnames(classes.timeBankButton, 'ani_timeBank')}
                             variant="outlined"
