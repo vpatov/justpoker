@@ -184,6 +184,11 @@ export class EventProcessorService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ClientActionType.QUITGAME]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            updates: [],
+        },
         [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),
             perform: () => this.gamePlayService.useTimeBankAction(),
