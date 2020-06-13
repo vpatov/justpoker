@@ -79,10 +79,19 @@ const useStyles = makeStyles((theme: Theme) =>
             },
             color: 'rgb(220,210,230)',
         },
+        handLogContentLabel: {
+            fontSize: '1.8vmin',
+        },
         handLogSectionLabel: {
             textTransform: 'uppercase',
             fontSize: '2.2vmin',
             color: blueGrey[700],
+        },
+        handLogPotWinnerLabel: {
+            fontSize: '1.8vmin',  
+        },
+        handLogShowHandLabel: {
+            fontSize: '1.8vmin',
         },
         handLogInlineCards: {
             display: 'flex',
@@ -543,7 +552,7 @@ function LogPanel(props: LogPanelProps) {
                 {playerHands.map((playerHand) => {
                     const playerSummary = playerSummaries[playerHand.playerUUID];
                     return (
-                        <Typography>
+                        <Typography className={classnames(classes.handLogContentLabel)}>
                             {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                             {playerHand.handDescription ? ` shows ${playerHand.handDescription}.` : ` doesn't show.`}
                         </Typography>
@@ -568,7 +577,7 @@ function LogPanel(props: LogPanelProps) {
               {winners.map((winner) => {
                   const playerSummary = playerSummaries[winner.playerUUID];
                   return (
-                      <Typography>
+                      <Typography className={classnames(classes.handLogContentLabel)}>
                           {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                           {` wins ${winner.amount}`}
                       </Typography>
@@ -588,7 +597,6 @@ function LogPanel(props: LogPanelProps) {
                 </Typography>
                 <Divider />
                 {potSummaries.map((potSummary) => {
-                    // const playerSummary = playerSummaries[potSumamry]
                     return (
                         <Typography className={classnames(classes.handLogPotSummary)}>
                             <div>Pot: {potSummary.amount}</div>
