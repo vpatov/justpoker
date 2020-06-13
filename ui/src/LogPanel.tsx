@@ -1,32 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
-import get from 'lodash/get';
-
-import TextFieldWrap from './reuseable/TextFieldWrap';
-
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
-import EmojiPicker from './EmojiPicker';
-
 import { WsServer } from './api/ws';
-import { UiChatMessage, UiHandLogEntry, UiCard } from './shared/models/uiState';
-import { getPlayerNameColor } from './style/colors';
-import { useStickyState, generateStringFromRank } from './utils';
-import { ButtonGroup, IconButton, Divider } from '@material-ui/core';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import { PlayerSummary, BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from './shared/models/handLog';
-import { PlayerPositionString } from './shared/models/playerPosition';
-import Suit from './Suit';
+import { UiChatMessage, UiHandLogEntry } from './shared/models/uiState';
+import { useStickyState, } from './utils';
+import { ButtonGroup } from '@material-ui/core';
 
 import blueGrey from '@material-ui/core/colors/blueGrey';
-import { BettingRoundActionType } from './shared/models/game';
-import { PlayerUUID } from './shared/models/uuid';
 import ChatLog from './ChatLog';
 import HandLog from './HandLog';
 
@@ -208,6 +191,40 @@ function LogPanel(props: LogPanelProps) {
     const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
     const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
     const [unreadChats, setUnreadChats] = useState(false);
+    const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
+    const [draftChatMessage, setDraftChatMessage] = useState('');
+
+    const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
+    const [currentHandNumber, setCurrentHandNumber] = useState(0);
+
+    useEffect(() => {
+        WsServer.subscribe('chat', onReceiveNewChatMessage);
+        WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
+        WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
+    }, []);
+
+    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
+        setUnreadChats(true);
+        setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
+    }
+
+    function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
+        if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
+            return;
+        }
+        setHandLogEntries((oldHandLogEntries) => {
+            // update the most recent entry
+            if (incomingHandLogEntries.length === 1){
+                const handLogEntry = incomingHandLogEntries[0];
+                const handNumber = handLogEntry.handNumber;
+                oldHandLogEntries[handNumber] = handLogEntry;
+                return [...oldHandLogEntries];
+            }
+
+            // If we received more than one handLogEntry, replace the entire list
+            return incomingHandLogEntries;
+        })
+    }
 
     function renderMessagePanelButtons() {
         return (
@@ -253,12 +270,21 @@ function LogPanel(props: LogPanelProps) {
         );
     }
 
+    // TODO consider toggle display none instead of handling data in this component
     function renderHandLog(){
         return (
-            <HandLog hideChatLog={hideChatLog} hideHandLog={hideHandLog}/>
+            <HandLog
+                hideChatLog={hideChatLog}
+                hideHandLog={hideHandLog}
+                handLogEntries={handLogEntries}
+                setHandLogEntries={setHandLogEntries}
+                currentHandNumber={currentHandNumber}
+                setCurrentHandNumber={setCurrentHandNumber}
+            />
         );
     }
 
+    // TODO consider toggle display none for child instead of handling data in this component
     function renderChatLog(){
         return (
             <ChatLog
@@ -266,6 +292,10 @@ function LogPanel(props: LogPanelProps) {
                 hideHandLog={hideHandLog}
                 unreadChats={unreadChats}
                 setUnreadChats={setUnreadChats}
+                chatMessages={chatMessages}
+                setChatMessages={setChatMessages}
+                draftChatMessage={draftChatMessage}
+                setDraftChatMessage={setDraftChatMessage}
             />
         );
     }

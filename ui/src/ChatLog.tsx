@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -91,30 +91,31 @@ createStyles({
 }),
 );
 
+// TODO Even if user chooses emoji, it doesnt get added to recent because these are recomputed every mount
+const defaultRecentEmojis = ['sweat_smile','joy','expressionless','face_with_sumbols_on_mouth','man_faceplaming','bomb','moneybag',
+'honey_pot','cookie','100','pray','skull_and_crossbones','interrobang','ok','cool','spades','hearts','diamonds','clubs','black_joker',];
+
+declare type Setter<T> = React.Dispatch<React.SetStateAction<T>>;
+
 interface ChatLogProps {
     hideChatLog: boolean;
     hideHandLog: boolean;
     unreadChats: boolean;
-    setUnreadChats: React.Dispatch<React.SetStateAction<boolean>>;
+    setUnreadChats: Setter<boolean>;
+    chatMessages: UiChatMessage[];
+    setChatMessages: Setter<UiChatMessage[]>;
+    draftChatMessage: string;
+    setDraftChatMessage: Setter<string>;
 }
 
 function ChatLog(props: ChatLogProps) {
-    const {hideChatLog, hideHandLog, unreadChats, setUnreadChats} = props;
+    const {hideChatLog, hideHandLog, unreadChats, setUnreadChats, chatMessages, setChatMessages, draftChatMessage, setDraftChatMessage} = props;
     const classes = useStyles();
 
-    const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
-    const [draftChatMessage, setDraftChatMessage] = useState('');
-
     const messagesRef = useRef(null);
-
     const scrollToBottom = () => {
         (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
     };
-
-    useEffect(() => {
-        WsServer.subscribe('chat', onReceiveNewChatMessage);
-    }, []);
-
 
     useEffect(scrollToBottom, [chatMessages, hideChatLog]);
 
@@ -133,21 +134,12 @@ function ChatLog(props: ChatLogProps) {
         }
     }
 
-    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
-        setUnreadChats(true);
-        setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
-    }
-
     const addEmoji = (emoji) => {
         setDraftChatMessage(draftChatMessage + emoji.native);
     };
 
-
-    return (
-        <div
-            className={classnames(classes.chatLogContainer)}
-            style={!hideHandLog ? {height: '50%'} : { }}
-        >
+    function renderChatMessages(){
+        return (
             <div className={classes.chatLogMessages}>
                 {chatMessages.map((message) => (
                     <Typography key={message.timestamp} className={classes.chatMessage}>
@@ -162,49 +154,56 @@ function ChatLog(props: ChatLogProps) {
                 ))}
                 <div ref={messagesRef} />
             </div>
-            <div className={classes.chatLogInputSection}>
-                <TextFieldWrap
-                    placeholder="Send Message"
-                    value={draftChatMessage}
-                    className={classes.messageTextField}
-                    onChange={(event) => {
-                        setDraftChatMessage(event.target.value);
-                    }}
-                    InputProps={{ classes: { input: classes.messageInput } }}
-                    onKeyPress={(event) => onTextAreaPressEnter(event)}
-                    multiline={true}
-                    rowsMax={7}
-                    maxChars={300}
-                />
+        )
+    }
 
-                <EmojiPicker
-                    className={classes.emojiPicker}
-                    onSelect={addEmoji}
-                    recent={[
-                        'sweat_smile',
-                        'joy',
-                        'expressionless',
-                        'face_with_sumbols_on_mouth',
-                        'man_faceplaming',
-                        'bomb',
-                        'moneybag',
-                        'honey_pot',
-                        'cookie',
-                        '100',
-                        'pray',
-                        'skull_and_crossbones',
-                        'interrobang',
-                        'ok',
-                        'cool',
-                        'spades',
-                        'hearts',
-                        'diamonds',
-                        'clubs',
-                        'black_joker',
-                    ]}
-                    useButton={false}
-                />
+    function renderSendMessageArea(){
+        return (
+            <TextFieldWrap
+                placeholder="Send Message"
+                value={draftChatMessage}
+                className={classes.messageTextField}
+                onChange={(event) => {
+                    setDraftChatMessage(event.target.value);
+                }}
+                InputProps={{ classes: { input: classes.messageInput } }}
+                onKeyPress={(event) => onTextAreaPressEnter(event)}
+                multiline={true}
+                rowsMax={7}
+                maxChars={300}
+            />
+        );
+    }
+
+    function renderChatLogInputSection() {
+        return (
+            <div className={classes.chatLogInputSection}>
+                {renderSendMessageArea()}
+                {renderEmojiPicker()}
             </div>
+        );
+    }
+
+
+
+    function renderEmojiPicker(){
+        return (
+            <EmojiPicker
+                className={classes.emojiPicker}
+                onSelect={addEmoji}
+                recent={defaultRecentEmojis}
+                useButton={false}
+                />
+        )
+    }
+
+    return (
+        <div
+            className={classnames(classes.chatLogContainer)}
+            style={!hideHandLog ? {height: '50%'} : { }}
+        >
+            {renderChatMessages()}
+            {renderChatLogInputSection()}
         </div>
     );
 }

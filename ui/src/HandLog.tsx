@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
 
 import Typography from '@material-ui/core/Typography';
 
-import { WsServer } from './api/ws';
 import { UiHandLogEntry, UiCard } from './shared/models/uiState';
 import { getPlayerNameColor } from './style/colors';
 import { generateStringFromRank } from './utils';
@@ -109,42 +108,21 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+declare type Setter<T> = React.Dispatch<React.SetStateAction<T>>;
 
 interface HandLogProps {
     hideChatLog: boolean;
     hideHandLog: boolean;
+    handLogEntries: UiHandLogEntry[];
+    setHandLogEntries: Setter<UiHandLogEntry[]>
+    currentHandNumber: number;
+    setCurrentHandNumber: Setter<number>;
 }
 
 function HandLog(props: HandLogProps) {
     const classes = useStyles();
-    const {hideChatLog, hideHandLog} = props;
+    const {hideChatLog, hideHandLog, handLogEntries, setHandLogEntries, currentHandNumber, setCurrentHandNumber} = props;
 
-    const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
-    const [currentHandNumber, setCurrentHandNumber] = useState(0);
-
-    useEffect(() => {
-        WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
-        WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
-    }, []);
-
-
-    function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
-        if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
-            return;
-        }
-        setHandLogEntries((oldHandLogEntries) => {
-            // update the most recent entry
-            if (incomingHandLogEntries.length === 1){
-                const handLogEntry = incomingHandLogEntries[0];
-                const handNumber = handLogEntry.handNumber;
-                oldHandLogEntries[handNumber] = handLogEntry;
-                return [...oldHandLogEntries];
-            }
-
-            // If we received more than one handLogEntry, replace the entire list
-            return incomingHandLogEntries;
-        })
-    }
 
 
     function getHandNumberString(){
@@ -408,7 +386,7 @@ function HandLog(props: HandLogProps) {
                 {potSummaries.map((potSummary) => {
                     return (
                         <Typography className={classnames(classes.handLogPotSummary)}>
-                            <div>Pot: {potSummary.amount}</div>
+                            Pot: {potSummary.amount}
                             {renderPlayerHands(potSummary.playerHands)}
                             {renderPotWinners(potSummary.winners)}
                         </Typography>
