@@ -14,7 +14,7 @@ docker push gcr.io/justpoker-279900/justpoker:latest;
 
 # update image on VM
 echo "updating vm instance group on google compute engine...";
-gcloud compute instances update-container jp-instance-group-p6zb --zone us-central1-a --container-image gcr.io/justpoker-279900/justpoker:latest;
+gcloud compute instances update-container jp-instance-group-ph0t --zone us-central1-a --container-image gcr.io/justpoker-279900/justpoker:latest;
 
 # pull image from GCR
 # docker pull gcr.io/justpoker-279900/justpoker:latest

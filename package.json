@@ -10,7 +10,6 @@
     "concurrently": "^1.0.0"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.155",
-    "jsondiffpatch": "^0.4.1"
+    "@types/lodash": "^4.14.155"
   }
 }
