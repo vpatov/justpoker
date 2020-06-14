@@ -3,10 +3,15 @@ import { StateConverter } from '../io/stateConverter';
 import * as WebSocket from 'ws';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/uuid';
-
+import * as jsondiffpatch from 'jsondiffpatch';
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
-    [gameInstanceUUID: string]: { [clientUUID: string]: WebSocket };
+    [gameInstanceUUID: string]: { [clientUUID: string]: Client };
+}
+
+export interface Client {
+    ws: WebSocket;
+    lastSentState: Record<string, any>;
 }
 
 @Service()
@@ -15,10 +20,21 @@ export class ConnectedClientManager {
 
     constructor(private stateConverter: StateConverter) {}
 
+    getClientGroups(): ClientGroups {
+        return this.ClientGroups;
+    }
+
     addOrUpdateClientInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: WebSocket): boolean {
         if (this.ClientGroups[gameInstanceUUID]) {
-            // add to group if exists
-            this.ClientGroups[gameInstanceUUID][clientUUID] = ws;
+            const client = this.ClientGroups[gameInstanceUUID][clientUUID];
+            if (client) {
+                // update ws if client exists
+                client.ws = ws;
+            } else {
+                // create if client doesnt exist
+                this.ClientGroups[gameInstanceUUID][clientUUID] = { ws: ws, lastSentState: {} };
+            }
+
             return true;
         }
         // group does not exist
@@ -31,7 +47,7 @@ export class ConnectedClientManager {
 
     @debugFunc()
     removeClientFromGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): boolean {
-        const ws = this.ClientGroups[gameInstanceUUID]?.[clientUUID];
+        const ws = this.ClientGroups[gameInstanceUUID]?.[clientUUID]?.ws;
         if (ws) {
             // remove from group if is in group
             ws.close(1000); // close if not already closed, 1000 indicated normal close
@@ -46,7 +62,7 @@ export class ConnectedClientManager {
         logger.verbose(`removing group ${gameInstanceUUID}`);
         if (this.ClientGroups[gameInstanceUUID]) {
             // close all websockets
-            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((ws) => ws.close(1000)); // 1000 indicated normal close
+            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((client) => client.ws.close(1000)); // 1000 indicated normal close
             // remove group if group exists
             delete this.ClientGroups[gameInstanceUUID];
         }
@@ -62,10 +78,14 @@ export class ConnectedClientManager {
 
     // would be good to refactor this so there isnt a direct dependency on stateConverter
     sendStateToEachInGroup(gameInstanceUUID: GameInstanceUUID) {
-        Object.entries(this.ClientGroups[gameInstanceUUID]).forEach(([clientUUID, websocket]) => {
+        Object.entries(this.ClientGroups[gameInstanceUUID]).forEach(([clientUUID, client]) => {
             const newState = this.stateConverter.getUIState(clientUUID as ClientUUID, false);
-            const jsonRes = JSON.stringify(newState);
-            websocket.send(jsonRes);
+            const delta = jsondiffpatch.diff(client.lastSentState, newState);
+            if (delta !== undefined) {
+                client.lastSentState = newState;
+                const jsonRes = JSON.stringify(delta);
+                client.ws.send(jsonRes);
+            }
         });
     }
 }

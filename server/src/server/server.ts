@@ -46,9 +46,15 @@ class Server {
             res.send({ health: 'Great :)' });
         });
 
-        router.get('/gameInstanceCount', (req, res) => {
+        router.get('/metrics', (req, res) => {
             const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
-            res.send({ count: instanceUUIDs.length, instanceList: instanceUUIDs });
+            const clientGroups = this.connectedClientManager.getClientGroups();
+
+            const WScount = Object.values(clientGroups).reduce(
+                (count, client) => count + Object.keys(client).length,
+                0,
+            );
+            res.send({ gameCount: instanceUUIDs.length, activeWS: WScount, gameInstances: instanceUUIDs });
         });
 
         router.post('/api/createGame', (req, res) => {
@@ -141,7 +147,10 @@ class Server {
     }
 
     initGameWSS() {
-        this.wss = new WebSocket.Server({ server: this.server });
+        this.wss = new WebSocket.Server({
+            server: this.server,
+            maxPayload: 100 * 100 * 4, // about 4 MBs
+        });
         this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             const ip = req.connection.remoteAddress;
             logger.verbose(`WS connection request from: ${ip} on url: ${req.url}`);

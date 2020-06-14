@@ -12,7 +12,7 @@ import queryString from "query-string";
 import WebSocket from "ws";
 
 let url = "justpoker.games";
-// url = "0.0.0.0:8080"; // uncomment for local
+url = "0.0.0.0:8080"; // uncomment for local
 const api = axios.create({
   baseURL: `http://${url}`,
 });
@@ -102,7 +102,7 @@ function playerCheck(ws) {
 function checkOnToAct(ws) {
   function onGameMessage(msg) {
     const jsonData = JSON.parse(get(msg, "data", {}));
-    const toAct = get(jsonData, "game.controller.toAct", false);
+    const toAct = get(jsonData, "game.controller.toAct[1]", false);
     if (toAct) {
       playerCheck(ws);
     }
