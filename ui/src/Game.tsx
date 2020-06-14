@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
     },
     disabled: {
         transition: 'opacity 0.15s linear',
-        opacity: 0.3,
+        opacity: 0.1,
         pointerEvents: 'none',
     },
 }));

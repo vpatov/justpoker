@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         justifyContent: 'flex-end',
         transform: 'translateY(-50%) translateX(-50%)',
+        filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
     },
     folded: {
         opacity: 0.5,
@@ -30,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         fontSize: '1.4vmin',
     },
+    disconnected: {},
     hero: {
         transform: 'translateY(-50%) translateX(-50%) scale(1.21)',
     },
@@ -62,7 +64,9 @@ function Player(props) {
 
     function getPlayerLabelComponent() {
         if (disconnected) {
-            return <Typography className={classes.labelText}>Disconnected</Typography>;
+            return (
+                <Typography className={classnames(classes.labelText, classes.disconnected)}>Disconnected</Typography>
+            );
         }
         if (playerTimer) {
             return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
@@ -85,7 +89,7 @@ function Player(props) {
     return (
         <div
             className={classnames(classes.root, className, {
-                [classes.folded]: folded || sittingOut || disconnected,
+                [classes.folded]: folded || sittingOut,
                 [classes.hero]: hero,
             })}
             style={style}
