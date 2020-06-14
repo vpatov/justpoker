@@ -11,6 +11,7 @@ import GameLabel from './GameLabel';
 import ControllerTimer from './ControllerTimer';
 import GameDisconnetionMessage from './GameDisconnectionMessage';
 import ReactionPicker from './ReactionPicker';
+import GameKeepAliveListener from './GameKeepAliveListener';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { useStickyState } from './utils';
@@ -51,6 +52,7 @@ function Game(props) {
     const { wsConnClosed } = props;
     return (
         <>
+            <GameKeepAliveListener />
             {wsConnClosed ? <GameDisconnetionMessage /> : null}
             <div className={classnames(classes.root, { [classes.disabled]: wsConnClosed })}>
                 <GameMenu mute={mute} SET_mute={SET_mute} />

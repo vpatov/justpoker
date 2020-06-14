@@ -64,6 +64,7 @@ export enum ClientActionType {
     SETGAMEPARAMETERS = 'SETGAMEPARAMETERS',
     ADDADMIN = 'ADDADMIN',
     REMOVEADMIN = 'REMOVEADMIN',
+    KEEPALIVE = 'KEEPALIVE',
 }
 
 export enum ServerActionType {

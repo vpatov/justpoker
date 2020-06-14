@@ -221,6 +221,12 @@ export class EventProcessorService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
+        // TODO keep alive should not trigger BE to resend state
+        [ClientActionType.KEEPALIVE]: {
+            validation: (uuid, req) => undefined,
+            perform: (uuid, req: PlayerReactionRequest) => {},
+            updates: [],
+        },
     };
 
     @debugFunc()

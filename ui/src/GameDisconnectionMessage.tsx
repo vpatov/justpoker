@@ -37,7 +37,7 @@ function GameDisconnectionMessage(props) {
 
     return (
         <div className={classes.root}>
-            <Typography className={classes.message}>Uh Oh! You Are Disconnected.</Typography>
+            <Typography className={classes.message}>You Are Disconnected.</Typography>
 
             <Button
                 className={classes.button}
