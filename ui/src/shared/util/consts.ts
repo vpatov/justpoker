@@ -20,5 +20,5 @@ export const MAX_VALUES = {
     TIME_BANK_TIME: 60 * 10, // 10 minutes
 };
 
-export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 6; // 6 minutes
-export const ATTEMPT_EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes
+export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes
+export const ATTEMPT_EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 15; // 15 minutes
