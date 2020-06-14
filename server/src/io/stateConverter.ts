@@ -42,7 +42,6 @@ import { AnimationService } from '../state/animationService';
 import { ChatService } from '../state/chatService';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
-import { debugFunc } from '../logger';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getHoleCardNickname } from '../../../ui/src/shared/models/game/cards';
 
@@ -90,7 +89,6 @@ export class StateConverter {
     }
 
     // Hero refers to the player who is receiving this particular UiState.
-    @debugFunc({ noResult: true })
     transformGameStateToUIState(clientUUID: ClientUUID, forceSendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
@@ -145,7 +143,6 @@ export class StateConverter {
         return uiState;
     }
 
-    @debugFunc({ noResult: true })
     getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
@@ -176,7 +173,6 @@ export class StateConverter {
     // and returns an unpopulated controller for when its not the players turn? Or is this function
     // only called for the current player to act? Whatever the choice is, the usage/parameters have
     // to be made consistent with the decision, because there is some redundancy right now.
-    @debugFunc({ noResult: true })
     getUIController(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): Controller {
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
 
@@ -368,7 +364,7 @@ export class StateConverter {
     }
 
     computeHandLabel(isHero: boolean, player: Player) {
-        if (isHero && player.holeCards.length > 0) {
+        if (isHero && player.holeCards.length > 0 && player.bestHand) {
             const shouldAttemptConvertToNickName =
                 player.holeCards.length === 2 &&
                 this.gameStateManager.getBettingRoundStage() === BettingRoundStage.PREFLOP;

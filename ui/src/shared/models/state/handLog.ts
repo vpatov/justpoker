@@ -53,8 +53,8 @@ export declare interface PlayerSummary {
     playerUUID: PlayerUUID;
     playerName: string;
     position: PlayerPosition;
-    wasDealtIn: boolean;
     holeCards: Card[];
+    wasDealtIn: boolean;
     startingChips: number;
     totalChipDeltaForHand: number;
     seatNumber: number;
@@ -94,8 +94,8 @@ export function getCleanPlayerSummary(): PlayerSummary {
         playerUUID: makeBlankUUID(),
         playerName: '',
         position: PlayerPosition.NOT_PLAYING,
-        wasDealtIn: false,
         holeCards: [],
+        wasDealtIn: false,
         startingChips: 0,
         totalChipDeltaForHand: 0,
         seatNumber: -1,

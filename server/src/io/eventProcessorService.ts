@@ -223,7 +223,6 @@ export class EventProcessorService {
         },
     };
 
-    @debugFunc()
     processServerAction(serverAction: ServerAction) {
         switch (serverAction.actionType) {
             case ServerActionType.TIMEOUT: {
@@ -236,7 +235,6 @@ export class EventProcessorService {
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }
 
-    @debugFunc()
     processClientAction(clientAction: ClientAction): ValidationResponse {
         const { clientUUID, actionType, request } = clientAction;
 
