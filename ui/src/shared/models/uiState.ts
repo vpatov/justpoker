@@ -53,6 +53,7 @@ export declare interface UiGameState {
     players: UiPlayer[];
     menu: MenuButton[];
     gameParameters: GameParameters;
+    ratHole: RatHolePlayer[];
 }
 
 export declare interface Global {
@@ -65,9 +66,13 @@ export declare interface Global {
     areOpenSeats: boolean;
     gameParametersWillChangeAfterHand: boolean;
     computedMaxBuyin: number;
+    adminNames: string[];
+    isSpectator: boolean;
+    isAtTable: boolean;
 }
 
 export declare interface Controller {
+    totalChips: number;
     min: number;
     max: number;
     timeBanks: number;
@@ -152,9 +157,16 @@ export declare interface UiPlayer {
     bet?: number;
     handLabel?: string;
     playerTimer?: PlayerTimer;
+    admin: boolean;
     hand: {
         cards: UiCard[];
     };
+    avatarKey: AvatarKeys;
+}
+
+export declare interface RatHolePlayer {
+    name: string;
+    stack: number;
     avatarKey: AvatarKeys;
 }
 
@@ -278,6 +290,7 @@ export function getCleanUiChatLog(): UiChatLog {
 /* Clean Controller for init. */
 export function getCleanController(): Controller {
     return {
+        totalChips: 0,
         toAct: false,
         lastBettingRoundAction: NOT_IN_HAND,
         min: 0,
@@ -303,6 +316,9 @@ export function getCleanGlobal(): Global {
         unqueueAllBettingRoundActions: true,
         areOpenSeats: true,
         computedMaxBuyin: 1,
+        adminNames: [],
+        isSpectator: true,
+        isAtTable: false,
     };
 }
 
@@ -318,6 +334,7 @@ export function getCleanGame(): UiGameState {
             communityCards: [],
         },
         players: [],
+        ratHole: [],
         gameParameters: getCleanGameParameters(),
     };
 }
@@ -383,6 +400,23 @@ shuffle(positions);
 export const TestGame: UiGameState = {
     menu: ALL_MENU_BUTTONS,
     gameParameters: getDefaultGameParameters(),
+    ratHole: [
+        {
+            name: 'Ratty Ratman',
+            stack: 100,
+            avatarKey: getRandomAvatarKey(),
+        },
+        {
+            name: 'Mark Anthony',
+            stack: 100,
+            avatarKey: getRandomAvatarKey(),
+        },
+        {
+            name: 'Othello',
+            stack: 100,
+            avatarKey: getRandomAvatarKey(),
+        },
+    ],
     global: {
         heroIsSeated: true,
         heroIsAdmin: true,
@@ -393,8 +427,12 @@ export const TestGame: UiGameState = {
         areOpenSeats: true,
         gameParametersWillChangeAfterHand: true,
         computedMaxBuyin: 1000,
+        adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
+        isSpectator: true,
+        isAtTable: true,
     },
     controller: {
+        totalChips: 57743,
         showWarningOnFold: true,
         toAct: true,
         lastBettingRoundAction: CHECK_ACTION,
@@ -470,6 +508,7 @@ export const TestGame: UiGameState = {
                 cards: [{ ...genRandomCard() }, genRandomCard()],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: true,
         },
         {
             name: 'Marty Shakus',
@@ -482,6 +521,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }, { hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Dean Markus',
@@ -497,6 +537,7 @@ export const TestGame: UiGameState = {
                 ],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         // {
         //     name: "Johnny Bones",
@@ -507,6 +548,7 @@ export const TestGame: UiGameState = {
         //         cards: [{ hidden: true }, { hidden: true }],
         //     },
         //     avatarKey: getRandomAvatarKey(),
+        //     admin: false,
         // },
 
         {
@@ -520,6 +562,7 @@ export const TestGame: UiGameState = {
                 cards: [genRandomCard(), genRandomCard(), genRandomCard(), genRandomCard()],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Lenny',
@@ -529,6 +572,7 @@ export const TestGame: UiGameState = {
                 cards: [],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: true,
         },
         {
             name: 'Jimmy Dean',
@@ -541,6 +585,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Nicki Lam',
@@ -552,6 +597,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
         {
             name: 'Tommy Bones',
@@ -563,6 +609,7 @@ export const TestGame: UiGameState = {
                 cards: [{ hidden: true }, { hidden: true }],
             },
             avatarKey: getRandomAvatarKey(),
+            admin: false,
         },
     ],
 };

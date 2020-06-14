@@ -5,8 +5,7 @@
 ## build_env=(DEV|PROD)
 
 ## In order to run the container, run:
-## $ sudo docker run -d -p <PORT>:8080 justpoker
-## where PORT is a port on the host machine that will be bound to the container's internal port (currently 8080)
+## $ docker run -d justpoker
 FROM node:13.12.0-alpine
 
 # set build_env default
@@ -34,3 +33,4 @@ ENV NODE_SERVER_ENVIRONMENT=${build_env}
 ENV ROOT_SERVER_DIR="/justpoker"
 # Build and start the server.
 CMD ["npm", "start"]
+

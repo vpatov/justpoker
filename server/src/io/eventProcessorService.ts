@@ -11,6 +11,8 @@ import {
     ShowCardRequest,
     PlayerReactionRequest,
     SetGameParametersRequest,
+    RemoveAdminRequest,
+    AddAdminRequest,
 } from '../../../ui/src/shared/models/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { ValidationService } from '../logic/validationService';
@@ -164,6 +166,16 @@ export class EventProcessorService {
             perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.removePlayerFromGame(req.playerUUID),
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ClientActionType.ADDADMIN]: {
+            validation: (uuid, req: AddAdminRequest) => this.validationService.validateAddAdminAction(uuid, req),
+            perform: (uuid, req: AddAdminRequest) => this.gameStateManager.addPlayerAdmin(req.playerUUID),
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.REMOVEADMIN]: {
+            validation: (uuid, req: RemoveAdminRequest) => this.validationService.validateRemoveAdminAction(uuid, req),
+            perform: (uuid, req: BootPlayerRequest) => this.gameStateManager.removePlayerAdmin(req.playerUUID),
+            updates: [ServerStateKey.GAMESTATE],
+        },
         [ClientActionType.LEAVETABLE]: {
             validation: (uuid, req) => this.validationService.validateLeaveTableAction(uuid),
             perform: (uuid) => {
@@ -171,6 +183,11 @@ export class EventProcessorService {
                 this.gameStateManager.removePlayerFromGame(player.uuid);
             },
             updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.QUITGAME]: {
+            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
+            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            updates: [],
         },
         [ClientActionType.USETIMEBANK]: {
             validation: (uuid, req) => this.validationService.validateUseTimeBankAction(uuid),

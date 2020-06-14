@@ -37,6 +37,9 @@ export declare interface Player {
     /** Gameplay goes from lower seat number to higher seat number and wraps around. */
     seatNumber: number;
 
+    /** If this player must post a big blind next hand */
+    willPostBlind: boolean;
+
     /**
      * The last action that the player has performed (check, bet, etc.) If they are in the
      * current hand, but have not acted yet, lastAction.type === WAITING_TO_ACT.
@@ -72,6 +75,7 @@ export function getCleanPlayer(): Player {
         sitting: false,
         sittingOut: false,
         quitting: false,
+        willPostBlind: false,
         willStraddle: false,
         seatNumber: -1,
         lastActionType: BettingRoundActionType.NOT_IN_HAND,

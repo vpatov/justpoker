@@ -45,6 +45,9 @@ export declare interface GameState {
 
     straddleUUID: PlayerUUID;
 
+    // used to see who should post blinds
+    prevBigBlindUUID: PlayerUUID;
+
     // playerUUID of last player to bet or raise
     lastAggressorUUID: PlayerUUID;
 
@@ -80,7 +83,7 @@ export declare interface GameState {
     deck: Deck;
 
     /** Sensitive field. */
-    admin: ClientUUID;
+    admins: ClientUUID[];
 
     /** Sensitive field. */
     activeConnections: Map<ClientUUID, ConnectedClient>;
@@ -147,10 +150,11 @@ export function getCleanGameState(): GameState {
         smallBlindUUID: makeBlankUUID(),
         bigBlindUUID: makeBlankUUID(),
         straddleUUID: makeBlankUUID(),
+        prevBigBlindUUID: makeBlankUUID(),
         lastAggressorUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: makeBlankUUID(),
-        admin: makeBlankUUID(),
+        admins: [],
         currentPlayerToAct: makeBlankUUID(),
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,

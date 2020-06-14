@@ -16,6 +16,8 @@ const useStyles = makeStyles((theme) => ({
     svgCont: {
         position: 'relative',
         marginTop: '-3vmin',
+        width: '2.5vmin',
+        height: '5vmin',
     },
 }));
 
@@ -36,8 +38,6 @@ function ChipStack(props) {
             <svg key={index}
                 className={classnames(classes.svgCont, 'ani_chipStack')}
                 viewBox="0 0 100 200"
-                width="2.5vmin"
-                height="5vmin"
             >
                 <Fragment> {chips}</Fragment>
             </svg>

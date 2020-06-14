@@ -293,6 +293,14 @@ export class GameStateManager {
         this.gameState.straddleUUID = straddleUUID;
     }
 
+    setPrevBigBlindUUID(playerUUID: PlayerUUID) {
+        this.gameState.prevBigBlindUUID = playerUUID;
+    }
+
+    getPrevBigBlindUUID(): PlayerUUID {
+        return this.gameState.prevBigBlindUUID;
+    }
+
     getHandNumber() {
         return this.gameState.handNumber;
     }
@@ -668,7 +676,7 @@ export class GameStateManager {
             this.isPlayerReadyToPlay(playerUUID) &&
             this.getPlayersReadyToPlay().length >= 2 &&
             !this.isGameInProgress() &&
-            this.isPlayerAdmin(this.getClientByPlayerUUID(playerUUID))
+            this.isPlayerAdmin(playerUUID)
         );
     }
 
@@ -747,6 +755,25 @@ export class GameStateManager {
         return nextPlayerUUID;
     }
 
+    getPlayerInBetween(firstPlayerUUID: PlayerUUID, secondPlayerUUID: PlayerUUID): PlayerUUID[] {
+        const seats = this.getSeats();
+        const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === firstPlayerUUID);
+        // find the next player that is in the hand
+        let nextIndex = (currentIndex + 1) % seats.length;
+        let [_, nextPlayerUUID] = seats[nextIndex];
+        let counted = 0;
+
+        const playersInBetween: PlayerUUID[] = [];
+        while (nextPlayerUUID !== secondPlayerUUID && counted < seats.length) {
+            playersInBetween.push(nextPlayerUUID);
+            nextIndex = (nextIndex + 1) % seats.length;
+            [_, nextPlayerUUID] = seats[nextIndex];
+            counted += 1;
+        }
+
+        return playersInBetween;
+    }
+
     isSeatTaken(seatNumber: number) {
         return Object.entries(this.gameState.players).some(([uuid, player]) => player.seatNumber === seatNumber);
     }
@@ -779,8 +806,8 @@ export class GameStateManager {
     initConnectedClient(clientUUID: ClientUUID) {
         const client = this.gameState.activeConnections.get(clientUUID);
         if (!client) {
-            if (!this.gameState.admin) {
-                this.initAdmin(clientUUID);
+            if (this.gameState.admins.length === 0) {
+                this.addClientAdmin(clientUUID);
             }
             const newClient = this.createConnectedClient(clientUUID);
             this.gameState.activeConnections.set(clientUUID, newClient);
@@ -788,12 +815,38 @@ export class GameStateManager {
         }
     }
 
-    initAdmin(clientUUID: ClientUUID) {
-        this.gameState.admin = clientUUID;
+    isPlayerAdmin(playerUUID: PlayerUUID): boolean {
+        return this.gameState.admins.includes(this.getClientByPlayerUUID(playerUUID));
     }
 
-    getAdminUUID() {
-        return this.gameState.admin;
+    isClientAdmin(clientUUID: ClientUUID): boolean {
+        return this.gameState.admins.includes(clientUUID);
+    }
+
+    getAdminClientUUIDs(): ClientUUID[] {
+        return this.gameState.admins;
+    }
+
+    addPlayerAdmin(playerUUID: PlayerUUID) {
+        this.addClientAdmin(this.getClientByPlayerUUID(playerUUID));
+    }
+
+    addClientAdmin(clientUUID: ClientUUID) {
+        this.gameState.admins.push(clientUUID);
+    }
+
+    removePlayerAdmin(playerUUID: PlayerUUID) {
+        // if last admin, make all players admin, then remove
+        if (this.gameState.admins.length === 1) {
+            this.gameState.admins.push(
+                ...Object.keys(this.getPlayers()).map((playerUUID) =>
+                    this.getClientByPlayerUUID(playerUUID as PlayerUUID),
+                ),
+            );
+        }
+        this.gameState.admins = this.gameState.admins.filter(
+            (clientUUID) => clientUUID !== this.getClientByPlayerUUID(playerUUID),
+        );
     }
 
     @debugFunc()
@@ -852,6 +905,9 @@ export class GameStateManager {
             this.setPlayerQuitting(playerUUID, true);
         } else {
             if (this.getPlayer(playerUUID)) {
+                if (this.isPlayerAdmin(playerUUID)) {
+                    this.removePlayerAdmin(playerUUID);
+                }
                 this.removePlayerFromPlayers(playerUUID);
                 this.deassociateClientAndPlayer(playerUUID);
             }
@@ -894,6 +950,17 @@ export class GameStateManager {
 
         this.ledgerService.addAlias(clientUUID, name);
         this.ledgerService.addBuyin(clientUUID, buyin);
+        if (this.isGameInProgress()) {
+            this.setPlayerWillPostBlind(player.uuid, true);
+        }
+    }
+
+    setPlayerWillPostBlind(playerUUID: PlayerUUID, value: boolean) {
+        this.gameState.players[playerUUID].willPostBlind = value;
+    }
+
+    getPlayersThatWillPostBlind(): Player[] {
+        return Object.values(this.gameState.players).filter((player: Player) => player.willPostBlind);
     }
 
     setWillPlayerStraddle(playerUUID: PlayerUUID, willStraddle: boolean) {
@@ -1157,10 +1224,6 @@ export class GameStateManager {
         return playersInHand.reduce((max, player) => {
             return player.betAmount > max ? player.betAmount : max;
         }, 0);
-    }
-
-    isPlayerAdmin(clientUUID: ClientUUID): boolean {
-        return this.getAdminUUID() === clientUUID;
     }
 
     isPlayerAllIn(playerUUID: PlayerUUID): boolean {
