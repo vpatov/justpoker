@@ -13,7 +13,7 @@ import { EventProcessorService } from '../io/eventProcessorService';
 import { StateConverter } from '../io/stateConverter';
 import { GameInstanceManager } from '../state/gameInstanceManager';
 
-import { ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src/shared/models/api';
+import { ClientAction, Event, EventType, ClientWsMessage, createWSCloseEvent } from '../../../ui/src/shared/models/api';
 
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from './connectedClientManager';
@@ -149,7 +149,7 @@ class Server {
     initGameWSS() {
         this.wss = new WebSocket.Server({
             server: this.server,
-            maxPayload: 100 * 100 * 4, // about 4 MBs
+            maxPayload: 100 * 100 * 1, // about 1 MB
         });
         this.wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             const ip = req.connection.remoteAddress;
@@ -195,16 +195,26 @@ class Server {
         // the event being a server action like GAME_INIT or something.
         ws.send(JSON.stringify(this.stateConverter.getUIState(clientUUID, true)));
 
-        ws.on('message', (data: WebSocket.Data) => this.processGameMessage(data, clientUUID, gameInstanceUUID));
-        ws.on('close', (data: WebSocket.Data) => {
-            logger.verbose(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
-            const succ = this.connectedClientManager.removeClientFromGroup(gameInstanceUUID, clientUUID);
-            if (!succ) {
-                logger.verbose(
-                    `Client ${clientUUID} not in group ${gameInstanceUUID}. Cannot remove from group. May have been deleted in other context.`,
-                );
-            }
+        ws.on('message', (data: WebSocket.Data) => {
+            this.connectedClientManager.setClientTimeMessaged(gameInstanceUUID, clientUUID);
+            this.processGameMessage(data, clientUUID, gameInstanceUUID);
         });
+        ws.on('close', (data: WebSocket.Data) => {
+            this.onWSClose(data, clientUUID, gameInstanceUUID);
+        });
+    }
+
+    onWSClose(data: WebSocket.Data, clientUUID: ClientUUID, gameInstanceUUID: GameInstanceUUID) {
+        logger.verbose(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
+        const closeEvent = createWSCloseEvent(gameInstanceUUID, clientUUID);
+        this.eventProcessorService.processEvent(closeEvent);
+
+        const succ = this.connectedClientManager.removeClientFromGroup(gameInstanceUUID, clientUUID);
+        if (!succ) {
+            logger.verbose(
+                `Client ${clientUUID} not in group ${gameInstanceUUID}. Cannot remove from group. May have been deleted in other context.`,
+            );
+        }
     }
 
     init() {

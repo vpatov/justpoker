@@ -931,6 +931,10 @@ export class GameStateManager {
         this.gameState.activeConnections.set(clientUUID, this.createConnectedClient(clientUUID));
     }
 
+    setPlayerDisconnected(playerUUID: PlayerUUID) {
+        this.getPlayers()[playerUUID].disconnected = true;
+    }
+
     addNewPlayerToGame(clientUUID: ClientUUID, request: JoinTableRequest) {
         const { name, buyin, avatarKey } = request;
         const player = this.createNewPlayer(name, buyin, avatarKey);

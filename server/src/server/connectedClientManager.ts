@@ -3,6 +3,7 @@ import { StateConverter } from '../io/stateConverter';
 import * as WebSocket from 'ws';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/uuid';
+import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
     [gameInstanceUUID: string]: { [clientUUID: string]: Client };
@@ -10,17 +11,43 @@ export interface ClientGroups {
 
 export interface Client {
     ws: WebSocket;
-    lastSentState: Record<string, any>;
+    lastMessaged: number;
 }
+
+const EXPIRE_CLIENT_TIME = 1000 * 12; // expire games after 15 min of inactivity
 
 @Service()
 export class ConnectedClientManager {
     private ClientGroups: ClientGroups = {};
 
-    constructor(private stateConverter: StateConverter) {}
+    constructor(private stateConverter: StateConverter) {
+        setInterval(() => this.clearStaleClients(), 1000); // attempt to expire clients every 20 minutes
+    }
 
     getClientGroups(): ClientGroups {
         return this.ClientGroups;
+    }
+
+    setClientTimeMessaged(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID) {
+        this.ClientGroups[gameInstanceUUID][clientUUID].lastMessaged = getEpochTimeMs();
+    }
+
+    clearStaleClients() {
+        logger.info(`attempting to expiring game instances`);
+        if (this.ClientGroups) {
+            // TODO implement warning game will be cleared do to inactivity
+            const now = getEpochTimeMs();
+            Object.entries(this.ClientGroups).forEach(([gameInstanceUUID, clients]) => {
+                Object.entries(clients).forEach(([clientUUID, client]) => {
+                    const timeInactive = now - client.lastMessaged;
+                    logger.info(`${clientUUID} in game ${gameInstanceUUID} has been inactive for ${timeInactive}`);
+                    if (timeInactive > EXPIRE_CLIENT_TIME) {
+                        logger.info(`expiring game instance ${gameInstanceUUID}`);
+                        this.removeClientFromGroup(gameInstanceUUID as GameInstanceUUID, clientUUID as ClientUUID);
+                    }
+                });
+            });
+        }
     }
 
     addOrUpdateClientInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: WebSocket): boolean {
@@ -31,7 +58,7 @@ export class ConnectedClientManager {
                 client.ws = ws;
             } else {
                 // create if client doesnt exist
-                this.ClientGroups[gameInstanceUUID][clientUUID] = { ws: ws, lastSentState: {} };
+                this.ClientGroups[gameInstanceUUID][clientUUID] = { ws: ws, lastMessaged: getEpochTimeMs() };
             }
 
             return true;

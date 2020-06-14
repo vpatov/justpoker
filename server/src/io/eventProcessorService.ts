@@ -231,6 +231,14 @@ export class EventProcessorService {
                 }
                 break;
             }
+            case ServerActionType.WS_CLOSE: {
+                const player = this.gameStateManager.getPlayerByClientUUID(serverAction.clientUUID);
+                if (player) {
+                    this.gameStateManager.setPlayerDisconnected(player.uuid);
+                }
+
+                break;
+            }
         }
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }

@@ -420,6 +420,7 @@ export class StateConverter {
             avatarKey: player.avatarKey,
             positionIndicator: this.getPlayerPositionIndicator(player.uuid),
             winner: player.winner,
+            disconnected: player.disconnected,
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
             admin: this.gameStateManager.isPlayerAdmin(player.uuid),
