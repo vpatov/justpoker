@@ -31,6 +31,9 @@ RUN npm install
 # set env for node back-end
 ENV NODE_SERVER_ENVIRONMENT=${build_env}
 ENV ROOT_SERVER_DIR="/justpoker"
+
+EXPOSE 8080
+
 # Build and start the server.
 CMD ["npm", "start"]
 
