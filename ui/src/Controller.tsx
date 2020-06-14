@@ -18,7 +18,7 @@ import Button from '@material-ui/core/Button';
 
 import { ClientActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/api/api';
 import { Typography, Tooltip } from '@material-ui/core';
-import { BettingRoundActionType } from './shared/models/game/game';
+import { BettingRoundActionType } from './shared/models/game/betting';
 
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';

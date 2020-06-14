@@ -18,7 +18,7 @@ import { PlayerPositionString } from './shared/models/player/playerPosition';
 import Suit from './Suit';
 
 import blueGrey from '@material-ui/core/colors/blueGrey';
-import { BettingRoundActionType } from './shared/models/game/game';
+import { BettingRoundActionType } from './shared/models/game/betting';
 import { PlayerUUID } from './shared/models/system/uuid';
 import { WsServer } from './api/ws';
 
