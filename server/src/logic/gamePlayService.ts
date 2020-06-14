@@ -598,6 +598,14 @@ export class GamePlayService {
         });
     }
 
+    flipCardsIfAllInRunOut() {
+        if (this.gsm.isAllInRunOut()) {
+            this.gsm.getPlayersInHand().forEach((playerUUID) => {
+                this.gsm.setPlayerCardsAllVisible(playerUUID);
+            });
+        }
+    }
+
     savePreviousHandInfo() {
         this.gsm.setPrevBigBlindUUID(this.gsm.getBigBlindUUID());
     }
