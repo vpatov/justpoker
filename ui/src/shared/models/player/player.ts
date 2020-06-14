@@ -1,7 +1,7 @@
-import { Card, Hand } from './cards';
-import { BettingRoundActionType } from './game';
-import { PlayerUUID, makeBlankUUID } from './uuid';
-import { AvatarKeys } from './assets';
+import { Card, Hand } from '../game/cards';
+import { BettingRoundActionType } from '../game/betting';
+import { PlayerUUID, makeBlankUUID } from '../system/uuid';
+import { AvatarKeys } from '../ui/assets';
 
 export declare interface Player {
     /** Unique identifier for player. */

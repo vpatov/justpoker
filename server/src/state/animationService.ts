@@ -5,10 +5,10 @@ import {
     getCleanAnimationState,
     AnimationType,
     GameplayTrigger,
-} from '../../../ui/src/shared/models/animationState';
-import { PlayerUUID } from '../../../ui/src/shared/models/uuid';
+} from '../../../ui/src/shared/models/state/animationState';
+import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameStateManager } from './gameStateManager';
-import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 
 @Service()
 export class AnimationService {

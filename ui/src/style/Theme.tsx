@@ -1,4 +1,4 @@
-import { UserPreferences } from '../shared/models/userPreferences';
+import { UserPreferences } from '../shared/models/ui/userPreferences';
 import { createMuiTheme, Theme } from '@material-ui/core/styles';
 
 import { PaletteType } from '@material-ui/core';

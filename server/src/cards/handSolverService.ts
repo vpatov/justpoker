@@ -5,7 +5,7 @@ import {
     SUIT_ABBREVIATIONS,
     getTwoCardCombinations,
     reformatHandDescription,
-} from '../../../ui/src/shared/models/cards';
+} from '../../../ui/src/shared/models/game/cards';
 import { Hand as HandSolver } from 'pokersolver';
 import { logger } from '../logger';
 

@@ -1,28 +1,11 @@
-import { GameParameters, BettingRoundStage, BettingRoundAction, BettingRoundActionType } from './game';
-import { Player } from './player';
-import { Card, Deck, Hand } from './cards';
-import { ClientActionType } from './api';
-import { ClientUUID, PlayerUUID, makeBlankUUID } from './uuid';
-import { getCleanGameParameters } from './game';
-
-export const enum GameStage {
-    NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
-    INITIALIZE_NEW_HAND = 'INITIALIZE_NEW_HAND',
-    SHOW_START_OF_HAND = 'SHOW_START_OF_HAND',
-    SHOW_START_OF_BETTING_ROUND = 'SHOW_START_OF_BETTING_ROUND',
-    WAITING_FOR_BET_ACTION = 'WAITING_FOR_BET_ACTION',
-    SHOW_BET_ACTION = 'SHOW_BET_ACTION',
-    FINISH_BETTING_ROUND = 'FINISH_BETTING_ROUND',
-    SHOW_WINNER = 'SHOW_WINNER',
-    POST_HAND_CLEANUP = 'EJECT_STACKED_PLAYERS',
-    SET_CURRENT_PLAYER_TO_ACT = 'SET_PLAYER_TO_ACT',
-}
-
-// TODO consider doing something similar to messageService for queuedActionsProcessor ?
-export declare interface QueuedServerAction {
-    actionType: ClientActionType;
-    args: any[];
-}
+import { BettingRoundStage, BettingRoundAction, BettingRoundActionType, Pot } from '../game/betting';
+import { GameParameters, ConnectedClient } from '../game/game';
+import { GameStage } from '../game/stateGraph';
+import { Player } from '../player/player';
+import { Card, Deck, Hand } from '../game/cards';
+import { ClientUUID, PlayerUUID, makeBlankUUID } from '../system/uuid';
+import { getCleanGameParameters } from '../game/game';
+import { QueuedServerAction } from '../system/server';
 
 export declare interface GameState {
     gameStage: GameStage;
@@ -103,40 +86,6 @@ export declare interface GameState {
     /** The number of the current hand. Starts at 0. */
     handNumber: number;
 }
-
-export declare interface ConnectedClient {
-    readonly uuid: ClientUUID;
-    playerUUID: PlayerUUID;
-}
-
-export declare interface Pot {
-    value: number;
-    contestors: Array<PlayerUUID>;
-}
-
-// TODO move out of GameState
-export const enum ServerStateKey {
-    GAMESTATE = 'GAMESTATE',
-    AUDIO = 'AUDIO',
-    CHAT = 'CHAT',
-    ANIMATION = 'ANIMATION',
-    SEND_ALL = 'SEND_ALL',
-}
-
-export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerAction) {
-    return (
-        a.actionType === b.actionType &&
-        a.args.length === b.args.length &&
-        a.args.every((arg, index) => arg === b.args[index])
-    );
-}
-
-export const ALL_STATE_KEYS = new Set([
-    ServerStateKey.GAMESTATE,
-    ServerStateKey.CHAT,
-    ServerStateKey.AUDIO,
-    ServerStateKey.SEND_ALL,
-]);
 
 // TODO create partially clean game that can be used to clear state of round info.
 export function getCleanGameState(): GameState {

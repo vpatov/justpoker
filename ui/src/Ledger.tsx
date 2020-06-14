@@ -4,8 +4,8 @@ import get from 'lodash/get';
 import { getLedger } from './api/http';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { UILedger, UILedgerRow } from './shared/models/ledger';
-import { ErrorDisplay } from './shared/models/uiState';
+import { UILedger, UILedgerRow } from './shared/models/state/ledger';
+import { ErrorDisplay } from './shared/models/ui/uiState';
 import { parseHTTPParams } from './shared/util/util';
 import ErrorMessage from './ErrorMessage';
 import Table from '@material-ui/core/Table';

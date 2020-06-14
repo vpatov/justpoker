@@ -13,19 +13,20 @@ import {
     SetGameParametersRequest,
     RemoveAdminRequest,
     AddAdminRequest,
-} from '../../../ui/src/shared/models/api';
+} from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { ValidationService } from '../logic/validationService';
 import { Service } from 'typedi';
 import { GamePlayService } from '../logic/gamePlayService';
-import { ValidationResponse, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
-import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import { ValidationResponse, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/api/validation';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { ChatService } from '../state/chatService';
 import { StateGraphManager } from '../logic/stateGraphManager';
 import { GameInstanceManager } from '../state/gameInstanceManager';
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '../server/connectedClientManager';
-import { ClientUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { AnimationService } from '../state/animationService';
 
 declare interface ActionProcessor {

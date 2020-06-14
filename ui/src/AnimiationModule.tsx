@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { WsServer } from './api/ws';
-import { AnimationType, AnimationState, GameplayTrigger } from './shared/models/animationState';
+import { AnimationType, AnimationState, GameplayTrigger } from './shared/models/state/animationState';
 import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';

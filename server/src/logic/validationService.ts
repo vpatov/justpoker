@@ -1,24 +1,19 @@
 import { Service } from 'typedi';
 import { GameStateManager } from '../state/gameStateManager';
-import {
-    BettingRoundActionType,
-    BettingRoundAction,
-    GameType,
-    MaxBuyinType,
-    GameParameters,
-} from '../../../ui/src/shared/models/game';
+import { GameType, GameParameters } from '../../../ui/src/shared/models/game/game';
+import { BettingRoundActionType, BettingRoundAction } from '../../../ui/src/shared/models/game/betting';
+
 import {
     SitDownRequest,
     JoinTableRequest,
-    ClientWsMessageRequest,
     ClientChatMessage,
     BootPlayerRequest,
     AddAdminRequest,
-} from '../../../ui/src/shared/models/api';
-import { printObj } from '../../../ui/src/shared/util/util';
-import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/validation';
-import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
-import { Card, cardsAreEqual } from '../../../ui/src/shared/models/cards';
+} from '../../../ui/src/shared/models/api/api';
+
+import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/api/validation';
+import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
+import { Card, cardsAreEqual } from '../../../ui/src/shared/models/game/cards';
 import { debugFunc } from '../logger';
 import { MIN_VALUES, MAX_VALUES } from '../../../ui/src/shared/util/consts';
 

@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { useSelector } from 'react-redux';
 import { heroPlayerUUIDSelector, isHeroSeatedSelector } from './store/selectors';
 import { WsServer } from './api/ws';
-import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
+import { ClientActionType, ClientWsMessageRequest } from './shared/models/api/api';
 import IconPicker from './reuseable/IconPicker';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
@@ -11,7 +11,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
 import MoodIcon from '@material-ui/icons/Mood';
 import Animoji from './Animoji';
-import { AnimojiKeysDefaultRecentlyUsed, AnimojiKeys } from './shared/models/assets';
+import { AnimojiKeysDefaultRecentlyUsed, AnimojiKeys } from './shared/models/ui/assets';
 import MoreHoriz from '@material-ui/icons/MoreHoriz';
 import { useStickyState } from './utils';
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Howl, Howler } from 'howler';
-import { SoundByte } from './shared/models/audioQueue';
+import { SoundByte } from './shared/models/state/audioQueue';
 import { WsServer } from './api/ws';
 
 // TODO if user can pick themes, it would essentially just change the src_path. audio init
