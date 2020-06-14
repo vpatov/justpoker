@@ -165,11 +165,9 @@ function HandLog(props: HandLogProps) {
     }
 
     function handleClickNextButton(){
-        console.log("handleClicknextButton", currentHandNumber);
-        if (currentHandNumber >= handLogEntries.length - 1){
-            return;
+        if (currentHandNumber < handLogEntries.length - 1){
+            setCurrentHandNumber((currentHandNumber) => currentHandNumber + 1);
         }
-        setCurrentHandNumber((currentHandNumber) => currentHandNumber + 1);
     }
 
     function handleClickPreviousButton(){
@@ -187,13 +185,13 @@ function HandLog(props: HandLogProps) {
                         className={classes.handLogIconButton}
                         onClick={() => handleClickSkipPreviousButton()}
                     >
-                        <SkipPreviousIcon></SkipPreviousIcon>
+                        <SkipPreviousIcon/>
                     </IconButton>
                     <IconButton
                         className={classes.handLogIconButton}
                         onClick={() => handleClickPreviousButton()}
                     >
-                        <NavigateBeforeIcon></NavigateBeforeIcon>
+                        <NavigateBeforeIcon/>
                     </IconButton>
                 </div>
                 <Typography
@@ -207,13 +205,13 @@ function HandLog(props: HandLogProps) {
                         className={classes.handLogIconButton}
                         onClick={() => handleClickNextButton()}
                     >
-                        <NavigateNextIcon></NavigateNextIcon>
+                        <NavigateNextIcon/>
                     </IconButton>
                     <IconButton
                         className={classes.handLogIconButton}
                         onClick={() => handleClickSkipNextButton()}
                     >
-                        <SkipNextIcon></SkipNextIcon>
+                        <SkipNextIcon/>
                     </IconButton>
                 </div>
             </div>
@@ -302,7 +300,7 @@ function HandLog(props: HandLogProps) {
                 className={classnames(classes.playerNameWithColor)}
                 style={{ color: getPlayerNameColor(seatNumber) }}
             >
-                {`${name}`}
+                {name}
             </span>
         );
     }
@@ -365,10 +363,10 @@ function HandLog(props: HandLogProps) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <>
-                {playerHands.map((playerHand) => {
+                {playerHands.map((playerHand, index) => {
                     const playerSummary = playerSummaries[playerHand.playerUUID];
                     return (
-                        <Typography className={classnames(classes.handLogContentLabel)}>
+                        <Typography className={classnames(classes.handLogContentLabel)} key={index}>
                             {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                             {playerHand.handDescription ? ` shows ${playerHand.handDescription}.` : ` doesn't show.`}
                         </Typography>
@@ -433,7 +431,7 @@ function HandLog(props: HandLogProps) {
         }
 
         return (
-            <div className={classnames(classes.handLogContents)} style={hideHandLog ? {display:'none'} : {}}>
+            <div className={classnames(classes.handLogContents)}>
                 {renderTimeHandStarted(handLogEntry.timeHandStarted)}
                 {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
                 {renderBoard(handLogEntry.board)}
@@ -442,6 +440,14 @@ function HandLog(props: HandLogProps) {
             </div>
         );
         
+    }
+
+    function displayStyle(){
+        return {
+            height: !hideChatLog ? '50%' : undefined,
+            maxHeight: !hideChatLog ? '50%' : undefined,
+            display: hideHandLog ? 'none' : undefined
+        };
     }
 
 
@@ -454,7 +460,7 @@ function HandLog(props: HandLogProps) {
     return (
         <div
             className={classnames(classes.handLogContainer)}
-            style={!hideChatLog ? {height: '50%', maxHeight: '50%'} : { }}
+            style={displayStyle()}
         >
             <div>
                 {renderHandLogControls()}

@@ -208,10 +208,19 @@ function ChatLog(props: ChatLogProps) {
         )
     }
 
+    function displayStyle(){
+        return {
+            height: !hideHandLog ? '50%' : undefined,
+            maxHeight: !hideHandLog ? '50%' : undefined,
+            display: hideChatLog ? 'none' : undefined
+        };
+    }
+
+
     return (
         <div
             className={classnames(classes.chatLogContainer)}
-            style={!hideHandLog ? {height: '50%'} : { }}
+            style={displayStyle()}
         >
             {renderChatMessages()}
             {renderChatLogInputSection()}
