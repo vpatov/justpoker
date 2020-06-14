@@ -4,6 +4,7 @@ import * as WebSocket from 'ws';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
+import { EXPIRE_CLIENT_INTERVAL, ATTEMPT_EXPIRE_CLIENT_INTERVAL } from '../../../ui/src/shared/util/consts';
 
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
@@ -15,14 +16,12 @@ export interface Client {
     lastMessaged: number;
 }
 
-const EXPIRE_CLIENT_TIME = 1000 * 12; // expire games after 15 min of inactivity
-
 @Service()
 export class ConnectedClientManager {
     private ClientGroups: ClientGroups = {};
 
     constructor(private stateConverter: StateConverter) {
-        setInterval(() => this.clearStaleClients(), 1000); // attempt to expire clients every 20 minutes
+        setInterval(() => this.clearStaleClients(), ATTEMPT_EXPIRE_CLIENT_INTERVAL);
     }
 
     getClientGroups(): ClientGroups {
@@ -42,7 +41,7 @@ export class ConnectedClientManager {
                 Object.entries(clients).forEach(([clientUUID, client]) => {
                     const timeInactive = now - client.lastMessaged;
                     logger.info(`${clientUUID} in game ${gameInstanceUUID} has been inactive for ${timeInactive}`);
-                    if (timeInactive > EXPIRE_CLIENT_TIME) {
+                    if (timeInactive > EXPIRE_CLIENT_INTERVAL) {
                         logger.info(`expiring game instance ${gameInstanceUUID}`);
                         this.removeClientFromGroup(gameInstanceUUID as GameInstanceUUID, clientUUID as ClientUUID);
                     }

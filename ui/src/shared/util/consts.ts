@@ -20,4 +20,5 @@ export const MAX_VALUES = {
     TIME_BANK_TIME: 60 * 10, // 10 minutes
 };
 
-export const CLIENT_CHECK_INTERACTION_TO_KEEP_ALIVE_INTERVAL = 1000 * 60 * 5; // minutes
+export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 6; // 6 minutes
+export const ATTEMPT_EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes
