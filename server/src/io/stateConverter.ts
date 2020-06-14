@@ -1,6 +1,8 @@
 import { Service } from 'typedi';
-import { Player } from '../../../ui/src/shared/models/player';
-import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import { Player } from '../../../ui/src/shared/models/player/player';
+import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
 
 import {
     UiState,
@@ -22,8 +24,8 @@ import {
     PositionIndicator,
     ShowCardButton,
     LEAVE_TABLE_BUTTON,
-} from '../../../ui/src/shared/models/uiState';
-import { BettingRoundStage, GameType } from '../../../ui/src/shared/models/game';
+} from '../../../ui/src/shared/models/ui/uiState';
+import { GameType } from '../../../ui/src/shared/models/game/game';
 import { GameStateManager } from '../state/gameStateManager';
 import { AudioService } from '../state/audioService';
 
@@ -34,15 +36,15 @@ import {
     SizingButton,
     COMMON_BB_SIZINGS,
     COMMON_POT_SIZINGS,
-} from '../../../ui/src/shared/models/uiState';
-import { SoundByte } from '../../../ui/src/shared/models/audioQueue';
+} from '../../../ui/src/shared/models/ui/uiState';
+import { SoundByte } from '../../../ui/src/shared/models/state/audioQueue';
 import { AnimationService } from '../state/animationService';
 import { ChatService } from '../state/chatService';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 import { debugFunc } from '../logger';
-import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
-import { getHoleCardNickname } from '../../../ui/src/shared/models/cards';
+import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
+import { getHoleCardNickname } from '../../../ui/src/shared/models/game/cards';
 
 declare interface CardInformation {
     hand: {

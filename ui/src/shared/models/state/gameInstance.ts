@@ -4,7 +4,7 @@ import { AudioQueue, getCleanAudioQueue } from './audioQueue';
 import { ChatLog, getCleanChatLog } from './chat';
 import { ServerLedger, getCleanLedger } from './ledger';
 import { GameInstanceLog, getCleanGameInstanceLog } from './handLog';
-import { getEpochTimeMs } from '../util/util';
+import { getEpochTimeMs } from '../../util/util';
 
 export declare interface GameInstance {
     gameState: GameState;

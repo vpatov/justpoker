@@ -6,13 +6,14 @@ import {
     GraphEdge,
     instanceOfCondition,
     StageDelayMap,
-} from '../../../ui/src/shared/models/stateGraph';
-import { GameStage, QueuedServerAction } from '../../../ui/src/shared/models/gameState';
-import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/api';
+} from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { QueuedServerAction } from '../../../ui/src/shared/models/system/server';
+import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from '../state/timerManager';
-import { BettingRoundStage } from '../../../ui/src/shared/models/game';
+import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
 import { LedgerService } from '../stats/ledgerService';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 

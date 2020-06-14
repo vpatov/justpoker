@@ -8,16 +8,19 @@ import {
     BettingRoundLog,
     getCleanBettingRoundLog,
     PotSummary,
-} from '../../../ui/src/shared/models/handLog';
-import { PlayerPosition, getPositionIndex } from '../../../ui/src/shared/models/playerPosition';
-import { GameInstanceUUID, PlayerUUID } from '../../../ui/src/shared/models/uuid';
+} from '../../../ui/src/shared/models/state/handLog';
+import { PlayerPosition, getPositionIndex } from '../../../ui/src/shared/models/player/playerPosition';
+import { GameInstanceUUID, PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameStateManager } from '../state/gameStateManager';
-import { Player } from '../../../ui/src/shared/models/player';
-import { Card } from '../../../ui/src/shared/models/cards';
-import { BettingRoundStage, BettingRoundAction, getBettingRoundStageIndex } from '../../../ui/src/shared/models/game';
+import { Player } from '../../../ui/src/shared/models/player/player';
+import { Card } from '../../../ui/src/shared/models/game/cards';
+import {
+    BettingRoundStage,
+    BettingRoundAction,
+    getBettingRoundStageIndex,
+} from '../../../ui/src/shared/models/game/betting';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
-import { UiHandLogEntry } from '../../../ui/src/shared/models/uiState';
-import { HandSolverService } from 'src/cards/handSolverService';
+import { UiHandLogEntry } from '../../../ui/src/shared/models/ui/uiState';
 
 @Service()
 export class GameInstanceLogService {

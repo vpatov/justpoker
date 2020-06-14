@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { printObj } from '../../../ui/src/shared/util/util';
+
 @Service()
 export class TimerManager {
     private stateTimer: NodeJS.Timer;

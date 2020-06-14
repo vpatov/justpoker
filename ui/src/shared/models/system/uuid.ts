@@ -2,7 +2,7 @@
 // uuids are not used incorrectly.
 // Inspiration taken from https://stackoverflow.com/a/61621026/3664123
 
-import { generateUUID } from '../util/util';
+import { generateUUID } from '../../util/util';
 
 export declare type ClientUUID = string & { __brand: 'ClientUUID' };
 export declare type PlayerUUID = string & { __brand: 'PlayerUUID' };

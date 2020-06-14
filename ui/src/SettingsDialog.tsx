@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { ThemePreferences } from './shared/models/userPreferences';
+import { ThemePreferences } from './shared/models/ui/userPreferences';
 import { ThemeSetter } from './App';
 import InputLabel from '@material-ui/core/InputLabel';
 import capitalize from 'lodash/capitalize';

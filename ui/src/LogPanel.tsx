@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import Button from '@material-ui/core/Button';
 
 import { WsServer } from './api/ws';
-import { UiChatMessage, UiHandLogEntry } from './shared/models/uiState';
+import { UiChatMessage, UiHandLogEntry } from './shared/models/ui/uiState';
 import { useStickyState, } from './utils';
 import { ButtonGroup } from '@material-ui/core';
 

@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { selectMenuButtons, selectGameParameters } from './store/selectors';
 import { WsServer } from './api/ws';
 import SettingsDialog from './SettingsDialog';
-import { ClientActionType, UiActionType, ClientWsMessageRequest } from './shared/models/api';
+import { ClientActionType, UiActionType, ClientWsMessageRequest } from './shared/models/api/api';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -24,7 +24,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 
 import GameParamatersDialog from './GameParamatersDialog';
-import { GameParameters } from './shared/models/game';
+import { GameParameters } from './shared/models/game/game';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

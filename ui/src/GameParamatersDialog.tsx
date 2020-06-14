@@ -11,7 +11,7 @@ import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
 
 import { MIN_VALUES, MAX_VALUES } from './shared/util/consts';
-import { GameType, MaxBuyinType } from './shared/models/game';
+import { GameType, MaxBuyinType } from './shared/models/game/game';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import RadioForm from './reuseable/RadioForm';
 import IconTooltip from './reuseable/IconTooltip';

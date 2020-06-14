@@ -1,7 +1,7 @@
-import { PlayerUUID, GameInstanceUUID, makeBlankUUID } from './uuid';
-import { Card } from './cards';
-import { BettingRoundAction, BettingRoundStage, BettingRoundActionType } from './game';
-import { PlayerPosition } from './playerPosition';
+import { PlayerUUID, GameInstanceUUID, makeBlankUUID } from '../system/uuid';
+import { Card } from '../game/cards';
+import { BettingRoundAction, BettingRoundStage } from '../game/betting';
+import { PlayerPosition } from '../player/playerPosition';
 
 /** Container object for logs for a game instance. */
 export declare interface GameInstanceLog {
