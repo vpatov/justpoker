@@ -102,7 +102,7 @@ function playerCheck(ws) {
 function checkOnToAct(ws) {
   function onGameMessage(msg) {
     const jsonData = JSON.parse(get(msg, "data", {}));
-    const toAct = get(jsonData, "game.controller.toAct[1]", false);
+    const toAct = get(jsonData, "game.controller.toAct", false);
     if (toAct) {
       playerCheck(ws);
     }

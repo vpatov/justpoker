@@ -1,7 +1,6 @@
 import get from 'lodash/get';
 import docCookies from '../Cookies';
 import queryString, { ParsedQuery } from 'query-string';
-import * as jsondiffpatch from 'jsondiffpatch';
 import isEmpty from 'lodash/isEmpty';
 import {
     ClientWsMessage,
@@ -24,7 +23,6 @@ const config: Config = process.env.REACT_APP_ENVIRONMENT === ENVIRONMENT.PROD ? 
 export class WsServer {
     static clientUUID: ClientUUID | null = null;
     static ws: WebSocket;
-    static lastReceivedState = {};
     static subscriptions: { [key: string]: any } = {};
 
     static openWs(gameInstanceUUID: GameInstanceUUID) {
@@ -55,17 +53,8 @@ export class WsServer {
     // TODO redesign dataCommunications and create general websocket data object so we
     // can add types here.
     private static onGameMessage(msg: MessageEvent) {
-        const sentDelta = JSON.parse(get(msg, 'data', {}));
-        console.log('sentDelta: ', sentDelta);
-        let computedState = {} as any;
-        if (isEmpty(WsServer.lastReceivedState)) {
-            computedState = sentDelta;
-        } else {
-            computedState = jsondiffpatch.patch(WsServer.lastReceivedState, sentDelta);
-        }
-        WsServer.lastReceivedState = computedState;
-        const jsonData = JSON.parse(JSON.stringify(computedState));
-
+        const jsonData = JSON.parse(get(msg, 'data', {}));
+        console.log('jsonData: ', jsonData);
         if (jsonData.clientUUID) {
             docCookies.setItem(clientUUIDCookieID, jsonData.clientUUID, ONE_DAY);
             WsServer.clientUUID = jsonData.clientUUID;

@@ -3,7 +3,6 @@ import { StateConverter } from '../io/stateConverter';
 import * as WebSocket from 'ws';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/uuid';
-import * as jsondiffpatch from 'jsondiffpatch';
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
     [gameInstanceUUID: string]: { [clientUUID: string]: Client };
@@ -80,12 +79,8 @@ export class ConnectedClientManager {
     sendStateToEachInGroup(gameInstanceUUID: GameInstanceUUID) {
         Object.entries(this.ClientGroups[gameInstanceUUID]).forEach(([clientUUID, client]) => {
             const newState = this.stateConverter.getUIState(clientUUID as ClientUUID, false);
-            const delta = jsondiffpatch.diff(client.lastSentState, newState);
-            if (delta !== undefined) {
-                client.lastSentState = newState;
-                const jsonRes = JSON.stringify(delta);
-                client.ws.send(jsonRes);
-            }
+            const jsonRes = JSON.stringify(newState);
+            client.ws.send(jsonRes);
         });
     }
 }
