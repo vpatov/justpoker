@@ -126,6 +126,9 @@ function HandLog(props: HandLogProps) {
         WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
     }, []);
 
+    function getCurrentHandNumber() {
+        return currentHandNumber;
+    }
 
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
         if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
@@ -136,6 +139,12 @@ function HandLog(props: HandLogProps) {
             if (incomingHandLogEntries.length === 1){
                 const handLogEntry = incomingHandLogEntries[0];
                 const handNumber = handLogEntry.handNumber;
+                if (handNumber === oldHandLogEntries.length){
+                    setCurrentHandNumber((oldHandNumber) => {
+                        return oldHandNumber === oldHandLogEntries.length - 2 ? oldHandNumber + 1 : oldHandNumber;
+                    });
+                }
+                
                 oldHandLogEntries[handNumber] = handLogEntry;
                 return [...oldHandLogEntries];
             }
