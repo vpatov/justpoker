@@ -1,28 +1,20 @@
 import { Service } from 'typedi';
 
+import { GameState, getCleanGameState } from '../../../ui/src/shared/models/state/gameState';
+import { ServerStateKey, ALL_STATE_KEYS, QueuedServerAction } from '../../../ui/src/shared/models/system/server';
+import { GameType, GameParameters, MaxBuyinType, ConnectedClient } from '../../../ui/src/shared/models/game/game';
 import {
-    GameState,
-    getCleanGameState,
-    ServerStateKey,
-    GameStage,
-    ALL_STATE_KEYS,
-    Pot,
-    QueuedServerAction,
-    ConnectedClient,
-} from '../../../ui/src/shared/models/gameState';
-import {
-    GameType,
-    GameParameters,
     BETTING_ROUND_STAGES,
     BettingRoundStage,
     BettingRoundAction,
     BettingRoundActionType,
-    MaxBuyinType,
-} from '../../../ui/src/shared/models/game';
-import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
+    Pot,
+} from '../../../ui/src/shared/models/game/betting';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
+import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
 import {
@@ -30,18 +22,17 @@ import {
     Card,
     cardsAreEqual,
     convertHandToCardArray,
-    RankAbbrToFullString,
     reformatHandDescription,
-} from '../../../ui/src/shared/models/cards';
-import { AwardPot } from '../../../ui/src/shared/models/uiState';
+} from '../../../ui/src/shared/models/game/cards';
+import { AwardPot } from '../../../ui/src/shared/models/ui/uiState';
 import { logger, debugFunc } from '../logger';
-import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import {
     PlayerPosition,
     PLAYER_POSITIONS_BY_HEADCOUNT,
     PlayerPositionString,
-} from '../../../ui/src/shared/models/playerPosition';
-import { AvatarKeys } from '../../../ui/src/shared/models/assets';
+} from '../../../ui/src/shared/models/player/playerPosition';
+import { AvatarKeys } from '../../../ui/src/shared/models/ui/assets';
 import sortBy from 'lodash/sortBy';
 
 // TODO Re-organize methods in some meaningful way

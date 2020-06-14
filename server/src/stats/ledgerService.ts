@@ -5,9 +5,9 @@ import {
     UILedger,
     ServerLedgerRow,
     UILedgerRow,
-} from '../../../ui/src/shared/models/ledger';
+} from '../../../ui/src/shared/models/state/ledger';
 import { logger } from '../logger';
-import { ClientUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 
 /*
     TODO:

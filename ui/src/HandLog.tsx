@@ -5,7 +5,7 @@ import classnames from 'classnames';
 
 import Typography from '@material-ui/core/Typography';
 
-import { UiHandLogEntry, UiCard } from './shared/models/uiState';
+import { UiHandLogEntry, UiCard } from './shared/models/ui/uiState';
 import { getPlayerNameColor } from './style/colors';
 import { generateStringFromRank } from './utils';
 import { IconButton, Divider } from '@material-ui/core';
@@ -13,13 +13,13 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import { BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from './shared/models/handLog';
-import { PlayerPositionString } from './shared/models/playerPosition';
+import { BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from './shared/models/state/handLog';
+import { PlayerPositionString } from './shared/models/player/playerPosition';
 import Suit from './Suit';
 
 import blueGrey from '@material-ui/core/colors/blueGrey';
-import { BettingRoundActionType } from './shared/models/game';
-import { PlayerUUID } from './shared/models/uuid';
+import { BettingRoundActionType } from './shared/models/game/game';
+import { PlayerUUID } from './shared/models/system/uuid';
 import { WsServer } from './api/ws';
 
 

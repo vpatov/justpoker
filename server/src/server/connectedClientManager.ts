@@ -2,8 +2,9 @@ import { Service } from 'typedi';
 import { StateConverter } from '../io/stateConverter';
 import * as WebSocket from 'ws';
 import { logger, debugFunc } from '../logger';
-import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
+
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
     [gameInstanceUUID: string]: { [clientUUID: string]: Client };

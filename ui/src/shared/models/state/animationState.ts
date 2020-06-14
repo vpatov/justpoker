@@ -1,4 +1,4 @@
-import { AnimojiKeys } from './assets';
+import { AnimojiKeys } from '../ui/assets';
 
 export declare interface AnimationState {
     animationType: AnimationType;

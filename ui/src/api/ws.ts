@@ -10,10 +10,10 @@ import {
     BootPlayerRequest,
     AddAdminRequest,
     RemoveAdminRequest,
-} from '../shared/models/api';
-import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
+} from '../shared/models/api/api';
+import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
-import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config';
+import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config/config';
 
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;

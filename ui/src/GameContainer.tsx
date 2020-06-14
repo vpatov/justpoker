@@ -9,7 +9,7 @@ import { WsServer } from './api/ws';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { parseHTTPParams } from './shared/util/util';
-import { ErrorDisplay } from './shared/models/uiState';
+import { ErrorDisplay } from './shared/models/ui/uiState';
 
 const useStyles = makeStyles((theme) => ({
     root: {

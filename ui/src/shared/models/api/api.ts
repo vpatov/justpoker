@@ -1,8 +1,9 @@
-import { BettingRoundAction, GameType, GameParameters } from './game';
-import { Suit, Card } from './cards';
-import { GameInstanceUUID, ClientUUID, PlayerUUID } from './uuid';
-import { ReactionTrigger } from './animationState';
-import { AvatarKeys } from './assets';
+import { GameParameters } from '../game/game';
+import { BettingRoundAction } from '../game/betting';
+import { Card } from '../game/cards';
+import { GameInstanceUUID, ClientUUID, PlayerUUID } from '../system/uuid';
+import { ReactionTrigger } from '../state/animationState';
+import { AvatarKeys } from '../ui/assets';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',

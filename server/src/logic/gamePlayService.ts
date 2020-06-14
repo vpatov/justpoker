@@ -1,25 +1,24 @@
 import { Service } from 'typedi';
 import { GameStateManager } from '../state/gameStateManager';
+import { GameType } from '../../../ui/src/shared/models/game/game';
+
+import { HandSolverService } from '../cards/handSolverService';
 import {
     BettingRoundAction,
     BettingRoundActionType,
     BettingRoundStage,
     CHECK_ACTION,
-    GameType,
-} from '../../../ui/src/shared/models/game';
-
-import { HandSolverService } from '../cards/handSolverService';
-import { Pot, ServerStateKey } from '../../../ui/src/shared/models/gameState';
-
+    Pot,
+} from '../../../ui/src/shared/models/game/betting';
 import { AudioService } from '../state/audioService';
 import { AnimationService } from '../state/animationService';
 
 import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
-import { Hand, Card, reformatHandDescription } from '../../../ui/src/shared/models/cards';
+import { Hand, Card } from '../../../ui/src/shared/models/game/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
-import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
+import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 @Service()

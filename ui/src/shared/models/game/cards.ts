@@ -1,4 +1,4 @@
-import { genRandomInt } from '../util/util';
+import { genRandomInt } from '../../util/util';
 
 export declare interface Deck {
     cards: Card[];

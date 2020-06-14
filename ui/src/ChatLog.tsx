@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import EmojiPicker from './EmojiPicker';
 
 import { WsServer } from './api/ws';
-import { UiChatMessage} from './shared/models/uiState';
+import { UiChatMessage} from './shared/models/ui/uiState';
 import { getPlayerNameColor } from './style/colors';
 
 const useStyles = makeStyles((theme: Theme) =>

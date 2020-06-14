@@ -1,24 +1,23 @@
-import { Suit, genRandomCard } from './cards';
-import { ClientActionType, UiActionType } from './api';
-import { genRandomInt } from '../util/util';
-import { SoundByte } from './audioQueue';
-import { AnimationState, getCleanAnimationState } from './animationState';
+import { Suit, genRandomCard } from '../game/cards';
+import { ClientActionType, UiActionType } from '../api/api';
+import { genRandomInt } from '../../util/util';
+import { SoundByte } from '../state/audioQueue';
+import { AnimationState, getCleanAnimationState } from '../state/animationState';
 import { UserPreferences } from './userPreferences';
 
-import { MAX_VALUES } from '../util/consts';
+import { MAX_VALUES } from '../../util/consts';
 import {
     BettingRoundActionType,
     BettingRoundAction,
     NOT_IN_HAND,
     CHECK_ACTION,
-    GameParameters,
-    getCleanGameParameters,
-    getDefaultGameParameters,
     BettingRoundStage,
-} from './game';
-import { PlayerUUID, makeBlankUUID } from './uuid';
+} from '../game/betting';
+
+import { GameParameters, getCleanGameParameters, getDefaultGameParameters } from '../game/game';
+import { PlayerUUID, makeBlankUUID } from '../system/uuid';
 import { getRandomAvatarKey, AvatarKeys } from './assets';
-import { PlayerSummary, BettingRoundLog, PotSummary } from './handLog';
+import { PlayerSummary, BettingRoundLog, PotSummary } from '../state/handLog';
 
 export declare interface ErrorDisplay {
     message?: string;

@@ -1,5 +1,5 @@
-import { UiGameState, Table, Controller, UiPlayer, Global, PlayerTimer, MenuButton } from '../shared/models/uiState';
-import { BettingRoundActionType, ALL_BETTING_ROUND_ACTION_TYPES, GameParameters } from '../shared/models/game';
+import { UiGameState, Table, Controller, UiPlayer, Global, PlayerTimer, MenuButton } from '../shared/models/ui/uiState';
+import { BettingRoundActionType, ALL_BETTING_ROUND_ACTION_TYPES, GameParameters } from '../shared/models/game/game';
 
 export const tableSelector = (gs: UiGameState): Table => gs.table;
 export const controllerSelector = (gs: UiGameState): Controller => gs.controller;

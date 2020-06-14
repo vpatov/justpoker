@@ -5,8 +5,7 @@ import {
   getDefaultGameParameters,
   BettingRoundActionType,
 } from "../../ui/src/shared/models/game";
-import { ClientActionType } from "../../ui/src/shared/models/api";
-import { ClientActionType } from "../../ui/src/shared/models/api";
+import { ClientActionType } from "../../ui/src/shared/models/api/api";
 
 import queryString from "query-string";
 import WebSocket from "ws";

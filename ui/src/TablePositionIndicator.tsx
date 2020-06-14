@@ -2,7 +2,7 @@ import React from 'react';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography, Tooltip } from '@material-ui/core';
-import { PositionIndicator } from './shared/models/uiState';
+import { PositionIndicator } from './shared/models/ui/uiState';
 import yellow from '@material-ui/core/colors/yellow';
 import orange from '@material-ui/core/colors/orange';
 import grey from '@material-ui/core/colors/grey';

@@ -16,14 +16,14 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 
-import { ClientActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/api';
+import { ClientActionType, ClientWsMessageRequest, ClientStraddleRequest } from './shared/models/api/api';
 import { Typography, Tooltip } from '@material-ui/core';
-import { BettingRoundActionType } from './shared/models/game';
+import { BettingRoundActionType } from './shared/models/game/game';
 
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
-import { BettingRoundActionButton } from './shared/models/uiState';
+import { BettingRoundActionButton } from './shared/models/ui/uiState';
 import red from '@material-ui/core/colors/red';
 import Color from 'color';
 

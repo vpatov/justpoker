@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { GameInstance, getCleanGameInstance } from '../../../ui/src/shared/models/gameInstance';
+import { GameInstance, getCleanGameInstance } from '../../../ui/src/shared/models/state/gameInstance';
 import { generateUUID, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 
 import { AudioService } from './audioService';
@@ -8,17 +8,17 @@ import { ChatService } from './chatService';
 import { GameStateManager } from './gameStateManager';
 import { LedgerService } from '../stats/ledgerService';
 import { TimerManager } from './timerManager';
-import { UILedger } from '../../../ui/src/shared/models/ledger';
+import { UILedger } from '../../../ui/src/shared/models/state/ledger';
 import { logger, debugFunc } from '../logger';
 import {
     GameInstanceUUID,
     makeBlankUUID,
     ClientUUID,
     generateGameInstanceUUID,
-} from '../../../ui/src/shared/models/uuid';
+} from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { ConnectedClientManager } from '../server/connectedClientManager';
-import { GameParameters } from '../../../ui/src/shared/models/game';
+import { GameParameters } from '../../../ui/src/shared/models/game/game';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;

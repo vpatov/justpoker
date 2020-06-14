@@ -1,9 +1,9 @@
 import util from 'util';
 import Location from 'history';
-import { GameState } from '../models/gameState';
-import { WSParams, HTTPParams } from '../models/api';
+import { GameState } from '../models/state/gameState';
+import { WSParams, HTTPParams } from '../models/api/api';
 import queryString from 'query-string';
-import { GameInstanceUUID } from '../models/uuid';
+import { GameInstanceUUID } from '../models/system/uuid';
 
 export function generateUUID(): string {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

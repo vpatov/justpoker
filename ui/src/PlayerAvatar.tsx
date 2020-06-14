@@ -8,7 +8,7 @@ import Avatar from './Avatar';
 import { grey } from '@material-ui/core/colors';
 import { getPlayerAvatarBackground } from './style/colors';
 import Animoji from './Animoji';
-import { AnimationState, AnimationType } from './shared/models/animationState';
+import { AnimationState, AnimationType } from './shared/models/state/animationState';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
