@@ -78,6 +78,10 @@ export const BETTING_ROUND_STAGES = [
     BettingRoundStage.SHOWDOWN,
 ];
 
+export function getBettingRoundStageIndex(bettingRoundStage: BettingRoundStage) {
+    return BETTING_ROUND_STAGES.findIndex((stage) => stage === bettingRoundStage);
+}
+
 export const CHECK_ACTION: BettingRoundAction = {
     type: BettingRoundActionType.CHECK,
 };

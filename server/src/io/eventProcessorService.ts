@@ -122,7 +122,7 @@ export class EventProcessorService {
         [ClientActionType.PINGSTATE]: {
             validation: (uuid, req) => undefined,
             perform: (uuid, req) => {},
-            updates: [ServerStateKey.GAMESTATE],
+            updates: [ServerStateKey.GAMESTATE, ServerStateKey.SEND_ALL],
         },
         [ClientActionType.BETACTION]: {
             validation: (uuid, req) => this.validationService.validateBettingRoundAction(uuid, req),

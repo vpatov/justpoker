@@ -68,6 +68,17 @@ export class WsServer {
         WsServer.ws.send(JSON.stringify(message));
     }
 
+    static ping(){
+        if (!WsServer.ws){
+            return;
+        }
+        const pingMessage = {
+            actionType: ClientActionType.PINGSTATE,
+            request: {}
+        } as ClientWsMessage;
+        WsServer.ws.send(JSON.stringify(pingMessage));
+    }
+
     static sendChatMessage(content: string) {
         const chatMessage: ClientChatMessage = { content };
         const clientWsMessage: ClientWsMessage = {

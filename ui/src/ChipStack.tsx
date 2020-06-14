@@ -25,17 +25,20 @@ function ChipStack(props) {
     const classes = useStyles();
     const { amount, className } = props;
 
-    function generateAStackOfChips(chipSize, numChips): JSX.Element {
+    function generateAStackOfChips(chipSize, numChips, index): JSX.Element {
         const chips = [] as any;
         const chipOffest = 4;
         let yPos = 80;
         for (let i = 0; i < numChips; i++) {
             yPos -= chipOffest;
-            const chipComp = <Chip amount={chipSize} yPos={`${yPos}%`} />;
+            const chipComp = <Chip amount={chipSize} key={i} yPos={`${yPos}%`} />;
             chips.push(chipComp);
         }
         return (
-            <svg className={classnames(classes.svgCont, 'ani_chipStack')} viewBox="0 0 100 200">
+            <svg key={index}
+                className={classnames(classes.svgCont, 'ani_chipStack')}
+                viewBox="0 0 100 200"
+            >
                 <Fragment> {chips}</Fragment>
             </svg>
         );
@@ -43,16 +46,16 @@ function ChipStack(props) {
 
     function generatesChipsStacksFromAmount(amount) {
         if (amount > MAX_VALUES.PLAYER_STACK) {
-            return generateAStackOfChips(amount, 1);
+            return generateAStackOfChips(amount, 1, 0);
         }
         const chipsStacks = [] as any;
         let remaining = amount;
 
-        for (let j = 0; remaining > 0; j++) {
+        for (let i = 0; remaining > 0; i++) {
             const bigChip = Math.pow(10, Math.floor(Math.log10(remaining)));
             const numBigChips = Math.floor(remaining / bigChip);
 
-            chipsStacks.push(generateAStackOfChips(bigChip, numBigChips));
+            chipsStacks.push(generateAStackOfChips(bigChip, numBigChips, i));
             remaining = remaining % bigChip;
         }
 

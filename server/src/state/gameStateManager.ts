@@ -31,6 +31,7 @@ import {
     cardsAreEqual,
     convertHandToCardArray,
     RankAbbrToFullString,
+    reformatHandDescription,
 } from '../../../ui/src/shared/models/cards';
 import { AwardPot } from '../../../ui/src/shared/models/uiState';
 import { logger, debugFunc } from '../logger';
@@ -362,6 +363,14 @@ export class GameStateManager {
 
     setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean) {
         this.getPlayer(playerUUID).quitting = quitting;
+    }
+
+    getPlayerName(playerUUID: PlayerUUID) {
+        return this.getPlayer(playerUUID).name;
+    }
+
+    getPlayerSeatNumber(playerUUID: PlayerUUID) {
+        return this.getPlayer(playerUUID).seatNumber;
     }
 
     // returns time in milliseconds
@@ -1069,16 +1078,15 @@ export class GameStateManager {
         return this.getPlayer(playerUUID).holeCards;
     }
 
-    computeBestHandForPlayer(playerUUID: PlayerUUID): Hand {
+    computePlayerBestHand(playerUUID: PlayerUUID): Hand {
         const bestHand =
             this.getGameType() === GameType.PLOMAHA
                 ? this.handSolverService.computeBestPLOHand(this.getPlayer(playerUUID).holeCards, this.getBoard())
                 : this.handSolverService.computeBestNLEHand(this.getPlayer(playerUUID).holeCards, this.getBoard());
-        this.getPlayer(playerUUID).bestHand = bestHand;
         return bestHand;
     }
 
-    isCardInPlayersBestHand(playerUUID: PlayerUUID, card: Card) {
+    isCardInPlayerBestHand(playerUUID: PlayerUUID, card: Card) {
         return convertHandToCardArray(this.getPlayerBestHand(playerUUID)).some((handCard) =>
             cardsAreEqual(handCard, card),
         );
@@ -1088,34 +1096,16 @@ export class GameStateManager {
         return this.getPlayer(playerUUID).bestHand;
     }
 
-    updatePlayerHandDescription(playerUUID: PlayerUUID) {
-        const bestHand = this.computeBestHandForPlayer(playerUUID);
-        this.getPlayer(playerUUID).handDescription = this.getStrDescriptionFromHand(bestHand);
+    updatePlayerBestHand(playerUUID: PlayerUUID) {
+        this.getPlayer(playerUUID).bestHand = this.computePlayerBestHand(playerUUID);
     }
 
-    clearPlayerHandDescription(playerUUID: PlayerUUID) {
-        this.getPlayer(playerUUID).handDescription = '';
+    getPlayerHandDescription(playerUUID: PlayerUUID): string {
+        return this.getPlayer(playerUUID).bestHand.descr;
     }
 
-    // removes wanted characters from the description string
-    // and in full names of cards
-    getStrDescriptionFromHand(hand: Hand): string {
-        // K High
-        // Two pair, A's & Q's
-        // Three of a Kind, 6's
-        // Pair, 3's
-        // Full House, 5's over 4's
-        // Flush, Ah High
-        // Straight, 8 High
-        let description = hand.descr;
-        Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
-            const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
-            const regex = new RegExp(regexStr, 'g');
-            description = description.replace(regex, fullStr);
-        });
-        description = description.replace(/'s/g, 's').replace(/Sixs/g, 'Sixes');
-
-        return description;
+    clearPlayerBestHand(playerUUID: PlayerUUID) {
+        this.getPlayer(playerUUID).bestHand = null;
     }
 
     getGameType(): GameType {
@@ -1271,7 +1261,7 @@ export class GameStateManager {
     }
 
     getWinningHandDescription(): string | undefined {
-        return this.gameState.winningHand ? this.getStrDescriptionFromHand(this.gameState.winningHand) : undefined;
+        return this.gameState.winningHand ? reformatHandDescription(this.gameState.winningHand.descr) : undefined;
     }
 
     setWinningHand(hand: Hand | undefined) {
