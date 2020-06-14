@@ -19,7 +19,6 @@ import {
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { GameParameters } from '../../../ui/src/shared/models/game';
-import { HandLog } from '../../../ui/src/shared/models/handLog';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -175,6 +174,6 @@ export class GameInstanceManager {
         const requestorPlayerUUID = connectedClient
             ? this.gameStateManager.getPlayerByClientUUID(clientUUID)?.uuid
             : makeBlankUUID();
-        return this.gameInstanceLogService.serializeHandLogs(requestorPlayerUUID);
+        return this.gameInstanceLogService.serializeAllHandLogEntries(requestorPlayerUUID);
     }
 }

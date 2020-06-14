@@ -120,6 +120,7 @@ export const enum ServerStateKey {
     AUDIO = 'AUDIO',
     CHAT = 'CHAT',
     ANIMATION = 'ANIMATION',
+    SEND_ALL = 'SEND_ALL',
 }
 
 export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerAction) {
@@ -130,7 +131,12 @@ export function areServerActionsEqual(a: QueuedServerAction, b: QueuedServerActi
     );
 }
 
-export const ALL_STATE_KEYS = new Set([ServerStateKey.GAMESTATE, ServerStateKey.CHAT, ServerStateKey.AUDIO]);
+export const ALL_STATE_KEYS = new Set([
+    ServerStateKey.GAMESTATE,
+    ServerStateKey.CHAT,
+    ServerStateKey.AUDIO,
+    ServerStateKey.SEND_ALL,
+]);
 
 // TODO create partially clean game that can be used to clear state of round info.
 export function getCleanGameState(): GameState {

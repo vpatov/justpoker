@@ -151,6 +151,17 @@ export function animateShowCard(id) {
         easing: 'easeOutExpo',
     });
 }
+
+export function flipCard(id) {
+    const duration = 300;
+
+    const a = anime({
+        targets: [`#${id}`],
+
+        rotateY: [-180, 0],
+        easing: 'easeOutExpo',
+    });
+}
 // utility functions
 
 function getCenterOfRef(ref) {

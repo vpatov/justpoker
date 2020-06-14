@@ -6,18 +6,34 @@ import { PlayerPosition } from './playerPosition';
 /** Container object for logs for a game instance. */
 export declare interface GameInstanceLog {
     gameInstanceUUID: GameInstanceUUID;
-    handLogs: HandLog[];
+    handLogEntries: HandLogEntry[];
 }
 
 /** Contains a complete record of one played hand. */
-export declare interface HandLog {
+export declare interface HandLogEntry {
     handNumber: number;
     timeHandStarted: number;
     playerSummaries: Map<PlayerUUID, PlayerSummary>;
     board: Card[];
-    winners: Set<PlayerUUID>;
+    potSummaries: PotSummary[];
     bettingRounds: Map<BettingRoundStage, BettingRoundLog>;
     lastBettingRoundStage: BettingRoundStage;
+}
+
+export declare interface PotSummary {
+    amount: number;
+    playerHands: ShowdownHand[];
+    winners: PotWinner[];
+}
+
+export declare interface PotWinner {
+    playerUUID: PlayerUUID;
+    amount: number;
+}
+
+export declare interface ShowdownHand {
+    playerUUID: PlayerUUID;
+    handDescription: string | undefined;
 }
 
 /** Contains a record of the actions completed during a betting round. */
@@ -27,7 +43,6 @@ export declare interface BettingRoundLog {
     actions: BetActionRecord[];
 }
 
-/**  */
 export declare interface BetActionRecord {
     playerUUID: PlayerUUID;
     bettingRoundAction: BettingRoundAction;
@@ -41,7 +56,8 @@ export declare interface PlayerSummary {
     wasDealtIn: boolean;
     holeCards: Card[];
     startingChips: number;
-    chipDelta: number;
+    totalChipDeltaForHand: number;
+    seatNumber: number;
 }
 
 /** Clean interface instantiators. */
@@ -49,17 +65,17 @@ export declare interface PlayerSummary {
 export function getCleanGameInstanceLog(): GameInstanceLog {
     return {
         gameInstanceUUID: makeBlankUUID(),
-        handLogs: [],
+        handLogEntries: [],
     };
 }
 
-export function getCleanHandLog(): HandLog {
+export function getCleanHandLogEntry(): HandLogEntry {
     return {
         handNumber: -1,
         timeHandStarted: 0,
         playerSummaries: new Map(),
         board: [],
-        winners: new Set(),
+        potSummaries: [],
         bettingRounds: new Map(),
         lastBettingRoundStage: BettingRoundStage.WAITING,
     };
@@ -81,6 +97,7 @@ export function getCleanPlayerSummary(): PlayerSummary {
         wasDealtIn: false,
         holeCards: [],
         startingChips: 0,
-        chipDelta: 0,
+        totalChipDeltaForHand: 0,
+        seatNumber: -1,
     };
 }

@@ -5,7 +5,7 @@ import Table from './Table';
 import Controller from './Controller';
 import AudioModule from './AudioModule';
 import AnimiationModule from './AnimiationModule';
-import ChatLog from './ChatLog';
+import LogPanel from './LogPanel';
 import GameMenu from './GameMenu';
 import GameLabel from './GameLabel';
 import ControllerTimer from './ControllerTimer';
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     table: {
         height: '85%',
     },
-    chatlog: {},
+    logPanel: {},
     controller: {
         height: '15%',
         width: '100%',
@@ -61,7 +61,7 @@ function Game(props) {
                     <ControllerTimer />
                     <Controller className={classes.controller} />
                 </div>
-                <ChatLog className={classes.chatlog} />
+                <LogPanel className={classes.logPanel} />
 
                 <AudioModule mute={mute} />
                 <AnimiationModule />

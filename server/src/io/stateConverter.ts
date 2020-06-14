@@ -38,6 +38,7 @@ import {
 import { SoundByte } from '../../../ui/src/shared/models/audioQueue';
 import { AnimationService } from '../state/animationService';
 import { ChatService } from '../state/chatService';
+import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 import { debugFunc } from '../logger';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
@@ -63,6 +64,7 @@ export class StateConverter {
         private readonly audioService: AudioService,
         private readonly animationService: AnimationService,
         private readonly chatService: ChatService,
+        private readonly gameInstanceLogService: GameInstanceLogService,
     ) {}
 
     gameUpdated(): boolean {
@@ -81,16 +83,20 @@ export class StateConverter {
         return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.ANIMATION);
     }
 
+    sendAll(): boolean {
+        return this.gameStateManager.getUpdatedKeys().has(ServerStateKey.SEND_ALL);
+    }
+
     // Hero refers to the player who is receiving this particular UiState.
     @debugFunc({ noResult: true })
-    transformGameStateToUIState(clientUUID: ClientUUID, sendAll: boolean): UiState {
+    transformGameStateToUIState(clientUUID: ClientUUID, forceSendAll: boolean): UiState {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
         const clientPlayerIsSeated = heroPlayer?.sitting;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
-        const board = this.gameStateManager.getBoard();
-        const winners = this.gameStateManager.getWinners();
+        const handLogEntry = this.gameInstanceLogService.getMostRecentHandLogEntry(heroPlayerUUID);
+        const sendAll = forceSendAll || this.sendAll();
 
         // TODO put each key into its own function
         const uiState: UiState = {
@@ -128,6 +134,11 @@ export class StateConverter {
             animation: this.animationUpdated() || sendAll ? this.animationService.getAnimationState() : undefined,
             // TODO refactor to send entire chatlog on init.
             chat: this.chatUpdated() || sendAll ? this.transformChatMessage() : undefined,
+            handLogEntries: sendAll
+                ? this.gameInstanceLogService.serializeAllHandLogEntries(heroPlayerUUID)
+                : this.gameUpdated() && handLogEntry
+                ? [handLogEntry]
+                : [],
         };
         return uiState;
     }
@@ -339,10 +350,11 @@ export class StateConverter {
             return holeCard.visible || isHero
                 ? {
                       ...holeCard,
+                      isBeingShown: holeCard.visible,
                       partOfWinningHand:
                           isWinner &&
                           shouldHighlightWinningCards &&
-                          this.gameStateManager.isCardInPlayersBestHand(player.uuid, holeCard),
+                          this.gameStateManager.isCardInPlayerBestHand(player.uuid, holeCard),
                   }
                 : { hidden: true };
         });
@@ -359,8 +371,8 @@ export class StateConverter {
                 player.holeCards.length === 2 &&
                 this.gameStateManager.getBettingRoundStage() === BettingRoundStage.PREFLOP;
             return shouldAttemptConvertToNickName
-                ? getHoleCardNickname(player.holeCards[0], player.holeCards[1]) || player.handDescription
-                : player.handDescription;
+                ? getHoleCardNickname(player.holeCards[0], player.holeCards[1]) || player.bestHand.descr
+                : player.bestHand.descr;
         }
         return undefined;
     }
@@ -374,7 +386,7 @@ export class StateConverter {
             const winnerUUID = winners[0];
             return board.map((card) => ({
                 ...card,
-                partOfWinningHand: this.gameStateManager.isCardInPlayersBestHand(winnerUUID, card),
+                partOfWinningHand: this.gameStateManager.isCardInPlayerBestHand(winnerUUID, card),
             }));
         } else {
             return [...board];
