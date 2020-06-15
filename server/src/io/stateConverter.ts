@@ -298,13 +298,13 @@ export class StateConverter {
 
         // if player is in game they can leave
         // TODO how to communicate to people that this is how they "stand up"
-        // if (heroPlayer && !heroPlayer.quitting && heroPlayer.isAtTable) {
-        menuButtons.push(LEAVE_TABLE_BUTTON);
-        // }
+        if (heroPlayer && !heroPlayer.leaving && !heroPlayer.quitting && heroPlayer.isAtTable) {
+            menuButtons.push(LEAVE_TABLE_BUTTON);
+        }
 
-        // if (heroPlayer) {
-        menuButtons.push(QUIT_GAME_BUTTON);
-        // }
+        if (heroPlayer && !heroPlayer.quitting) {
+            menuButtons.push(QUIT_GAME_BUTTON);
+        }
 
         return menuButtons;
     }
