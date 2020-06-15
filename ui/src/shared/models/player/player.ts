@@ -31,6 +31,9 @@ export declare interface Player {
     /** Player will leave table after hand. */
     quitting: boolean;
 
+    /** Whether player's ws is closed. */
+    disconnected: boolean;
+
     /** If this is true, player will straddle when they are in position to do so. */
     willStraddle: boolean;
 
@@ -75,6 +78,7 @@ export function getCleanPlayer(): Player {
         isAtTable: false,
         sittingOut: false,
         quitting: false,
+        disconnected: false,
         willPostBlind: false,
         willStraddle: false,
         seatNumber: -1,

@@ -152,6 +152,7 @@ export declare interface UiPlayer {
     quitting?: boolean;
     folded?: boolean;
     toAct?: boolean;
+    disconnected?: boolean;
     positionIndicator?: PositionIndicator;
     winner?: boolean;
     bet?: number;
@@ -577,6 +578,7 @@ export const TestGame: UiGameState = {
                 cards: [],
             },
             avatarKey: getRandomAvatarKey(),
+            disconnected: true,
             admin: true,
         },
         {

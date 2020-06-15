@@ -205,6 +205,11 @@ export class EventProcessorService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
+        [ClientActionType.KEEPALIVE]: {
+            validation: (uuid, req) => undefined,
+            perform: (uuid, req: PlayerReactionRequest) => {},
+            updates: [],
+        },
     };
 
     processServerAction(serverAction: ServerAction) {
@@ -213,6 +218,14 @@ export class EventProcessorService {
                 if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
                     this.gamePlayService.timeOutPlayer();
                 }
+                break;
+            }
+            case ServerActionType.WS_CLOSE: {
+                const player = this.gameStateManager.getPlayerByClientUUID(serverAction.clientUUID);
+                if (player) {
+                    this.gameStateManager.setPlayerDisconnected(player.uuid);
+                }
+
                 break;
             }
         }
@@ -260,6 +273,10 @@ export class EventProcessorService {
             }
 
             case EventType.CLIENT_ACTION: {
+                // nothing needs to be processed or sent for keep alive
+                if (event?.body?.actionType === ClientActionType.KEEPALIVE) {
+                    return;
+                }
                 // TODO refactor handling of errors from validation.
                 // Consider removing NO_ERROR var and replacing with ValidationResponse | undefined
                 const error = this.processClientAction(event.body as ClientAction);

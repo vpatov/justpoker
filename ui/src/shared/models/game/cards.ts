@@ -135,6 +135,18 @@ export function getTwoCardCombinations(holeCards: Readonly<Card[]>): Card[][] {
     return combinations;
 }
 
+export function getThreeCardCombinations(holeCards: Readonly<Card[]>): Card[][] {
+    const combinations: Card[][] = [];
+    for (let i = 0; i < holeCards.length; i += 1) {
+        for (let j = i + 1; j < holeCards.length; j += 1) {
+            for (let k = j + 1; k < holeCards.length; k += 1) {
+                combinations.push([holeCards[i], holeCards[j], holeCards[k]]);
+            }
+        }
+    }
+    return combinations;
+}
+
 export function convertHandToCardArray(hand: Hand): Card[] {
     return hand.cards.map((pokerSolverCard) => ({
         suit: suitLetterToSuit(pokerSolverCard.suit),

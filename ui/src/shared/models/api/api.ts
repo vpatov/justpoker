@@ -25,8 +25,10 @@ export declare interface ClientAction extends BaseAction {
     clientUUID: ClientUUID;
     request: ClientWsMessageRequest;
 }
+
 export declare interface ServerAction extends BaseAction {
     actionType: ServerActionType;
+    clientUUID?: ClientUUID;
 }
 
 export declare interface WSParams {
@@ -60,10 +62,12 @@ export enum ClientActionType {
     SETGAMEPARAMETERS = 'SETGAMEPARAMETERS',
     ADDADMIN = 'ADDADMIN',
     REMOVEADMIN = 'REMOVEADMIN',
+    KEEPALIVE = 'KEEPALIVE',
 }
 
 export enum ServerActionType {
     TIMEOUT = 'TIMEOUT',
+    WS_CLOSE = 'WS_CLOSE',
 }
 
 export enum UiActionType {
@@ -155,6 +159,17 @@ export function createTimeoutEvent(gameInstanceUUID: GameInstanceUUID): Event {
         body: {
             actionType: ServerActionType.TIMEOUT,
             gameInstanceUUID,
+        } as ServerAction,
+    };
+}
+
+export function createWSCloseEvent(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): Event {
+    return {
+        eventType: EventType.SERVER_ACTION,
+        body: {
+            actionType: ServerActionType.WS_CLOSE,
+            gameInstanceUUID,
+            clientUUID,
         } as ServerAction,
     };
 }

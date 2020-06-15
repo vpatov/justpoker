@@ -69,7 +69,6 @@ export const CUSTOM_THEME = {
             color: 'black',
             backgroundColor: blueGrey[200],
             borderRadius: '0.6vmin',
-            boxShadow: '0 6px 14px 3px rgba(0,0,0,0.9)',
         },
         STACK_TO_ACT: {
             boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',

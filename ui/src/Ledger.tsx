@@ -20,8 +20,9 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100%',
+    ledgerContainer: {
+        width: '95%',
+        margin: '0 auto',
     },
     paper: {
         width: '100%',
@@ -136,8 +137,8 @@ const headCells: HeadCell[] = [
     { id: 'handsWon', numeric: true, disablePadding: false, label: 'Hands Won' },
     { id: 'flopsSeen', numeric: true, disablePadding: false, label: 'Flops Seen' },
     { id: 'vpip', numeric: true, disablePadding: false, label: 'Flops Seen %' },
-    { id: 'timeStartedPlaying', numeric: true, disablePadding: false, label: 'Time Started Playing' },
-    { id: 'timeMostRecentHand', numeric: true, disablePadding: false, label: 'Time Last Played' },
+    { id: 'timeStartedPlaying', numeric: false, disablePadding: false, label: 'Time Started Playing' },
+    { id: 'timeMostRecentHand', numeric: false, disablePadding: false, label: 'Time Last Played' },
 ];
 
 interface LedgerTableProps {
@@ -192,6 +193,10 @@ function LedgerTableHead(props: LedgerTableProps) {
     );
 }
 
+function formatTimestamp(timestamp: number){
+    return new Date(timestamp).toLocaleString().replace(',','');
+}
+
 function LedgerTable(props) {
     const classes = useStyles();
     const [order, setOrder] = React.useState<Order>('asc');
@@ -233,72 +238,74 @@ function LedgerTable(props) {
     const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
     return (
-        <div className={classes.root}>
-            <Paper className={classes.paper}>
-                <TableContainer>
-                    <Table
-                        className={classes.table}
-                        aria-labelledby="tableTitle"
-                        size={'medium'}
-                        aria-label="enhanced table"
-                    >
-                        <LedgerTableHead
-                            classes={classes}
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={(event) => handleSelectAllClick(event)}
-                            onRequestSort={(event, property) => handleRequestSort(event, property)}
-                            rowCount={ledger.length}
-                        />
-                        <TableBody>
-                            {stableSort(ledger, getComparator(order, orderBy)).map((row, index) => {
-                                const isItemSelected = isSelected(row.aliases);
-                                const labelId = `enhanced-table-checkbox-${index}`;
-
-                                return (
-                                    <TableRow
-                                        hover
-                                        onClick={(event) => handleClick(event, row.aliases)}
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={row.aliases}
-                                        selected={isItemSelected}
-                                    >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                checked={isItemSelected}
-                                                inputProps={{ 'aria-labelledby': labelId }}
-                                            />
-                                        </TableCell>
-                                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                                            {row.aliases}
-                                        </TableCell>
-                                        <TableCell align="right">{row.buyins}</TableCell>
-                                        <TableCell align="right">{row.totalBuyin}</TableCell>
-                                        <TableCell align="right">{row.walkaway}</TableCell>
-                                        <TableCell align="right">{row.net}</TableCell>
-                                        <TableCell align="right">{row.currentChips}</TableCell>
-                                        <TableCell align="right">{row.handsDealtIn}</TableCell>
-                                        <TableCell align="right">{row.handsWon}</TableCell>
-                                        <TableCell align="right">{row.flopsSeen}</TableCell>
-                                        <TableCell align="right">{row.vpip}</TableCell>
-                                        <TableCell align="right">{row.timeStartedPlaying}</TableCell>
-                                        <TableCell align="right">{row.timeMostRecentHand}</TableCell>
+        <>
+            <div style={{height:'2vmin'}}></div>
+            <div className={classes.ledgerContainer}>
+                <Paper className={classes.paper}>
+                    <TableContainer>
+                        <Table
+                            className={classes.table}
+                            aria-labelledby="tableTitle"
+                            size={'medium'}
+                            aria-label="enhanced table"
+                        >
+                            <LedgerTableHead
+                                classes={classes}
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={(event) => handleSelectAllClick(event)}
+                                onRequestSort={(event, property) => handleRequestSort(event, property)}
+                                rowCount={ledger.length}
+                            />
+                            <TableBody>
+                                {stableSort(ledger, getComparator(order, orderBy)).map((row, index) => {
+                                    const isItemSelected = isSelected(row.aliases);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
+                                    return (
+                                        <TableRow
+                                            hover
+                                            onClick={(event) => handleClick(event, row.aliases)}
+                                            role="checkbox"
+                                            aria-checked={isItemSelected}
+                                            tabIndex={-1}
+                                            key={row.aliases}
+                                            selected={isItemSelected}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    checked={isItemSelected}
+                                                    inputProps={{ 'aria-labelledby': labelId }}
+                                                />
+                                            </TableCell>
+                                            <TableCell component="th" id={labelId} scope="row" padding="none">
+                                                {row.aliases}
+                                            </TableCell>
+                                            <TableCell align="right">{row.buyins}</TableCell>
+                                            <TableCell align="right">{row.totalBuyin}</TableCell>
+                                            <TableCell align="right">{row.walkaway}</TableCell>
+                                            <TableCell align="right">{row.net}</TableCell>
+                                            <TableCell align="right">{row.currentChips}</TableCell>
+                                            <TableCell align="right">{row.handsDealtIn}</TableCell>
+                                            <TableCell align="right">{row.handsWon}</TableCell>
+                                            <TableCell align="right">{row.flopsSeen}</TableCell>
+                                            <TableCell align="right">{row.vpip}</TableCell>
+                                            <TableCell align="right">{row.timeStartedPlaying}</TableCell>
+                                            <TableCell align="right">{row.timeMostRecentHand}</TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                                {
+                                    <TableRow style={{ height: 53 }}>
+                                        <TableCell colSpan={6} />
                                     </TableRow>
-                                );
-                            })}
-                            {
-                                <TableRow style={{ height: 53 }}>
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            }
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-        </div>
+                                }
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            </div>
+        </>
     );
 }
 
