@@ -238,7 +238,7 @@ function HandLog(props: HandLogProps) {
                 {cards.map((card) => (
                     <>
                         {generateStringFromRank(card.rank)}
-                        <Suit className={classes.suit} suit={card.suit}></Suit>
+                        <Suit className={classes.suit} suit={card.suit} color />
                     </>
                 ))}
             </Typography>

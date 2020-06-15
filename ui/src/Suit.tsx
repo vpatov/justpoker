@@ -2,31 +2,46 @@ import React from 'react';
 import classnames from 'classnames';
 import { Suit } from './shared/models/game/cards';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { SUITS } from './utils';
+import { grey } from '@material-ui/core/colors';
+import Color from 'color';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         icon: { fill: 'white' },
+        [SUITS.HEARTS]: {
+            fill: Color(theme.custom.HEARTS.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        },
+        [SUITS.SPADES]: {
+            fill: Color(theme.custom.SPADES.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        },
+        [SUITS.CLUBS]: {
+            fill: Color(theme.custom.CLUBS.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        },
+        [SUITS.DIAMONDS]: {
+            fill: Color(theme.custom.DIAMONDS.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        },
     }),
 );
 
 function SuitIcon(props) {
     const classes = useStyles();
-    const { suit, className } = props;
+    const { suit, className, color } = props;
 
     function generateStringFromSuit(suit) {
         let suitString;
         switch (suit) {
             case Suit.HEARTS:
-                suitString = <Heart className={classnames(classes.icon, className)} />;
+                suitString = <Heart className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
                 break;
             case Suit.SPADES:
-                suitString = <Spade className={classnames(classes.icon, className)} />;
+                suitString = <Spade className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
                 break;
             case Suit.CLUBS:
-                suitString = <Club className={classnames(classes.icon, className)} />;
+                suitString = <Club className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
                 break;
             case Suit.DIAMONDS:
-                suitString = <Diamond className={classnames(classes.icon, className)} />;
+                suitString = <Diamond className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
                 break;
         }
 
