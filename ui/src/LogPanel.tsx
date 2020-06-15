@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
 import Button from '@material-ui/core/Button';
 
-import { WsServer } from './api/ws';
-import { UiChatMessage, UiHandLogEntry } from './shared/models/ui/uiState';
-import { useStickyState, } from './utils';
+import { useStickyState } from './utils';
 import { ButtonGroup } from '@material-ui/core';
 
-import blueGrey from '@material-ui/core/colors/blueGrey';
 import ChatLog from './ChatLog';
 import HandLog from './HandLog';
-
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -21,10 +17,12 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '100%',
             maxHeight: '100%',
             width: '15%',
+            maxWidth: '350px',
+            flexShrink: 0,
             ...theme.custom.LOGPANEL,
         },
         noDisplay: {
-            display: 'none'
+            display: 'none',
         },
 
         hideButtonGroup: {
@@ -64,12 +62,12 @@ function LogPanel(props: LogPanelProps) {
             <ButtonGroup
                 orientation="vertical"
                 className={classnames(classes.hideButtonGroup)}
-                style={hideHandLog && hideChatLog ? {} : { right: 'calc(15% + 15px)' }}
+                style={hideHandLog && hideChatLog ? {} : { right: 'min(calc(15% + 15px), 365px)' }}
             >
                 {renderHideHandLogButton()}
                 {renderHideChatButton()}
             </ButtonGroup>
-        )
+        );
     }
 
     function renderHideHandLogButton() {
@@ -103,42 +101,30 @@ function LogPanel(props: LogPanelProps) {
         );
     }
 
-    function renderHandLog(){
-        return (
-            <HandLog
-                hideChatLog={hideChatLog}
-                hideHandLog={hideHandLog}
-            />
-        );
+    function renderHandLog() {
+        return <HandLog hideChatLog={hideChatLog} hideHandLog={hideHandLog} />;
     }
 
-    function renderChatLog(){
-        return (
-            <ChatLog
-                hideChatLog={hideChatLog}
-                hideHandLog={hideHandLog}
-                setUnreadChats={setUnreadChats}
-            />
-        );
+    function renderChatLog() {
+        return <ChatLog hideChatLog={hideChatLog} hideHandLog={hideHandLog} setUnreadChats={setUnreadChats} />;
     }
 
     function renderSharedLogPanel() {
         return (
             <>
-                <div 
+                <div
                     className={classnames(classes.root, className)}
-                    style={hideChatLog && hideHandLog ? {display: 'none'} : {}}
+                    style={hideChatLog && hideHandLog ? { display: 'none' } : {}}
                 >
                     {renderHandLog()}
                     {renderChatLog()}
                 </div>
                 {renderMessagePanelButtons()}
             </>
-        )
+        );
     }
 
     return renderSharedLogPanel();
-
 }
 
 export default LogPanel;
