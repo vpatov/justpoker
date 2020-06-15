@@ -111,7 +111,9 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator } = useSelector(globalGameStateSelector);
+    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator } = useSelector(
+        globalGameStateSelector,
+    );
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
         tableSelector,
     );
@@ -156,7 +158,7 @@ function Table(props) {
                         }}
                     />,
                 );
-            } else {
+            } else if (isHeroAtTable) {
                 ans.push(
                     <EmptySeat
                         key={index}
@@ -171,6 +173,8 @@ function Table(props) {
                         virtualPositon={mod(index + offset - 1, 9)}
                     />,
                 );
+            } else {
+                ans.push(null);
             }
         }
         return ans;
