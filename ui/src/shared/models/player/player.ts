@@ -23,7 +23,7 @@ export declare interface Player {
      * If a player is sitting they are either playing/have played
      * in the current hand, or are waiting to be dealt in the next hand.
      */
-    sitting: boolean;
+    isAtTable: boolean;
 
     /** Player is at the table but not being dealt in. */
     sittingOut: boolean;
@@ -75,7 +75,7 @@ export function getCleanPlayer(): Player {
         chips: 0,
         holeCards: [],
         bestHand: null,
-        sitting: false,
+        isAtTable: false,
         sittingOut: false,
         quitting: false,
         disconnected: false,

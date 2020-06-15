@@ -22,6 +22,7 @@ import VolumeOnIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeMute';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 
 import GameParamatersDialog from './GameParamatersDialog';
 import { GameParameters } from './shared/models/game/game';
@@ -124,6 +125,8 @@ function GameMenu(props) {
             case ClientActionType.STOPGAME:
                 sendServerAction(ClientActionType.STOPGAME);
                 break;
+            case ClientActionType.QUITGAME:
+                sendServerAction(ClientActionType.QUITGAME);
             default:
                 break;
         }
@@ -138,7 +141,8 @@ function GameMenu(props) {
             [UiActionType.GAME_SETTINGS]: <GameSettingsIcon className={iconClass} />,
             [UiActionType.USER_SETTINGS]: <UserSettingsIcon className={iconClass} />,
             [UiActionType.OPEN_LEDGER]: <AccountBalanceIcon className={iconClass} />,
-            [ClientActionType.LEAVETABLE]: <QuitIcon className={iconClass} />,
+            [ClientActionType.LEAVETABLE]: <DirectionsRunIcon className={iconClass} />,
+            [ClientActionType.QUITGAME]: <QuitIcon className={iconClass} />,
             [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,
             [ClientActionType.STARTGAME]: <StartIcon className={iconClass} />,
         };

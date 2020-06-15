@@ -21,7 +21,7 @@ import {
 } from '../../../ui/src/shared/models/game/betting';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { UiHandLogEntry } from '../../../ui/src/shared/models/ui/uiState';
-import { debugFunc, logger } from '../logger';
+import { logger } from '../logger';
 
 @Service()
 export class GameInstanceLogService {
@@ -154,7 +154,6 @@ export class GameInstanceLogService {
         });
     }
 
-    @debugFunc()
     private initNewPlayerSummaryForHandLogEntry(player: Readonly<Player>): PlayerSummary {
         return {
             playerUUID: player.uuid,
@@ -219,7 +218,6 @@ export class GameInstanceLogService {
         return playerSummary.holeCards.every((card) => card.visible);
     }
 
-    @debugFunc()
     private sanitizePotSummaries(potSummaries: PotSummary[]): PotSummary[] {
         return potSummaries.map((potSummary) => ({
             amount: potSummary.amount,
@@ -247,7 +245,6 @@ export class GameInstanceLogService {
     }
 
     /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
-    @debugFunc()
     private serializeHandLogEntry(requestorPlayerUUID: PlayerUUID, handLogEntry: HandLogEntry): UiHandLogEntry {
         return {
             ...handLogEntry,

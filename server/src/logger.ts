@@ -71,20 +71,20 @@ export function debugFunc(paramsArg?: DebugFuncParams) {
             descriptor.value = function (...args: any[]) {
                 if (!params.noCall) {
                     let startMessage = `CALL: ${String(key)}`;
-                    if (!params.noArgs) startMessage += `\t ARGS: ${inspect(args)}`;
+                    if (!params.noArgs) startMessage += `\t ARGS: ${inspect(args, false, null, true)}`;
                     logger.debug(startMessage);
                 }
                 try {
                     const result = original.apply(this, args);
                     if (!params.noReturn) {
                         let finishMessage = `RTRN ${String(key)}`;
-                        if (!params.noResult) finishMessage += `\t RSLT: ${inspect(result)}`;
+                        if (!params.noResult) finishMessage += `\t RSLT: ${inspect(result, false, null, true)}`;
                         logger.debug(finishMessage);
                     }
                     return result;
                 } catch (e) {
                     const err = e as Error;
-                    logger.warn(`RTRN: ${String(key)} \t ERRR: ${e}`);
+                    logger.warn(`RTRN: ${String(key)} \t ERRR: ${inspect(e, false, null, true)}`);
                     logger.warn(`Stacktrace: ${err.stack}`);
                     throw e;
                 }

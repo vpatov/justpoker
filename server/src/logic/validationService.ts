@@ -4,11 +4,12 @@ import { GameType, GameParameters } from '../../../ui/src/shared/models/game/gam
 import { BettingRoundActionType, BettingRoundAction } from '../../../ui/src/shared/models/game/betting';
 
 import {
-    SitDownRequest,
     JoinTableRequest,
     ClientChatMessage,
     BootPlayerRequest,
     AddAdminRequest,
+    JoinGameRequest,
+    JoinGameAndTableRequest,
 } from '../../../ui/src/shared/models/api/api';
 
 import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/api/validation';
@@ -16,6 +17,7 @@ import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/system/uui
 import { Card, cardsAreEqual } from '../../../ui/src/shared/models/game/cards';
 import { debugFunc } from '../logger';
 import { MIN_VALUES, MAX_VALUES } from '../../../ui/src/shared/util/consts';
+import { errorMonitor } from 'events';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -50,7 +52,7 @@ export class ValidationService {
     ensureClientIsInGame(clientUUID: ClientUUID): ValidationResponse {
         const client = this.gsm.getConnectedClient(clientUUID);
 
-        if (!client.playerUUID) {
+        if (!client?.playerUUID) {
             return {
                 errorType: ErrorType.CLIENT_HAS_NOT_JOINED_GAME,
                 errorString: `Client ${clientUUID} has not joined the game.`,
@@ -69,7 +71,7 @@ export class ValidationService {
 
     ensureClientIsNotInGame(clientUUID: ClientUUID): ValidationResponse {
         const client = this.gsm.getConnectedClient(clientUUID);
-        if (client.playerUUID) {
+        if (client?.playerUUID) {
             return {
                 errorType: ErrorType.CLIENT_ALREADY_HAS_PLAYER,
                 errorString: `Client ${clientUUID} already has player association: ${client.playerUUID}`,
@@ -78,9 +80,9 @@ export class ValidationService {
         return undefined;
     }
 
-    ensurePlayerIsSitting(playerUUID: PlayerUUID): ValidationResponse {
+    ensurePlayerIsAtTable(playerUUID: PlayerUUID): ValidationResponse {
         const player = this.gsm.getPlayer(playerUUID);
-        if (!player.sitting) {
+        if (!player.isAtTable) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `Player is not sitting:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
@@ -89,9 +91,9 @@ export class ValidationService {
         return undefined;
     }
 
-    ensurePlayerIsStanding(playerUUID: PlayerUUID): ValidationResponse {
+    ensurePlayerIsNotAtTable(playerUUID: PlayerUUID): ValidationResponse {
         const player = this.gsm.getPlayer(playerUUID);
-        if (player.sitting) {
+        if (player.isAtTable) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
                 errorString: `Player is not standing:\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
@@ -128,7 +130,7 @@ export class ValidationService {
             return error;
         }
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
-        error = this.ensurePlayerIsSitting(player.uuid);
+        error = this.ensurePlayerIsAtTable(player.uuid);
         if (error) {
             return error;
         }
@@ -143,35 +145,31 @@ export class ValidationService {
         return undefined;
     }
 
-    validateJoinTableRequest(clientUUID: ClientUUID, request: JoinTableRequest): ValidationResponse {
-        // TODO return this logic later
-        // const error = this.ensureClientIsNotInGame(clientUUID);
-        // if (error) {
-        //     return error;
-        // }
-        if (!this.gsm.areOpenSeats()) {
-            return {
-                errorString: `There are no open seats left at this table`,
-                errorType: ErrorType.NO_OPEN_SEATS,
-            };
-        }
+    validateJoinGameRequest(clientUUID: ClientUUID, request: JoinGameRequest): ValidationResponse {
+        const error = this.ensureClientIsNotInGame(clientUUID);
+        if (error) return error;
+
         if (request.name.length > MAX_NAME_LENGTH) {
             return {
                 errorString: `Name ${request.name} is too long - exceeds limit of ${MAX_NAME_LENGTH} characters.`,
                 errorType: ErrorType.MAX_NAME_LENGTH_EXCEEDED,
             };
         }
-        const { minBuyin } = this.gsm.getGameParameters();
-        if (request.buyin > this.gsm.getMaxBuyin() || request.buyin < minBuyin) {
+
+        const [minBuyin, maxBuyin] = [this.gsm.getMinBuyin(), this.gsm.getMaxBuyin()];
+        if (this.validateMinMaxValues(request.buyin, minBuyin, maxBuyin, 'buyin')) {
             return {
-                errorString: `Buyin ${request.buyin} buying exceeds gama parameter limit of ${this.gsm.getMaxBuyin()}.`,
+                errorString: `Buyin ${request.buyin} is outside of game parameter buyin limits of ${minBuyin} - ${maxBuyin}.`,
                 errorType: ErrorType.ILLEGAL_ACTION,
             };
         }
+
+        // TODO validate avatarkey to ensure that it is an existing avatar
+
         return undefined;
     }
 
-    validateSitDownRequest(clientUUID: ClientUUID, request: SitDownRequest): ValidationResponse {
+    validateJoinTableRequest(clientUUID: ClientUUID, request: JoinTableRequest): ValidationResponse {
         let error = this.ensureClientIsInGame(clientUUID);
         if (error) {
             return error;
@@ -181,7 +179,7 @@ export class ValidationService {
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         const errorPrefix = `Cannot SitDown\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`;
 
-        error = this.ensurePlayerIsStanding(player.uuid);
+        error = this.ensurePlayerIsNotAtTable(player.uuid);
         if (error) {
             return error;
         }
@@ -189,7 +187,7 @@ export class ValidationService {
         if (player.chips <= 0) {
             return {
                 errorType: ErrorType.NOT_ENOUGH_CHIPS,
-                errorString: `${errorPrefix} Player needs chips to sit down.`,
+                errorString: `${errorPrefix} Player needs chips to join the table.`,
             };
         }
 
@@ -203,7 +201,19 @@ export class ValidationService {
         if (this.gsm.isSeatTaken(seatNumber)) {
             return {
                 errorType: ErrorType.SEAT_IS_TAKEN,
-                errorString: `${errorPrefix} Seat ${seatNumber} is taken. Please pick another`,
+                errorString: `${errorPrefix} Seat ${seatNumber} is taken. Please pick another.`,
+            };
+        }
+        return undefined;
+    }
+
+    validateJoinGameAndTableRequest(clientUUID: ClientUUID, request: JoinGameAndTableRequest): ValidationResponse {
+        const error = this.validateJoinGameRequest(clientUUID, request);
+        if (error) return error;
+        if (!this.gsm.areOpenSeats()) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `There are no empty seats at the moment, you cannot join the table.`,
             };
         }
         return undefined;
@@ -215,16 +225,25 @@ export class ValidationService {
             return error;
         }
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
-        return this.ensurePlayerIsSitting(player.uuid);
+        return this.ensurePlayerIsAtTable(player.uuid);
     }
 
     validateSitInAction(clientUUID: ClientUUID): ValidationResponse {
-        const error = this.ensureClientIsInGame(clientUUID);
-        if (error) {
-            return error;
-        }
+        let error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
-        return this.ensurePlayerIsSittingOut(player.uuid);
+        error = this.ensurePlayerIsSittingOut(player.uuid);
+        if (error) return error;
+
+        if (player.chips <= 0) {
+            return {
+                errorString: `Player ${player.name} ${player.uuid} cannot sit in without any chips.`,
+                errorType: ErrorType.NOT_ENOUGH_CHIPS,
+            };
+        }
+
+        return undefined;
     }
 
     validateSitOutAction(clientUUID: ClientUUID): ValidationResponse {
@@ -464,14 +483,21 @@ export class ValidationService {
         return undefined;
     }
 
-    validateLeaveTableAction(clientUUID: ClientUUID): ValidationResponse {
+    validateQuitGameRequest(clientUUID: ClientUUID): ValidationResponse {
+        const error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
+        return undefined;
+    }
+
+    validateLeaveTableRequest(clientUUID: ClientUUID): ValidationResponse {
+        let error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
-        if (!player) {
-            return {
-                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
-                errorString: `Player ${clientUUID} is not at table.`,
-            };
-        }
+        error = this.ensurePlayerIsAtTable(player.uuid);
+        if (error) return error;
+
         return undefined;
     }
 

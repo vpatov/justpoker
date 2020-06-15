@@ -57,7 +57,6 @@ export declare interface UiGameState {
 
 export declare interface Global {
     heroIsAdmin: boolean;
-    heroIsSeated: boolean;
     isGameInProgress: boolean;
     canStartGame: boolean;
     gameWillStopAfterHand: boolean;
@@ -67,11 +66,12 @@ export declare interface Global {
     computedMaxBuyin: number;
     adminNames: string[];
     isSpectator: boolean;
-    isAtTable: boolean;
+    isHeroAtTable: boolean;
+    heroTotalChips: number;
+    numberOfSpectators: number;
 }
 
 export declare interface Controller {
-    totalChips: number;
     min: number;
     max: number;
     timeBanks: number;
@@ -241,6 +241,11 @@ export const LEAVE_TABLE_BUTTON: MenuButton = {
     label: 'Leave Table',
 };
 
+export const QUIT_GAME_BUTTON: MenuButton = {
+    action: ClientActionType.QUITGAME,
+    label: 'Quit Game',
+};
+
 export const VOLUME_BUTTON: MenuButton = {
     action: UiActionType.VOLUME,
     label: 'Mute',
@@ -291,7 +296,6 @@ export function getCleanUiChatLog(): UiChatLog {
 /* Clean Controller for init. */
 export function getCleanController(): Controller {
     return {
-        totalChips: 0,
         toAct: false,
         lastBettingRoundAction: NOT_IN_HAND,
         min: 0,
@@ -308,8 +312,8 @@ export function getCleanController(): Controller {
 
 export function getCleanGlobal(): Global {
     return {
+        heroTotalChips: 0,
         heroIsAdmin: false,
-        heroIsSeated: false,
         isGameInProgress: false,
         canStartGame: false,
         gameWillStopAfterHand: false,
@@ -319,7 +323,8 @@ export function getCleanGlobal(): Global {
         computedMaxBuyin: 1,
         adminNames: [],
         isSpectator: true,
-        isAtTable: false,
+        isHeroAtTable: false,
+        numberOfSpectators: 0,
     };
 }
 
@@ -419,7 +424,6 @@ export const TestGame: UiGameState = {
         },
     ],
     global: {
-        heroIsSeated: true,
         heroIsAdmin: true,
         isGameInProgress: true,
         canStartGame: false,
@@ -430,10 +434,11 @@ export const TestGame: UiGameState = {
         computedMaxBuyin: 1000,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
         isSpectator: true,
-        isAtTable: true,
+        isHeroAtTable: false,
+        heroTotalChips: 17,
+        numberOfSpectators: 4,
     },
     controller: {
-        totalChips: 57743,
         showWarningOnFold: true,
         toAct: true,
         lastBettingRoundAction: CHECK_ACTION,

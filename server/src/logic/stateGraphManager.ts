@@ -64,9 +64,9 @@ export class StateGraphManager {
     stateGraph: Readonly<StateGraph> = {
         [GameStage.NOT_IN_PROGRESS]: new Map([
             [ClientActionType.STARTGAME, this.canContinueGameCondition],
-            [ClientActionType.SITDOWN, this.canContinueGameCondition],
+            [ClientActionType.JOINTABLE, this.canContinueGameCondition],
+            [ClientActionType.JOINGAMEANDJOINTABLE, this.canContinueGameCondition],
             [ClientActionType.SITIN, this.canContinueGameCondition],
-            [ClientActionType.JOINTABLEANDSITDOWN, this.canContinueGameCondition],
         ]),
         [GameStage.INITIALIZE_NEW_HAND]: new Map([[ServerActionType.TIMEOUT, GameStage.SHOW_START_OF_HAND]]),
         [GameStage.SHOW_START_OF_HAND]: new Map([[ServerActionType.TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND]]),

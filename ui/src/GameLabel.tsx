@@ -7,6 +7,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 import IconTooltip from './reuseable/IconTooltip';
 import AdminIcon from '@material-ui/icons/AccountBox';
+import SpectatorsIcon from '@material-ui/icons/Visibility';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,7 +28,13 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.3vmin',
             color: theme.palette.error.contrastText,
         },
-        adminIcon: {
+        spectating: {
+            fontSize: '1.8vmin',
+            color: theme.palette.error.contrastText,
+        },
+        icons: {
+            marginRight: '.3vmin',
+            marginTop: '.3vmin',
             position: 'relative',
             zIndex: 10,
         },
@@ -37,10 +44,13 @@ const useStyles = makeStyles((theme: Theme) =>
 function GameLabel(props) {
     const classes = useStyles();
 
-    const [blink, SET_blink] = useState(false);
-    const { gameWillStopAfterHand, gameParametersWillChangeAfterHand, adminNames } = useSelector(
-        globalGameStateSelector,
-    );
+    const {
+        gameWillStopAfterHand,
+        gameParametersWillChangeAfterHand,
+        adminNames,
+        isSpectator,
+        numberOfSpectators,
+    } = useSelector(globalGameStateSelector);
     const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
 
     return (
@@ -51,13 +61,23 @@ function GameLabel(props) {
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
-
             <Typography className={classes.gameText}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
+            {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
+            {numberOfSpectators > 0 ? (
+                <IconTooltip
+                    className={classnames(classes.icons)}
+                    title={`${numberOfSpectators} ${
+                        numberOfSpectators === 1 ? 'person is spectating.' : 'people are spectating.'
+                    }`}
+                    icon={<SpectatorsIcon />}
+                    placement="bottom"
+                />
+            ) : null}
             <IconTooltip
-                className={classnames(classes.adminIcon)}
+                className={classnames(classes.icons)}
                 title={`Admin${adminNames.length > 1 ? 's' : ''}: ${adminNames.join(', ')}`}
                 icon={<AdminIcon />}
-                placement="left"
+                placement="bottom"
             />
         </div>
     );

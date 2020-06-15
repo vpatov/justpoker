@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import Player from './Player';
 import OpenSeat from './OpenSeat';
 import EmptySeat from './EmptySeat';
@@ -111,8 +111,9 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, heroIsSeated, isGameInProgress, areOpenSeats } = useSelector(globalGameStateSelector);
-    const { maxPlayers } = useSelector(selectGameParameters);
+    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator } = useSelector(
+        globalGameStateSelector,
+    );
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
         tableSelector,
     );
@@ -145,7 +146,7 @@ function Table(props) {
                         }}
                     />,
                 );
-            } else if (!heroIsSeated && areOpenSeats) {
+            } else if (!isHeroAtTable && areOpenSeats && !isSpectator) {
                 ans.push(
                     <OpenSeat
                         key={index}
@@ -157,7 +158,7 @@ function Table(props) {
                         }}
                     />,
                 );
-            } else {
+            } else if (isHeroAtTable) {
                 ans.push(
                     <EmptySeat
                         key={index}
@@ -172,6 +173,8 @@ function Table(props) {
                         virtualPositon={mod(index + offset - 1, 9)}
                     />,
                 );
+            } else {
+                ans.push(null);
             }
         }
         return ans;

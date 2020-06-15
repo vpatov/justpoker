@@ -14,7 +14,7 @@ import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api/api';
+import { ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
 import {
@@ -78,6 +78,10 @@ export class GameStateManager {
 
     getGameStage(): GameStage {
         return this.gameState.gameStage;
+    }
+
+    getMinBuyin(): number {
+        return this.gameState.gameParameters.minBuyin;
     }
 
     getMaxBuyin(): number {
@@ -211,12 +215,21 @@ export class GameStateManager {
         return this.gameState.gameParameters.maxPlayers;
     }
 
-    getSittingPlayers(): Player[] {
-        return Object.values(this.getPlayers()).filter((player) => player.sitting);
+    getPlayersAtTable(): Player[] {
+        return Object.values(this.getPlayers()).filter((player) => player.isAtTable);
     }
 
     areOpenSeats(): boolean {
-        return this.getMaxPlayers() > Object.values(this.getPlayers()).length;
+        return this.getMaxPlayers() > this.getPlayersAtTable().length;
+    }
+
+    findFirstOpenSeat(): number {
+        const allSeatNumbers = new Set([...Array(this.getMaxPlayers()).keys()]);
+        this.forEveryPlayer((player) => {
+            allSeatNumbers.delete(player.seatNumber);
+        });
+        const seatNumber = allSeatNumbers.values().next().value;
+        return seatNumber >= 0 ? seatNumber : -1;
     }
 
     // TODO when branded types can be used as index signatures, replace string with PlayerUUID
@@ -311,18 +324,6 @@ export class GameStateManager {
         const chips = this.getPlayerChips(playerUUID);
         const callAmount = this.getPreviousRaise() > chips ? chips : this.getPreviousRaise();
         return callAmount;
-    }
-
-    playerBuyinAddChips(playerUUID: PlayerUUID, addChips: number) {
-        if (addChips <= 0) {
-            logger.error(
-                `gameStateManager.playerBuyinAddChips was called with a zero or negative chip amount: ${addChips}`,
-            );
-            return;
-        }
-        this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), addChips);
-        const newChipAmount = this.getPlayerChips(playerUUID) + addChips;
-        this.setPlayerChips(playerUUID, newChipAmount);
     }
 
     playerBuyinSetChips(playerUUID: PlayerUUID, setChips: number) {
@@ -507,6 +508,9 @@ export class GameStateManager {
     getPlayerPositionMap(): Map<PlayerUUID, PlayerPosition> {
         const numPlayers = this.getPlayersDealtIn().length;
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[numPlayers];
+        if (!positions) {
+            return undefined;
+        }
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const seats = this.getSeats().filter(([seatNumber, uuid]) => this.wasPlayerDealtIn(uuid));
 
@@ -524,7 +528,7 @@ export class GameStateManager {
     }
 
     getPlayerPositionString(playerUUID: PlayerUUID): string | undefined {
-        return PlayerPositionString[this.getPlayerPositionMap().get(playerUUID)];
+        return PlayerPositionString[this.getPlayerPositionMap()?.get(playerUUID)];
     }
 
     getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
@@ -605,7 +609,7 @@ export class GameStateManager {
     }
 
     isPlayerReadyToPlay(playerUUID: PlayerUUID): boolean {
-        return this.getPlayer(playerUUID).sitting && !this.getPlayer(playerUUID).sittingOut;
+        return this.getPlayer(playerUUID).isAtTable && !this.getPlayer(playerUUID).sittingOut;
     }
 
     isPlayerInHand(playerUUID: PlayerUUID): boolean {
@@ -788,9 +792,6 @@ export class GameStateManager {
     initConnectedClient(clientUUID: ClientUUID) {
         const client = this.gameState.activeConnections.get(clientUUID);
         if (!client) {
-            if (this.gameState.admins.length === 0) {
-                this.addClientAdmin(clientUUID);
-            }
             const newClient = this.createConnectedClient(clientUUID);
             this.gameState.activeConnections.set(clientUUID, newClient);
             this.ledgerService.initRow(clientUUID);
@@ -902,9 +903,12 @@ export class GameStateManager {
 
     removePlayerFromPlayers(playerUUID: PlayerUUID) {
         const player = this.getPlayer(playerUUID);
-        if (player.sitting) {
-            this.standUpPlayer(playerUUID);
+        if (player.isAtTable) {
+            this.playerLeaveTable(playerUUID);
         }
+        const clientUUID = this.getClientByPlayerUUID(playerUUID);
+        this.ledgerService.addWalkaway(clientUUID, player.chips);
+        this.ledgerService.setCurrentChips(clientUUID, 0);
         delete this.gameState.players[playerUUID];
     }
 
@@ -925,22 +929,19 @@ export class GameStateManager {
         this.getPlayers()[playerUUID].disconnected = false;
     }
 
-    addNewPlayerToGame(clientUUID: ClientUUID, request: JoinTableRequest) {
+    addNewPlayerToGame(clientUUID: ClientUUID, request: JoinGameRequest) {
         const { name, buyin, avatarKey } = request;
         const player = this.createNewPlayer(name, buyin, avatarKey);
 
-        // TODO remove temporary logic
-        // this deletes previous player association and replaces it
-        // with new one
         const client = this.getConnectedClient(clientUUID);
-        if (client.playerUUID) {
-            this.removePlayerFromPlayers(client.playerUUID);
-        }
-        // -----
-
         const associatedClient = this.associateClientAndPlayer(clientUUID, player.uuid);
+
         this.updatePlayer(player.uuid, player, true);
         this.gameState.activeConnections.set(associatedClient.uuid, associatedClient);
+
+        if (this.gameState.admins.length === 0) {
+            this.addPlayerAdmin(player.uuid);
+        }
 
         this.ledgerService.addAlias(clientUUID, name);
         this.ledgerService.addBuyin(clientUUID, buyin);
@@ -961,20 +962,18 @@ export class GameStateManager {
         this.getPlayer(playerUUID).willStraddle = willStraddle;
     }
 
-    sitDownPlayer(playerUUID: PlayerUUID, seatNumber: number) {
+    playerJoinTable(playerUUID: PlayerUUID, seatNumber: number) {
         const player = this.getPlayer(playerUUID);
-        player.sitting = true;
+        player.isAtTable = true;
         player.sittingOut = false;
         player.seatNumber = seatNumber;
     }
 
-    standUpPlayer(playerUUID: PlayerUUID) {
+    playerLeaveTable(playerUUID: PlayerUUID) {
         const player = this.getPlayer(playerUUID);
-        player.sitting = false;
+        player.isAtTable = false;
         player.sittingOut = false;
         player.seatNumber = -1;
-        const clientUUID = this.getClientByPlayerUUID(playerUUID);
-        this.ledgerService.addWalkaway(clientUUID, player.chips);
     }
 
     sitOutPlayer(playerUUID: PlayerUUID) {

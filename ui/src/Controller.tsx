@@ -7,7 +7,7 @@ import {
     heroHandLabelSelector,
     selectGameParameters,
     bettingRoundActionTypesToUnqueueSelector,
-    isHeroSeatedSelector,
+    globalGameStateSelector,
     heroPlayerUUIDSelector,
 } from './store/selectors';
 
@@ -20,9 +20,11 @@ import { ClientActionType, ClientWsMessageRequest, ClientStraddleRequest } from 
 import { Typography, Tooltip } from '@material-ui/core';
 import { BettingRoundActionType } from './shared/models/game/betting';
 
+import ControllerSpectator from './ControllerSpectator';
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
+import BuyChipsDialog from './BuyChipsDialog';
 import { BettingRoundActionButton } from './shared/models/ui/uiState';
 import red from '@material-ui/core/colors/red';
 import Color from 'color';
@@ -46,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'self-start',
-            justifyContent: 'flex-end',
+            justifyContent: 'center',
         },
         sizeAndBetActionsCont: {
             width: '60%',
@@ -95,7 +97,10 @@ const useStyles = makeStyles((theme: Theme) =>
         handLabel: {
             fontSize: '1.8vmin',
             color: theme.palette.primary.main,
-            marginBottom: '4.9vmin',
+        },
+        totalChips: {
+            fontSize: '1.8vmin',
+            color: theme.palette.primary.main,
         },
         handLabelSmaller: {
             fontSize: '1.6vmin',
@@ -147,7 +152,9 @@ function ControllerComp(props: ControllerProps) {
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
-    const heroSeated = useSelector(isHeroSeatedSelector);
+    const { isSpectator, isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
+    const [buyChipsDialogOpen, setBuyinDialogOpen] = useState(false);
+
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
     const [betAmt, setBetAmt] = useState(0);
@@ -160,7 +167,7 @@ function ControllerComp(props: ControllerProps) {
         if (betAmt !== 0 && betAmt < min) {
             setBetAmt(0);
         }
-    }, [min, betAmt, setBetAmt]);
+    }, [min, setBetAmt]);
 
     useEffect(() => {
         for (const actionType of bettingRoundActionTypesToUnqueue) {
@@ -171,6 +178,17 @@ function ControllerComp(props: ControllerProps) {
             }
         }
     }, [bettingRoundActionTypesToUnqueue]);
+
+    const handleClose = () => {
+        setBuyinDialogOpen(false);
+    };
+
+    const handleBuy = () => {
+        setBuyinDialogOpen(false);
+        // TODO make it such that user is automatically sitting in
+        // as soon as they buyin through this dialog
+        sendSitMessage(false);
+    };
 
     const changeBetAmount = (newAmt) => {
         // parse string into int
@@ -232,11 +250,16 @@ function ControllerComp(props: ControllerProps) {
         });
     }
 
-    function onToggleSitOutNextHand() {
+    function sendSitMessage(dealInNextHand: boolean) {
         WsServer.send({
             actionType: dealInNextHand ? ClientActionType.SITOUT : ClientActionType.SITIN,
             request: {} as ClientWsMessageRequest,
         });
+    }
+
+    function onToggleSitOutNextHand() {
+        if (heroTotalChips <= 0) setBuyinDialogOpen(true);
+        else sendSitMessage(dealInNextHand);
     }
 
     function onToggleStraddle() {
@@ -267,6 +290,15 @@ function ControllerComp(props: ControllerProps) {
         }
     }
 
+    if (isSpectator)
+        return (
+            <ControllerSpectator
+                className={classnames(classes.root, className, {
+                    [classes.rootToAct]: toAct,
+                })}
+            />
+        );
+
     return (
         <div
             className={classnames(classes.root, className, {
@@ -274,10 +306,24 @@ function ControllerComp(props: ControllerProps) {
             })}
         >
             <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
+            <BuyChipsDialog open={buyChipsDialogOpen} handleBuy={handleBuy} handleCancel={handleClose} />
             <div className={classes.gameInfoCont}>
-                {toAct ? (
-                    <Tooltip title="You should probably raise." placement="right">
-                        <Typography className={classes.toActLabel}>{'☉ Your Turn'}</Typography>
+                {!isHeroAtTable ? (
+                    <Tooltip title="Your current total chips." placement="right">
+                        <Typography
+                            className={classes.totalChips}
+                        >{`Chips: ${heroTotalChips.toLocaleString()}`}</Typography>
+                    </Tooltip>
+                ) : null}
+                {heroHandLabel ? (
+                    <Tooltip title="Your current best hand." placement="right">
+                        <Typography
+                            className={classnames(classes.handLabel, {
+                                [classes.handLabelSmaller]: heroHandLabel.length > 22,
+                            })}
+                        >
+                            {heroHandLabel}
+                        </Typography>
                     </Tooltip>
                 ) : null}
                 {playerPositionString ? (
@@ -285,15 +331,6 @@ function ControllerComp(props: ControllerProps) {
                         <Typography className={classes.playerPositonString}>{playerPositionString}</Typography>
                     </Tooltip>
                 ) : null}
-                <Tooltip title="Your current best hand." placement="right">
-                    <Typography
-                        className={classnames(classes.handLabel, {
-                            [classes.handLabelSmaller]: heroHandLabel.length > 22,
-                        })}
-                    >
-                        {heroHandLabel}
-                    </Typography>
-                </Tooltip>
             </div>
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>
@@ -313,7 +350,7 @@ function ControllerComp(props: ControllerProps) {
                                         button.action === BettingRoundActionType.FOLD && showWarningOnFold,
                                 })}
                                 disabled={
-                                    button.disabled || (button.action === BettingRoundActionType.BET && betAmt === 0)
+                                    button.disabled || (button.action === BettingRoundActionType.BET && betAmt < min)
                                 }
                                 onClick={() => onClickActionButton(button.action)}
                             >
@@ -337,7 +374,7 @@ function ControllerComp(props: ControllerProps) {
                     {showCardButtons?.length ? (
                         <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
                     ) : null}
-                    {heroSeated && allowTimeBanks ? (
+                    {isHeroAtTable && allowTimeBanks ? (
                         <Button
                             className={classnames(classes.timeBankButton, 'ani_timeBank')}
                             variant="outlined"

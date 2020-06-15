@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import classnames from 'classnames';
 
 import Table from './Table';
@@ -47,7 +47,6 @@ const MUTE_LOCAL_STORAGE_KEY = 'jp-last-used-mute';
 
 function Game(props) {
     const [mute, SET_mute] = useStickyState(false, MUTE_LOCAL_STORAGE_KEY);
-
     const classes = useStyles();
     const { wsConnClosed } = props;
     return (
