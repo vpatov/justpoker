@@ -975,17 +975,14 @@ export class GameStateManager {
                 actionType: ClientActionType.LEAVETABLE,
                 args: [playerUUID],
             });
-            this.setPlayerLeaving(playerUUID, true);
+            this.getPlayer(playerUUID).leaving = true;
         } else {
             const player = this.getPlayer(playerUUID);
             player.isAtTable = false;
             player.sittingOut = false;
             player.seatNumber = -1;
+            this.getPlayer(playerUUID).leaving = false;
         }
-    }
-
-    setPlayerLeaving(playerUUID: PlayerUUID, value: boolean) {
-        this.getPlayer(playerUUID).leaving = value;
     }
 
     sitOutPlayer(playerUUID: PlayerUUID) {

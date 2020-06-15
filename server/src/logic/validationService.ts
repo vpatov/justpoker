@@ -487,6 +487,13 @@ export class ValidationService {
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
 
+        const player = this.gsm.getPlayerByClientUUID(clientUUID);
+        if (player.quitting) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player already has quitting action queued.`,
+            };
+        }
         return undefined;
     }
 
@@ -497,6 +504,20 @@ export class ValidationService {
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         error = this.ensurePlayerIsAtTable(player.uuid);
         if (error) return error;
+
+        if (player.quitting) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player already has quitting action queued. When they quit they will leave.`,
+            };
+        }
+
+        if (player.leaving) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player already has leaving action queued.`,
+            };
+        }
 
         return undefined;
     }

@@ -71,11 +71,11 @@ function Player(props) {
         if (playerTimer) {
             return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
         }
-        if (leaving) {
-            return <Typography className={classes.labelText}>Leaving</Typography>;
-        }
         if (quitting) {
             return <Typography className={classes.labelText}>Quitting</Typography>;
+        }
+        if (leaving) {
+            return <Typography className={classes.labelText}>Leaving</Typography>;
         }
         if (sittingOut) {
             return <Typography className={classes.labelText}>Sitting Out</Typography>;
