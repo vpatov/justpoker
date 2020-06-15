@@ -234,10 +234,7 @@ export class ValidationService {
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
 
-        return this.validateNotInGameStages(
-            INIT_HAND_STAGES,
-            'sit in/out',
-        );
+        return this.validateNotInGameStages(INIT_HAND_STAGES, 'sit in/out');
     }
 
     validateSitInAction(clientUUID: ClientUUID): ValidationResponse {
@@ -517,7 +514,7 @@ export class ValidationService {
         if (error) return error;
 
         error = this.validateNotInGameStages(INIT_HAND_STAGES, 'leave table');
-        if (error) return error; 
+        if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         error = this.ensurePlayerIsAtTable(player.uuid);
