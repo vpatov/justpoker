@@ -508,6 +508,9 @@ export class GameStateManager {
     getPlayerPositionMap(): Map<PlayerUUID, PlayerPosition> {
         const numPlayers = this.getPlayersDealtIn().length;
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[numPlayers];
+        if (!positions) {
+            return undefined;
+        }
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const seats = this.getSeats().filter(([seatNumber, uuid]) => this.wasPlayerDealtIn(uuid));
 
@@ -525,7 +528,7 @@ export class GameStateManager {
     }
 
     getPlayerPositionString(playerUUID: PlayerUUID): string | undefined {
-        return PlayerPositionString[this.getPlayerPositionMap().get(playerUUID)];
+        return PlayerPositionString[this.getPlayerPositionMap()?.get(playerUUID)];
     }
 
     getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
@@ -789,9 +792,6 @@ export class GameStateManager {
     initConnectedClient(clientUUID: ClientUUID) {
         const client = this.gameState.activeConnections.get(clientUUID);
         if (!client) {
-            if (this.gameState.admins.length === 0) {
-                this.addClientAdmin(clientUUID);
-            }
             const newClient = this.createConnectedClient(clientUUID);
             this.gameState.activeConnections.set(clientUUID, newClient);
             this.ledgerService.initRow(clientUUID);
@@ -930,6 +930,10 @@ export class GameStateManager {
 
         this.updatePlayer(player.uuid, player, true);
         this.gameState.activeConnections.set(associatedClient.uuid, associatedClient);
+
+        if (this.gameState.admins.length === 0) {
+            this.addPlayerAdmin(player.uuid);
+        }
 
         this.ledgerService.addAlias(clientUUID, name);
         this.ledgerService.addBuyin(clientUUID, buyin);
