@@ -126,10 +126,10 @@ export class WsServer {
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 
-    static sendJoinTableMessage(playerUUID: PlayerUUID) {
+    static sendJoinTableMessage(playerUUID: PlayerUUID, seatNumber: number) {
         const clientWsMessage: ClientWsMessage = {
             actionType: ClientActionType.JOINTABLE,
-            request: ({ playerUUID } as JoinTableRequest) as ClientWsMessageRequest,
+            request: ({ playerUUID, seatNumber } as JoinTableRequest) as ClientWsMessageRequest,
         };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }

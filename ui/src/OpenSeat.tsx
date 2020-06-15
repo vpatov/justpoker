@@ -1,6 +1,6 @@
 import React, { useState, Fragment } from 'react';
 import classnames from 'classnames';
-import { heroPlayerUUIDSelector } from './store/selectors';
+import { heroPlayerUUIDSelector, globalGameStateSelector } from './store/selectors';
 import { useSelector } from 'react-redux';
 import { WsServer } from './api/ws';
 
@@ -28,20 +28,22 @@ const useStyles = makeStyles((theme) => ({
 
 function OpenSeat(props) {
     const classes = useStyles();
-    const { className, style } = props;
+    const { className, style, seatNumber } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
+    const {heroTotalChips} = useSelector(globalGameStateSelector);
     const handleCancel = () => {
         setDialogOpen(false);
     };
 
     const handleBuy = () => {
-        WsServer.sendJoinTableMessage(heroPlayerUUID);
+        WsServer.sendJoinTableMessage(heroPlayerUUID, seatNumber);
         setDialogOpen(false);
     };
 
     function onClickSitDown() {
-        setDialogOpen(true);
+        if (heroTotalChips > 0) WsServer.sendJoinTableMessage(heroPlayerUUID, seatNumber);
+        else setDialogOpen(true);
     }
 
     return (

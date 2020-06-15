@@ -72,18 +72,5 @@ export class ChatService {
             }
             return;
         }
-        const sitDownMatch = message.content.match(sitDownCommandRegEx);
-        if (sitDownMatch) {
-            if (!player) {
-                return;
-            }
-            const seatNumber = Number(sitDownMatch[1]);
-            if (!isNaN(seatNumber)) {
-                const error = this.validationService.validateSitDownRequest(clientUUID, { seatNumber });
-                if (!error) {
-                    this.gameStateManager.sitDownPlayer(player.uuid, seatNumber);
-                }
-            }
-        }
     }
 }

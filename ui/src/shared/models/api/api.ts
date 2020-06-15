@@ -41,8 +41,6 @@ export declare interface HTTPParams {
 export enum ClientActionType {
     STARTGAME = 'STARTGAME',
     STOPGAME = 'STOPGAME',
-    SITDOWN = 'SITDOWN',
-    STANDUP = 'STANDUP',
     SITIN = 'SITIN',
     SITOUT = 'SITOUT',
     JOINGAME = 'JOINGAME',
@@ -76,12 +74,9 @@ export enum UiActionType {
     OPEN_LEDGER = 'OPEN_LEDGER',
 }
 
-export declare interface SitDownRequest {
-    seatNumber: number;
-}
-
 export declare interface JoinTableRequest {
     playerUUID: PlayerUUID;
+    seatNumber: number;
 }
 
 export declare interface JoinGameRequest {
@@ -89,6 +84,8 @@ export declare interface JoinGameRequest {
     buyin: number;
     avatarKey: AvatarKeys;
 }
+
+export declare type JoinGameAndTableRequest = JoinTableRequest & JoinGameRequest;
 
 export declare interface AddChipsRequest {
     chipAmount: number;
@@ -133,10 +130,9 @@ export declare interface SetGameParametersRequest {
     gameParameters: GameParameters;
 }
 
-export type ClientWsMessageRequest = SitDownRequest &
-    JoinTableRequest &
+export type ClientWsMessageRequest = JoinTableRequest &
     JoinGameRequest &
-    (SitDownRequest & JoinTableRequest) &
+    JoinTableRequest &
     BettingRoundAction &
     AddChipsRequest &
     SetChipsRequest &

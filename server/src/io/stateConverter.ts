@@ -24,6 +24,7 @@ import {
     PositionIndicator,
     ShowCardButton,
     LEAVE_TABLE_BUTTON,
+    QUIT_GAME_BUTTON,
 } from '../../../ui/src/shared/models/ui/uiState';
 import { GameType } from '../../../ui/src/shared/models/game/game';
 import { GameStateManager } from '../state/gameStateManager';
@@ -93,7 +94,7 @@ export class StateConverter {
         // TODO the way that heroPlayer / clientPlayerIsInGame is handled is a little complicated
         // and should be refactored
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const clientPlayerIsSeated = heroPlayer?.sitting;
+        const clientPlayerIsAtTable = heroPlayer?.isAtTable;
         const heroPlayerUUID = heroPlayer ? heroPlayer.uuid : makeBlankUUID();
         const handLogEntry = this.gameInstanceLogService.getMostRecentHandLogEntry(heroPlayerUUID);
         const sendAll = forceSendAll || this.sendAll();
@@ -104,7 +105,7 @@ export class StateConverter {
                 this.gameUpdated() || sendAll
                     ? {
                           global: this.getUIGlobal(clientUUID),
-                          controller: clientPlayerIsSeated
+                          controller: clientPlayerIsAtTable
                               ? this.getUIController(clientUUID, heroPlayerUUID)
                               : getCleanController(),
                           table: {
@@ -145,7 +146,7 @@ export class StateConverter {
 
     getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const clientPlayerIsSeated = heroPlayer?.sitting;
+        const clientPlayerIsSeated = heroPlayer?.isAtTable;
         const gameStage = this.gameStateManager.getGameStage();
 
         const global: Global = {
@@ -158,13 +159,13 @@ export class StateConverter {
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
-            isHeroAtTable: true, // to be implemented
-            isSpectator: false, // to be implemented
+            isHeroAtTable: heroPlayer?.isAtTable,
+            isSpectator: !heroPlayer,
             numberOfSpectators: 0, // to be implemented
             adminNames: this.gameStateManager
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
-            heroTotalChips: heroPlayer.chips,
+            heroTotalChips: heroPlayer?.chips,
         };
 
         return global;
@@ -296,8 +297,13 @@ export class StateConverter {
         }
 
         // if player is in game they can leave
-        if (heroPlayer && !heroPlayer.quitting) {
+        // TODO how to communicate to people that this is how they "stand up"
+        if (heroPlayer && !heroPlayer.quitting && heroPlayer.isAtTable) {
             menuButtons.push(LEAVE_TABLE_BUTTON);
+        }
+
+        if (heroPlayer) {
+            menuButtons.push(QUIT_GAME_BUTTON);
         }
 
         return menuButtons;

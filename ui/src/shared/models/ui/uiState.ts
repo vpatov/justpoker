@@ -240,6 +240,11 @@ export const LEAVE_TABLE_BUTTON: MenuButton = {
     label: 'Leave Table',
 };
 
+export const QUIT_GAME_BUTTON: MenuButton = {
+    action: ClientActionType.QUITGAME,
+    label: 'Quit Game',
+};
+
 export const VOLUME_BUTTON: MenuButton = {
     action: UiActionType.VOLUME,
     label: 'Mute',

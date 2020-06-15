@@ -111,7 +111,7 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats } = useSelector(globalGameStateSelector);
+    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator } = useSelector(globalGameStateSelector);
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
         tableSelector,
     );
@@ -144,7 +144,7 @@ function Table(props) {
                         }}
                     />,
                 );
-            } else if (!isHeroAtTable && areOpenSeats) {
+            } else if (!isHeroAtTable && areOpenSeats && !isSpectator) {
                 ans.push(
                     <OpenSeat
                         key={index}

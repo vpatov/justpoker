@@ -28,6 +28,7 @@ import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { AnimationService } from '../state/animationService';
+import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 
 declare interface ActionProcessor {
     validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -80,52 +81,49 @@ export class EventProcessorService {
             updates: [ServerStateKey.GAMESTATE],
         },
 
-        // these action types should be deprecated VVVV
-        [ClientActionType.SITDOWN]: {
-            validation: (uuid, req) => this.validationService.validateSitDownRequest(uuid, req),
-            perform: (uuid, req) => {
-                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.sitDownPlayer(player.uuid, req.seatNumber);
-            },
-            updates: [ServerStateKey.GAMESTATE],
-        },
-        [ClientActionType.STANDUP]: {
-            validation: (uuid, req) => this.validationService.validateStandUpRequest(uuid),
-            perform: (uuid, req) => {
-                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.standUpPlayer(player.uuid);
-            },
-            updates: [ServerStateKey.GAMESTATE],
-        },
-        // these action types should be deprecated ^^^^
-
-        // these action should be reimplemented VVVV
         [ClientActionType.JOINGAME]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid) => NOT_IMPLEMENTED_YET,
+            validation: (uuid, req) => this.validationService.validateJoinGameRequest(uuid, req),
+            perform: (uuid, req) => {
+                this.gameStateManager.addNewPlayerToGame(uuid, req);
+            },
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.QUITGAME]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid) => NOT_IMPLEMENTED_YET,
-            updates: [],
+            validation: (uuid, req) => this.validationService.validateQuitGameRequest(uuid),
+            perform: (uuid) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.removePlayerFromGame(player.uuid);
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.JOINTABLE]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid) => NOT_IMPLEMENTED_YET,
-            updates: [],
-        },
-        [ClientActionType.LEAVETABLE]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid) => NOT_IMPLEMENTED_YET,
-            updates: [],
+            validation: (uuid, req) => this.validationService.validateJoinTableRequest(uuid, req),
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.playerJoinTable(player.uuid, req.seatNumber);
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.JOINGAMEANDJOINTABLE]: {
-            validation: (uuid, req) => NOT_IMPLEMENTED_YET,
-            perform: (uuid) => NOT_IMPLEMENTED_YET,
-            updates: [],
+            validation: (uuid, req) => this.validationService.validateJoinGameAndTableRequest(uuid, req),
+            perform: (uuid, req) => {
+                this.gameStateManager.addNewPlayerToGame(uuid, req);
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                const seatNumber = this.gameStateManager.findFirstOpenSeat();
+                if (seatNumber !== -1) {
+                    this.gameStateManager.playerJoinTable(player.uuid, seatNumber);
+                }
+            },
+            updates: [ServerStateKey.GAMESTATE],
         },
-        // these action should be reimplemented  ^^^^
+        [ClientActionType.LEAVETABLE]: {
+            validation: (uuid, req) => this.validationService.validateLeaveTableRequest(uuid),
+            perform: (uuid) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.playerLeaveTable(player.uuid);
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
 
         [ClientActionType.PINGSTATE]: {
             validation: (uuid, req) => undefined,
