@@ -921,11 +921,7 @@ export class GameStateManager {
         const { name, buyin, avatarKey } = request;
         const player = this.createNewPlayer(name, buyin, avatarKey);
 
-        // deletes previous player association and replace it with a new one
         const client = this.getConnectedClient(clientUUID);
-        if (client.playerUUID) {
-            this.removePlayerFromPlayers(client.playerUUID);
-        }
         const associatedClient = this.associateClientAndPlayer(clientUUID, player.uuid);
 
         this.updatePlayer(player.uuid, player, true);

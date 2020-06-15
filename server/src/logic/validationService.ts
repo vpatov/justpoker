@@ -146,14 +146,6 @@ export class ValidationService {
     }
 
     validateJoinGameRequest(clientUUID: ClientUUID, request: JoinGameRequest): ValidationResponse {
-        // TODO;
-        // if (!this.gsm.areOpenSeats()) {
-        //     return {
-        //         errorString: `There are no open seats left at this table`,
-        //         errorType: ErrorType.NO_OPEN_SEATS,
-        //     };
-        // }
-
         const error = this.ensureClientIsNotInGame(clientUUID);
         if (error) return error;
 
