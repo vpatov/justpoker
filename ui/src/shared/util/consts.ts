@@ -22,3 +22,5 @@ export const MAX_VALUES = {
 
 export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes
 export const ATTEMPT_EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 15; // 15 minutes
+
+export const WS_NORMAL_CLOSE = 1000;

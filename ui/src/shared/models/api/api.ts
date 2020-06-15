@@ -28,7 +28,7 @@ export declare interface ClientAction extends BaseAction {
 
 export declare interface ServerAction extends BaseAction {
     actionType: ServerActionType;
-    clientUUID: ClientUUID;
+    clientUUID?: ClientUUID;
 }
 
 export declare interface WSParams {

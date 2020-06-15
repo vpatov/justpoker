@@ -221,7 +221,6 @@ export class EventProcessorService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-        // TODO keep alive should not trigger BE to resend state
         [ClientActionType.KEEPALIVE]: {
             validation: (uuid, req) => undefined,
             perform: (uuid, req: PlayerReactionRequest) => {},
@@ -292,6 +291,10 @@ export class EventProcessorService {
             }
 
             case EventType.CLIENT_ACTION: {
+                // nothing needs to be processed or sent for keep alive
+                if (event?.body?.actionType === ClientActionType.KEEPALIVE) {
+                    return;
+                }
                 // TODO refactor handling of errors from validation.
                 // Consider removing NO_ERROR var and replacing with ValidationResponse | undefined
                 const error = this.processClientAction(event.body as ClientAction);

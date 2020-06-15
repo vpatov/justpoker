@@ -4,7 +4,11 @@ import * as WebSocket from 'ws';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
-import { EXPIRE_CLIENT_INTERVAL, ATTEMPT_EXPIRE_CLIENT_INTERVAL } from '../../../ui/src/shared/util/consts';
+import {
+    EXPIRE_CLIENT_INTERVAL,
+    ATTEMPT_EXPIRE_CLIENT_INTERVAL,
+    WS_NORMAL_CLOSE,
+} from '../../../ui/src/shared/util/consts';
 
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
@@ -33,16 +37,16 @@ export class ConnectedClientManager {
     }
 
     clearStaleClients() {
-        logger.info(`attempting to expiring game instances`);
+        logger.verbose(`attempting to expiring game instances`);
         if (this.ClientGroups) {
-            // TODO implement warning game will be cleared do to inactivity
+            // TODO implement warning you will be disconnected
             const now = getEpochTimeMs();
             Object.entries(this.ClientGroups).forEach(([gameInstanceUUID, clients]) => {
                 Object.entries(clients).forEach(([clientUUID, client]) => {
                     const timeInactive = now - client.lastMessaged;
-                    logger.info(`${clientUUID} in game ${gameInstanceUUID} has been inactive for ${timeInactive}`);
+                    logger.verbose(`${clientUUID} in game ${gameInstanceUUID} has been inactive for ${timeInactive}`);
                     if (timeInactive > EXPIRE_CLIENT_INTERVAL) {
-                        logger.info(`expiring game instance ${gameInstanceUUID}`);
+                        logger.verbose(`expiring client ${clientUUID} ws connection`);
                         this.removeClientFromGroup(gameInstanceUUID as GameInstanceUUID, clientUUID as ClientUUID);
                     }
                 });
@@ -76,7 +80,7 @@ export class ConnectedClientManager {
         const ws = this.ClientGroups[gameInstanceUUID]?.[clientUUID]?.ws;
         if (ws) {
             // remove from group if is in group
-            ws.close(1000); // close if not already closed, 1000 indicated normal close
+            ws.close(WS_NORMAL_CLOSE); // close if not already closed
             delete this.ClientGroups[gameInstanceUUID][clientUUID];
             return true;
         }
@@ -88,7 +92,7 @@ export class ConnectedClientManager {
         logger.verbose(`removing group ${gameInstanceUUID}`);
         if (this.ClientGroups[gameInstanceUUID]) {
             // close all websockets
-            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((client) => client.ws.close(1000)); // 1000 indicated normal close
+            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((client) => client.ws.close(WS_NORMAL_CLOSE));
             // remove group if group exists
             delete this.ClientGroups[gameInstanceUUID];
         }
