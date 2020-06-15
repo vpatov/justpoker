@@ -417,6 +417,7 @@ export class StateConverter {
                 : undefined,
             name: player.name,
             quitting: player.quitting,
+            leaving: player.leaving,
             toAct: herosTurnToAct,
             hero: player.uuid === heroPlayerUUID,
             position: player.seatNumber,
