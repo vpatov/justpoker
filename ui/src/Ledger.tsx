@@ -136,8 +136,8 @@ const headCells: HeadCell[] = [
     { id: 'handsWon', numeric: true, disablePadding: false, label: 'Hands Won' },
     { id: 'flopsSeen', numeric: true, disablePadding: false, label: 'Flops Seen' },
     { id: 'vpip', numeric: true, disablePadding: false, label: 'Flops Seen %' },
-    { id: 'timeStartedPlaying', numeric: true, disablePadding: false, label: 'Time Started Playing' },
-    { id: 'timeMostRecentHand', numeric: true, disablePadding: false, label: 'Time Last Played' },
+    { id: 'timeStartedPlaying', numeric: false, disablePadding: false, label: 'Time Started Playing' },
+    { id: 'timeMostRecentHand', numeric: false, disablePadding: false, label: 'Time Last Played' },
 ];
 
 interface LedgerTableProps {
@@ -190,6 +190,10 @@ function LedgerTableHead(props: LedgerTableProps) {
             </TableRow>
         </TableHead>
     );
+}
+
+function formatTimestamp(timestamp: number){
+    return new Date(timestamp).toLocaleString().replace(',','');
 }
 
 function LedgerTable(props) {
@@ -284,8 +288,8 @@ function LedgerTable(props) {
                                         <TableCell align="right">{row.handsWon}</TableCell>
                                         <TableCell align="right">{row.flopsSeen}</TableCell>
                                         <TableCell align="right">{row.vpip}</TableCell>
-                                        <TableCell align="right">{row.timeStartedPlaying}</TableCell>
-                                        <TableCell align="right">{row.timeMostRecentHand}</TableCell>
+                                        <TableCell align="right">{formatTimestamp(row.timeStartedPlaying)}</TableCell>
+                                        <TableCell align="right">{formatTimestamp(row.timeMostRecentHand)}</TableCell>
                                     </TableRow>
                                 );
                             })}
