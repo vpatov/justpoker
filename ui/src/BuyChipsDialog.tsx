@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TextFieldWrap from './reuseable/TextFieldWrap';
+import FieldWithMinMaxButtons from './reuseable/FieldWithMinMaxButtons';
 import { selectGameParameters, globalGameStateSelector, heroPlayerUUIDSelector } from './store/selectors';
 import { useSelector } from 'react-redux';
 
@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
         },
         field: {
-            marginTop: 24,
             marginBottom: 24,
         },
         minMaxButtonCont: {
@@ -68,28 +67,15 @@ function BuyChipsDialog(props) {
         <Dialog open={open} maxWidth="sm" fullWidth>
             <DialogTitle>{`Buy Chips`}</DialogTitle>
             <DialogContent className={classes.content}>
-                <div className={classes.amtCont}>
-                    <TextFieldWrap
-                        className={classes.field}
-                        label="Amount"
-                        onChange={(event) => SET_ChipAmt(event.target.value)}
-                        value={chipAmt}
-                        min={0}
-                        max={computeMax()}
-                        type="number"
-                        variant="standard"
-                    />
-                    <div className={classes.minMaxButtonCont}>
-                        <Button
-                            className={classes.minMaxButton}
-                            onClick={() => SET_ChipAmt(computeMax())}
-                        >{`Max Buyin: ${computeMax()}`}</Button>
-                        <Button
-                            className={classes.minMaxButton}
-                            onClick={() => SET_ChipAmt(computeMin())}
-                        >{`Min Buyin: ${computeMin()}`}</Button>
-                    </div>
-                </div>
+                <FieldWithMinMaxButtons
+                    className={classes.field}
+                    label="Amount"
+                    onChange={(event) => SET_ChipAmt(event.target.value)}
+                    value={chipAmt}
+                    min={0}
+                    max={computeMax()}
+                    type="number"
+                />
                 <Typography>{`Current Chips: ${heroTotalChips.toLocaleString()}`}</Typography>
                 <Typography>{`Resulting Chips: ${resultingChips.toLocaleString()}`}</Typography>
             </DialogContent>

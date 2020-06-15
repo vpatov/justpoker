@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WsServer } from './api/ws';
+
+import FieldWithMinMaxButtons from './reuseable/FieldWithMinMaxButtons';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import IconPicker from './reuseable/IconPicker';
 
@@ -27,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
     },
     field: {
         marginTop: '3vmin',
-        width: '35%',
     },
     dialogPaper: {
         height: '80vh',
@@ -135,32 +136,21 @@ function JoinGameDialog(props) {
                         maxChars={24}
                     />
                 </div>
-                <div className={classes.betRow}>
-                    <TextFieldWrap
-                        variant="standard"
-                        type="number"
-                        className={classes.field}
-                        value={buyin}
-                        label="Buy In"
-                        onChange={(e) => setBuyin(e.target.value)}
-                        inputProps={{
-                            step: 1,
-                        }}
-                        max={maxBuyin}
-                        error={invalidBuyin()}
-                        helperText={invalidBuyin() ? `Min Buyin is ${minBuyin}` : ''}
-                    />
-                    <div className={classes.minMaxButtonCont}>
-                        <Button
-                            className={classes.minMaxButton}
-                            onClick={() => setBuyin(maxBuyin)}
-                        >{`Max: ${maxBuyin}`}</Button>
-                        <Button
-                            className={classes.minMaxButton}
-                            onClick={() => setBuyin(minBuyin)}
-                        >{`Min: ${minBuyin}`}</Button>
-                    </div>
-                </div>
+
+                <FieldWithMinMaxButtons
+                    type="number"
+                    className={classes.field}
+                    value={buyin}
+                    label="Buy In"
+                    onChange={(e) => setBuyin(e.target.value)}
+                    inputProps={{
+                        step: 1,
+                    }}
+                    min={minBuyin}
+                    max={maxBuyin}
+                    error={invalidBuyin()}
+                    helperText={invalidBuyin() ? `Min Buyin is ${minBuyin}` : ''}
+                />
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>

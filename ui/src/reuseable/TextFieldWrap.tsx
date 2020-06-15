@@ -2,7 +2,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 
 function TextFieldWrap(props) {
-    const { onChange, type, min, max, maxChars = 250, ...rest } = props;
+    const { onChange, type, min, max, minStrict, maxStrict = true, maxChars = 250, ...rest } = props;
 
     function getReturnValue(current) {
         if (current.length > maxChars) {
@@ -16,10 +16,10 @@ function TextFieldWrap(props) {
             if (Number.isNaN(intValue) || current <= 0) {
                 return 0;
             } else {
-                if (max) {
+                if (max && maxStrict) {
                     intValue = Math.min(intValue, max);
                 }
-                if (min) {
+                if (min && minStrict) {
                     intValue = Math.max(intValue, min);
                 }
                 return intValue;
