@@ -237,12 +237,21 @@ export class ValidationService {
     }
 
     validateSitInAction(clientUUID: ClientUUID): ValidationResponse {
-        const error = this.ensureClientIsInGame(clientUUID);
-        if (error) {
-            return error;
-        }
+        let error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
-        return this.ensurePlayerIsSittingOut(player.uuid);
+        error = this.ensurePlayerIsSittingOut(player.uuid);
+        if (error) return error;
+
+        if (player.chips <= 0) {
+            return {
+                errorString: `Player ${player.name} ${player.uuid} cannot sit in without any chips.`,
+                errorType: ErrorType.NOT_ENOUGH_CHIPS,
+            };
+        }
+
+        return undefined;
     }
 
     validateSitOutAction(clientUUID: ClientUUID): ValidationResponse {

@@ -37,6 +37,9 @@ function OpenSeat(props) {
     };
 
     const handleBuy = () => {
+        // TODO This is a potential source of bug - The BuyChipsDialog sends a message to server with SETCHIPS, and
+        // afterwards this function is executed. However, this function relies on the previous message actually being executed,
+        // and it has no way of knowing that as of now. 
         WsServer.sendJoinTableMessage(heroPlayerUUID, seatNumber);
         setDialogOpen(false);
     };
@@ -61,7 +64,6 @@ function OpenSeat(props) {
                     open={dialogOpen}
                     handleCancel={handleCancel}
                     handleBuy={handleBuy}
-                    sitDownOnBuy={true}
                 />
             ) : null}
         </Fragment>

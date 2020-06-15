@@ -24,6 +24,7 @@ import ControllerSpectator from './ControllerSpectator';
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
+import BuyChipsDialog from './BuyChipsDialog';
 import { BettingRoundActionButton } from './shared/models/ui/uiState';
 import red from '@material-ui/core/colors/red';
 import Color from 'color';
@@ -152,6 +153,7 @@ function ControllerComp(props: ControllerProps) {
     const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
     const { isSpectator, isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
+    const [buyChipsDialogOpen, setBuyinDialogOpen] = useState(false);
 
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
@@ -176,6 +178,17 @@ function ControllerComp(props: ControllerProps) {
             }
         }
     }, [bettingRoundActionTypesToUnqueue]);
+
+    const handleClose = () => {
+        setBuyinDialogOpen(false);
+    };
+    
+    const handleBuy = () => {
+        setBuyinDialogOpen(false);
+        // TODO make it such that user is automatically sitting in
+        // as soon as they buyin through this dialog
+        sendSitMessage(true);
+    }
 
     const changeBetAmount = (newAmt) => {
         // parse string into int
@@ -237,11 +250,16 @@ function ControllerComp(props: ControllerProps) {
         });
     }
 
-    function onToggleSitOutNextHand() {
+    function sendSitMessage(dealInNextHand: boolean){
         WsServer.send({
             actionType: dealInNextHand ? ClientActionType.SITOUT : ClientActionType.SITIN,
             request: {} as ClientWsMessageRequest,
         });
+    }
+
+    function onToggleSitOutNextHand() {
+        if (heroTotalChips <= 0) setBuyinDialogOpen(true);
+        else sendSitMessage(dealInNextHand);   
     }
 
     function onToggleStraddle() {
@@ -288,6 +306,7 @@ function ControllerComp(props: ControllerProps) {
             })}
         >
             <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
+            <BuyChipsDialog open={buyChipsDialogOpen} handleBuy={handleBuy} handleCancel={handleClose}/>
             <div className={classes.gameInfoCont}>
                 {!isHeroAtTable ? (
                     <Tooltip title="Your current total chips." placement="right">

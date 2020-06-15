@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function GameDisconnectionMessage(props) {
     const classes = useStyles();
 
-    return <Typography className={classes.message}>Disconnected. Try to refresh to reconnect.</Typography>;
+    return <Typography className={classes.message}>Disconnected. Refresh the page (Ctrl+R) reconnect.</Typography>;
 }
 
 export default GameDisconnectionMessage;

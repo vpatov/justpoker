@@ -142,15 +142,6 @@ export class EventProcessorService {
             },
             updates: [ServerStateKey.CHAT],
         },
-        [ClientActionType.ADDCHIPS]: {
-            validation: (_, __) => undefined,
-            perform: (uuid, request) => {
-                this.validationService.ensureClientIsInGame(uuid);
-                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
-                this.gameStateManager.playerBuyinAddChips(player.uuid, Number(request.chipAmount));
-            },
-            updates: [ServerStateKey.GAMESTATE],
-        },
         [ClientActionType.SETCHIPS]: {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, request) => {

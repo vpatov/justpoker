@@ -326,18 +326,6 @@ export class GameStateManager {
         return callAmount;
     }
 
-    playerBuyinAddChips(playerUUID: PlayerUUID, addChips: number) {
-        if (addChips <= 0) {
-            logger.error(
-                `gameStateManager.playerBuyinAddChips was called with a zero or negative chip amount: ${addChips}`,
-            );
-            return;
-        }
-        this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), addChips);
-        const newChipAmount = this.getPlayerChips(playerUUID) + addChips;
-        this.setPlayerChips(playerUUID, newChipAmount);
-    }
-
     playerBuyinSetChips(playerUUID: PlayerUUID, setChips: number) {
         const chipDifference = setChips - this.getPlayerChips(playerUUID);
         if (chipDifference > 0) {
@@ -916,6 +904,7 @@ export class GameStateManager {
         }
         const clientUUID = this.getClientByPlayerUUID(playerUUID);
         this.ledgerService.addWalkaway(clientUUID, player.chips);
+        this.ledgerService.setCurrentChips(clientUUID, 0);
         delete this.gameState.players[playerUUID];
     }
 

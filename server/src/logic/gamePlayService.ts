@@ -512,7 +512,7 @@ export class GamePlayService {
     ejectStackedPlayers() {
         this.gsm.forEveryPlayerUUID((playerUUID) => {
             if (this.gsm.getPlayerChips(playerUUID) === 0) {
-                this.gsm.playerLeaveTable(playerUUID);
+                this.gsm.sitOutPlayer(playerUUID);
             }
         });
     }
