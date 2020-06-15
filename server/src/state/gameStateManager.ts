@@ -795,6 +795,10 @@ export class GameStateManager {
             this.gameState.activeConnections.set(clientUUID, newClient);
             this.ledgerService.initRow(clientUUID);
         }
+        const player = this.getPlayerByClientUUID(clientUUID);
+        if (player) {
+            this.setPlayerConnected(player.uuid);
+        }
     }
 
     isPlayerAdmin(playerUUID: PlayerUUID): boolean {
@@ -911,6 +915,14 @@ export class GameStateManager {
             throw Error('deassociateClientAndPlayer called with a player that doesnt have a client.');
         }
         this.gameState.activeConnections.set(clientUUID, this.createConnectedClient(clientUUID));
+    }
+
+    setPlayerDisconnected(playerUUID: PlayerUUID) {
+        this.getPlayers()[playerUUID].disconnected = true;
+    }
+
+    setPlayerConnected(playerUUID: PlayerUUID) {
+        this.getPlayers()[playerUUID].disconnected = false;
     }
 
     addNewPlayerToGame(clientUUID: ClientUUID, request: JoinTableRequest) {

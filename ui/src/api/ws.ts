@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 import docCookies from '../Cookies';
 import queryString, { ParsedQuery } from 'query-string';
+import isEmpty from 'lodash/isEmpty';
 import {
     ClientWsMessage,
     ClientChatMessage,
@@ -13,6 +14,7 @@ import {
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
 import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config/config';
+import { getEpochTimeMs } from '../shared/util/util';
 
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
@@ -23,6 +25,7 @@ export class WsServer {
     static clientUUID: ClientUUID | null = null;
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
+    static timeLastSentMsg: number;
 
     static openWs(gameInstanceUUID: GameInstanceUUID) {
         console.log('opening ws...');
@@ -40,7 +43,7 @@ export class WsServer {
         WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
         WsServer.ws.onmessage = WsServer.onGameMessage;
         WsServer.ws.onclose = WsServer.onWSClose;
-
+        WsServer.timeLastSentMsg = getEpochTimeMs();
         return true;
     }
 
@@ -53,7 +56,7 @@ export class WsServer {
     // can add types here.
     private static onGameMessage(msg: MessageEvent) {
         const jsonData = JSON.parse(get(msg, 'data', {}));
-        console.log(jsonData);
+        console.log('jsonData: ', jsonData);
         if (jsonData.clientUUID) {
             docCookies.setItem(clientUUIDCookieID, jsonData.clientUUID, ONE_DAY);
             WsServer.clientUUID = jsonData.clientUUID;
@@ -67,18 +70,27 @@ export class WsServer {
 
     // TODO make this private, and expose a helper method to each component.
     static send(message: ClientWsMessage) {
+        WsServer.timeLastSentMsg = getEpochTimeMs();
         WsServer.ws.send(JSON.stringify(message));
     }
 
-    static ping(){
-        if (!WsServer.ws){
+    static ping() {
+        if (!WsServer.ws) {
             return;
         }
         const pingMessage = {
             actionType: ClientActionType.PINGSTATE,
-            request: {}
+            request: {},
         } as ClientWsMessage;
-        WsServer.ws.send(JSON.stringify(pingMessage));
+        WsServer.send(pingMessage);
+    }
+
+    static sendKeepAliveMessage() {
+        const clientWsMessage = {
+            actionType: ClientActionType.KEEPALIVE,
+            request: {},
+        } as ClientWsMessage;
+        WsServer.send(clientWsMessage);
     }
 
     static sendChatMessage(content: string) {
@@ -87,7 +99,7 @@ export class WsServer {
             actionType: ClientActionType.CHAT,
             request: (chatMessage as ClientChatMessage) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendBootPlayerMessage(playerUUID: PlayerUUID) {
@@ -95,7 +107,7 @@ export class WsServer {
             actionType: ClientActionType.BOOTPLAYER,
             request: ({ playerUUID } as BootPlayerRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendAddAdminMessage(playerUUID: PlayerUUID) {
@@ -103,7 +115,7 @@ export class WsServer {
             actionType: ClientActionType.ADDADMIN,
             request: ({ playerUUID } as AddAdminRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendRemoveAdminMessage(playerUUID: PlayerUUID) {
@@ -111,7 +123,7 @@ export class WsServer {
             actionType: ClientActionType.REMOVEADMIN,
             request: ({ playerUUID } as RemoveAdminRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static subscribe(key: string, onMessage) {

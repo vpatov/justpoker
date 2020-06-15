@@ -19,17 +19,19 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         justifyContent: 'flex-end',
         transform: 'translateY(-50%) translateX(-50%)',
+        filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
     },
     folded: {
         opacity: 0.5,
     },
 
     labelText: {
-        margin: '0.3vmin 0',
+        margin: '0.3vmin 0.8vmin',
         width: '9vmin',
         textAlign: 'center',
         fontSize: '1.4vmin',
     },
+    disconnected: {},
     hero: {
         transform: 'translateY(-50%) translateX(-50%) scale(1.21)',
     },
@@ -49,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
     const classes = useStyles();
     const { className, player, style, setHeroRotation, virtualPositon } = props;
-    const { stack, hand, name, playerTimer, folded, uuid, sittingOut, hero, quitting } = player;
+    const { stack, hand, name, playerTimer, folded, uuid, sittingOut, hero, quitting, disconnected } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -61,6 +63,11 @@ function Player(props) {
     };
 
     function getPlayerLabelComponent() {
+        if (disconnected) {
+            return (
+                <Typography className={classnames(classes.labelText, classes.disconnected)}>Disconnected</Typography>
+            );
+        }
         if (playerTimer) {
             return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
         }

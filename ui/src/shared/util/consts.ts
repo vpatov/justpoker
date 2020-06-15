@@ -19,3 +19,8 @@ export const MAX_VALUES = {
     NUMBER_TIME_BANKS: 100,
     TIME_BANK_TIME: 60 * 10, // 10 minutes
 };
+
+export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes
+export const ATTEMPT_EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 15; // 15 minutes
+
+export const WS_NORMAL_CLOSE = 1000;
