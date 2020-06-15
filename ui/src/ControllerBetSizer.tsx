@@ -6,7 +6,7 @@ import TextFieldWrap from './reuseable/TextFieldWrap';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import Slider from '@material-ui/core/Slider';
-import { BettingRoundActionType } from './shared/models/game';
+import { BettingRoundActionType } from './shared/models/game/betting';
 var Color = require('color');
 
 const ThiccSlider = withStyles({

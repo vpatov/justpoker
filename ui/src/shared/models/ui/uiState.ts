@@ -1,22 +1,23 @@
-import { Suit, genRandomCard } from './cards';
-import { ClientActionType, UiActionType } from './api';
-import { genRandomInt } from '../util/util';
-import { SoundByte } from './audioQueue';
-import { AnimationState, getCleanAnimationState } from './animationState';
+import { Suit, genRandomCard } from '../game/cards';
+import { ClientActionType, UiActionType } from '../api/api';
+import { genRandomInt } from '../../util/util';
+import { SoundByte } from '../state/audioQueue';
+import { AnimationState, getCleanAnimationState } from '../state/animationState';
 import { UserPreferences } from './userPreferences';
 
-import { MAX_VALUES } from '../util/consts';
+import { MAX_VALUES } from '../../util/consts';
 import {
     BettingRoundActionType,
     BettingRoundAction,
     NOT_IN_HAND,
     CHECK_ACTION,
-    GameParameters,
-    getCleanGameParameters,
-    getDefaultGameParameters,
-} from './game';
-import { PlayerUUID, makeBlankUUID } from './uuid';
+    BettingRoundStage,
+} from '../game/betting';
+
+import { GameParameters, getCleanGameParameters, getDefaultGameParameters } from '../game/game';
+import { PlayerUUID, makeBlankUUID } from '../system/uuid';
 import { getRandomAvatarKey, AvatarKeys } from './assets';
+import { PlayerSummary, BettingRoundLog, PotSummary } from '../state/handLog';
 
 export declare interface ErrorDisplay {
     message?: string;
@@ -41,6 +42,7 @@ export declare interface UiState {
     chat: UiChatMessage;
     animation: AnimationState;
     userPreferences?: UserPreferences;
+    handLogEntries: UiHandLogEntry[];
 }
 
 export declare interface UiGameState {
@@ -117,6 +119,7 @@ export declare interface UiCard {
     rank?: string;
     hidden?: boolean;
     partOfWinningHand?: boolean;
+    isBeingShown?: boolean;
 }
 
 export declare interface Table {
@@ -183,6 +186,17 @@ export declare interface UiChatMessage {
 
 export declare interface UiChatLog {
     messages: UiChatMessage[];
+}
+
+export declare interface UiHandLogEntry {
+    handNumber: number;
+    timeHandStarted: number;
+    playerSummaries: { [key: string]: PlayerSummary };
+    playersSortedByPosition: PlayerUUID[];
+    board: UiCard[];
+    potSummaries: PotSummary[];
+    bettingRounds: BettingRoundLog[];
+    lastBettingRoundStage: BettingRoundStage;
 }
 
 /* Action Buttons */
@@ -340,6 +354,7 @@ export const CleanRootState: UiState = {
     audio: SoundByte.NONE,
     chat: getCleanChatMessage(),
     animation: getCleanAnimationState(),
+    handLogEntries: [],
 };
 
 export const testUiChatLog: UiChatLog = {
@@ -490,7 +505,7 @@ export const TestGame: UiGameState = {
             handLabel: 'Full House, Queens over Threes',
             bet: genRandomInt(0, 10),
             hand: {
-                cards: [{ ...genRandomCard() }, genRandomCard()],
+                cards: [{ ...genRandomCard(), isBeingShown: true }, genRandomCard()],
             },
             avatarKey: getRandomAvatarKey(),
             admin: true,

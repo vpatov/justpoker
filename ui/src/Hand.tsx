@@ -21,19 +21,19 @@ const useStyles = makeStyles((theme) => ({
 
 function Hand(props) {
     const classes = useStyles();
-    const { folded, hand, hero, className } = props;
+    const { hand, hero, className } = props;
     const { cards } = hand;
 
     return (
-        <div
-            className={classnames(
-                classes.root,
-                className,
-                //{ [classes.folded]: folded, [classes.heroHover]: hero }
-            )}
-        >
+        <div className={classnames(classes.root, className)}>
             {cards.map((c, i) => (
-                <CardSmall {...c} size="small" className={`ani_playerCard_${i}`} shouldFlex={cards.length > 2} />
+                <CardSmall
+                    {...c}
+                    size="small"
+                    className={`ani_playerCard_${i}`}
+                    shouldFlex={cards.length > 2}
+                    hero={hero}
+                />
             ))}
         </div>
     );

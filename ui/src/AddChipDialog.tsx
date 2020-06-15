@@ -15,7 +15,7 @@ import { MAX_VALUES } from './shared/util/consts';
 import { Typography } from '@material-ui/core';
 
 import { WsServer } from './api/ws';
-import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
+import { ClientActionType, ClientWsMessageRequest } from './shared/models/api/api';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

@@ -13,14 +13,14 @@ import { EventProcessorService } from '../io/eventProcessorService';
 import { StateConverter } from '../io/stateConverter';
 import { GameInstanceManager } from '../state/gameInstanceManager';
 
-import { ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src/shared/models/api';
+import { ClientAction, Event, EventType, ClientWsMessage } from '../../../ui/src/shared/models/api/api';
 
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from './connectedClientManager';
-import { getDefaultGame404 } from '../../../ui/src/shared/models/uiState';
-import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/src/shared/models/uuid';
-import { GameParameters } from '../../../ui/src/shared/models/game';
-import { CONFIGS, Config, ENVIRONMENT } from '../../../ui/src/shared/models/config';
+import { getDefaultGame404 } from '../../../ui/src/shared/models/ui/uiState';
+import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/src/shared/models/system/uuid';
+import { GameParameters } from '../../../ui/src/shared/models/game/game';
+import { CONFIGS, Config, ENVIRONMENT } from '../../../ui/src/shared/models/config/config';
 
 @Service()
 class Server {

@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
-import { AudioQueue, getCleanAudioQueue, SoundByte } from '../../../ui/src/shared/models/audioQueue';
+import { AudioQueue, getCleanAudioQueue, SoundByte } from '../../../ui/src/shared/models/state/audioQueue';
 import { GameStateManager } from './gameStateManager';
-import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 
 @Service()
 export class AudioService {

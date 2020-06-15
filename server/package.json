@@ -1,14 +1,11 @@
 {
-    "name": "poker_web",
-    "version": "1.0.0",
-    "description": "",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/vpatov/poker_web.git"
-    },
+    "name": "jp-server",
+    "version": "0.2.0",
+    "private": true,
+    "license": "UNLICENSED",
     "scripts": {
         "prebuild": "npm run lint; rm -rf dist",
-        "lint": "eslint --quiet --fix --config .eslintrc.js --no-eslintrc ./src/**/*.ts ../ui/src/shared/**/*",
+        "lint": "eslint --quiet --fix --config .eslintrc.js --no-eslintrc ./src/**/*.ts ../ui/src/shared/**/**/*",
         "build": "tsc",
         "prestart": "npm run build",
         "start": "node ./dist/server/server/src/server/server.js",
@@ -16,9 +13,6 @@
         "start-d": "npm run build && LOG_LEVEL=debug node ./dist/server/server/src/server/server.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
     "devDependencies": {
         "@types/body-parser": "^1.19.0",
         "@types/cookie": "^0.3.3",
@@ -31,6 +25,7 @@
         "@types/ws": "^7.2.3",
         "@typescript-eslint/eslint-plugin": "^2.27.0",
         "@typescript-eslint/parser": "^2.27.0",
+        "@types/color": "^3.0.1",
         "eslint": "^6.8.0",
         "eslint-config-prettier": "^6.10.1",
         "eslint-plugin-prettier": "^3.1.3",
@@ -38,14 +33,11 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@types/color": "^3.0.1",
-        "@types/lodash": "^4.14.155",
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
         "pokersolver": "^2.1.3",
         "reflect-metadata": "^0.1.13",
         "request": "^2.88.2",
-        "rxjs": "^6.5.5",
         "typedi": "^0.8.0",
         "winston": "^3.2.1",
         "ws": "^7.2.3"

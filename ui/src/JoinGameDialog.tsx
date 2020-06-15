@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { WsServer } from './api/ws';
-import { ClientActionType } from './shared/models/api';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import IconPicker from './reuseable/IconPicker';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { ClientWsMessageRequest } from './shared/models/api';
-import { Dialog, DialogContent, DialogActions, Button, DialogTitle } from '@material-ui/core';
+import { Dialog, DialogContent, DialogActions, DialogTitle, Button } from '@material-ui/core';
 import { selectGameParameters, globalGameStateSelector } from './store/selectors';
-import { AvatarKeys, getRandomAvatarKey } from './shared/models/assets';
+import { AvatarKeys, getRandomAvatarKey } from './shared/models/ui/assets';
 import Avatar from './Avatar';
 import { useStickyState } from './utils';
 

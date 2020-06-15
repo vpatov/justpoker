@@ -11,7 +11,7 @@ import Button from '@material-ui/core/Button';
 import { Select, MenuItem } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import { GameType, getDefaultGameParameters, GameParameters } from './shared/models/game';
+import { GameType, getDefaultGameParameters, GameParameters } from './shared/models/game/game';
 import GameParamatersDialog from './GameParamatersDialog';
 
 const useStyles = makeStyles((theme) => ({

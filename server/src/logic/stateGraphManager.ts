@@ -6,13 +6,14 @@ import {
     GraphEdge,
     instanceOfCondition,
     StageDelayMap,
-} from '../../../ui/src/shared/models/stateGraph';
-import { GameStage, QueuedServerAction } from '../../../ui/src/shared/models/gameState';
-import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/api';
+} from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { QueuedServerAction } from '../../../ui/src/shared/models/system/server';
+import { ClientActionType, ServerActionType, ActionType } from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from '../state/timerManager';
-import { BettingRoundStage } from '../../../ui/src/shared/models/game';
+import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
 import { LedgerService } from '../stats/ledgerService';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
@@ -44,7 +45,7 @@ export class StateGraphManager {
 
     isAllInRunOutCondition: Condition = {
         fn: () => this.gameStateManager.isAllInRunOut(),
-        TRUE: this.isHandGamePlayOverCondition,
+        TRUE: GameStage.FINISH_BETTING_ROUND,
         FALSE: GameStage.SET_CURRENT_PLAYER_TO_ACT,
     };
 
@@ -222,6 +223,7 @@ export class StateGraphManager {
 
             case GameStage.FINISH_BETTING_ROUND: {
                 this.gamePlayService.placeBetsInPot();
+                this.gamePlayService.flipCardsIfAllInRunOut();
                 this.gameStateManager.clearCurrentPlayerToAct();
                 break;
             }

@@ -1,6 +1,6 @@
 import React from 'react';
 import classnames from 'classnames';
-import { Suit } from './shared/models/cards';
+import { Suit } from './shared/models/game/cards';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme: Theme) =>

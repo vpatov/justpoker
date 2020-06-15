@@ -1,25 +1,24 @@
 import { Service } from 'typedi';
 import { GameStateManager } from '../state/gameStateManager';
+import { GameType } from '../../../ui/src/shared/models/game/game';
+
+import { HandSolverService } from '../cards/handSolverService';
 import {
     BettingRoundAction,
     BettingRoundActionType,
     BettingRoundStage,
     CHECK_ACTION,
-    GameType,
-} from '../../../ui/src/shared/models/game';
-
-import { HandSolverService } from '../cards/handSolverService';
-import { Pot, ServerStateKey } from '../../../ui/src/shared/models/gameState';
-
+    Pot,
+} from '../../../ui/src/shared/models/game/betting';
 import { AudioService } from '../state/audioService';
 import { AnimationService } from '../state/animationService';
 
 import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { ValidationService } from './validationService';
-import { Hand, Card } from '../../../ui/src/shared/models/cards';
+import { Hand, Card } from '../../../ui/src/shared/models/game/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
-import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/uuid';
+import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 @Service()
@@ -88,11 +87,11 @@ export class GamePlayService {
         }
     }
 
-    updateHandDescriptions() {
+    updatePlayersBestHands() {
         this.gsm.forEveryPlayerUUID((playerUUID) => {
             this.gsm.isPlayerInHand(playerUUID)
-                ? this.gsm.updatePlayerHandDescription(playerUUID)
-                : this.gsm.clearPlayerHandDescription(playerUUID);
+                ? this.gsm.updatePlayerBestHand(playerUUID)
+                : this.gsm.clearPlayerBestHand(playerUUID);
         });
     }
 
@@ -103,7 +102,7 @@ export class GamePlayService {
         }
         this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPartialAllInLeftOver(0);
-        this.updateHandDescriptions();
+        this.updatePlayersBestHands();
     }
 
     resetBettingRoundActions() {
@@ -124,11 +123,7 @@ export class GamePlayService {
     /* Betting Round Actions */
     performBettingRoundAction(action: BettingRoundAction) {
         this.gsm.setLastBettingRoundAction(action);
-        this.gameInstanceLogService.pushBetAction(
-            this.gsm.getCurrentPlayerToAct(),
-            action,
-            getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
-        );
+        let betAmount = action.amount;
         switch (action.type) {
             case BettingRoundActionType.CHECK: {
                 this.check();
@@ -140,15 +135,23 @@ export class GamePlayService {
                 break;
             }
 
+            /** bet and callBet have logic that authoritatively determine the betAmounts. */
             case BettingRoundActionType.BET: {
-                this.bet(action.amount);
+                betAmount = this.bet(action.amount);
                 break;
             }
 
             case BettingRoundActionType.CALL: {
-                this.callBet();
+                betAmount = this.callBet();
+                break;
             }
         }
+
+        this.gameInstanceLogService.pushBetAction(
+            this.gsm.getCurrentPlayerToAct(),
+            { type: action.type, amount: betAmount },
+            getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
+        );
     }
 
     // if the validation layer takes care of most things,
@@ -189,16 +192,6 @@ export class GamePlayService {
                 : BettingRoundActionType.BET,
         );
 
-        /* TODO
-           Also ensure that other players cannot reraise after this.
-           This will be done by 
-           1) changing buttons available to UI
-           2) validation in the validationservice
-           Determine boolean expression that represents whether a player can raise.
-           playerCanRaise = facingRaise || waitingToAct
-           facingRaise = lastAmountPutInPot > yourLastBet + minRaiseDiff ???
-        */
-
         const previousRaise = this.gsm.getPreviousRaise();
         const minRaiseDiff = betAmount - previousRaise;
 
@@ -228,6 +221,8 @@ export class GamePlayService {
         });
 
         this.audioService.playBetSFX();
+
+        return actualBetAmount;
     }
 
     callBet() {
@@ -244,6 +239,8 @@ export class GamePlayService {
             currentPlayerToAct,
             isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
         );
+
+        return callAmount;
     }
 
     initializeDealerButton() {
@@ -407,9 +404,11 @@ export class GamePlayService {
     showDown() {
         const playersHands: [PlayerUUID, any][] = this.gsm
             .getPlayersInHand()
-            .map((playerUUID) => [playerUUID, this.gsm.computeBestHandForPlayer(playerUUID)]);
+            .map((playerUUID) => [playerUUID, this.gsm.getPlayerBestHand(playerUUID)]);
 
         const pot = this.gsm.popPot();
+
+        this.gameInstanceLogService.initializePotSummary(pot.value);
 
         const eligiblePlayers: [PlayerUUID, Hand][] = playersHands.filter(([uuid, hand]) =>
             pot.contestors.includes(uuid),
@@ -440,7 +439,6 @@ export class GamePlayService {
             winningPlayers.map((playerUUID) => {
                 const amount = oddChips > 0 ? evenSplit + 1 : evenSplit;
                 oddChips -= 1;
-                this.gameInstanceLogService.addWinnerToCurrentHand(playerUUID, amount);
                 return [playerUUID, amount];
             }),
         );
@@ -466,24 +464,27 @@ export class GamePlayService {
 
             // start with startingPlayer continue left, circularly
             // only show if your hand is the best seen thus far, break if we hit a winning hand
-            let playerToBeat = eligiblePlayers[startIndex];
+            let [playerToBeatUUID, handToBeatUUID] = eligiblePlayers[startIndex];
             for (let i = startIndex; i < eligiblePlayers.length + startIndex; i++) {
-                const curPlayer = eligiblePlayers[i % eligiblePlayers.length];
-                if (this.handSolverService.compareHands(playerToBeat[1], curPlayer[1]) <= 0) {
-                    this.setPlayerCardsAllVisible(curPlayer[0]);
-                    playerToBeat = curPlayer;
+                const [currentPlayerUUID, currentPlayerHand] = eligiblePlayers[i % eligiblePlayers.length];
+                if (this.handSolverService.compareHands(handToBeatUUID, currentPlayerHand) <= 0) {
+                    this.setPlayerCardsAllVisible(currentPlayerUUID);
+                    [playerToBeatUUID, handToBeatUUID] = [currentPlayerUUID, currentPlayerHand];
                 }
+                this.gameInstanceLogService.addPlayerHandToPotSummary(currentPlayerUUID, currentPlayerHand.descr);
             }
         }
 
         this.gsm.clearWinnersAndDeltas();
 
         winningPlayers.forEach((playerUUID) => {
+            const amountWon = amountsWon[playerUUID];
             this.audioService.playHeroWinSFX(playerUUID);
-            this.gsm.addPlayerChips(playerUUID, amountsWon[playerUUID]);
+            this.gsm.addPlayerChips(playerUUID, amountWon);
             this.gsm.setIsPlayerWinner(playerUUID, true);
-            this.gsm.setPlayerChipDelta(playerUUID, amountsWon[playerUUID]);
+            this.gsm.setPlayerChipDelta(playerUUID, amountWon);
             this.gsm.addHandWinner(playerUUID);
+            this.gameInstanceLogService.addWinnerToPotSummary(playerUUID, amountWon);
         });
     }
 
@@ -584,6 +585,14 @@ export class GamePlayService {
             this.gsm.subtractBetAmountFromChips(playerUUID);
             this.gsm.setPlayerBetAmount(playerUUID, 0);
         });
+    }
+
+    flipCardsIfAllInRunOut() {
+        if (this.gsm.isAllInRunOut()) {
+            this.gsm.getPlayersInHand().forEach((playerUUID) => {
+                this.gsm.setPlayerCardsAllVisible(playerUUID);
+            });
+        }
     }
 
     savePreviousHandInfo() {

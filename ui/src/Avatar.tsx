@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { genRandomInt } from './shared/util/util';
 import AvatarsSvg from './assets/avatars/avatars.svg';
-import { AvatarKeys, getRandomAvatarKey } from './shared/models/assets';
+import { AvatarKeys, getRandomAvatarKey } from './shared/models/ui/assets';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

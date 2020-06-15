@@ -9,14 +9,14 @@ import {
     BootPlayerRequest,
     AddAdminRequest,
     RemoveAdminRequest,
-    JoinTableRequest,
     JoinGameRequest,
     SetChipsRequest,
-} from '../shared/models/api';
-import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/uuid';
+    JoinTableRequest,
+} from '../shared/models/api/api';
+import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
-import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config';
-import { AvatarKeys } from '../shared/models/assets';
+import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config/config';
+import { AvatarKeys } from '../shared/models/ui/assets';
 
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
@@ -30,7 +30,9 @@ export class WsServer {
 
     static openWs(gameInstanceUUID: GameInstanceUUID) {
         console.log('opening ws...');
-        const wsURL = `ws://${config.SERVER_URL}${config.CLIENT_NEED_PORT ? `:${config.SERVER_PORT}` : ''}`;
+        const wsURL = `ws${config.SECURE_WS ? 's' : ''}://${config.SERVER_URL}${
+            config.CLIENT_NEED_PORT ? `:${config.SERVER_PORT}` : ''
+        }`;
         const wsURI = {
             url: wsURL,
             query: {
@@ -70,6 +72,17 @@ export class WsServer {
     // TODO make this private, and expose a helper method to each component.
     static send(message: ClientWsMessage) {
         WsServer.ws.send(JSON.stringify(message));
+    }
+
+    static ping() {
+        if (!WsServer.ws) {
+            return;
+        }
+        const pingMessage = {
+            actionType: ClientActionType.PINGSTATE,
+            request: {},
+        } as ClientWsMessage;
+        WsServer.ws.send(JSON.stringify(pingMessage));
     }
 
     static sendChatMessage(content: string) {

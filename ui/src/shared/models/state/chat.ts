@@ -1,4 +1,4 @@
-import { PlayerUUID, ClientUUID } from './uuid';
+import { PlayerUUID, ClientUUID } from '../system/uuid';
 
 export declare interface ChatLog {
     messages: ChatMessage[];

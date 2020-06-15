@@ -3,16 +3,16 @@ import { generateStringFromRank, SUITS } from './utils';
 import classnames from 'classnames';
 
 import { WsServer } from './api/ws';
-import { ClientActionType, UiActionType, ClientWsMessageRequest, ShowCardRequest } from './shared/models/api';
+import { ClientActionType, UiActionType, ClientWsMessageRequest, ShowCardRequest } from './shared/models/api/api';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import Paper from '@material-ui/core/Paper';
 
-import { ShowCardButton } from './shared/models/uiState';
+import { ShowCardButton } from './shared/models/ui/uiState';
 import { Button, ButtonGroup, Tooltip } from '@material-ui/core';
 import Suit from './Suit';
-import { Card } from './shared/models/cards';
+import { Card } from './shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
 import Grow from '@material-ui/core/Grow';
 const useStyles = makeStyles((theme: Theme) =>

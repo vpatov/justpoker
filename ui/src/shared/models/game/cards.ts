@@ -1,4 +1,4 @@
-import { genRandomInt } from '../util/util';
+import { genRandomInt } from '../../util/util';
 
 export declare interface Deck {
     cards: Card[];
@@ -220,3 +220,24 @@ export const RankAbbrToFullString: Record<string, string> = {
     '3': 'Three',
     '2': 'Two',
 };
+
+// removes unwanted characters from the description string
+// and in full names of cards
+export function reformatHandDescription(handDescription: string): string {
+    // K High
+    // Two pair, A's & Q's
+    // Three of a Kind, 6's
+    // Pair, 3's
+    // Full House, 5's over 4's
+    // Flush, Ah High
+    // Straight, 8 High
+    let description = handDescription;
+    Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
+        const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
+        const regex = new RegExp(regexStr, 'g');
+        description = description.replace(regex, fullStr);
+    });
+    description = description.replace(/'s/g, 's').replace(/Sixs/g, 'Sixes');
+
+    return description;
+}

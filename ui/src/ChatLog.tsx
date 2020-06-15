@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -7,125 +7,134 @@ import get from 'lodash/get';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 
 import EmojiPicker from './EmojiPicker';
 
 import { WsServer } from './api/ws';
-import { UiChatMessage } from './shared/models/uiState';
+import { UiChatMessage} from './shared/models/ui/uiState';
 import { getPlayerNameColor } from './style/colors';
-import { useStickyState } from './utils';
 
 const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            zIndex: 5,
-            height: '100%',
-            display: 'flex',
-            flexShrink: '0',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexDirection: 'column',
-            width: '15%',
-            ...theme.custom.CHAT,
-        },
-        chatLog: {
-            paddingTop: '1vh',
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            width: '100%',
-            overflowY: 'auto',
-            overflowWrap: 'anywhere',
-        },
-        chatInputSection: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-            width: '100%',
-            paddingTop: '2vmin',
-            overflow: 'hidden',
-        },
-        sendButton: {
-            fontSize: '1vmin',
-            marginRight: '1vmin',
-        },
-        messageTextField: {
-            flexGrow: 1,
-            margin: '-0.15vh -0.15vw',
-            marginTop: 0,
-        },
-        messageInput: {
-            paddingLeft: '1.2vmin',
-            paddingRight: '1.2vmin',
-            paddingTop: '1vmin',
-            paddingBottom: '1.2vmin',
-            width: '82%',
-        },
-        emojiPicker: {
-            position: 'absolute',
-            right: '0.25vw',
-        },
-        chatMessage: {
-            margin: '0.2vh 0.4vw',
-            fontSize: '1.4vmin',
-        },
-        senderName: {
-            fontWeight: 'bold',
-            // color: 'rgb(255, 163, 97)',
-            marginRight: '8px',
-        },
-        messageContent: {
-            color: 'rgb(220,210,230)',
-        },
-        hideButton: {
-            fontSize: '1vmin',
-            zIndex: 5,
-            position: 'absolute',
-            bottom: '18%',
-            right: 15,
-        },
-        unread: {
-            borderColor: theme.palette.secondary.main,
-            color: theme.palette.secondary.main,
-        },
-    }),
+createStyles({
+    chatLogContainer: {
+        display: 'flex',
+        height: '100%',
+        flexShrink: 0,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'column',
+    },
+    chatLogMessages: {
+        paddingTop: '1vh',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        overflowY: 'auto',
+        overflowWrap: 'anywhere',
+    },
+
+    chatLogInputSection: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        width: '100%',
+        paddingTop: '2vmin',
+        overflow: 'hidden',
+    },
+    sendButton: {
+        fontSize: '1vmin',
+        marginRight: '1vmin',
+    },
+    messageTextField: {
+        flexGrow: 1,
+        margin: '-0.15vh -0.15vw',
+        marginTop: 0,
+    },
+    messageInput: {
+        paddingLeft: '1.2vmin',
+        paddingRight: '1.2vmin',
+        paddingTop: '1vmin',
+        paddingBottom: '1.2vmin',
+        width: '82%',
+    },
+    emojiPicker: {
+        position: 'absolute',
+        right: '0.25vw',
+    },
+    chatMessage: {
+        margin: '0.2vh 0.4vw',
+        fontSize: '1.4vmin',
+    },
+    senderName: {
+        fontWeight: 'bold',
+        // color: 'rgb(255, 163, 97)',
+        marginRight: '8px',
+    },
+    messageContent: {
+        color: 'rgb(220,210,230)',
+    },
+    hideButtonGroup: {
+        zIndex: 5,
+        position: 'absolute',
+        bottom: '18%',
+        right: 15,
+    },
+    hideButton: {
+        fontSize: '1vmin',
+    },
+    unread: {
+        borderColor: theme.palette.secondary.main,
+        color: theme.palette.secondary.main,
+    },
+}),
 );
 
+// TODO Even if user chooses emoji, it doesnt get added to recent because these are recomputed every mount
+const defaultRecentEmojis = ['sweat_smile','joy','expressionless','face_with_sumbols_on_mouth','man_faceplaming','bomb','moneybag',
+'honey_pot','cookie','100','pray','skull_and_crossbones','interrobang','ok','cool','spades','hearts','diamonds','clubs','black_joker',];
+
+declare type Setter<T> = React.Dispatch<React.SetStateAction<T>>;
+
 interface ChatLogProps {
-    className?: string;
+    hideChatLog: boolean;
+    hideHandLog: boolean;
+    setUnreadChats: Setter<boolean>;
 }
 
-const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
-
 function ChatLog(props: ChatLogProps) {
+    const {hideChatLog, hideHandLog, setUnreadChats} = props;
     const classes = useStyles();
 
-    const { className } = props;
 
-    const [hideChat, setHideChat] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
-    const [messages, setMessages] = useState([] as any);
-    const [draftMessage, setDraftMessage] = useState('');
-    const [unreadChats, setUnreadChats] = useState(false);
+    const [chatMessages, setChatMessages] = useState([] as UiChatMessage[]);
+    const [draftChatMessage, setDraftChatMessage] = useState('');
 
+
+    useEffect(() => {
+        WsServer.subscribe('chat', onReceiveNewChatMessage);
+        WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
+    }, []);
+
+    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
+        setUnreadChats(true);
+        setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
+    }
+    
     const messagesRef = useRef(null);
-
     const scrollToBottom = () => {
         (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(scrollToBottom, [messages, hideChat]);
+    useEffect(scrollToBottom, [chatMessages, hideChatLog]);
 
-    useEffect(() => {
-        WsServer.subscribe('chat', onReceiveNewChatMessage);
-    }, []);
 
     function sendMessage() {
-        const trimmedMessage = draftMessage.trim();
+        const trimmedMessage = draftChatMessage.trim();
         if (trimmedMessage) {
             WsServer.sendChatMessage(trimmedMessage);
-            setDraftMessage('');
+            setDraftChatMessage('');
         }
     }
 
@@ -136,102 +145,87 @@ function ChatLog(props: ChatLogProps) {
         }
     }
 
-    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
-        setUnreadChats(true);
-        setMessages((oldMessages) => [...oldMessages, chatMessage]);
-    }
-
-    function renderHideChatButton() {
-        return (
-            <Button
-                variant="outlined"
-                className={classnames(classes.hideButton, {
-                    [classes.unread]: unreadChats && hideChat,
-                })}
-                onClick={(e) => {
-                    setUnreadChats(false);
-                    setHideChat(!hideChat);
-                }}
-                style={hideChat ? {} : { right: 'calc(15% + 15px)' }}
-            >
-                {`${hideChat ? 'Show' : 'Hide'} Chat`}
-            </Button>
-        );
-    }
     const addEmoji = (emoji) => {
-        setDraftMessage(draftMessage + emoji.native);
+        setDraftChatMessage(draftChatMessage + emoji.native);
     };
 
-    function renderChat() {
+    function renderChatMessages(){
         return (
-            <div className={classnames(classes.root, className)}>
-                <div className={classes.chatLog}>
-                    {messages.map((message) => (
-                        <Typography key={message.timestamp} className={classes.chatMessage}>
-                            <span
-                                className={classes.senderName}
-                                style={{ color: getPlayerNameColor(message.seatNumber) }}
-                            >
-                                {message.senderName}:
-                            </span>
-                            <span className={classes.messageContent}>{message.content}</span>
-                        </Typography>
-                    ))}
-                    <div ref={messagesRef} />
-                </div>
-                <div className={classes.chatInputSection}>
-                    <TextFieldWrap
-                        placeholder="Send Message"
-                        value={draftMessage}
-                        className={classes.messageTextField}
-                        onChange={(event) => {
-                            setDraftMessage(event.target.value);
-                        }}
-                        InputProps={{ classes: { input: classes.messageInput } }}
-                        onKeyPress={(event) => onTextAreaPressEnter(event)}
-                        multiline={true}
-                        rowsMax={7}
-                        maxChars={300}
-                    />
+            <div className={classes.chatLogMessages}>
+                {chatMessages.map((message) => (
+                    <Typography key={message.timestamp} className={classes.chatMessage}>
+                        <span
+                            className={classes.senderName}
+                            style={{ color: getPlayerNameColor(message.seatNumber) }}
+                        >
+                            {message.senderName}:
+                        </span>
+                        <span className={classes.messageContent}>{message.content}</span>
+                    </Typography>
+                ))}
+                <div ref={messagesRef} />
+            </div>
+        )
+    }
 
-                    <EmojiPicker
-                        className={classes.emojiPicker}
-                        onSelect={addEmoji}
-                        recent={[
-                            'sweat_smile',
-                            'joy',
-                            'expressionless',
-                            'face_with_sumbols_on_mouth',
-                            'man_faceplaming',
-                            'bomb',
-                            'moneybag',
-                            'honey_pot',
-                            'cookie',
-                            '100',
-                            'pray',
-                            'skull_and_crossbones',
-                            'interrobang',
-                            'ok',
-                            'cool',
-                            'spades',
-                            'hearts',
-                            'diamonds',
-                            'clubs',
-                            'black_joker',
-                        ]}
-                        useButton={false}
-                    />
-                </div>
-                {renderHideChatButton()}
+    function renderSendMessageArea(){
+        return (
+            <TextFieldWrap
+                placeholder="Send Message"
+                value={draftChatMessage}
+                className={classes.messageTextField}
+                onChange={(event) => {
+                    setDraftChatMessage(event.target.value);
+                }}
+                InputProps={{ classes: { input: classes.messageInput } }}
+                onKeyPress={(event) => onTextAreaPressEnter(event)}
+                multiline={true}
+                rowsMax={7}
+                maxChars={300}
+            />
+        );
+    }
+
+    function renderChatLogInputSection() {
+        return (
+            <div className={classes.chatLogInputSection}>
+                {renderSendMessageArea()}
+                {renderEmojiPicker()}
             </div>
         );
     }
 
-    if (!hideChat) {
-        return renderChat();
-    } else {
-        return renderHideChatButton();
+
+
+    function renderEmojiPicker(){
+        return (
+            <EmojiPicker
+                className={classes.emojiPicker}
+                onSelect={addEmoji}
+                recent={defaultRecentEmojis}
+                useButton={false}
+                />
+        )
     }
+
+    function displayStyle(){
+        return {
+            height: !hideHandLog ? '50%' : undefined,
+            maxHeight: !hideHandLog ? '50%' : undefined,
+            display: hideChatLog ? 'none' : undefined
+        };
+    }
+
+
+    return (
+        <div
+            className={classnames(classes.chatLogContainer)}
+            style={displayStyle()}
+        >
+            {renderChatMessages()}
+            {renderChatLogInputSection()}
+        </div>
+    );
 }
 
 export default ChatLog;
