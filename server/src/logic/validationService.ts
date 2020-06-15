@@ -277,7 +277,6 @@ export class ValidationService {
         }
     }
 
-    @debugFunc()
     validateShowCardAction(clientUUID: ClientUUID, cards: Card[]): ValidationResponse {
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) {

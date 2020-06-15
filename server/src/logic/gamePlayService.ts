@@ -192,16 +192,6 @@ export class GamePlayService {
                 : BettingRoundActionType.BET,
         );
 
-        /* TODO
-           Also ensure that other players cannot reraise after this.
-           This will be done by 
-           1) changing buttons available to UI
-           2) validation in the validationservice
-           Determine boolean expression that represents whether a player can raise.
-           playerCanRaise = facingRaise || waitingToAct
-           facingRaise = lastAmountPutInPot > yourLastBet + minRaiseDiff ???
-        */
-
         const previousRaise = this.gsm.getPreviousRaise();
         const minRaiseDiff = betAmount - previousRaise;
 

@@ -21,6 +21,7 @@ import {
 } from '../../../ui/src/shared/models/game/betting';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import { UiHandLogEntry } from '../../../ui/src/shared/models/ui/uiState';
+import { debugFunc, logger } from '../logger';
 
 @Service()
 export class GameInstanceLogService {
@@ -137,7 +138,12 @@ export class GameInstanceLogService {
         const playerSummary = this.currentHandLogEntry.playerSummaries.get(playerUUID);
         if (playerSummary) {
             playerSummary.holeCards = [...this.gameStateManager.getHoleCards(playerUUID)];
-            playerSummary.wasDealtIn = playerSummary.holeCards.length > 0;
+            playerSummary.wasDealtIn = true;
+        } else {
+            logger.error(
+                `undefined playerSummary for ${playerUUID}.` +
+                    `players: ${JSON.stringify(this.gameStateManager.getPlayers())}`,
+            );
         }
     }
 
@@ -148,6 +154,7 @@ export class GameInstanceLogService {
         });
     }
 
+    @debugFunc()
     private initNewPlayerSummaryForHandLogEntry(player: Readonly<Player>): PlayerSummary {
         return {
             playerUUID: player.uuid,
@@ -199,10 +206,21 @@ export class GameInstanceLogService {
     }
 
     private areAllHoleCardsVisible(playerUUID: PlayerUUID) {
-        return this.currentHandLogEntry.playerSummaries.get(playerUUID).holeCards.every((card) => card.visible);
+        const playerSummary = this.currentHandLogEntry.playerSummaries.get(playerUUID);
+        if (!playerSummary) {
+            // TODO reproduce this bug and fix
+            logger.error(
+                `areAllHoleCardsVisible got undefined playerSummary for ${playerUUID}.\n` +
+                    `Current hand log entry: ${JSON.stringify(this.currentHandLogEntry)}.\n` +
+                    `Current players in gsm: ${JSON.stringify(this.gameStateManager.getPlayers())}`,
+            );
+            return false;
+        }
+        return playerSummary.holeCards.every((card) => card.visible);
     }
 
-    private sanitizePotSummaries(potSummaries: PotSummary[], requestorPlayerUUID: PlayerUUID): PotSummary[] {
+    @debugFunc()
+    private sanitizePotSummaries(potSummaries: PotSummary[]): PotSummary[] {
         return potSummaries.map((potSummary) => ({
             amount: potSummary.amount,
             winners: potSummary.winners,
@@ -229,10 +247,11 @@ export class GameInstanceLogService {
     }
 
     /** Convert maps to simple objects for JSON serialization, and sanitize sensitive fields (like player's cards). */
+    @debugFunc()
     private serializeHandLogEntry(requestorPlayerUUID: PlayerUUID, handLogEntry: HandLogEntry): UiHandLogEntry {
         return {
             ...handLogEntry,
-            potSummaries: this.sanitizePotSummaries(handLogEntry.potSummaries, requestorPlayerUUID),
+            potSummaries: this.sanitizePotSummaries(handLogEntry.potSummaries),
             playerSummaries: this.sanitizePlayerSummaries(handLogEntry.playerSummaries, requestorPlayerUUID),
             bettingRounds: this.serializeBettingRounds(handLogEntry.bettingRounds),
             playersSortedByPosition: this.serializePlayersSortedByPosition(handLogEntry.playerSummaries),

@@ -45,7 +45,7 @@ export class StateGraphManager {
 
     isAllInRunOutCondition: Condition = {
         fn: () => this.gameStateManager.isAllInRunOut(),
-        TRUE: this.isHandGamePlayOverCondition,
+        TRUE: GameStage.FINISH_BETTING_ROUND,
         FALSE: GameStage.SET_CURRENT_PLAYER_TO_ACT,
     };
 
