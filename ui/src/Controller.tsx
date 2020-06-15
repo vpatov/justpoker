@@ -182,13 +182,13 @@ function ControllerComp(props: ControllerProps) {
     const handleClose = () => {
         setBuyinDialogOpen(false);
     };
-    
+
     const handleBuy = () => {
         setBuyinDialogOpen(false);
         // TODO make it such that user is automatically sitting in
         // as soon as they buyin through this dialog
-        sendSitMessage(true);
-    }
+        sendSitMessage(false);
+    };
 
     const changeBetAmount = (newAmt) => {
         // parse string into int
@@ -250,7 +250,7 @@ function ControllerComp(props: ControllerProps) {
         });
     }
 
-    function sendSitMessage(dealInNextHand: boolean){
+    function sendSitMessage(dealInNextHand: boolean) {
         WsServer.send({
             actionType: dealInNextHand ? ClientActionType.SITOUT : ClientActionType.SITIN,
             request: {} as ClientWsMessageRequest,
@@ -259,7 +259,7 @@ function ControllerComp(props: ControllerProps) {
 
     function onToggleSitOutNextHand() {
         if (heroTotalChips <= 0) setBuyinDialogOpen(true);
-        else sendSitMessage(dealInNextHand);   
+        else sendSitMessage(dealInNextHand);
     }
 
     function onToggleStraddle() {
@@ -306,7 +306,7 @@ function ControllerComp(props: ControllerProps) {
             })}
         >
             <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
-            <BuyChipsDialog open={buyChipsDialogOpen} handleBuy={handleBuy} handleCancel={handleClose}/>
+            <BuyChipsDialog open={buyChipsDialogOpen} handleBuy={handleBuy} handleCancel={handleClose} />
             <div className={classes.gameInfoCont}>
                 {!isHeroAtTable ? (
                     <Tooltip title="Your current total chips." placement="right">
