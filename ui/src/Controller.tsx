@@ -167,7 +167,7 @@ function ControllerComp(props: ControllerProps) {
         if (betAmt !== 0 && betAmt < min) {
             setBetAmt(0);
         }
-    }, [min, betAmt, setBetAmt]);
+    }, [min, setBetAmt]);
 
     useEffect(() => {
         for (const actionType of bettingRoundActionTypesToUnqueue) {
@@ -350,7 +350,7 @@ function ControllerComp(props: ControllerProps) {
                                         button.action === BettingRoundActionType.FOLD && showWarningOnFold,
                                 })}
                                 disabled={
-                                    button.disabled || (button.action === BettingRoundActionType.BET && betAmt === 0)
+                                    button.disabled || (button.action === BettingRoundActionType.BET && betAmt < min)
                                 }
                                 onClick={() => onClickActionButton(button.action)}
                             >
