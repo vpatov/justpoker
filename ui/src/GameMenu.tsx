@@ -4,7 +4,7 @@ import { parseHTTPParams } from './shared/util/util';
 import queryString from 'query-string';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { selectMenuButtons, selectGameParameters } from './store/selectors';
+import { selectMenuButtons, selectGameParameters, isHeroAdminSelector } from './store/selectors';
 import { WsServer } from './api/ws';
 import SettingsDialog from './SettingsDialog';
 import { ClientActionType, UiActionType, ClientWsMessageRequest } from './shared/models/api/api';
@@ -73,6 +73,8 @@ function GameMenu(props) {
     const [open, setOpen] = React.useState(false);
     const menuButtons = useSelector(selectMenuButtons);
     const gameParameters = useSelector(selectGameParameters);
+    const isHeroAdmin = useSelector(isHeroAdminSelector);
+
     const location = useLocation();
 
     const [settingsOpen, setSettingsOpen] = React.useState(false);
@@ -195,6 +197,7 @@ function GameMenu(props) {
                 gameParameters={gameParameters}
                 onCancel={() => SET_gameParametersOpen(false)}
                 onSave={onGameParamatersDialogSave}
+                disabled={!isHeroAdmin}
             />
         </>
     );
