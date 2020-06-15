@@ -21,6 +21,7 @@ import blueGrey from '@material-ui/core/colors/blueGrey';
 import { BettingRoundActionType } from './shared/models/game/betting';
 import { PlayerUUID } from './shared/models/system/uuid';
 import { WsServer } from './api/ws';
+import { cardsAreEqual, Card } from './shared/models/game/cards';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -338,23 +339,40 @@ function HandLog(props: HandLogProps) {
         )
     }
 
-    function renderBettingRoundLog(bettingRoundLog: BettingRoundLog, index: number){
+
+    // A 3 5 4 7,    A 3 5    ->    A 3 5
+    // A 3 5 4 7,    4     ->       A 3 5 4
+    // A 3 5 4 7,    7     ->       A 3 5 4 7
+    function getCumulativeCards(board: UiCard[], cardsDealtThisRound: UiCard[]){
+        const cards: UiCard[] = [];
+        let [i,j] = [0,0];
+        while (i < board.length && j < cardsDealtThisRound.length){
+            cards.push(board[i]);
+            if (cardsAreEqual(board[i] as Card,cardsDealtThisRound[j] as Card)){
+                j += 1;
+            }
+            i += 1;
+        }
+        return cards;
+    }
+
+    function renderBettingRoundLog(bettingRoundLog: BettingRoundLog, index: number, board: UiCard[]){
         return (
             <div key={index}>
                 <Typography className={classes.handLogSectionLabel}>
                     {bettingRoundLog.bettingRoundStage}
                 </Typography>
                 <Divider />
-                {renderCardsInline(bettingRoundLog.cardsDealtThisBettingRound)}
+                {renderCardsInline(getCumulativeCards(board,bettingRoundLog.cardsDealtThisBettingRound))}
                 {renderBettingRoundActions(bettingRoundLog.actions)}
             </div>
         )
     }
 
-    function renderBettingRoundLogs(bettingRounds: BettingRoundLog[]){
+    function renderBettingRoundLogs(bettingRounds: BettingRoundLog[], board: UiCard[]){
         return (
             <> 
-                {bettingRounds.map((bettingRound, index) => renderBettingRoundLog(bettingRound, index))}
+                {bettingRounds.map((bettingRound, index) => renderBettingRoundLog(bettingRound, index, board))}
             </>
         );
 
@@ -444,7 +462,7 @@ function HandLog(props: HandLogProps) {
                 {renderTimeHandStarted(handLogEntry.timeHandStarted)}
                 {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
                 {renderBoard(handLogEntry.board)}
-                {renderBettingRoundLogs(handLogEntry.bettingRounds)}
+                {renderBettingRoundLogs(handLogEntry.bettingRounds, handLogEntry.board)}
                 {handLogEntry.potSummaries.length ? renderPotSummaries(handLogEntry.potSummaries) : null}
             </div>
         );
