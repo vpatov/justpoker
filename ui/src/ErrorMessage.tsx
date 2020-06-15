@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { ErrorDisplay } from './shared/models/uiState';
+import { ErrorDisplay } from './shared/models/ui/uiState';
 import Typography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom';
 

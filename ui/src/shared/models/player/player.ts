@@ -1,7 +1,7 @@
-import { Card, Hand } from './cards';
-import { BettingRoundActionType } from './game';
-import { PlayerUUID, makeBlankUUID } from './uuid';
-import { AvatarKeys } from './assets';
+import { Card, Hand } from '../game/cards';
+import { BettingRoundActionType } from '../game/betting';
+import { PlayerUUID, makeBlankUUID } from '../system/uuid';
+import { AvatarKeys } from '../ui/assets';
 
 export declare interface Player {
     /** Unique identifier for player. */
@@ -15,9 +15,6 @@ export declare interface Player {
 
     /** Player's hole cards. */
     holeCards: ReadonlyArray<Card>;
-
-    /** Label describing the best hand the player current holds. */
-    handDescription: string;
 
     /** Cards that make up the player's best hand.*/
     bestHand: Hand | null;
@@ -74,7 +71,6 @@ export function getCleanPlayer(): Player {
         name: '',
         chips: 0,
         holeCards: [],
-        handDescription: '',
         bestHand: null,
         sitting: false,
         sittingOut: false,

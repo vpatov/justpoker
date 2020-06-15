@@ -13,19 +13,20 @@ import {
     SetGameParametersRequest,
     RemoveAdminRequest,
     AddAdminRequest,
-} from '../../../ui/src/shared/models/api';
+} from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { ValidationService } from '../logic/validationService';
 import { Service } from 'typedi';
 import { GamePlayService } from '../logic/gamePlayService';
-import { ValidationResponse, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/validation';
-import { ServerStateKey, GameStage } from '../../../ui/src/shared/models/gameState';
+import { ValidationResponse, NOT_IMPLEMENTED_YET } from '../../../ui/src/shared/models/api/validation';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { ChatService } from '../state/chatService';
 import { StateGraphManager } from '../logic/stateGraphManager';
 import { GameInstanceManager } from '../state/gameInstanceManager';
 import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '../server/connectedClientManager';
-import { ClientUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { AnimationService } from '../state/animationService';
 
 declare interface ActionProcessor {
@@ -122,7 +123,7 @@ export class EventProcessorService {
         [ClientActionType.PINGSTATE]: {
             validation: (uuid, req) => undefined,
             perform: (uuid, req) => {},
-            updates: [ServerStateKey.GAMESTATE],
+            updates: [ServerStateKey.GAMESTATE, ServerStateKey.SEND_ALL],
         },
         [ClientActionType.BETACTION]: {
             validation: (uuid, req) => this.validationService.validateBettingRoundAction(uuid, req),
@@ -222,7 +223,6 @@ export class EventProcessorService {
         },
     };
 
-    @debugFunc()
     processServerAction(serverAction: ServerAction) {
         switch (serverAction.actionType) {
             case ServerActionType.TIMEOUT: {
@@ -235,7 +235,6 @@ export class EventProcessorService {
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }
 
-    @debugFunc()
     processClientAction(clientAction: ClientAction): ValidationResponse {
         const { clientUUID, actionType, request } = clientAction;
 

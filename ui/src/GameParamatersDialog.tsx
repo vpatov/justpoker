@@ -13,7 +13,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
 import { MIN_VALUES, MAX_VALUES } from './shared/util/consts';
-import { GameType, MaxBuyinType } from './shared/models/game';
+import { GameType, MaxBuyinType } from './shared/models/game/game';
 import TextFieldWrap from './reuseable/TextFieldWrap';
 import RadioForm from './reuseable/RadioForm';
 import IconTooltip from './reuseable/IconTooltip';

@@ -1,6 +1,5 @@
 import { Service } from 'typedi';
-import { Card, Deck, BASE_DECK, SUIT_ABBREVIATIONS, Suit } from '../../../ui/src/shared/models/cards';
-import { Hand as HandSolver } from 'pokersolver';
+import { Card, Deck, BASE_DECK, SUIT_ABBREVIATIONS, Suit } from '../../../ui/src/shared/models/game/cards';
 
 @Service()
 // TODO Clearly define what does "Service", "Manager", "Helper" mean.

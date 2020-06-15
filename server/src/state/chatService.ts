@@ -1,10 +1,10 @@
 import { Service } from 'typedi';
-import { ChatMessage, ChatLog } from '../../../ui/src/shared/models/chat';
-import { ClientChatMessage } from '../../../ui/src/shared/models/api';
+import { ChatMessage, ChatLog } from '../../../ui/src/shared/models/state/chat';
+import { ClientChatMessage } from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from './gameStateManager';
-import { ServerStateKey } from '../../../ui/src/shared/models/gameState';
+import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { ValidationService } from '../logic/validationService';
-import { ClientUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 
 const changeNameCommandRegEx = /\/name\s(.+)$/;
 const sitDownCommandRegEx = /\/sitdown\s(\d{1,2})$/;
@@ -55,7 +55,7 @@ export class ChatService {
             senderName: player ? player.name : 'Anonymous',
             playerUUID: player ? player.uuid : undefined,
             clientUUID,
-            seatNumber: player.seatNumber,
+            seatNumber: player ? player.seatNumber : -1,
         };
 
         this.chatLog.messages.push(this.lastMessage);

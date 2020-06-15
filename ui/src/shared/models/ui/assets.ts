@@ -1,4 +1,4 @@
-import { genRandomInt } from '../util/util';
+import { genRandomInt } from '../../util/util';
 
 /* eslint-disable @typescript-eslint/camelcase */
 export enum AvatarKeys {

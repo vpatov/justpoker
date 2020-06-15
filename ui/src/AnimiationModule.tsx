@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { WsServer } from './api/ws';
-import { AnimationType, AnimationState, GameplayTrigger } from './shared/models/animationState';
+import { AnimationType, AnimationState, GameplayTrigger } from './shared/models/state/animationState';
 import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
@@ -148,6 +148,17 @@ export function animateShowCard(id) {
         },
         duration: duration,
         rotateZ: [-360, 0],
+        easing: 'easeOutExpo',
+    });
+}
+
+export function flipCard(id) {
+    const duration = 300;
+
+    const a = anime({
+        targets: [`#${id}`],
+
+        rotateY: [-180, 0],
         easing: 'easeOutExpo',
     });
 }

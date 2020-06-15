@@ -1,28 +1,20 @@
 import { Service } from 'typedi';
 
+import { GameState, getCleanGameState } from '../../../ui/src/shared/models/state/gameState';
+import { ServerStateKey, ALL_STATE_KEYS, QueuedServerAction } from '../../../ui/src/shared/models/system/server';
+import { GameType, GameParameters, MaxBuyinType, ConnectedClient } from '../../../ui/src/shared/models/game/game';
 import {
-    GameState,
-    getCleanGameState,
-    ServerStateKey,
-    GameStage,
-    ALL_STATE_KEYS,
-    Pot,
-    QueuedServerAction,
-    ConnectedClient,
-} from '../../../ui/src/shared/models/gameState';
-import {
-    GameType,
-    GameParameters,
     BETTING_ROUND_STAGES,
     BettingRoundStage,
     BettingRoundAction,
     BettingRoundActionType,
-    MaxBuyinType,
-} from '../../../ui/src/shared/models/game';
-import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player';
+    Pot,
+} from '../../../ui/src/shared/models/game/betting';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api';
+import { JoinTableRequest, ClientActionType } from '../../../ui/src/shared/models/api/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
 import {
@@ -30,17 +22,17 @@ import {
     Card,
     cardsAreEqual,
     convertHandToCardArray,
-    RankAbbrToFullString,
-} from '../../../ui/src/shared/models/cards';
-import { AwardPot } from '../../../ui/src/shared/models/uiState';
+    reformatHandDescription,
+} from '../../../ui/src/shared/models/game/cards';
+import { AwardPot } from '../../../ui/src/shared/models/ui/uiState';
 import { logger, debugFunc } from '../logger';
-import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/uuid';
+import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import {
     PlayerPosition,
     PLAYER_POSITIONS_BY_HEADCOUNT,
     PlayerPositionString,
-} from '../../../ui/src/shared/models/playerPosition';
-import { AvatarKeys } from '../../../ui/src/shared/models/assets';
+} from '../../../ui/src/shared/models/player/playerPosition';
+import { AvatarKeys } from '../../../ui/src/shared/models/ui/assets';
 import sortBy from 'lodash/sortBy';
 
 // TODO Re-organize methods in some meaningful way
@@ -338,7 +330,7 @@ export class GameStateManager {
         if (chipDifference > 0) {
             this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
         } else {
-            logger.warning(
+            logger.warn(
                 `gameStateManager.playerBuyinSetChips has been called with a chip amount that is less than the player's 
                 current stack. This is either a bug, or being used for development`,
             );
@@ -362,6 +354,14 @@ export class GameStateManager {
 
     setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean) {
         this.getPlayer(playerUUID).quitting = quitting;
+    }
+
+    getPlayerName(playerUUID: PlayerUUID) {
+        return this.getPlayer(playerUUID).name;
+    }
+
+    getPlayerSeatNumber(playerUUID: PlayerUUID) {
+        return this.getPlayer(playerUUID).seatNumber;
     }
 
     // returns time in milliseconds
@@ -443,23 +443,14 @@ export class GameStateManager {
 
     popPot(): Pot {
         const potsLength = this.gameState.pots.length;
-        if (!(potsLength > 0)) {
+        if (!potsLength) {
             throw Error(
                 `Cannot call popPot when length of pot array is zero. This is a bug. GameState: ${getLoggableGameState(
                     this.gameState,
                 )}`,
             );
         }
-        const poppedPot = this.gameState.pots[0];
-        this.gameState.pots = this.getPots().filter((pot) => pot != poppedPot);
-        if (!(this.gameState.pots.length === potsLength - 1)) {
-            throw Error(
-                `Pot array should have pot removed after calling popPot. This is a bug. GameState: ${getLoggableGameState(
-                    this.gameState,
-                )}`,
-            );
-        }
-        return poppedPot;
+        return this.gameState.pots.shift();
     }
 
     getTotalPot() {
@@ -1069,16 +1060,15 @@ export class GameStateManager {
         return this.getPlayer(playerUUID).holeCards;
     }
 
-    computeBestHandForPlayer(playerUUID: PlayerUUID): Hand {
+    computePlayerBestHand(playerUUID: PlayerUUID): Hand {
         const bestHand =
             this.getGameType() === GameType.PLOMAHA
                 ? this.handSolverService.computeBestPLOHand(this.getPlayer(playerUUID).holeCards, this.getBoard())
                 : this.handSolverService.computeBestNLEHand(this.getPlayer(playerUUID).holeCards, this.getBoard());
-        this.getPlayer(playerUUID).bestHand = bestHand;
         return bestHand;
     }
 
-    isCardInPlayersBestHand(playerUUID: PlayerUUID, card: Card) {
+    isCardInPlayerBestHand(playerUUID: PlayerUUID, card: Card) {
         return convertHandToCardArray(this.getPlayerBestHand(playerUUID)).some((handCard) =>
             cardsAreEqual(handCard, card),
         );
@@ -1088,34 +1078,16 @@ export class GameStateManager {
         return this.getPlayer(playerUUID).bestHand;
     }
 
-    updatePlayerHandDescription(playerUUID: PlayerUUID) {
-        const bestHand = this.computeBestHandForPlayer(playerUUID);
-        this.getPlayer(playerUUID).handDescription = this.getStrDescriptionFromHand(bestHand);
+    updatePlayerBestHand(playerUUID: PlayerUUID) {
+        this.getPlayer(playerUUID).bestHand = this.computePlayerBestHand(playerUUID);
     }
 
-    clearPlayerHandDescription(playerUUID: PlayerUUID) {
-        this.getPlayer(playerUUID).handDescription = '';
+    getPlayerHandDescription(playerUUID: PlayerUUID): string {
+        return this.getPlayer(playerUUID).bestHand.descr;
     }
 
-    // removes wanted characters from the description string
-    // and in full names of cards
-    getStrDescriptionFromHand(hand: Hand): string {
-        // K High
-        // Two pair, A's & Q's
-        // Three of a Kind, 6's
-        // Pair, 3's
-        // Full House, 5's over 4's
-        // Flush, Ah High
-        // Straight, 8 High
-        let description = hand.descr;
-        Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
-            const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
-            const regex = new RegExp(regexStr, 'g');
-            description = description.replace(regex, fullStr);
-        });
-        description = description.replace(/'s/g, 's').replace(/Sixs/g, 'Sixes');
-
-        return description;
+    clearPlayerBestHand(playerUUID: PlayerUUID) {
+        this.getPlayer(playerUUID).bestHand = null;
     }
 
     getGameType(): GameType {
@@ -1271,7 +1243,7 @@ export class GameStateManager {
     }
 
     getWinningHandDescription(): string | undefined {
-        return this.gameState.winningHand ? this.getStrDescriptionFromHand(this.gameState.winningHand) : undefined;
+        return this.gameState.winningHand ? reformatHandDescription(this.gameState.winningHand.descr) : undefined;
     }
 
     setWinningHand(hand: Hand | undefined) {

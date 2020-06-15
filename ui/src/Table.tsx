@@ -9,7 +9,7 @@ import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
 import { tableSelector, playersSelector, globalGameStateSelector, selectGameParameters } from './store/selectors';
-import { ClientActionType, ClientWsMessageRequest } from './shared/models/api';
+import { ClientActionType, ClientWsMessageRequest } from './shared/models/api/api';
 import { WsServer } from './api/ws';
 
 import { makeStyles } from '@material-ui/core/styles';

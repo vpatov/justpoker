@@ -5,8 +5,7 @@ import {
   getDefaultGameParameters,
   BettingRoundActionType,
 } from "../../ui/src/shared/models/game";
-import { ClientActionType } from "../../ui/src/shared/models/api";
-import { ClientActionType } from "../../ui/src/shared/models/api";
+import { ClientActionType } from "../../ui/src/shared/models/api/api";
 
 import queryString from "query-string";
 import WebSocket from "ws";
@@ -14,7 +13,7 @@ import WebSocket from "ws";
 let url = "justpoker.games";
 // url = "0.0.0.0:8080"; // uncomment for local
 const api = axios.create({
-  baseURL: `http://${url}`,
+  baseURL: `https://${url}`,
 });
 
 function sleep(ms) {
@@ -41,7 +40,7 @@ function CreateGame() {
 
 function openWsForGame(gameInstanceUUID) {
   const wsURI = {
-    url: `ws://${url}`,
+    url: `wss://${url}`,
     query: {
       clientUUID: null,
       gameInstanceUUID: gameInstanceUUID,
