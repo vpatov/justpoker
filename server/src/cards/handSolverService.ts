@@ -5,6 +5,7 @@ import {
     SUIT_ABBREVIATIONS,
     getTwoCardCombinations,
     reformatHandDescription,
+    getThreeCardCombinations,
 } from '../../../ui/src/shared/models/game/cards';
 import { Hand as HandSolver } from 'pokersolver';
 import { logger } from '../logger';
@@ -53,8 +54,14 @@ export class HandSolverService {
     }
 
     computeBestPLOHand(holeCards: Readonly<Card[]>, board: Readonly<Card[]>) {
-        const twoCardCombinations = getTwoCardCombinations(holeCards);
-        const bestHands = twoCardCombinations.map((twoCards) => this.computeBestHandFromCards([...twoCards, ...board]));
+        const holeCardCombos = getTwoCardCombinations(holeCards);
+        const boardCombos = getThreeCardCombinations(board);
+        const bestHands = [];
+        for (const holeCardCombo of holeCardCombos) {
+            for (const boardCombo of boardCombos) {
+                bestHands.push(this.computeBestHandFromCards([...holeCardCombo, ...boardCombo]));
+            }
+        }
         const winningHands = this.getWinningHands(bestHands);
         return winningHands[0];
     }
