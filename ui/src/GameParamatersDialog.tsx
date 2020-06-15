@@ -88,6 +88,221 @@ function GameParamatersDialog(props) {
         SET_tabValue(newValue);
     };
 
+    function generateChipsContent() {
+        return (
+            <div className={classes.tabCont}>
+                <TextFieldWrap
+                    className={classes.field}
+                    label="Small Blind"
+                    variant="standard"
+                    onChange={(event) => setIntoGameParameters('smallBlind', event.target.value)}
+                    value={smallBlind}
+                    min={MIN_VALUES.SMALL_BLIND}
+                    max={MAX_VALUES.SMALL_BLIND}
+                    type="number"
+                />
+                <TextFieldWrap
+                    className={classes.field}
+                    label="Big Blind"
+                    variant="standard"
+                    onChange={(event) => setIntoGameParameters('bigBlind', event.target.value)}
+                    value={bigBlind}
+                    min={MIN_VALUES.BIG_BLIND}
+                    max={MAX_VALUES.BIG_BLIND}
+                    type="number"
+                />
+                <TextFieldWrap
+                    className={classes.field}
+                    label={dynamicMaxBuyin ? 'Fixed Max Buyin' : 'Max Buyin'}
+                    variant="standard"
+                    onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
+                    value={maxBuyin}
+                    min={MIN_VALUES.BUY_IN}
+                    max={MAX_VALUES.BUY_IN}
+                    type="number"
+                />
+                <TextFieldWrap
+                    className={classes.field}
+                    label="Min Buyin"
+                    onChange={(event) => setIntoGameParameters('minBuyin', event.target.value)}
+                    value={minBuyin}
+                    type="number"
+                    variant="standard"
+                    min={MIN_VALUES.BUY_IN}
+                    max={MAX_VALUES.BUY_IN}
+                />
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="Enables maximum buyin amount to be computed during the game according to the sizes of other player's stacks. Players will always be able to buyin for at least the Fixed Max Buyin."
+                        placement="left"
+                    />
+                    <RadioForm
+                        label="Dynamic Max Buyin"
+                        onChange={(event) => setIntoGameParameters('dynamicMaxBuyin', event.target.value === 'true')}
+                        value={dynamicMaxBuyin + ''}
+                        options={[
+                            { label: 'Dynamic', value: 'true' },
+                            { label: 'Fixed', value: 'false' },
+                        ]}
+                        radioGroupProps={{ row: true }}
+                    />
+                </div>
+
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="Indicates how the maximum buyin amount is computed."
+                        placement="left"
+                    />
+                    <FormControl className={classes.field}>
+                        <InputLabel>Max Buyin Type</InputLabel>
+                        <Select
+                            value={dynamicMaxBuyin ? maxBuyinType : ''}
+                            onChange={(event) =>
+                                setIntoGameParameters('maxBuyinType', event.target.value as MaxBuyinType)
+                            }
+                            disabled={!dynamicMaxBuyin}
+                        >
+                            <MenuItem value={MaxBuyinType.TopStack}>Largest Stack</MenuItem>
+                            <MenuItem value={MaxBuyinType.HalfTopStack}>Half of Largest Stack</MenuItem>
+                            <MenuItem value={MaxBuyinType.SecondStack}>Second Largest Stack</MenuItem>
+                            <MenuItem value={MaxBuyinType.AverageStack}>Average of All Stacks</MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
+            </div>
+        );
+    }
+
+    function generateGamePlayContent() {
+        return (
+            <div className={classes.tabCont}>
+                <FormControl className={classes.field}>
+                    <InputLabel>Game Type</InputLabel>
+                    <Select
+                        value={gameType}
+                        onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
+                    >
+                        <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
+                        <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
+                    </Select>
+                </FormControl>
+
+                <TextFieldWrap
+                    className={classes.field}
+                    label="Max Players"
+                    onChange={(event) => setIntoGameParameters('maxPlayers', event.target.value)}
+                    value={maxPlayers}
+                    type="number"
+                    variant="standard"
+                    min={MIN_VALUES.MAX_PLAYERS}
+                    max={MAX_VALUES.MAX_PLAYERS}
+                />
+                <TextFieldWrap
+                    className={classes.field}
+                    label="Time To Act"
+                    variant="standard"
+                    onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
+                    value={timeToAct}
+                    min={MIN_VALUES.TIME_TO_ACT}
+                    max={MAX_VALUES.TIME_TO_ACT}
+                    type="number"
+                />
+
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="Gives players ability to straddle. The player to the left of the big blind bets twice the big blind before the cards are dealt."
+                        placement="left"
+                    />
+                    <RadioForm
+                        label="Allow Straddle"
+                        onChange={(event) => setIntoGameParameters('allowStraddle', event.target.value === 'true')}
+                        value={allowStraddle + ''}
+                        options={[
+                            { label: 'Allow', value: 'true' },
+                            { label: 'Disallow', value: 'false' },
+                        ]}
+                        radioGroupProps={{ row: true }}
+                    />
+                </div>
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="Gives players ability to show some or all of their hole cards once one vs one with another player."
+                        placement="left"
+                    />
+                    <RadioForm
+                        className={classes.field}
+                        label="Can Show Heads Up"
+                        onChange={(event) => setIntoGameParameters('canShowHeadsUp', event.target.value === 'true')}
+                        value={canShowHeadsUp + ''}
+                        options={[
+                            { label: 'Can Show', value: 'true' },
+                            { label: "Can't Show", value: 'false' },
+                        ]}
+                        radioGroupProps={{ row: true }}
+                    />
+                </div>
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="Give players ability use a time bank which extends their time to act on that turn by a fixed amount."
+                        placement="left"
+                    />
+                    <RadioForm
+                        className={classes.field}
+                        label="Time Banks"
+                        onChange={(event) => setIntoGameParameters('allowTimeBanks', event.target.value === 'true')}
+                        value={allowTimeBanks + ''}
+                        options={[
+                            { label: 'On', value: 'true' },
+                            { label: 'Off', value: 'false' },
+                        ]}
+                        radioGroupProps={{ row: true }}
+                    />
+                </div>
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="The number of time banks a player is given at buyin."
+                        placement="left"
+                    />
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Number of Time Banks"
+                        onChange={(event) => setIntoGameParameters('numberTimeBanks', event.target.value)}
+                        value={numberTimeBanks}
+                        type="number"
+                        variant="standard"
+                        disabled={!allowTimeBanks}
+                        min={MIN_VALUES.NUMBER_TIME_BANKS}
+                        max={MAX_VALUES.NUMBER_TIME_BANKS}
+                    />
+                </div>
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="The number of seconds by which a player's time to act is extended after using a time bank."
+                        placement="left"
+                    />
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Time Bank Seconds"
+                        onChange={(event) => setIntoGameParameters('timeBankTime', event.target.value)}
+                        value={timeBankTime}
+                        type="number"
+                        variant="standard"
+                        disabled={!allowTimeBanks}
+                        min={MIN_VALUES.TIME_BANK_TIME}
+                        max={MAX_VALUES.TIME_BANK_TIME}
+                    />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <Dialog
             className={classes.dialog}
@@ -102,225 +317,8 @@ function GameParamatersDialog(props) {
                     <Tab label="Chips" value="chips" />
                     <Tab label="Gameplay" value="gameplay" />
                 </Tabs>
-
-                {tabValue === 'chips' ? (
-                    <div className={classes.tabCont}>
-                        <TextFieldWrap
-                            className={classes.field}
-                            label="Small Blind"
-                            variant="standard"
-                            onChange={(event) => setIntoGameParameters('smallBlind', event.target.value)}
-                            value={smallBlind}
-                            min={MIN_VALUES.SMALL_BLIND}
-                            max={MAX_VALUES.SMALL_BLIND}
-                            type="number"
-                        />
-                        <TextFieldWrap
-                            className={classes.field}
-                            label="Big Blind"
-                            variant="standard"
-                            onChange={(event) => setIntoGameParameters('bigBlind', event.target.value)}
-                            value={bigBlind}
-                            min={MIN_VALUES.BIG_BLIND}
-                            max={MAX_VALUES.BIG_BLIND}
-                            type="number"
-                        />
-                        <TextFieldWrap
-                            className={classes.field}
-                            label={dynamicMaxBuyin ? 'Fixed Max Buyin' : 'Max Buyin'}
-                            variant="standard"
-                            onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
-                            value={maxBuyin}
-                            min={MIN_VALUES.BUY_IN}
-                            max={MAX_VALUES.BUY_IN}
-                            type="number"
-                        />
-                        <TextFieldWrap
-                            className={classes.field}
-                            label="Min Buyin"
-                            onChange={(event) => setIntoGameParameters('minBuyin', event.target.value)}
-                            value={minBuyin}
-                            type="number"
-                            variant="standard"
-                            min={MIN_VALUES.BUY_IN}
-                            max={MAX_VALUES.BUY_IN}
-                        />
-                        <div className={classes.field}>
-                            <IconTooltip
-                                className={classes.iconTip}
-                                title="Enables maximum buyin amount to be computed during the game according to the sizes of other player's stacks. Players will always be able to buyin for at least the Fixed Max Buyin."
-                                placement="left"
-                            />
-                            <RadioForm
-                                label="Dynamic Max Buyin"
-                                onChange={(event) =>
-                                    setIntoGameParameters('dynamicMaxBuyin', event.target.value === 'true')
-                                }
-                                value={dynamicMaxBuyin + ''}
-                                options={[
-                                    { label: 'Dynamic', value: 'true' },
-                                    { label: 'Fixed', value: 'false' },
-                                ]}
-                                radioGroupProps={{ row: true }}
-                            />
-                        </div>
-
-                        <div className={classes.field}>
-                            <IconTooltip
-                                className={classes.iconTip}
-                                title="Indicates how the maximum buyin amount is computed."
-                                placement="left"
-                            />
-                            <FormControl className={classes.field}>
-                                <InputLabel>Max Buyin Type</InputLabel>
-                                <Select
-                                    value={dynamicMaxBuyin ? maxBuyinType : ''}
-                                    onChange={(event) =>
-                                        setIntoGameParameters('maxBuyinType', event.target.value as MaxBuyinType)
-                                    }
-                                    disabled={!dynamicMaxBuyin}
-                                >
-                                    <MenuItem value={MaxBuyinType.TopStack}>Largest Stack</MenuItem>
-                                    <MenuItem value={MaxBuyinType.HalfTopStack}>Half of Largest Stack</MenuItem>
-                                    <MenuItem value={MaxBuyinType.SecondStack}>Second Largest Stack</MenuItem>
-                                    <MenuItem value={MaxBuyinType.AverageStack}>Average of All Stacks</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </div>
-                    </div>
-                ) : null}
-
-                {tabValue === 'gameplay' ? (
-                    <div className={classes.tabCont}>
-                        <FormControl className={classes.field}>
-                            <InputLabel>Game Type</InputLabel>
-                            <Select
-                                value={gameType}
-                                onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
-                            >
-                                <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
-                                <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
-                            </Select>
-                        </FormControl>
-
-                        <TextFieldWrap
-                            className={classes.field}
-                            label="Max Players"
-                            onChange={(event) => setIntoGameParameters('maxPlayers', event.target.value)}
-                            value={maxPlayers}
-                            type="number"
-                            variant="standard"
-                            min={MIN_VALUES.MAX_PLAYERS}
-                            max={MAX_VALUES.MAX_PLAYERS}
-                        />
-                        <TextFieldWrap
-                            className={classes.field}
-                            label="Time To Act"
-                            variant="standard"
-                            onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
-                            value={timeToAct}
-                            min={MIN_VALUES.TIME_TO_ACT}
-                            max={MAX_VALUES.TIME_TO_ACT}
-                            type="number"
-                        />
-
-                        <div className={classes.field}>
-                            <IconTooltip
-                                className={classes.iconTip}
-                                title="Gives players ability to straddle. The player to the left of the big blind bets twice the big blind before the cards are dealt."
-                                placement="left"
-                            />
-                            <RadioForm
-                                label="Allow Straddle"
-                                onChange={(event) =>
-                                    setIntoGameParameters('allowStraddle', event.target.value === 'true')
-                                }
-                                value={allowStraddle + ''}
-                                options={[
-                                    { label: 'Allow', value: 'true' },
-                                    { label: 'Disallow', value: 'false' },
-                                ]}
-                                radioGroupProps={{ row: true }}
-                            />
-                        </div>
-                        <div className={classes.field}>
-                            <IconTooltip
-                                className={classes.iconTip}
-                                title="Gives players ability to show some or all of their hole cards once one vs one with another player."
-                                placement="left"
-                            />
-                            <RadioForm
-                                className={classes.field}
-                                label="Can Show Heads Up"
-                                onChange={(event) =>
-                                    setIntoGameParameters('canShowHeadsUp', event.target.value === 'true')
-                                }
-                                value={canShowHeadsUp + ''}
-                                options={[
-                                    { label: 'Can Show', value: 'true' },
-                                    { label: "Can't Show", value: 'false' },
-                                ]}
-                                radioGroupProps={{ row: true }}
-                            />
-                        </div>
-                        <div className={classes.field}>
-                            <IconTooltip
-                                className={classes.iconTip}
-                                title="Give players ability use a time bank which extends their time to act on that turn by a fixed amount."
-                                placement="left"
-                            />
-                            <RadioForm
-                                className={classes.field}
-                                label="Time Banks"
-                                onChange={(event) =>
-                                    setIntoGameParameters('allowTimeBanks', event.target.value === 'true')
-                                }
-                                value={allowTimeBanks + ''}
-                                options={[
-                                    { label: 'On', value: 'true' },
-                                    { label: 'Off', value: 'false' },
-                                ]}
-                                radioGroupProps={{ row: true }}
-                            />
-                        </div>
-                        <div className={classes.field}>
-                            <IconTooltip
-                                className={classes.iconTip}
-                                title="The number of time banks a player is given at buyin."
-                                placement="left"
-                            />
-                            <TextFieldWrap
-                                className={classes.field}
-                                label="Number of Time Banks"
-                                onChange={(event) => setIntoGameParameters('numberTimeBanks', event.target.value)}
-                                value={numberTimeBanks}
-                                type="number"
-                                variant="standard"
-                                disabled={!allowTimeBanks}
-                                min={MIN_VALUES.NUMBER_TIME_BANKS}
-                                max={MAX_VALUES.NUMBER_TIME_BANKS}
-                            />
-                        </div>
-                        <div className={classes.field}>
-                            <IconTooltip
-                                className={classes.iconTip}
-                                title="The number of seconds by which a player's time to act is extended after using a time bank."
-                                placement="left"
-                            />
-                            <TextFieldWrap
-                                className={classes.field}
-                                label="Time Bank Seconds"
-                                onChange={(event) => setIntoGameParameters('timeBankTime', event.target.value)}
-                                value={timeBankTime}
-                                type="number"
-                                variant="standard"
-                                disabled={!allowTimeBanks}
-                                min={MIN_VALUES.TIME_BANK_TIME}
-                                max={MAX_VALUES.TIME_BANK_TIME}
-                            />
-                        </div>
-                    </div>
-                ) : null}
+                {tabValue === 'chips' ? generateChipsContent() : null}
+                {tabValue === 'gameplay' ? generateGamePlayContent() : null}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onCancel}>Cancel</Button>
