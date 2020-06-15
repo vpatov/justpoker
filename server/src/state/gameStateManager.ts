@@ -330,7 +330,7 @@ export class GameStateManager {
         if (chipDifference > 0) {
             this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
         } else {
-            logger.warning(
+            logger.warn(
                 `gameStateManager.playerBuyinSetChips has been called with a chip amount that is less than the player's 
                 current stack. This is either a bug, or being used for development`,
             );
@@ -443,23 +443,14 @@ export class GameStateManager {
 
     popPot(): Pot {
         const potsLength = this.gameState.pots.length;
-        if (!(potsLength > 0)) {
+        if (!potsLength) {
             throw Error(
                 `Cannot call popPot when length of pot array is zero. This is a bug. GameState: ${getLoggableGameState(
                     this.gameState,
                 )}`,
             );
         }
-        const poppedPot = this.gameState.pots[0];
-        this.gameState.pots = this.getPots().filter((pot) => pot != poppedPot);
-        if (!(this.gameState.pots.length === potsLength - 1)) {
-            throw Error(
-                `Pot array should have pot removed after calling popPot. This is a bug. GameState: ${getLoggableGameState(
-                    this.gameState,
-                )}`,
-            );
-        }
-        return poppedPot;
+        return this.gameState.pots.shift();
     }
 
     getTotalPot() {

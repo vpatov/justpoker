@@ -137,8 +137,8 @@ const headCells: HeadCell[] = [
     { id: 'handsWon', numeric: true, disablePadding: false, label: 'Hands Won' },
     { id: 'flopsSeen', numeric: true, disablePadding: false, label: 'Flops Seen' },
     { id: 'vpip', numeric: true, disablePadding: false, label: 'Flops Seen %' },
-    { id: 'timeStartedPlaying', numeric: true, disablePadding: false, label: 'Time Started Playing' },
-    { id: 'timeMostRecentHand', numeric: true, disablePadding: false, label: 'Time Last Played' },
+    { id: 'timeStartedPlaying', numeric: false, disablePadding: false, label: 'Time Started Playing' },
+    { id: 'timeMostRecentHand', numeric: false, disablePadding: false, label: 'Time Last Played' },
 ];
 
 interface LedgerTableProps {
@@ -191,6 +191,10 @@ function LedgerTableHead(props: LedgerTableProps) {
             </TableRow>
         </TableHead>
     );
+}
+
+function formatTimestamp(timestamp: number){
+    return new Date(timestamp).toLocaleString().replace(',','');
 }
 
 function LedgerTable(props) {
@@ -258,7 +262,6 @@ function LedgerTable(props) {
                                 {stableSort(ledger, getComparator(order, orderBy)).map((row, index) => {
                                     const isItemSelected = isSelected(row.aliases);
                                     const labelId = `enhanced-table-checkbox-${index}`;
-
                                     return (
                                         <TableRow
                                             hover
