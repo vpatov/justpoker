@@ -282,10 +282,9 @@ export class StateConverter {
     getValidMenuButtons(clientUUID: ClientUUID): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        const menuButtons = [USER_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
+        const menuButtons = [USER_SETTINGS_BUTTON, GAME_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
 
         if (this.gameStateManager.isClientAdmin(clientUUID)) {
-            menuButtons.push(GAME_SETTINGS_BUTTON);
             if (
                 (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) ||
                 this.gameStateManager.gameWillStopAfterHand()

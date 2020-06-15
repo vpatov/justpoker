@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classnames from 'classnames';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
@@ -8,7 +9,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Button from '@material-ui/core/Button';
-import { Select, MenuItem } from '@material-ui/core';
+import { Select, MenuItem, Typography } from '@material-ui/core';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'flex-start',
             flexWrap: 'wrap',
             flexDirection: 'column',
-            height: '60vh',
+            height: '50vh',
         },
 
         field: {
@@ -46,12 +47,16 @@ const useStyles = makeStyles((theme: Theme) =>
         tabs: {
             backgroundColor: '#101010',
         },
+        disabled: {
+            pointerEvents: 'none',
+            opacity: 0.65,
+        },
     }),
 );
 
 function GameParamatersDialog(props) {
     const classes = useStyles();
-    const { open, onSave, onCancel, gameParameters } = props;
+    const { open, onSave, onCancel, gameParameters, disabled } = props;
 
     const [curGameParameters, SET_curGameParameters] = useState(gameParameters);
     const [tabValue, SET_tabValue] = React.useState('chips');
@@ -317,14 +322,23 @@ function GameParamatersDialog(props) {
                     <Tab label="Chips" value="chips" />
                     <Tab label="Gameplay" value="gameplay" />
                 </Tabs>
-                {tabValue === 'chips' ? generateChipsContent() : null}
-                {tabValue === 'gameplay' ? generateGamePlayContent() : null}
+                <div className={classnames({ [classes.disabled]: disabled })}>
+                    {tabValue === 'chips' ? generateChipsContent() : null}
+                    {tabValue === 'gameplay' ? generateGamePlayContent() : null}
+                </div>
+                {disabled ? <Typography>Only admin can change game settings.</Typography> : null}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>Cancel</Button>
-                <Button onClick={() => onSave(curGameParameters)} color="primary">
-                    Save
-                </Button>
+                {disabled ? (
+                    <Button onClick={onCancel}>Close</Button>
+                ) : (
+                    <>
+                        <Button onClick={onCancel}>Cancel</Button>
+                        <Button onClick={() => onSave(curGameParameters)} color="primary">
+                            Save
+                        </Button>{' '}
+                    </>
+                )}
             </DialogActions>
         </Dialog>
     );
