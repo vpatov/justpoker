@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) =>
             zIndex: -1,
             display: 'flex',
             justifyContent: 'center',
-            backgroundColor: 'rgba(230,230,230,0.8)',
+            backgroundColor: 'rgba(255,255,255,0.35)',
             borderBottomLeftRadius: '0.6vmin',
             borderBottomRightRadius: '0.6vmin',
             position: 'absolute',

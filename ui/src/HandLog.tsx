@@ -23,7 +23,6 @@ import { PlayerUUID } from './shared/models/system/uuid';
 import { WsServer } from './api/ws';
 import { cardsAreEqual, Card } from './shared/models/game/cards';
 
-
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         handLogContainer: {
@@ -61,8 +60,8 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         handLogContents: {
             margin: '0.2vh 0.40vw',
-            '& > *':{
-                marginBottom: '1.2vh'    
+            '& > *': {
+                marginBottom: '1.2vh',
             },
             color: 'rgb(220,210,230)',
         },
@@ -75,7 +74,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: blueGrey[700],
         },
         handLogPotWinnerLabel: {
-            fontSize: '1.8vmin',  
+            fontSize: '1.8vmin',
         },
         handLogShowHandLabel: {
             fontSize: '1.8vmin',
@@ -85,9 +84,9 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
 
             fontSize: '2.2vmin',
-            '& > *':{
-                marginRight: '0.3vw'    
-            }
+            '& > *': {
+                marginRight: '0.3vw',
+            },
         },
         playerNameWithColor: {
             fontSize: '1.8vmin',
@@ -116,8 +115,7 @@ interface HandLogProps {
 
 function HandLog(props: HandLogProps) {
     const classes = useStyles();
-    const {hideChatLog, hideHandLog} = props;
-
+    const { hideChatLog, hideHandLog } = props;
 
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
@@ -131,37 +129,35 @@ function HandLog(props: HandLogProps) {
         return currentHandNumber;
     }
 
-    function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]){
-        if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0] ){
+    function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]) {
+        if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0]) {
             return;
         }
         setHandLogEntries((oldHandLogEntries) => {
             // update the most recent entry
-            if (incomingHandLogEntries.length === 1){
+            if (incomingHandLogEntries.length === 1) {
                 const handLogEntry = incomingHandLogEntries[0];
                 const handNumber = handLogEntry.handNumber;
-                if (handNumber === oldHandLogEntries.length){
+                if (handNumber === oldHandLogEntries.length) {
                     setCurrentHandNumber((oldHandNumber) => {
                         return oldHandNumber === oldHandLogEntries.length - 2 ? oldHandNumber + 1 : oldHandNumber;
                     });
                 }
-                
+
                 oldHandLogEntries[handNumber] = handLogEntry;
                 return [...oldHandLogEntries];
             }
 
             // If we received more than one handLogEntry, replace the entire list
             return incomingHandLogEntries;
-        })
+        });
     }
 
-
-    function getHandNumberString(){
-        if (handLogEntries.length === 0){
-            return 'No entries';
+    function getHandNumberString() {
+        if (handLogEntries.length === 0) {
+            return 'None';
         }
         return `${currentHandNumber + 1} of ${handLogEntries.length}`;
-
     }
 
     function handleClickSkipPreviousButton() {
@@ -169,19 +165,19 @@ function HandLog(props: HandLogProps) {
     }
 
     function handleClickSkipNextButton() {
-        if (handLogEntries.length){
+        if (handLogEntries.length) {
             setCurrentHandNumber(handLogEntries.length - 1);
         }
     }
 
-    function handleClickNextButton(){
-        if (currentHandNumber < handLogEntries.length - 1){
+    function handleClickNextButton() {
+        if (currentHandNumber < handLogEntries.length - 1) {
             setCurrentHandNumber((currentHandNumber) => currentHandNumber + 1);
         }
     }
 
-    function handleClickPreviousButton(){
-        if (currentHandNumber > 0){
+    function handleClickPreviousButton() {
+        if (currentHandNumber > 0) {
             setCurrentHandNumber((currentHandNumber) => currentHandNumber - 1);
         }
     }
@@ -191,69 +187,53 @@ function HandLog(props: HandLogProps) {
         return (
             <div className={classnames(classes.handLogControls)}>
                 <div className={classnames(classes.handLogControlButtonSection)}>
-                    <IconButton
-                        className={classes.handLogIconButton}
-                        onClick={() => handleClickSkipPreviousButton()}
-                    >
-                        <SkipPreviousIcon/>
+                    <IconButton className={classes.handLogIconButton} onClick={() => handleClickSkipPreviousButton()}>
+                        <SkipPreviousIcon />
                     </IconButton>
-                    <IconButton
-                        className={classes.handLogIconButton}
-                        onClick={() => handleClickPreviousButton()}
-                    >
-                        <NavigateBeforeIcon/>
+                    <IconButton className={classes.handLogIconButton} onClick={() => handleClickPreviousButton()}>
+                        <NavigateBeforeIcon />
                     </IconButton>
                 </div>
                 <Typography
                     className={classes.handNumberString}
-                    style={handNumberString.length >= 11 ? {fontSize: '1.3vmin'} : {}}
-                    >
+                    style={handNumberString.length >= 11 ? { fontSize: '1.3vmin' } : {}}
+                >
                     {handNumberString}
                 </Typography>
                 <div className={classnames(classes.handLogControlButtonSection)}>
-                    <IconButton
-                        className={classes.handLogIconButton}
-                        onClick={() => handleClickNextButton()}
-                    >
-                        <NavigateNextIcon/>
+                    <IconButton className={classes.handLogIconButton} onClick={() => handleClickNextButton()}>
+                        <NavigateNextIcon />
                     </IconButton>
-                    <IconButton
-                        className={classes.handLogIconButton}
-                        onClick={() => handleClickSkipNextButton()}
-                    >
-                        <SkipNextIcon/>
+                    <IconButton className={classes.handLogIconButton} onClick={() => handleClickSkipNextButton()}>
+                        <SkipNextIcon />
                     </IconButton>
                 </div>
             </div>
-        )
+        );
     }
 
-    function renderPlayerPosition(playerUUID: PlayerUUID, index:number){
+    function renderPlayerPosition(playerUUID: PlayerUUID, index: number) {
         const playerSummary = handLogEntries[currentHandNumber].playerSummaries[playerUUID];
         return playerSummary.wasDealtIn ? (
             <Typography className={classnames(classes.handLogPlayerSummary)} key={index}>
-                <span>
-                    {`${PlayerPositionString[playerSummary.position]}: `}
-                </span>
+                <span>{`${PlayerPositionString[playerSummary.position]}: `}</span>
                 {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                 <span>{` (${playerSummary.startingChips})`}</span>
             </Typography>
         ) : null;
     }
 
-    function renderPlayerPositions(playersSortedByPosition: PlayerUUID[]){
+    function renderPlayerPositions(playersSortedByPosition: PlayerUUID[]) {
         return (
             <div>
-                <Typography className={classes.handLogSectionLabel}>
-                    Players
-                </Typography>
-                <Divider/>
-                {playersSortedByPosition.map((playerPosition,index) => (renderPlayerPosition(playerPosition,index)))}
+                <Typography className={classes.handLogSectionLabel}>Players</Typography>
+                <Divider />
+                {playersSortedByPosition.map((playerPosition, index) => renderPlayerPosition(playerPosition, index))}
             </div>
         );
     }
 
-    function renderCardsInline(cards: UiCard[]){
+    function renderCardsInline(cards: UiCard[]) {
         return (
             <Typography className={classes.handLogInlineCards}>
                 {cards.map((card) => (
@@ -262,24 +242,22 @@ function HandLog(props: HandLogProps) {
                         <Suit className={classes.suit} suit={card.suit}></Suit>
                     </>
                 ))}
-            </Typography>  
+            </Typography>
         );
     }
 
-    function renderBoard(board: UiCard[]){
+    function renderBoard(board: UiCard[]) {
         return board?.length ? (
             <div>
-                <Typography className={classes.handLogSectionLabel}>
-                    Board
-                </Typography>
+                <Typography className={classes.handLogSectionLabel}>Board</Typography>
                 <Divider />
-                {renderCardsInline(board)}   
+                {renderCardsInline(board)}
             </div>
         ) : null;
     }
 
-    function getBetActionVerbString(bettingRoundAction: BettingRoundActionType, amount?: number){
-        switch (bettingRoundAction){
+    function getBetActionVerbString(bettingRoundAction: BettingRoundActionType, amount?: number) {
+        switch (bettingRoundAction) {
             case BettingRoundActionType.CHECK: {
                 return 'checks.';
             }
@@ -297,46 +275,42 @@ function HandLog(props: HandLogProps) {
             }
         }
     }
-    
-    function renderBettingRoundAction(action: BetActionRecord){
-        return (
-            ` ${getBetActionVerbString(action.bettingRoundAction.type, action.bettingRoundAction.amount)}`
-        );
+
+    function renderBettingRoundAction(action: BetActionRecord) {
+        return ` ${getBetActionVerbString(action.bettingRoundAction.type, action.bettingRoundAction.amount)}`;
     }
 
-    function renderPlayerName(seatNumber: number, name: string){
-        return  (
-            <span 
-                className={classnames(classes.playerNameWithColor)}
-                style={{ color: getPlayerNameColor(seatNumber) }}
-            >
+    function renderPlayerName(seatNumber: number, name: string) {
+        return (
+            <span className={classnames(classes.playerNameWithColor)} style={{ color: getPlayerNameColor(seatNumber) }}>
                 {name}
             </span>
         );
     }
 
-    function renderTimeTookToAct(timeTookToAct: number){
+    function renderTimeTookToAct(timeTookToAct: number) {
         // 1512 -> (1.5s)
         return `(${Math.round(timeTookToAct / 100) / 10}s)`;
     }
 
-    function renderBettingRoundActions(actions: BetActionRecord[]){
+    function renderBettingRoundActions(actions: BetActionRecord[]) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <>
                 {actions.map((action, index) => {
                     const playerSummary = playerSummaries[action.playerUUID];
                     return (
-                    <Typography className={classnames(classes.handLogBettingRoundAction)} key={index}>
-                        <span>
-                            {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
-                            {renderBettingRoundAction(action)}
-                        </span>
-                        <span>{renderTimeTookToAct(action.timeTookToAct)}</span>
-                    </Typography>);
+                        <Typography className={classnames(classes.handLogBettingRoundAction)} key={index}>
+                            <span>
+                                {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                                {renderBettingRoundAction(action)}
+                            </span>
+                            <span>{renderTimeTookToAct(action.timeTookToAct)}</span>
+                        </Typography>
+                    );
                 })}
             </>
-        )
+        );
     }
 
 
@@ -359,9 +333,7 @@ function HandLog(props: HandLogProps) {
     function renderBettingRoundLog(bettingRoundLog: BettingRoundLog, index: number, board: UiCard[]){
         return (
             <div key={index}>
-                <Typography className={classes.handLogSectionLabel}>
-                    {bettingRoundLog.bettingRoundStage}
-                </Typography>
+                <Typography className={classes.handLogSectionLabel}>{bettingRoundLog.bettingRoundStage}</Typography>
                 <Divider />
                 {renderCardsInline(getCumulativeCards(board,bettingRoundLog.cardsDealtThisBettingRound))}
                 {renderBettingRoundActions(bettingRoundLog.actions)}
@@ -375,18 +347,17 @@ function HandLog(props: HandLogProps) {
                 {bettingRounds.map((bettingRound, index) => renderBettingRoundLog(bettingRound, index, board))}
             </>
         );
-
     }
 
-    function renderTimeHandStarted(timeHandStarted: number){
-        return timeHandStarted ? 
+    function renderTimeHandStarted(timeHandStarted: number) {
+        return timeHandStarted ? (
             <Typography className={classes.timeHandStartedLabel}>
-                {new Date(timeHandStarted).toLocaleString().replace(',','')}
-            </Typography> : 
-        null;
+                {new Date(timeHandStarted).toLocaleString().replace(',', '')}
+            </Typography>
+        ) : null;
     }
 
-    function renderPlayerHands(playerHands: ShowdownHand[]){
+    function renderPlayerHands(playerHands: ShowdownHand[]) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <>
@@ -400,35 +371,31 @@ function HandLog(props: HandLogProps) {
                     );
                 })}
             </>
-        )
-
+        );
     }
 
-    function renderPotWinners(winners: PotWinner[]){
+    function renderPotWinners(winners: PotWinner[]) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <>
-              {winners.map((winner, index) => {
-                  const playerSummary = playerSummaries[winner.playerUUID];
-                  return (
-                      <Typography className={classnames(classes.handLogContentLabel)} key={index}>
-                          {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
-                          {` wins ${winner.amount}`}
-                      </Typography>
-                  );
-              })}
+                {winners.map((winner, index) => {
+                    const playerSummary = playerSummaries[winner.playerUUID];
+                    return (
+                        <Typography className={classnames(classes.handLogContentLabel)} key={index}>
+                            {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                            {` wins ${winner.amount}`}
+                        </Typography>
+                    );
+                })}
             </>
         );
-
     }
 
-    function renderPotSummaries(potSummaries: PotSummary[]){
+    function renderPotSummaries(potSummaries: PotSummary[]) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <div>
-                <Typography className={classes.handLogSectionLabel}>
-                    Result
-                </Typography>
+                <Typography className={classes.handLogSectionLabel}>Result</Typography>
                 <Divider />
                 {potSummaries.map((potSummary, index) => {
                     return (
@@ -448,12 +415,12 @@ function HandLog(props: HandLogProps) {
     }
 
     function renderHandLogEntry() {
-        if (handLogEntries.length === 0){
+        if (handLogEntries.length === 0) {
             return null;
         }
 
         const handLogEntry = handLogEntries[currentHandNumber];
-        if (!handLogEntry){
+        if (!handLogEntry) {
             return null;
         }
 
@@ -466,38 +433,33 @@ function HandLog(props: HandLogProps) {
                 {handLogEntry.potSummaries.length ? renderPotSummaries(handLogEntry.potSummaries) : null}
             </div>
         );
-        
     }
 
-    function displayStyle(){
+    function displayStyle() {
         return {
             height: !hideChatLog ? '50%' : undefined,
             maxHeight: !hideChatLog ? '50%' : undefined,
-            display: hideHandLog ? 'none' : undefined
+            display: hideHandLog ? 'none' : undefined,
         };
     }
 
-
     function renderLogPanelDivider() {
-        return !hideHandLog && !hideChatLog ?
-            <div><Divider /> </div> :
-            null;
+        return !hideHandLog && !hideChatLog ? (
+            <div>
+                <Divider />{' '}
+            </div>
+        ) : null;
     }
 
     return (
-        <div
-            className={classnames(classes.handLogContainer)}
-            style={displayStyle()}
-        >
+        <div className={classnames(classes.handLogContainer)} style={displayStyle()}>
             <div>
                 {renderHandLogControls()}
                 {renderHandLogEntry()}
             </div>
-            {!hideChatLog ? renderLogPanelDivider(): null}
+            {!hideChatLog ? renderLogPanelDivider() : null}
         </div>
     );
-    
-
 }
 
 export default HandLog;
