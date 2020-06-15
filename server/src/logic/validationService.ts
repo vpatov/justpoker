@@ -18,8 +18,10 @@ import { Card, cardsAreEqual } from '../../../ui/src/shared/models/game/cards';
 import { debugFunc } from '../logger';
 import { MIN_VALUES, MAX_VALUES } from '../../../ui/src/shared/util/consts';
 import { errorMonitor } from 'events';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 
 const MAX_NAME_LENGTH = 32;
+const INIT_HAND_STAGES = [GameStage.SHOW_START_OF_HAND, GameStage.SHOW_START_OF_BETTING_ROUND];
 
 /*
     TODO: Redesign error message construction
@@ -228,8 +230,15 @@ export class ValidationService {
         return this.ensurePlayerIsAtTable(player.uuid);
     }
 
+    validateSitInOrOutAction(clientUUID: ClientUUID): ValidationResponse {
+        const error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
+        return this.validateNotInGameStages(INIT_HAND_STAGES, 'sit in/out');
+    }
+
     validateSitInAction(clientUUID: ClientUUID): ValidationResponse {
-        let error = this.ensureClientIsInGame(clientUUID);
+        let error = this.validateSitInOrOutAction(clientUUID);
         if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
@@ -247,12 +256,22 @@ export class ValidationService {
     }
 
     validateSitOutAction(clientUUID: ClientUUID): ValidationResponse {
-        const error = this.ensureClientIsInGame(clientUUID);
-        if (error) {
-            return error;
-        }
+        const error = this.validateSitInOrOutAction(clientUUID);
+        if (error) return error;
+
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         return this.ensurePlayerIsSittingIn(player.uuid);
+    }
+
+    validateNotInGameStages(stages: GameStage[], actionString?: string): ValidationResponse {
+        const stage = this.gsm.getGameStage();
+        if (stages.indexOf(stage) > -1) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Cannot perform ${actionString || 'action'} during gamestage ${stage}`,
+            };
+        }
+        return undefined;
     }
 
     validateStartGameRequest(clientUUID: ClientUUID): ValidationResponse {
@@ -487,11 +506,14 @@ export class ValidationService {
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
 
-        return undefined;
+        return this.validateNotInGameStages(INIT_HAND_STAGES, 'quit game');
     }
 
     validateLeaveTableRequest(clientUUID: ClientUUID): ValidationResponse {
         let error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'leave table');
         if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
