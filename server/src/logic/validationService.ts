@@ -21,6 +21,7 @@ import { errorMonitor } from 'events';
 import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 
 const MAX_NAME_LENGTH = 32;
+const INIT_HAND_STAGES = [GameStage.SHOW_START_OF_HAND, GameStage.SHOW_START_OF_BETTING_ROUND];
 
 /*
     TODO: Redesign error message construction
@@ -234,7 +235,7 @@ export class ValidationService {
         if (error) return error;
 
         return this.validateNotInGameStages(
-            [GameStage.SHOW_START_OF_HAND, GameStage.SHOW_START_OF_BETTING_ROUND],
+            INIT_HAND_STAGES,
             'sit in/out',
         );
     }
@@ -508,12 +509,15 @@ export class ValidationService {
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
 
-        return undefined;
+        return this.validateNotInGameStages(INIT_HAND_STAGES, 'quit game');
     }
 
     validateLeaveTableRequest(clientUUID: ClientUUID): ValidationResponse {
         let error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'leave table');
+        if (error) return error; 
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         error = this.ensurePlayerIsAtTable(player.uuid);
