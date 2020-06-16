@@ -9,6 +9,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 
 import Home from './Home';
 import Ledger from '../ledger/Ledger';
+import ErrorBoundary from './ErrorBoundry';
 
 const USER_PREFS_LOCAL_STORAGE_KEY = 'jp-user-prefs';
 
@@ -52,18 +53,20 @@ function App() {
     }
 
     return (
-        <ThemeSetter.Provider value={{ curfPrefs: pref, themeSetter: setNewTheme }}>
-            <ThemeProvider theme={createMuiTheme(theme)}>
-                <Router>
-                    <Switch>
-                        <Route exact path="/game/test" render={(props) => <GameContainer useTestGame />} />
-                        <Route path="/game" component={GameContainer} />
-                        <Route path="/ledger" component={Ledger} />
-                        <Route path="/" component={Home} />
-                    </Switch>
-                </Router>
-            </ThemeProvider>
-        </ThemeSetter.Provider>
+        <ErrorBoundary>
+            <ThemeSetter.Provider value={{ curfPrefs: pref, themeSetter: setNewTheme }}>
+                <ThemeProvider theme={createMuiTheme(theme)}>
+                    <Router>
+                        <Switch>
+                            <Route exact path="/game/test" render={(props) => <GameContainer useTestGame />} />
+                            <Route path="/game" component={GameContainer} />
+                            <Route path="/ledger" component={Ledger} />
+                            <Route path="/" component={Home} />
+                        </Switch>
+                    </Router>
+                </ThemeProvider>
+            </ThemeSetter.Provider>
+        </ErrorBoundary>
     );
 }
 

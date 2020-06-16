@@ -15,3 +15,8 @@ export const getLedger = (gameInstanceUUID, onSuccess, onError) => {
     const url = `/api/ledger?gameInstanceUUID=${gameInstanceUUID}`;
     return api.get(url).then(onSuccess).catch(onError);
 };
+
+export const reportFrontEndError = (data, onSuccess, onError) => {
+    const url = `/api/error`;
+    return api.post(url, data).then(onSuccess).catch(onError);
+};

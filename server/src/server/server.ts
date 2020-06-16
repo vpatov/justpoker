@@ -63,6 +63,10 @@ class Server {
             res.send({ gameCount: instanceUUIDs.length, activeWS: WScount, gameInstances: instanceUUIDs });
         });
 
+        router.post('/api/error', (req, res) => {
+            logger.error('Front-end reported error: ', req.body);
+        });
+
         router.post('/api/createGame', (req, res) => {
             const gameParameters: GameParameters = req.body.gameParameters;
             const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
