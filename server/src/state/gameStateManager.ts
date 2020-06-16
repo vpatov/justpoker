@@ -970,10 +970,19 @@ export class GameStateManager {
     }
 
     playerLeaveTable(playerUUID: PlayerUUID) {
-        const player = this.getPlayer(playerUUID);
-        player.isAtTable = false;
-        player.sittingOut = false;
-        player.seatNumber = -1;
+        if (this.isPlayerInHand(playerUUID)) {
+            this.queueAction({
+                actionType: ClientActionType.LEAVETABLE,
+                args: [playerUUID],
+            });
+            this.getPlayer(playerUUID).leaving = true;
+        } else {
+            const player = this.getPlayer(playerUUID);
+            player.isAtTable = false;
+            player.sittingOut = false;
+            player.seatNumber = -1;
+            this.getPlayer(playerUUID).leaving = false;
+        }
     }
 
     sitOutPlayer(playerUUID: PlayerUUID) {
