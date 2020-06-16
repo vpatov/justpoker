@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
     const classes = useStyles();
     const { className, player, style, setHeroRotation, virtualPositon } = props;
-    const { stack, hand, name, playerTimer, folded, uuid, sittingOut, hero, quitting, disconnected } = player;
+    const { stack, hand, name, playerTimer, folded, uuid, sittingOut, hero, quitting, leaving, disconnected } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -73,6 +73,9 @@ function Player(props) {
         }
         if (quitting) {
             return <Typography className={classes.labelText}>Quitting</Typography>;
+        }
+        if (leaving) {
+            return <Typography className={classes.labelText}>Leaving</Typography>;
         }
         if (sittingOut) {
             return <Typography className={classes.labelText}>Sitting Out</Typography>;

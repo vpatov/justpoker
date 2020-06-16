@@ -275,6 +275,11 @@ export class StateGraphManager {
                 this.gameStateManager.setGameParameters(gameParameters);
                 break;
             }
+            case ClientActionType.LEAVETABLE: {
+                const playerUUID = action.args[0];
+                this.gameStateManager.playerLeaveTable(playerUUID);
+                break;
+            }
         }
     }
 

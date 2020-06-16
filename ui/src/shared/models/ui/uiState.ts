@@ -150,6 +150,7 @@ export declare interface UiPlayer {
     hero?: boolean;
     sittingOut?: boolean;
     quitting?: boolean;
+    leaving?: boolean;
     folded?: boolean;
     toAct?: boolean;
     disconnected?: boolean;

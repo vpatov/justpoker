@@ -28,8 +28,11 @@ export declare interface Player {
     /** Player is at the table but not being dealt in. */
     sittingOut: boolean;
 
-    /** Player will leave table after hand. */
+    /** Player will quit game after hand. */
     quitting: boolean;
+
+    /** Player will leave table after hand. */
+    leaving: boolean;
 
     /** Whether player's ws is closed. */
     disconnected: boolean;
@@ -78,6 +81,7 @@ export function getCleanPlayer(): Player {
         isAtTable: false,
         sittingOut: false,
         quitting: false,
+        leaving: false,
         disconnected: false,
         willPostBlind: false,
         willStraddle: false,
