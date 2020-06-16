@@ -83,7 +83,9 @@ export declare interface JoinTableRequest {
     seatNumber: number;
 }
 
-export declare type SeatChangeRequest = JoinTableRequest;
+export declare interface SeatChangeRequest {
+    seatNumber: number;
+}
 
 export declare interface JoinGameRequest {
     name: string;

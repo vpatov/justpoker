@@ -246,11 +246,10 @@ export class GamePlayService {
     initializeDealerButton() {
         const seats = this.gsm.getSeats();
         const [_, seatZeroPlayerUUID] = seats[0];
-        const dealerUUID = this.gsm.getDealerUUID()
-            ? this.gsm.getNextPlayerReadyToPlayUUID(this.gsm.getDealerUUID())
-            : seatZeroPlayerUUID;
+        const dealerUUID = this.gsm.getDealerUUID();
+        const newDealerUUID = dealerUUID ? this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID) : seatZeroPlayerUUID;
 
-        this.gsm.setDealerUUID(dealerUUID);
+        this.gsm.setDealerUUID(newDealerUUID);
     }
 
     initializeNewHand() {

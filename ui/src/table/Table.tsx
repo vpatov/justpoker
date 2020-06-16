@@ -163,6 +163,7 @@ function Table(props) {
                     <EmptySeat
                         key={index}
                         className={classes.openSeat}
+                        seatNumber={index}
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
                             left: `${pPos.x}${W_UNIT}`,

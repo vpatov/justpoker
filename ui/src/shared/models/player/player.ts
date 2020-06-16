@@ -71,6 +71,31 @@ export declare interface Player {
     avatarKey: AvatarKeys;
 }
 
+/* Represents the partial of Player that is cleared after every hand. */
+export function getPlayerCleanHandDefaults(): Partial<Player> {
+    return {
+        lastActionType: BettingRoundActionType.NOT_IN_HAND,
+        holeCards: [],
+        bestHand: null,
+        winner: false,
+        betAmount: 0,
+        chipDelta: 0,
+        chipsAtStartOfHand: 0,
+    };
+}
+
+export function getPlayerCleanTableDefaults(): Partial<Player> {
+    return {
+        ...getPlayerCleanHandDefaults(),
+        seatNumber: -1,
+        willStraddle: false,
+        leaving: false,
+        isAtTable: false,
+        quitting: false,
+        sittingOut: false,
+    };
+}
+
 export function getCleanPlayer(): Player {
     return {
         uuid: makeBlankUUID(),

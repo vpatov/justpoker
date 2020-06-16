@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import { WsServer } from '../api/ws';
 
 const size = 5;
 
@@ -45,14 +46,14 @@ const useStyles = makeStyles((theme) => ({
 
 function EmptySeat(props) {
     const classes = useStyles();
-    const { className, style, setHeroRotation, virtualPositon } = props;
+    const { className, style, setHeroRotation, virtualPositon, seatNumber } = props;
 
     function handleRotationButtonClick() {
         setHeroRotation(virtualPositon);
     }
 
     function handleSeatChangeClick() {
-        // TODO implementing
+        WsServer.sendSeatChangeMessage(seatNumber);
     }
 
     return (

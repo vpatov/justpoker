@@ -11,7 +11,12 @@ import {
     Pot,
 } from '../../../ui/src/shared/models/game/betting';
 import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
-import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player/player';
+import {
+    Player,
+    getCleanPlayer,
+    getPlayerCleanHandDefaults,
+    getPlayerCleanTableDefaults,
+} from '../../../ui/src/shared/models/player/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api/api';
@@ -982,11 +987,7 @@ export class GameStateManager {
             });
             this.getPlayer(playerUUID).leaving = true;
         } else {
-            const player = this.getPlayer(playerUUID);
-            player.isAtTable = false;
-            player.sittingOut = false;
-            player.seatNumber = -1;
-            this.getPlayer(playerUUID).leaving = false;
+            this.updatePlayer(playerUUID, getPlayerCleanTableDefaults());
         }
     }
 
@@ -1174,17 +1175,7 @@ export class GameStateManager {
     }
 
     clearStateOfHandInfo() {
-        this.updatePlayers((_) => ({
-            lastActionType: BettingRoundActionType.NOT_IN_HAND,
-            holeCards: [],
-            handDescription: '',
-            bestHand: null,
-            winner: false,
-            betAmount: 0,
-            timeBanksUsedThisAction: 0,
-            chipDelta: 0,
-            chipsAtStartOfHand: 0,
-        }));
+        this.updatePlayers((_) => getPlayerCleanHandDefaults());
 
         // TODO make gameState partial that represents a clean pre-hand state.
         this.updateGameState({
