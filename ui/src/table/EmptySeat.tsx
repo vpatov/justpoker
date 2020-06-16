@@ -32,6 +32,9 @@ const useStyles = makeStyles((theme) => ({
     topButtonText: {
         marginTop: '1vmin'
     },
+    bottomButtonText: {
+        marginBottom: '1vmin',
+    },
     text: {
         fontSize: '1.2vmin',
     },
@@ -58,10 +61,9 @@ function EmptySeat(props) {
                     <Typography className={classnames(classes.text,classes.topButtonText)}>Rotate Here</Typography>
                 </IconButton>
                 <IconButton className={classnames(classes.button)} onClick={handleSeatChangeClick}>
-                    <Typography className={classes.text}>Sit Here</Typography>
+                    <Typography className={classnames(classes.text,classes.bottomButtonText)}>Sit Here</Typography>
                 </IconButton>
             </div>
-            
         </div>
     );
 }

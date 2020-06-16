@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         top: 0,
         left: 0,
-        transform: 'translateY(-50%) translateX(-50%)',
+        transform: 'translateY(-20%) translateX(-50%)',
     },
     player: {
         position: 'absolute',
