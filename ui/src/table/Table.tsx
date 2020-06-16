@@ -111,7 +111,7 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator } = useSelector(
+    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator, isHeroInHand } = useSelector(
         globalGameStateSelector,
     );
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
@@ -171,6 +171,7 @@ function Table(props) {
                         setHeroRotation={(r) => {
                             setHeroRotation(r);
                         }}
+                        isHeroInHand={isHeroInHand}
                         virtualPositon={mod(index + offset - 1, 9)}
                     />,
                 );

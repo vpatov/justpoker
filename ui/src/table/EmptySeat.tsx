@@ -44,9 +44,11 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+
 function EmptySeat(props) {
     const classes = useStyles();
-    const { className, style, setHeroRotation, virtualPositon, seatNumber } = props;
+    const { className, style, setHeroRotation, virtualPositon, seatNumber, isHeroInHand } = props;
 
     function handleRotationButtonClick() {
         setHeroRotation(virtualPositon);
@@ -56,15 +58,36 @@ function EmptySeat(props) {
         WsServer.sendSeatChangeMessage(seatNumber);
     }
 
+    function renderRotateButton(semicircle: boolean){
+        return (
+            <IconButton
+                className={classnames(classes.button)}
+                onClick={handleRotationButtonClick}
+                style={semicircle ? {} : {height: `${size*2}vmin`}}
+            >
+                <Typography className={classnames(classes.text, semicircle ? classes.topButtonText : null)}>
+                    Rotate Here
+                </Typography>
+            </IconButton>
+        );
+    }
+
+
+    function renderSeatChangeButton(){
+        return (
+            <IconButton className={classnames(classes.button)} onClick={handleSeatChangeClick}>
+                <Typography className={classnames(classes.text, classes.bottomButtonText)}>
+                    Sit Here
+                </Typography>
+            </IconButton>
+        );
+    }
+
     return (
         <div className={classnames(classes.hoverZone, className)} style={style}>
             <div className={classes.container}>
-                <IconButton className={classnames(classes.button)} onClick={handleRotationButtonClick}>
-                    <Typography className={classnames(classes.text, classes.topButtonText)}>Rotate Here</Typography>
-                </IconButton>
-                <IconButton className={classnames(classes.button)} onClick={handleSeatChangeClick}>
-                    <Typography className={classnames(classes.text, classes.bottomButtonText)}>Sit Here</Typography>
-                </IconButton>
+                {isHeroInHand ? renderRotateButton(false) : renderRotateButton(true)}
+                {isHeroInHand ? null : renderSeatChangeButton()}
             </div>
         </div>
     );

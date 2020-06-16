@@ -57,6 +57,7 @@ export declare interface UiGameState {
 
 export declare interface Global {
     heroIsAdmin: boolean;
+    isHeroInHand: boolean;
     isGameInProgress: boolean;
     canStartGame: boolean;
     gameWillStopAfterHand: boolean;
@@ -314,6 +315,7 @@ export function getCleanController(): Controller {
 export function getCleanGlobal(): Global {
     return {
         heroTotalChips: 0,
+        isHeroInHand: false,
         heroIsAdmin: false,
         isGameInProgress: false,
         canStartGame: false,
@@ -426,6 +428,7 @@ export const TestGame: UiGameState = {
     ],
     global: {
         heroIsAdmin: true,
+        isHeroInHand: true,
         isGameInProgress: true,
         canStartGame: false,
         gameWillStopAfterHand: true,
