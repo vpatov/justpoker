@@ -87,6 +87,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         top: 0,
         left: 0,
+        transition: 'top 0.4s, left 0.4s',
     },
 
     startGame: {
