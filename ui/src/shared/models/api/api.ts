@@ -50,6 +50,7 @@ export enum ClientActionType {
     JOINGAMEANDJOINTABLE = 'JOINGAMEANDJOINTABLE',
     PINGSTATE = 'PINGSTATE',
     CHAT = 'CHAT',
+    SEATCHANGE = 'SEATCHANGE',
     SETCHIPS = 'SETCHIPS',
     BETACTION = 'BETACTION',
     SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
@@ -81,6 +82,8 @@ export declare interface JoinTableRequest {
     playerUUID: PlayerUUID;
     seatNumber: number;
 }
+
+export declare type SeatChangeRequest = JoinTableRequest;
 
 export declare interface JoinGameRequest {
     name: string;

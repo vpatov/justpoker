@@ -969,6 +969,11 @@ export class GameStateManager {
         player.seatNumber = seatNumber;
     }
 
+    changeSeats(playerUUID: PlayerUUID, seatNumber: number) {
+        const player = this.getPlayer(playerUUID);
+        player.seatNumber = seatNumber;
+    }
+
     playerLeaveTable(playerUUID: PlayerUUID) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({

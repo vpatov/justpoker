@@ -80,7 +80,14 @@ export class EventProcessorService {
             },
             updates: [ServerStateKey.GAMESTATE],
         },
-
+        [ClientActionType.SEATCHANGE]: {
+            validation: (uuid, req) => this.validationService.validateSeatChangeRequest(uuid, req),
+            perform: (uuid, req) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                this.gameStateManager.changeSeats(player.uuid, req.seatNumber);
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
         [ClientActionType.JOINGAME]: {
             validation: (uuid, req) => this.validationService.validateJoinGameRequest(uuid, req),
             perform: (uuid, req) => {
