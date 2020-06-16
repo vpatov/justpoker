@@ -46,9 +46,9 @@ function EmptySeat(props) {
     function handleRotationButtonClick() {
         setHeroRotation(virtualPositon);
     };
-    
+
     function handleSeatChangeClick() {
-        
+        // TODO implementing 
     }
 
     return (
