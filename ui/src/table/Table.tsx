@@ -15,6 +15,7 @@ import { WsServer } from '../api/ws';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { Typography, Zoom } from '@material-ui/core';
+import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 
 const W_UNIT = 'vmin';
 const H_UNIT = 'vmin';
@@ -221,7 +222,7 @@ function Table(props) {
             <div className={classnames(classes.table, 'ani_table')}>
                 {canStartGame ? (
                     <Button
-                        id={'ID_StartGameButton'}
+                        id={SELENIUM_TAGS.IDS.START_GAME_BUTTON}
                         className={classes.startGame}
                         color="primary"
                         variant="contained"

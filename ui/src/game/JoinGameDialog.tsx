@@ -12,6 +12,7 @@ import { selectGameParameters, globalGameStateSelector } from '../store/selector
 import { AvatarKeys, getRandomAvatarKey } from '../shared/models/ui/assets';
 import Avatar from '../reuseable/Avatar';
 import { useStickyState } from '../utils';
+import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 
 const useStyles = makeStyles((theme) => ({
     nameRow: {
@@ -124,7 +125,7 @@ function JoinGameDialog(props) {
 
                     <TextFieldWrap
                         className={classes.nameField}
-                        id="ID_NameField"
+                        id={SELENIUM_TAGS.IDS.NAME_FIELD}
                         label="Name"
                         type="text"
                         fullWidth
@@ -154,10 +155,15 @@ function JoinGameDialog(props) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button id="ID_SitDownButton" disabled={formInvalid()} onClick={onJoin}>
+                <Button disabled={formInvalid()} onClick={onJoin}>
                     Join
                 </Button>
-                <Button id="ID_SitDownButton" disabled={formInvalid()} onClick={onJoinAndSit} color="primary">
+                <Button
+                    id={SELENIUM_TAGS.IDS.JOIN_AND_SIT_BUTTON}
+                    disabled={formInvalid()}
+                    onClick={onJoinAndSit}
+                    color="primary"
+                >
                     Join and Sit
                 </Button>
             </DialogActions>

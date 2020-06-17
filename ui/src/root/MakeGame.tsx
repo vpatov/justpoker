@@ -13,6 +13,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { GameType, getDefaultGameParameters, GameParameters } from '../shared/models/game/game';
 import GameParamatersDialog from '../game/GameParamatersDialog';
+import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -149,7 +150,7 @@ function MakeGame(props) {
                     Advanced Settings
                 </Button>
                 <Button
-                    id={'ID_CreateGameButton'}
+                    id={SELENIUM_TAGS.IDS.CREATE_GAME_BUTTON}
                     className={classes.button}
                     variant="contained"
                     color="primary"
