@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import classnames from 'classnames';
 import Bet from './Bet';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
@@ -22,7 +22,6 @@ function PotAward(props) {
         animateAwardPot(winnerUUID, potId);
     }, []);
 
-    console.log(' ap');
     return <Bet className={classnames(classes.root)} amount={value} id={potId} />;
 }
 
