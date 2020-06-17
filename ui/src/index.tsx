@@ -13,7 +13,7 @@ import './fonts/Futura.ttf';
 import './fonts/FuturaBold.ttf';
 import './fonts/FuturaItalic.ttf';
 
-const store = createStore(rootReducer);
+export const store = createStore(rootReducer);
 
 ReactDOM.render(
     <Provider store={store}>

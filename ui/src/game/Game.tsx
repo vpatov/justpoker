@@ -49,6 +49,7 @@ function Game(props) {
     const [mute, SET_mute] = useStickyState(false, MUTE_LOCAL_STORAGE_KEY);
     const classes = useStyles();
     const { wsConnClosed } = props;
+
     return (
         <>
             <GameKeepAliveListener />
