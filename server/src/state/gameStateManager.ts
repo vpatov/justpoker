@@ -328,14 +328,8 @@ export class GameStateManager {
 
     playerBuyinSetChips(playerUUID: PlayerUUID, setChips: number) {
         const chipDifference = setChips - this.getPlayerChips(playerUUID);
-        if (chipDifference > 0) {
-            this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
-        } else {
-            logger.warn(
-                `gameStateManager.playerBuyinSetChips has been called with a chip amount that is less than the player's 
-                current stack. This is either a bug, or being used for development`,
-            );
-        }
+
+        this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
 
         this.setPlayerChips(playerUUID, setChips);
     }
