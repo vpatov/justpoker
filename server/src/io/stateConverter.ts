@@ -286,11 +286,6 @@ export class StateConverter {
 
         const menuButtons = [USER_SETTINGS_BUTTON, GAME_SETTINGS_BUTTON, VOLUME_BUTTON]; // currently these are always visible
 
-        // only if player, not for spectator
-        if (heroPlayer) {
-            menuButtons.push(BUY_CHIPS_BUTTON, LEDGER_BUTTON);
-        }
-
         if (this.gameStateManager.isClientAdmin(clientUUID)) {
             if (
                 (heroPlayer && this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid)) ||
@@ -302,14 +297,23 @@ export class StateConverter {
             }
         }
 
-        // if player is in game they can leave
-        // TODO how to communicate to people that this is how they "stand up"
-        if (heroPlayer && !heroPlayer.leaving && !heroPlayer.quitting && heroPlayer.isAtTable) {
-            menuButtons.push(LEAVE_TABLE_BUTTON);
-        }
+        // only if hero is player, not for spectator
+        if (heroPlayer) {
+            menuButtons.push(LEDGER_BUTTON);
 
-        if (heroPlayer && !heroPlayer.quitting) {
-            menuButtons.push(QUIT_GAME_BUTTON);
+            // dont allow player to queue multiple buys
+            if (!heroPlayer.willAddChips) {
+                menuButtons.push(BUY_CHIPS_BUTTON);
+            }
+
+            // TODO how to communicate to people that this is how they "stand up"
+            if (!heroPlayer.leaving && !heroPlayer.quitting && heroPlayer.isAtTable) {
+                menuButtons.push(LEAVE_TABLE_BUTTON);
+            }
+
+            if (!heroPlayer.quitting) {
+                menuButtons.push(QUIT_GAME_BUTTON);
+            }
         }
 
         return menuButtons;
