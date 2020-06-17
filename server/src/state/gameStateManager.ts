@@ -1237,8 +1237,10 @@ export class GameStateManager {
         return this.filterPlayerUUIDs((playerUUID) => this.isPlayerAllIn(playerUUID));
     }
 
-    isAllInRunOut() {
+    isAllInRunOut(): boolean {
         const playersAllIn = this.getPlayersAllIn();
+        if (playersAllIn.length === 0) return false;
+
         const playersInHand = this.getPlayersInHand();
         return playersAllIn.length >= playersInHand.length - 1;
     }
