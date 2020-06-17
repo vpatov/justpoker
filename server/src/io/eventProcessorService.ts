@@ -146,7 +146,15 @@ export class EventProcessorService {
             validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
             perform: (uuid, request) => {
                 const player = this.gameStateManager.getPlayer(request.playerUUID);
-                this.gameStateManager.playerBuyinSetChips(player.uuid, Number(request.chipAmount));
+                this.gameStateManager.playerSetChips(player.uuid, Number(request.chipAmount));
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.BUYCHIPS]: {
+            validation: (uuid, req) => this.validationService.ensureClientIsInGame(uuid),
+            perform: (uuid, request) => {
+                const player = this.gameStateManager.getPlayer(request.playerUUID);
+                this.gameStateManager.playerBuyChips(player.uuid, Number(request.chipAmount));
             },
             updates: [ServerStateKey.GAMESTATE],
         },

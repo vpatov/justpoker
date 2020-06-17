@@ -132,7 +132,7 @@ function GameMenu(props) {
                 break;
             case ClientActionType.QUITGAME:
                 sendServerAction(ClientActionType.QUITGAME);
-            case ClientActionType.SETCHIPS:
+            case UiActionType.OPEN_ADD_CHIPS:
                 SET_buyChipsDialog(true);
             default:
                 break;
@@ -152,7 +152,7 @@ function GameMenu(props) {
             [ClientActionType.QUITGAME]: <QuitIcon className={iconClass} />,
             [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,
             [ClientActionType.STARTGAME]: <StartIcon className={iconClass} />,
-            [ClientActionType.SETCHIPS]: <MonetizationOnIcon className={iconClass} />,
+            [UiActionType.OPEN_ADD_CHIPS]: <MonetizationOnIcon className={iconClass} />,
         };
         return ACTION_TO_ICON[action];
     }
@@ -209,11 +209,13 @@ function GameMenu(props) {
                 onSave={onGameParamatersDialogSave}
                 disabled={!isHeroAdmin}
             />
-            <BuyChipsDialog
-                open={buyChipsDialog}
-                handleBuy={() => SET_buyChipsDialog(false)}
-                handleCancel={() => SET_buyChipsDialog(false)}
-            />
+            {buyChipsDialog ? (
+                <BuyChipsDialog
+                    open={buyChipsDialog}
+                    handleBuy={() => SET_buyChipsDialog(false)}
+                    handleCancel={() => SET_buyChipsDialog(false)}
+                />
+            ) : null}
         </>
     );
 }

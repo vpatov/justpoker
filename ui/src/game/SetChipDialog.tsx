@@ -28,10 +28,14 @@ const useStyles = makeStyles((theme: Theme) =>
             marginTop: 24,
             marginBottom: 24,
         },
+        warning: {
+            marginTop: 12,
+            fontSize: 12,
+        },
     }),
 );
 
-function AddChipDialog(props) {
+function SetChipDialog(props) {
     const classes = useStyles();
     const { open, handleClose, name, stack, uuid } = props;
     const [chipAmt, setChipAmt] = useState(0);
@@ -45,13 +49,7 @@ function AddChipDialog(props) {
     };
 
     function onSubmit() {
-        WsServer.send({
-            actionType: ClientActionType.SETCHIPS,
-            request: {
-                chipAmount: resultingChips,
-                playerUUID: uuid,
-            } as ClientWsMessageRequest,
-        });
+        WsServer.sendSetChipsMessage(uuid, resultingChips);
         handleClose();
     }
 
@@ -99,9 +97,15 @@ function AddChipDialog(props) {
                     max={getMax()}
                     type="number"
                     variant="standard"
+                    autoFocus
                 />
                 <Typography>{`Current Chips: ${stack.toLocaleString()}`}</Typography>
                 <Typography>{`Resulting Chips: ${resultingChips.toLocaleString()}`}</Typography>
+                <Typography className={classes.warning}>
+                    {
+                        'Warning: this action will take effect immediately and may impact the gameplay of the current hand. The change will be recorded in the ledger.'
+                    }
+                </Typography>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
@@ -113,4 +117,4 @@ function AddChipDialog(props) {
     );
 }
 
-export default AddChipDialog;
+export default SetChipDialog;

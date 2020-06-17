@@ -25,6 +25,7 @@ import {
     ShowCardButton,
     LEAVE_TABLE_BUTTON,
     QUIT_GAME_BUTTON,
+    BUY_CHIPS_BUTTON,
 } from '../../../ui/src/shared/models/ui/uiState';
 import { GameType } from '../../../ui/src/shared/models/game/game';
 import { GameStateManager } from '../state/gameStateManager';
@@ -146,7 +147,6 @@ export class StateConverter {
 
     getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const clientPlayerIsSeated = heroPlayer?.isAtTable;
         const gameStage = this.gameStateManager.getGameStage();
 
         const global: Global = {
@@ -166,6 +166,8 @@ export class StateConverter {
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
             heroTotalChips: heroPlayer?.chips,
+            willAddChips: heroPlayer?.willAddChips,
+            isHeroInHand: this.gameStateManager.isPlayerInHand(heroPlayer?.uuid),
         };
 
         return global;
@@ -282,7 +284,12 @@ export class StateConverter {
     getValidMenuButtons(clientUUID: ClientUUID): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        const menuButtons = [USER_SETTINGS_BUTTON, GAME_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
+        const menuButtons = [USER_SETTINGS_BUTTON, GAME_SETTINGS_BUTTON, VOLUME_BUTTON]; // currently these are always visible
+
+        // only if player, not for spectator
+        if (heroPlayer) {
+            menuButtons.push(BUY_CHIPS_BUTTON, LEDGER_BUTTON);
+        }
 
         if (this.gameStateManager.isClientAdmin(clientUUID)) {
             if (

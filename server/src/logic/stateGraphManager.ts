@@ -280,6 +280,12 @@ export class StateGraphManager {
                 this.gameStateManager.playerLeaveTable(playerUUID);
                 break;
             }
+            case ClientActionType.BUYCHIPS: {
+                const playerUUID = action.args[0];
+                const chipAmt = action.args[1];
+                this.gameStateManager.playerBuyChips(playerUUID, chipAmt);
+                break;
+            }
         }
     }
 

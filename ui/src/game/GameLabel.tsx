@@ -56,17 +56,18 @@ function GameLabel(props) {
 
     return (
         <div className={classes.root}>
+            {willAddChips ? (
+                <Typography
+                    className={classes.pause}
+                >{`Up to ${willAddChips.toLocaleString()} chips will be added to your total after this hand.`}</Typography>
+            ) : null}
             {gameParametersWillChangeAfterHand ? (
                 <Typography className={classes.pause}>{`Game settings will change after this hand.`}</Typography>
             ) : null}
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
-            {willAddChips ? (
-                <Typography
-                    className={classes.pause}
-                >{`${willAddChips} chips will be added from your total after this hand.`}</Typography>
-            ) : null}
+
             <Typography className={classes.gameText}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
             {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
             {numberOfSpectators > 0 ? (

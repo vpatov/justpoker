@@ -326,18 +326,28 @@ export class GameStateManager {
         return callAmount;
     }
 
-    playerBuyinSetChips(playerUUID: PlayerUUID, setChips: number) {
-        const chipDifference = setChips - this.getPlayerChips(playerUUID);
-        if (chipDifference > 0) {
-            this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
+    playerBuyChips(playerUUID: PlayerUUID, numChips: number) {
+        if (this.isPlayerInHand(playerUUID)) {
+            this.queueAction({
+                actionType: ClientActionType.BUYCHIPS,
+                args: [playerUUID, numChips],
+            });
+            this.setPlayerWillAddChips(playerUUID, numChips);
         } else {
-            logger.warn(
-                `gameStateManager.playerBuyinSetChips has been called with a chip amount that is less than the player's 
-                current stack. This is either a bug, or being used for development`,
-            );
+            const maxBuyin = this.getMaxBuyin();
+            const currentStack = this.getPlayerChips(playerUUID);
+            const resultingChips = currentStack + numChips > maxBuyin ? currentStack : currentStack + numChips;
+            const amountAdded = resultingChips - currentStack;
+            this.setPlayerChips(playerUUID, resultingChips);
+            this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), amountAdded);
+            this.setPlayerWillAddChips(playerUUID, 0);
         }
+    }
 
-        this.setPlayerChips(playerUUID, setChips);
+    playerSetChips(playerUUID: PlayerUUID, chipAmt: number) {
+        const chipDifference = chipAmt - this.getPlayerChips(playerUUID);
+        this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
+        this.setPlayerChips(playerUUID, chipAmt);
     }
 
     subtractBetAmountFromChips(playerUUID: PlayerUUID) {
@@ -355,6 +365,10 @@ export class GameStateManager {
 
     setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean) {
         this.getPlayer(playerUUID).quitting = quitting;
+    }
+
+    setPlayerWillAddChips(playerUUID: PlayerUUID, numChips: number) {
+        this.getPlayer(playerUUID).willAddChips = numChips;
     }
 
     getPlayerName(playerUUID: PlayerUUID) {

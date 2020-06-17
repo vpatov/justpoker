@@ -50,6 +50,7 @@ export enum ClientActionType {
     JOINGAMEANDJOINTABLE = 'JOINGAMEANDJOINTABLE',
     PINGSTATE = 'PINGSTATE',
     CHAT = 'CHAT',
+    BUYCHIPS = 'BUYCHIPS',
     SETCHIPS = 'SETCHIPS',
     BETACTION = 'BETACTION',
     SETPLAYERSTRADDLE = 'SETPLAYERSTRADDLE',
@@ -75,6 +76,7 @@ export enum UiActionType {
     GAME_SETTINGS = 'GAME_SETTINGS',
     USER_SETTINGS = 'USER_SETTINGS',
     OPEN_LEDGER = 'OPEN_LEDGER',
+    OPEN_ADD_CHIPS = 'OPEN_ADD_CHIPS',
 }
 
 export declare interface JoinTableRequest {
@@ -90,10 +92,13 @@ export declare interface JoinGameRequest {
 
 export declare type JoinGameAndTableRequest = JoinTableRequest & JoinGameRequest;
 
-export declare interface AddChipsRequest {
+// for players, queuing
+export declare interface BuyChipsRequest {
     chipAmount: number;
+    playerUUID: PlayerUUID;
 }
 
+// for admins, non-queuing
 export declare interface SetChipsRequest {
     chipAmount: number;
     playerUUID: PlayerUUID;
@@ -137,7 +142,7 @@ export type ClientWsMessageRequest = JoinTableRequest &
     JoinGameRequest &
     JoinTableRequest &
     BettingRoundAction &
-    AddChipsRequest &
+    BuyChipsRequest &
     SetChipsRequest &
     ClientStraddleRequest &
     ClientChatMessage &

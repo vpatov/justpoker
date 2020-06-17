@@ -70,6 +70,7 @@ export declare interface Global {
     heroTotalChips: number;
     numberOfSpectators: number;
     willAddChips?: number;
+    isHeroInHand: boolean;
 }
 
 export declare interface Controller {
@@ -269,7 +270,7 @@ export const LEDGER_BUTTON: MenuButton = {
 };
 
 export const BUY_CHIPS_BUTTON: MenuButton = {
-    action: ClientActionType.SETCHIPS,
+    action: UiActionType.OPEN_ADD_CHIPS,
     label: 'Buy Chips',
 };
 
@@ -333,6 +334,7 @@ export function getCleanGlobal(): Global {
         isSpectator: true,
         isHeroAtTable: false,
         numberOfSpectators: 0,
+        isHeroInHand: false,
     };
 }
 
@@ -446,6 +448,7 @@ export const TestGame: UiGameState = {
         heroTotalChips: 17,
         numberOfSpectators: 4,
         willAddChips: 1430,
+        isHeroInHand: true,
     },
     controller: {
         showWarningOnFold: true,
