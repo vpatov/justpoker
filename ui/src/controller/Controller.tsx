@@ -28,6 +28,7 @@ import BuyChipsDialog from '../game/BuyChipsDialog';
 import { BettingRoundActionButton } from '../shared/models/ui/uiState';
 import red from '@material-ui/core/colors/red';
 import Color from 'color';
+import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -340,7 +341,7 @@ function ControllerComp(props: ControllerProps) {
                                 id={
                                     button.action === BettingRoundActionType.CHECK ||
                                     button.action === BettingRoundActionType.CALL
-                                        ? `ID_CheckCallButton`
+                                        ? `${SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}`
                                         : ''
                                 }
                                 variant="outlined"

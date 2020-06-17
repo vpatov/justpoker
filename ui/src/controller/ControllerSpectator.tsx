@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import JoinGameDialog from '../game/JoinGameDialog';
+import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -35,6 +36,7 @@ function ControllerSpectator(props) {
                 variant="contained"
                 color="primary"
                 autoFocus
+                id={SELENIUM_TAGS.IDS.JOIN_GAME_BUTTON}
             >
                 Join Game
             </Button>
