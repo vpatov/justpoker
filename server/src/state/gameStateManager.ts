@@ -658,12 +658,7 @@ export class GameStateManager {
      * if the game is not currently in progress, and if there are enough players to play.
      */
     canPlayerStartGame(playerUUID: PlayerUUID) {
-        return (
-            this.isPlayerReadyToPlay(playerUUID) &&
-            this.getPlayersReadyToPlay().length >= 2 &&
-            !this.isGameInProgress() &&
-            this.isPlayerAdmin(playerUUID)
-        );
+        return this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress() && this.isPlayerAdmin(playerUUID);
     }
 
     /**
