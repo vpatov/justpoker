@@ -42,7 +42,7 @@ function BuyChipsDialog(props) {
     const { open, handleBuy, handleCancel } = props;
     const [chipAmt, SET_ChipAmt] = useState(0);
 
-    const { heroTotalChips } = useSelector(globalGameStateSelector);
+    const { heroTotalChips, isHeroInHand } = useSelector(globalGameStateSelector);
     const { minBuyin, maxBuyin } = useSelector(selectGameParameters);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
@@ -84,11 +84,13 @@ function BuyChipsDialog(props) {
                     autoFocus
                 />
                 <Typography>{`Current Chips: ${heroTotalChips?.toLocaleString()}`}</Typography>
-                <Typography className={classes.note}>
-                    If you are currently particpating in a hand, the chips will be added to your stack upon completion.
-                    If you win chips, the chips will be added up to the amount indicated, but not exceeding the maximum
-                    buyin.
-                </Typography>
+                {isHeroInHand ? (
+                    <Typography className={classes.note}>
+                        You are currently particpating in a hand. The chips will be added to your stack upon completion.
+                        If you win the hand, chips will be added up to the amount indicated, but not exceeding the
+                        maximum buyin.
+                    </Typography>
+                ) : null}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleCancel}>Cancel</Button>
