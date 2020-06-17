@@ -174,3 +174,4 @@ function getCenterOfTable() {
     return getCenterOfRef(document.getElementsByClassName('ani_table')[0]);
 }
 asdfasd;
+sdfsd;
