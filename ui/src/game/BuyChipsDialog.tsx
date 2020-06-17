@@ -82,7 +82,7 @@ function BuyChipsDialog(props) {
             <DialogActions>
                 <Button onClick={handleCancel}>Cancel</Button>
                 <Button onClick={onSubmit} color="primary" autoFocus disabled={!validBuy()}>
-                    Buyin
+                    Buy
                 </Button>
             </DialogActions>
         </Dialog>

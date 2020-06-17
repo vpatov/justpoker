@@ -69,6 +69,7 @@ export declare interface Global {
     isHeroAtTable: boolean;
     heroTotalChips: number;
     numberOfSpectators: number;
+    willAddChips?: number;
 }
 
 export declare interface Controller {
@@ -267,6 +268,11 @@ export const LEDGER_BUTTON: MenuButton = {
     label: 'Ledger',
 };
 
+export const BUY_CHIPS_BUTTON: MenuButton = {
+    action: ClientActionType.SETCHIPS,
+    label: 'Buy Chips',
+};
+
 export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
 
 export const FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, RAISE_BUTTON];
@@ -280,6 +286,7 @@ export const ALL_MENU_BUTTONS = [
     VOLUME_BUTTON,
     USER_SETTINGS_BUTTON,
     GAME_SETTINGS_BUTTON,
+    BUY_CHIPS_BUTTON,
 ];
 
 /* Common bet sizes */
@@ -438,6 +445,7 @@ export const TestGame: UiGameState = {
         isHeroAtTable: false,
         heroTotalChips: 17,
         numberOfSpectators: 4,
+        willAddChips: 1430,
     },
     controller: {
         showWarningOnFold: true,

@@ -23,9 +23,11 @@ import VolumeOffIcon from '@material-ui/icons/VolumeMute';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 
 import GameParamatersDialog from './GameParamatersDialog';
 import { GameParameters } from '../shared/models/game/game';
+import BuyChipsDialog from './BuyChipsDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -81,6 +83,7 @@ function GameMenu(props) {
     const [settingsOpen, setSettingsOpen] = React.useState(false);
     const [gameParametersOpen, SET_gameParametersOpen] = React.useState(false);
 
+    const [buyChipsDialog, SET_buyChipsDialog] = React.useState(false);
     const handleSettingsOpen = () => {
         setSettingsOpen(true);
     };
@@ -129,6 +132,8 @@ function GameMenu(props) {
                 break;
             case ClientActionType.QUITGAME:
                 sendServerAction(ClientActionType.QUITGAME);
+            case ClientActionType.SETCHIPS:
+                SET_buyChipsDialog(true);
             default:
                 break;
         }
@@ -147,6 +152,7 @@ function GameMenu(props) {
             [ClientActionType.QUITGAME]: <QuitIcon className={iconClass} />,
             [ClientActionType.STOPGAME]: <StopIcon className={iconClass} />,
             [ClientActionType.STARTGAME]: <StartIcon className={iconClass} />,
+            [ClientActionType.SETCHIPS]: <MonetizationOnIcon className={iconClass} />,
         };
         return ACTION_TO_ICON[action];
     }
@@ -202,6 +208,11 @@ function GameMenu(props) {
                 onCancel={() => SET_gameParametersOpen(false)}
                 onSave={onGameParamatersDialogSave}
                 disabled={!isHeroAdmin}
+            />
+            <BuyChipsDialog
+                open={buyChipsDialog}
+                handleBuy={() => SET_buyChipsDialog(false)}
+                handleCancel={() => SET_buyChipsDialog(false)}
             />
         </>
     );

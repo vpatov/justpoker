@@ -50,6 +50,7 @@ function GameLabel(props) {
         adminNames,
         isSpectator,
         numberOfSpectators,
+        willAddChips,
     } = useSelector(globalGameStateSelector);
     const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
 
@@ -60,6 +61,11 @@ function GameLabel(props) {
             ) : null}
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
+            ) : null}
+            {willAddChips ? (
+                <Typography
+                    className={classes.pause}
+                >{`${willAddChips} chips will be added from your total after this hand.`}</Typography>
             ) : null}
             <Typography className={classes.gameText}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
             {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
