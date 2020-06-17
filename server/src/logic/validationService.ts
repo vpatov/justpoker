@@ -760,7 +760,7 @@ export class ValidationService {
             };
         }
 
-        let error = this.validateMinMaxValues(
+        const error = this.validateMinMaxValues(
             player.chips + req.chipAmount,
             MIN_VALUES.BUY_IN,
             this.gsm.getMaxBuyin(),

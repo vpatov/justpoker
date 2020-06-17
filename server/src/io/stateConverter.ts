@@ -167,7 +167,7 @@ export class StateConverter {
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
             heroTotalChips: heroPlayer?.chips,
             willAddChips: heroPlayer?.willAddChips,
-            isHeroInHand: this.gameStateManager.isPlayerInHand(heroPlayer?.uuid),
+            isHeroInHand: heroPlayer?.uuid ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
         };
 
         return global;

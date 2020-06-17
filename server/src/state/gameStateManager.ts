@@ -339,7 +339,7 @@ export class GameStateManager {
             const resultingChips = currentStack + numChips > maxBuyin ? currentStack : currentStack + numChips;
             const amountAdded = resultingChips - currentStack;
             this.setPlayerChips(playerUUID, resultingChips);
-            this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), amountAdded);
+            if (amountAdded > 0) this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), amountAdded);
             this.setPlayerWillAddChips(playerUUID, 0);
         }
     }
