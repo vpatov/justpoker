@@ -72,7 +72,7 @@ function BuyChipsDialog(props) {
                     label="Amount"
                     onChange={(event) => SET_ChipAmt(event.target.value)}
                     value={chipAmt}
-                    min={0}
+                    min={computeMin()}
                     max={computeMax()}
                     type="number"
                 />
