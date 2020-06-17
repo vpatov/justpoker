@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '3vmin',
     },
     isBeingShownAndHero: {
-        boxShadow: `0vmin 0px 0.4vmin 0.25vmin ${theme.palette.primary.main}`,
+        // boxShadow: `0vmin 0px 0.4vmin 0.25vmin ${theme.palette.primary.main}`,
     },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
@@ -99,7 +99,7 @@ function CardSmall(props) {
 
     useEffect(() => {
         if (!prevIsBeingShown && isBeingShown) {
-            flipCard(cardId);
+            flipCard(cardId, hero);
         }
     }, [isBeingShown, prevIsBeingShown]);
 
