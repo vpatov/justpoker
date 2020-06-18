@@ -326,7 +326,7 @@ export class GameStateManager {
         return callAmount;
     }
 
-    playerBuyChips(playerUUID: PlayerUUID, numChips: number) {
+    buyChipsPlayerAction(playerUUID: PlayerUUID, numChips: number) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
                 actionType: ClientActionType.BUYCHIPS,
@@ -344,9 +344,9 @@ export class GameStateManager {
         }
     }
 
-    playerSetChips(playerUUID: PlayerUUID, chipAmt: number) {
+    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number) {
         const chipDifference = chipAmt - this.getPlayerChips(playerUUID);
-        this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
+        if (chipDifference !== 0) this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
         this.setPlayerChips(playerUUID, chipAmt);
     }
 
