@@ -82,12 +82,13 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         top: 0,
         left: 0,
-        transform: 'translateY(-50%) translateX(-50%)',
+        transform: 'translateY(-20%) translateX(-50%)',
     },
     player: {
         position: 'absolute',
         top: 0,
         left: 0,
+        transition: 'top 0.4s, left 0.4s',
     },
 
     startGame: {
@@ -112,7 +113,7 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator } = useSelector(
+    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator, isHeroInHand } = useSelector(
         globalGameStateSelector,
     );
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
@@ -164,6 +165,7 @@ function Table(props) {
                     <EmptySeat
                         key={index}
                         className={classes.openSeat}
+                        seatNumber={index}
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
                             left: `${pPos.x}${W_UNIT}`,
@@ -171,6 +173,7 @@ function Table(props) {
                         setHeroRotation={(r) => {
                             setHeroRotation(r);
                         }}
+                        isHeroInHand={isHeroInHand}
                         virtualPositon={mod(index + offset - 1, 9)}
                     />,
                 );

@@ -13,6 +13,7 @@ import {
     JoinGameRequest,
     SetChipsRequest,
     JoinTableRequest,
+    SeatChangeRequest,
 } from '../shared/models/api/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
@@ -142,6 +143,14 @@ export class WsServer {
         const clientWsMessage: ClientWsMessage = {
             actionType: ClientActionType.JOINTABLE,
             request: ({ playerUUID, seatNumber } as JoinTableRequest) as ClientWsMessageRequest,
+        };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendSeatChangeMessage(seatNumber: number) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.SEATCHANGE,
+            request: ({ seatNumber } as SeatChangeRequest) as ClientWsMessageRequest,
         };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }

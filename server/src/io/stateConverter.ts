@@ -151,6 +151,7 @@ export class StateConverter {
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
+            isHeroInHand: heroPlayer ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
             heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
