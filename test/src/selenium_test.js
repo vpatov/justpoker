@@ -4,6 +4,7 @@ const webdriver = require('selenium-webdriver'),
     until = webdriver.until;
 
 import { SELENIUM_TAGS } from '../../ui/src/shared/models/test/seleniumTags';
+import sample from 'lodash/sample';
 
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -36,6 +37,36 @@ function spawnWindowAtLocation(url) {
     return driver;
 }
 
+async function checkCall(driver) {
+    return driver.findElement(By.id(SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON)).click();
+}
+
+async function clickRandomButton(driver, parentSelector) {
+    if (!parentSelector) parentSelector = '';
+    try {
+        // attempt to press cancel buttons if they exist
+        const elements = await driver.findElements(By.css(`button`));
+        let cancelButton = false;
+        for (let j = 0; j < elements.length; j++) {
+            const text = await elements[j].getText();
+            if (text === 'CANCEL') {
+                await elements[j].click();
+                console.log(`clicked CANCEL`);
+            }
+        }
+
+        const elements = await driver.findElements(By.css(`${parentSelector} button`));
+
+        const toClick = sample(elements);
+        const enabled = await toClick.isEnabled();
+        if (enabled) {
+            await toClick.click();
+            const text = await toClick.getText();
+            console.log(`clicked ${text}`);
+        }
+    } catch {}
+}
+
 async function checkItDown(drivers) {
     const WaitBetweenRounds = 3000 + 150 * drivers.length;
     // only do 100 checks
@@ -47,16 +78,28 @@ async function checkItDown(drivers) {
     }
 }
 
+async function clickRandomButtons(drivers, interval, parentSelector) {
+    const numClicks = 500;
+    for (let i = 1; i < numClicks; i++) {
+        for (let j = 0; j < drivers.length; j++) {
+            try {
+                await clickRandomButton(drivers[j], parentSelector).catch();
+            } catch (error) {
+                console.log('could not click');
+            }
+
+            await sleep(interval);
+        }
+        await sleep(interval);
+    }
+}
+
 async function sitDown(driver, playerName) {
     await driver.wait(until.elementLocated(By.id(SELENIUM_TAGS.IDS.JOIN_GAME_BUTTON)));
     await driver.findElement(By.id(SELENIUM_TAGS.IDS.JOIN_GAME_BUTTON)).click();
     await driver.findElement(By.id(SELENIUM_TAGS.IDS.NAME_FIELD)).sendKeys(playerName);
     await driver.findElement(By.id(SELENIUM_TAGS.IDS.JOIN_AND_SIT_BUTTON)).click();
     return driver;
-}
-
-async function checkCall(driver) {
-    return driver.findElement(By.id(SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON)).click();
 }
 
 // gameplay functions
@@ -92,6 +135,14 @@ async function playGameWithPlayers(numPlayers) {
     checkItDown([adminWindow, ...playerDrivers]);
 }
 
+async function clickButtonsWithPlayers(numPlayers) {
+    const adminWindow = await createGameSitDownAdmin();
+    const gameUrl = adminWindow.getCurrentUrl();
+    const playerDrivers = await sitDownPlayers(numPlayers, gameUrl);
+    await adminWindow.findElement(By.id(SELENIUM_TAGS.IDS.START_GAME_BUTTON)).click();
+
+    clickRandomButtons([adminWindow, ...playerDrivers], 100, `#${SELENIUM_TAGS.IDS.CONTROLLER_ROOT}`);
+}
 // main functions
 
 async function play(numTables, players) {
@@ -120,4 +171,17 @@ async function sit(numTables, players) {
     }
 }
 
-play(2, 2);
+async function click(numTables, players) {
+    const tables = [];
+    for (let i = 0; i < numTables; i++) {
+        tables.push(clickButtonsWithPlayers(players));
+    }
+    try {
+        await Promise.all(tables);
+    } catch (error) {
+        console.log('caught err', error);
+        allDrivers.forEach((d) => d.quit());
+    }
+}
+
+click(1, 4);
