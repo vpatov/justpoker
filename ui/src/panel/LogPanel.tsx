@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
         hideButtonGroup: {
             zIndex: 5,
             position: 'absolute',
-            bottom: '18%',
+            bottom: 'calc(15% + 15px)',
             right: 15,
         },
         hideButton: {

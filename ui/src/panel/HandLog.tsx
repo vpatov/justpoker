@@ -13,6 +13,8 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+
 import { BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from '../shared/models/state/handLog';
 import { PlayerPositionString } from '../shared/models/player/playerPosition';
 import Suit from '../reuseable/Suit';
@@ -22,6 +24,7 @@ import { BettingRoundActionType } from '../shared/models/game/betting';
 import { PlayerUUID } from '../shared/models/system/uuid';
 import { WsServer } from '../api/ws';
 import { cardsAreEqual, Card } from '../shared/models/game/cards';
+import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -39,10 +42,11 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
         },
         handLogControlButtonSection: {
-            display: 'flex',
+            width: '35%',
         },
         handLogIconButton: {
-            borderRadius: '25%',
+            borderRadius: '0',
+            width: '50%',
         },
         handLogBettingRoundAction: {
             display: 'flex',
@@ -53,17 +57,19 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '2.0vmin',
         },
         handNumberString: {
-            fontSize: '1.6vmin',
+            fontSize: '1.5vmin',
+            letterSpacing: '-0.05vmin',
         },
         timeHandStartedLabel: {
-            fontSize: '1.4vmin',
+            width: '100%',
+            fontSize: '1.3vmin',
         },
         handLogContents: {
             margin: '0.2vh 0.40vw',
             '& > *': {
                 marginBottom: '1.2vh',
             },
-            color: 'rgb(220,210,230)',
+            color: grey[200],
         },
         handLogContentLabel: {
             fontSize: '1.8vmin',
@@ -71,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
         handLogSectionLabel: {
             textTransform: 'uppercase',
             fontSize: '2.2vmin',
-            color: blueGrey[700],
+            color: blueGrey[500],
         },
         handLogPotWinnerLabel: {
             fontSize: '1.8vmin',
@@ -119,6 +125,8 @@ function HandLog(props: HandLogProps) {
 
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
+    const smallWidth = useMediaQuery('(max-aspect-ratio: 5/4)');
+    const smallCurrentHandText = smallWidth || `${currentHandNumber}${handLogEntries.length}`.length >= 4;
 
     useEffect(() => {
         WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
@@ -156,6 +164,9 @@ function HandLog(props: HandLogProps) {
     function getHandNumberString() {
         if (handLogEntries.length === 0) {
             return 'None';
+        }
+        if (smallCurrentHandText) {
+            return `${currentHandNumber + 1}/${handLogEntries.length}`;
         }
         return `${currentHandNumber + 1} of ${handLogEntries.length}`;
     }
@@ -196,7 +207,7 @@ function HandLog(props: HandLogProps) {
                 </div>
                 <Typography
                     className={classes.handNumberString}
-                    style={handNumberString.length >= 11 ? { fontSize: '1.3vmin' } : {}}
+                    style={smallCurrentHandText ? { fontSize: '1.2vmin' } : {}}
                 >
                     {handNumberString}
                 </Typography>
@@ -387,7 +398,6 @@ function HandLog(props: HandLogProps) {
     }
 
     function renderPotSummaries(potSummaries: PotSummary[]) {
-        const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
         return (
             <div>
                 <Typography className={classes.handLogSectionLabel}>Result</Typography>
@@ -441,7 +451,7 @@ function HandLog(props: HandLogProps) {
     function renderLogPanelDivider() {
         return !hideHandLog && !hideChatLog ? (
             <div>
-                <Divider />{' '}
+                <Divider />
             </div>
         ) : null;
     }

@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
         '&:hover $emptySeat': {
             visibility: 'visible',
         },
-        zIndex: 5,
+        zIndex: 3,
     },
     betCont: {
         position: 'absolute',
