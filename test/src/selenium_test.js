@@ -56,7 +56,6 @@ async function clickRandomButton(driver, parentSelector) {
         }
 
         const elements = await driver.findElements(By.css(`${parentSelector} button`));
-
         const toClick = sample(elements);
         const enabled = await toClick.isEnabled();
         if (enabled) {
@@ -184,4 +183,4 @@ async function click(numTables, players) {
     }
 }
 
-click(1, 4);
+click(1, 3);
