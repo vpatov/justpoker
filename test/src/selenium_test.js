@@ -86,8 +86,7 @@ async function clickRandomButtons(drivers, interval, parentSelector) {
             } catch (error) {
                 console.log('could not click');
             }
-
-            await sleep(interval);
+            // await sleep(interval);
         }
         await sleep(interval);
     }
@@ -140,7 +139,7 @@ async function clickButtonsWithPlayers(numPlayers) {
     const playerDrivers = await sitDownPlayers(numPlayers, gameUrl);
     await adminWindow.findElement(By.id(SELENIUM_TAGS.IDS.START_GAME_BUTTON)).click();
 
-    clickRandomButtons([adminWindow, ...playerDrivers], 100, `#${SELENIUM_TAGS.IDS.CONTROLLER_ROOT}`);
+    clickRandomButtons([adminWindow, ...playerDrivers], 40, `#${SELENIUM_TAGS.IDS.CONTROLLER_ROOT}`);
 }
 // main functions
 
@@ -183,4 +182,4 @@ async function click(numTables, players) {
     }
 }
 
-click(1, 3);
+click(1, 8);
