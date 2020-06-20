@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
             marginRight: '.3vmin',
             marginTop: '.3vmin',
             position: 'relative',
-            zIndex: 10,
+            zIndex: 5,
         },
     }),
 );

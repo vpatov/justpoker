@@ -29,7 +29,6 @@ import { grey } from '@material-ui/core/colors';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         handLogContainer: {
-            backgroundColor: 'rgba(12,0,12,0.1)',
             display: 'flex',
             justifyContent: 'space-between',
             flexDirection: 'column',
