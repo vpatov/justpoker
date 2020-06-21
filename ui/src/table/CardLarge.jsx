@@ -3,10 +3,12 @@ import { usePrevious } from '../utils';
 import { animateWinningCards } from '../game/AnimiationModule';
 import { generateStringFromRank, SUITS } from '../utils';
 import classnames from 'classnames';
+import Suit from '../reuseable/Suit';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Suit from '../reuseable/Suit';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,6 +42,14 @@ const useStyles = makeStyles((theme) => ({
         bottom: '5%',
         right: '5%',
     },
+
+    smallWidth: {
+        '& > *': {
+            fontSize: '4vmin',
+            width: '4vmin',
+            height: '4vmin',
+        },
+    },
     partOfWinningHand: {
         transform: 'translateY(33%)',
         ...theme.custom.WINNING_CARD,
@@ -61,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 function CardLarge(props) {
     const classes = useStyles();
     const { suit, rank, partOfWinningHand, className } = props;
+    const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
 
     // this function could be located in many different componets
     // we could also do it at a global level, maybe the animation module is peforming these diff?
@@ -77,6 +88,7 @@ function CardLarge(props) {
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
                 ['ani_notWinningCard']: !partOfWinningHand,
+                [classes.smallWidth]: smallWidth,
             })}
         >
             <Typography

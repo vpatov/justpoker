@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        transform: 'translateY(-50%) translateX(-50%)',
         filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
     },
     folded: {

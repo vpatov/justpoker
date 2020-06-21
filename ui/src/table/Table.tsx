@@ -17,17 +17,17 @@ import Button from '@material-ui/core/Button';
 import { Typography, Zoom } from '@material-ui/core';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 
-const W_UNIT = 'vmin';
-const H_UNIT = 'vmin';
+const W_UNIT = '%';
+const H_UNIT = '%';
 
-const TABLE_HEIGHT = 39;
-const TABLE_WIDTH = 71;
+const TABLE_HEIGHT = 46;
+const TABLE_WIDTH = 44;
 
-const PLAYER_HEIGHT = 60;
-const PLAYER_WIDTH = 93;
+// const PLAYER_HEIGHT = 72;
+// const PLAYER_WIDTH = 74;
 
-const BET_HEIGHT = 30;
-const BET_WIDTH = 60;
+const BET_HEIGHT = 35;
+const BET_WIDTH = 38;
 
 const HERO_DEFAULT_ROTATION = 5;
 
@@ -57,23 +57,19 @@ const useStyles = makeStyles((theme) => ({
     },
     playersCont: {
         position: 'absolute',
-        height: `${PLAYER_HEIGHT}vmin`,
-        width: `${PLAYER_WIDTH}vmin`,
+        height: `calc(calc(${TABLE_HEIGHT}${H_UNIT} + ${theme.custom.PLAYER_HEIGHT}vmin ) + 86px)`,
+        width: `calc(calc(${TABLE_WIDTH}${W_UNIT} + ${theme.custom.PLAYER_WIDTH}vmin ) + 48px)`,
         border: '6vmin solid transparent', // inscrease size for better hover radius
         '&:hover $emptySeat': {
             visibility: 'visible',
         },
         zIndex: 3,
     },
-    betCont: {
-        position: 'absolute',
-        height: `${BET_HEIGHT}vmin`,
-        width: `${BET_WIDTH}vmin`,
-    },
+
     table: {
         position: 'absolute',
-        height: `${TABLE_HEIGHT}vmin`,
-        width: `${TABLE_WIDTH}vmin`,
+        height: `${TABLE_HEIGHT}${H_UNIT}`,
+        width: `${TABLE_WIDTH}${W_UNIT}`,
         borderRadius: '30vmin',
         margin: 'auto',
         display: 'flex',
@@ -82,15 +78,20 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         ...theme.custom.TABLE,
     },
+    betCont: {
+        position: 'absolute',
+        height: `${BET_HEIGHT}${H_UNIT}`,
+        width: `${BET_WIDTH}${W_UNIT}`,
+    },
     openSeat: {
         position: 'absolute',
         top: 0,
         left: 0,
-        transform: 'translateY(-20%) translateX(-50%)',
+        // transform: 'translateY(-20%) translateX(-50%)',
     },
     hoverEmptyCont: {
-        height: `${PLAYER_HEIGHT + 12}vmin`,
-        width: `${PLAYER_WIDTH + 12}vmin`,
+        height: `${TABLE_HEIGHT + 16}${H_UNIT}`,
+        width: `${TABLE_WIDTH + 16}${W_UNIT}`,
         '&:hover $emptySeat': {
             visibility: 'visible',
         },
@@ -103,7 +104,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         top: 0,
         left: 0,
-        transform: 'translateY(-20%) translateX(-50%)',
+        // transform: 'translateY(-20%) translateX(-50%)',
     },
     player: {
         position: 'absolute',
@@ -117,11 +118,15 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '4vmin',
     },
     winningHandDescription: {
+        width: '100%',
         zIndex: 5,
-        marginTop: '27vmin',
+        position: 'absolute',
+        bottom: '15%',
+
         letterSpacing: '-0.8px',
         fontSize: '3.1vmin',
         fontWeight: 'bold',
+        textAlign: 'center',
         color: 'white',
         textShadow: `0.2vmin 0.2vmin ${theme.palette.secondary.main}`,
     },
@@ -155,7 +160,7 @@ function Table(props) {
 
         for (let index = 0; index < spots; index++) {
             const virtualPosition = computeVirtualPosition(index, heroRotation, heroPosition);
-            const pPos = positionToPlacement(PLAYER_WIDTH, PLAYER_HEIGHT, virtualPosition);
+            const pPos = positionToPlacement(100, 100, virtualPosition);
             const player = players.find((p) => p.position === index);
 
             if (player) {
@@ -171,6 +176,7 @@ function Table(props) {
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
                             left: `${pPos.x}${W_UNIT}`,
+                            transform: 'translateY(-50%) translateX(-50%)',
                         }}
                     />,
                 );
@@ -183,6 +189,7 @@ function Table(props) {
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
                             left: `${pPos.x}${W_UNIT}`,
+                            transform: 'translateY(-50%) translateX(-50%)',
                         }}
                     />,
                 );
@@ -195,6 +202,7 @@ function Table(props) {
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
                             left: `${pPos.x}${W_UNIT}`,
+                            transform: 'translateY(-50%) translateX(-50%)',
                         }}
                         setHeroRotation={(r) => {
                             setHeroRotation(r);
@@ -227,7 +235,7 @@ function Table(props) {
         for (let index = 0; index < spots; index++) {
             const virtualPosition = computeVirtualPosition(index, heroRotation, heroPosition);
 
-            const bPos = positionToPlacement(BET_WIDTH, BET_HEIGHT, virtualPosition);
+            const bPos = positionToPlacement(100, 100, virtualPosition);
             const player = players.find((p) => p.position === index);
             if (player && player.bet) {
                 ans.push(
@@ -274,12 +282,13 @@ function Table(props) {
                     </>
                 ) : null}
                 {players.length < 2 && !isGameInProgress ? <TableCopyLink /> : null}
+                {winningHandDescription ? (
+                    <Zoom in={true}>
+                        <Typography className={classes.winningHandDescription}>{winningHandDescription}</Typography>
+                    </Zoom>
+                ) : null}
             </div>
-            {winningHandDescription ? (
-                <Zoom in={true}>
-                    <Typography className={classes.winningHandDescription}>{winningHandDescription}</Typography>
-                </Zoom>
-            ) : null}
+
             <div className={classes.playersCont}>{createSpotsAtTable()}</div>
             <div className={classes.betCont}>{createBetsAtTable()}</div>
         </div>
