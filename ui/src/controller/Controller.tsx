@@ -305,6 +305,7 @@ function ControllerComp(props: ControllerProps) {
             className={classnames(classes.root, className, {
                 [classes.rootToAct]: toAct,
             })}
+            id={SELENIUM_TAGS.IDS.CONTROLLER_ROOT}
         >
             <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
             <BuyChipsDialog open={buyChipsDialogOpen} handleBuy={handleBuy} handleCancel={handleClose} />
