@@ -15,7 +15,7 @@ export const bettingRoundActionTypesToUnqueueSelector: (UiGameState) => BettingR
     if (gs.global.unqueueAllBettingRoundActions) {
         return ALL_BETTING_ROUND_ACTION_TYPES;
     } else if (gs.controller.lastBettingRoundAction.type === BettingRoundActionType.BET) {
-        return [BettingRoundActionType.CHECK, BettingRoundActionType.CALL];
+        return [BettingRoundActionType.CHECK, BettingRoundActionType.CALL, BettingRoundActionType.BET];
     } else {
         return [];
     }

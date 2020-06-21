@@ -437,7 +437,7 @@ export const TestGame: UiGameState = {
         gameParametersWillChangeAfterHand: true,
         computedMaxBuyin: 1000,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
-        isSpectator: true,
+        isSpectator: false,
         isHeroAtTable: false,
         heroTotalChips: 17,
         numberOfSpectators: 4,

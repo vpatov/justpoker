@@ -5,22 +5,19 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import { WsServer } from '../api/ws';
+import { grey } from '@material-ui/core/colors';
 
 const size = 5;
 
 const useStyles = makeStyles((theme) => ({
-    hoverZone: {
+    emptySeatRoot: {
         width: `${size * 2}vmin`,
         height: `${size * 2}vmin`,
         borderRadius: '50%',
         justifyContent: 'center',
         alignItems: 'center',
-        '&:hover button': {
-            visibility: 'visible',
-        },
-        '&:hover ': {
-            border: '0.2vmin solid white',
-        },
+        border: `0.2vmin solid ${grey[300]}`,
+        visibility: 'hidden',
     },
     container: {
         display: 'flex',
@@ -31,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: 'unset',
         width: `${size * 2}vmin`,
         height: `${size}vmin`,
-        visibility: 'hidden',
     },
     topButtonText: {
         marginTop: '1vmin',
@@ -44,8 +40,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
-
 function EmptySeat(props) {
     const classes = useStyles();
     const { className, style, setHeroRotation, virtualPositon, seatNumber, isHeroInHand } = props;
@@ -56,14 +50,15 @@ function EmptySeat(props) {
 
     function handleSeatChangeClick() {
         WsServer.sendSeatChangeMessage(seatNumber);
+        setHeroRotation(virtualPositon);
     }
 
-    function renderRotateButton(semicircle: boolean){
+    function renderRotateButton(semicircle: boolean) {
         return (
             <IconButton
                 className={classnames(classes.button)}
                 onClick={handleRotationButtonClick}
-                style={semicircle ? {} : {height: `${size*2}vmin`}}
+                style={semicircle ? {} : { height: `${size * 2}vmin` }}
             >
                 <Typography className={classnames(classes.text, semicircle ? classes.topButtonText : null)}>
                     Rotate Here
@@ -72,19 +67,16 @@ function EmptySeat(props) {
         );
     }
 
-
-    function renderSeatChangeButton(){
+    function renderSeatChangeButton() {
         return (
             <IconButton className={classnames(classes.button)} onClick={handleSeatChangeClick}>
-                <Typography className={classnames(classes.text, classes.bottomButtonText)}>
-                    Sit Here
-                </Typography>
+                <Typography className={classnames(classes.text, classes.bottomButtonText)}>Sit Here</Typography>
             </IconButton>
         );
     }
 
     return (
-        <div className={classnames(classes.hoverZone, className)} style={style}>
+        <div className={classnames(classes.emptySeatRoot, className)} style={style}>
             <div className={classes.container}>
                 {isHeroInHand ? renderRotateButton(false) : renderRotateButton(true)}
                 {isHeroInHand ? null : renderSeatChangeButton()}

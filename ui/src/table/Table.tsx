@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Player from '../player/Player';
 import OpenSeat from './OpenSeat';
 import EmptySeat from './EmptySeat';
@@ -23,7 +23,7 @@ const H_UNIT = 'vmin';
 const TABLE_HEIGHT = 39;
 const TABLE_WIDTH = 71;
 
-const PLAYER_HEIGHT = 58;
+const PLAYER_HEIGHT = 60;
 const PLAYER_WIDTH = 93;
 
 const BET_HEIGHT = 30;
@@ -31,8 +31,7 @@ const BET_WIDTH = 60;
 
 const HERO_DEFAULT_ROTATION = 5;
 
-function positionToPlacement(width, height, index, offset) {
-    const virtualIndex = mod(index + offset - 1, 9);
+function positionToPlacement(width, height, virtualPositon) {
     const xInc = width / 8;
     const yInc = height / 6;
     const dict = {
@@ -47,7 +46,7 @@ function positionToPlacement(width, height, index, offset) {
         8: { x: 0, y: yInc * 2 },
     };
 
-    return dict[virtualIndex];
+    return dict[virtualPositon];
 }
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,6 +59,11 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         height: `${PLAYER_HEIGHT}vmin`,
         width: `${PLAYER_WIDTH}vmin`,
+        border: '6vmin solid transparent', // inscrease size for better hover radius
+        '&:hover $emptySeat': {
+            visibility: 'visible',
+        },
+        zIndex: 3,
     },
     betCont: {
         position: 'absolute',
@@ -79,6 +83,23 @@ const useStyles = makeStyles((theme) => ({
         ...theme.custom.TABLE,
     },
     openSeat: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        transform: 'translateY(-20%) translateX(-50%)',
+    },
+    hoverEmptyCont: {
+        height: `${PLAYER_HEIGHT + 12}vmin`,
+        width: `${PLAYER_WIDTH + 12}vmin`,
+        '&:hover $emptySeat': {
+            visibility: 'visible',
+        },
+
+        backgroundColor: 'red',
+        top: 0,
+        left: 0,
+    },
+    emptySeat: {
         position: 'absolute',
         top: 0,
         left: 0,
@@ -123,13 +144,18 @@ function Table(props) {
     const [heroRotation, setHeroRotation] = useState(HERO_DEFAULT_ROTATION);
 
     const heroPosition = players.find((p) => Boolean(p.hero))?.position || 0;
-    const offset = heroRotation - heroPosition + 1;
 
+    function computeVirtualPosition(index, heroRotation, heroPosition) {
+        return mod(index + heroRotation - heroPosition, 9);
+    }
+
+    console.log(heroRotation, heroPosition);
     function createSpotsAtTable() {
         const ans = [] as any;
 
         for (let index = 0; index < spots; index++) {
-            const pPos = positionToPlacement(PLAYER_WIDTH, PLAYER_HEIGHT, index, offset);
+            const virtualPosition = computeVirtualPosition(index, heroRotation, heroPosition);
+            const pPos = positionToPlacement(PLAYER_WIDTH, PLAYER_HEIGHT, virtualPosition);
             const player = players.find((p) => p.position === index);
 
             if (player) {
@@ -139,7 +165,7 @@ function Table(props) {
                         setHeroRotation={(r) => {
                             setHeroRotation(r);
                         }}
-                        virtualPositon={mod(index + offset - 1, 9)}
+                        virtualPositon={virtualPosition}
                         player={player}
                         className={classes.player}
                         style={{
@@ -164,7 +190,7 @@ function Table(props) {
                 ans.push(
                     <EmptySeat
                         key={index}
-                        className={classes.openSeat}
+                        className={classes.emptySeat}
                         seatNumber={index}
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
@@ -174,7 +200,7 @@ function Table(props) {
                             setHeroRotation(r);
                         }}
                         isHeroInHand={isHeroInHand}
-                        virtualPositon={mod(index + offset - 1, 9)}
+                        virtualPositon={virtualPosition}
                     />,
                 );
             } else {
@@ -199,7 +225,9 @@ function Table(props) {
         const ans = [] as any;
 
         for (let index = 0; index < spots; index++) {
-            const bPos = positionToPlacement(BET_WIDTH, BET_HEIGHT, index, offset);
+            const virtualPosition = computeVirtualPosition(index, heroRotation, heroPosition);
+
+            const bPos = positionToPlacement(BET_WIDTH, BET_HEIGHT, virtualPosition);
             const player = players.find((p) => p.position === index);
             if (player && player.bet) {
                 ans.push(
