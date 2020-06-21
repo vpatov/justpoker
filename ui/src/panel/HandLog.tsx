@@ -25,6 +25,7 @@ import { PlayerUUID } from '../shared/models/system/uuid';
 import { WsServer } from '../api/ws';
 import { cardsAreEqual, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
+import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -124,7 +125,7 @@ function HandLog(props: HandLogProps) {
 
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
-    const smallWidth = useMediaQuery('(max-aspect-ratio: 5/4)');
+    const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
     const smallCurrentHandText = smallWidth || `${currentHandNumber}${handLogEntries.length}`.length >= 4;
 
     useEffect(() => {

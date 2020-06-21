@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '3.8vmin',
             fontWeight: 'bold',
             width: '22vw',
+            minWidth: '300px',
             height: '16vh',
         },
     }),

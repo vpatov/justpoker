@@ -91,7 +91,12 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         checkLabel: {
             fontSize: '1.4vmin',
+            textAlign: 'right',
         },
+        formControlLabel: {
+            margin: 0,
+        },
+
         adminButton: {
             fontSize: '1.4vmin',
         },
@@ -389,6 +394,7 @@ function ControllerComp(props: ControllerProps) {
                 </div>
                 {allowStraddle ? (
                     <FormControlLabel
+                        className={classes.formControlLabel}
                         classes={{ label: classes.checkLabel }}
                         control={
                             <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
@@ -397,6 +403,7 @@ function ControllerComp(props: ControllerProps) {
                     />
                 ) : null}
                 <FormControlLabel
+                    className={classes.formControlLabel}
                     classes={{ label: classes.checkLabel }}
                     control={
                         <Checkbox

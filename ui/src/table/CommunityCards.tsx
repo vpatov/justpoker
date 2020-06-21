@@ -6,10 +6,11 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
     communityCardsCont: {
         height: '25%',
-        width: '65%',
+        width: '80%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        flexWrap: 'wrap',
     },
     communityCard: {},
 }));
