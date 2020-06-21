@@ -25,6 +25,8 @@ import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 
 import GameParamatersDialog from './GameParamatersDialog';
+import ConfirmationDialog from '../reuseable/ConfirmationDialog';
+
 import { GameParameters } from '../shared/models/game/game';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -80,6 +82,7 @@ function GameMenu(props) {
 
     const [settingsOpen, setSettingsOpen] = React.useState(false);
     const [gameParametersOpen, SET_gameParametersOpen] = React.useState(false);
+    const [confirmationQuit, SET_confirmationQuit] = React.useState(false);
 
     const handleSettingsOpen = () => {
         setSettingsOpen(true);
@@ -128,7 +131,8 @@ function GameMenu(props) {
                 sendServerAction(ClientActionType.STOPGAME);
                 break;
             case ClientActionType.QUITGAME:
-                sendServerAction(ClientActionType.QUITGAME);
+                SET_confirmationQuit(true);
+
             default:
                 break;
         }
@@ -202,6 +206,19 @@ function GameMenu(props) {
                 onCancel={() => SET_gameParametersOpen(false)}
                 onSave={onGameParamatersDialogSave}
                 disabled={!isHeroAdmin}
+            />
+            <ConfirmationDialog
+                title="Are you sure you want to quit?"
+                contextText={
+                    'Quitting will remove you from the table and make you a spectator. If you join again you will have a new entry in the ledger.'
+                }
+                open={confirmationQuit}
+                onCancel={() => SET_confirmationQuit(false)}
+                onConfirm={() => {
+                    SET_confirmationQuit(false);
+                    sendServerAction(ClientActionType.QUITGAME);
+                }}
+                nullWhenClosed
             />
         </>
     );

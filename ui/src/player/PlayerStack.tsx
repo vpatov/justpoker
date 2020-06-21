@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
         height: '6vmin',
         alignItems: 'center',
         cursor: 'pointer',
-        transition: 'background-color 1s',
         ...theme.custom.STACK,
     },
     outOfHand: {
@@ -28,7 +27,6 @@ const useStyles = makeStyles((theme) => ({
         ...theme.custom.STACK_TO_ACT,
     },
     winner: {
-        transition: 'all 1s',
         ...theme.custom.STACK_WINNER,
     },
     '@keyframes grad': {
@@ -78,12 +76,6 @@ const useStyles = makeStyles((theme) => ({
         width: `100%`,
         height: '20vmin',
         position: 'absolute',
-        opacity: 0,
-        transition: 'opacity 0.4s',
-    },
-    showWinnerAnimoji: {
-        transition: 'opacity 0.4s',
-        opacity: 1,
     },
 }));
 
@@ -111,14 +103,11 @@ function PlayerStack(props) {
                 [classes.outOfHand]: outOfHand,
             })}
         >
-            <div className={classes.winnerAnimojiCont}>
-                {/* TODO is there performance concern of having mounted on every player with opaticty zero? */}
-                <Animoji
-                    reaction={'winner'}
-                    className={classnames(classes.winnerAnimoji, { [classes.showWinnerAnimoji]: winner })}
-                    animated
-                />
-            </div>
+            {winner ? (
+                <div className={classes.winnerAnimojiCont}>
+                    <Animoji reaction={'winner'} className={classes.winnerAnimoji} animated />
+                </div>
+            ) : null}
             <PlayerAvatar position={position} playerUUID={uuid} avatarKey={avatarKey} />
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <div className={classes.nameStackCont}>

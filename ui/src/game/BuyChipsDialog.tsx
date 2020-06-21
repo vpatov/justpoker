@@ -36,11 +36,11 @@ const useStyles = makeStyles((theme: Theme) =>
 function BuyChipsDialog(props) {
     const classes = useStyles();
     const { open, handleBuy, handleCancel } = props;
-    const [chipAmt, SET_ChipAmt] = useState(0);
 
     const { heroTotalChips } = useSelector(globalGameStateSelector);
     const { minBuyin, maxBuyin } = useSelector(selectGameParameters);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
+    const [chipAmt, SET_ChipAmt] = useState(computeMax());
     const resultingChips = computeResultingChips();
 
     function onSubmit() {

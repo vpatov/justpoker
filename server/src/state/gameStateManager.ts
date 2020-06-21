@@ -663,12 +663,7 @@ export class GameStateManager {
      * if the game is not currently in progress, and if there are enough players to play.
      */
     canPlayerStartGame(playerUUID: PlayerUUID) {
-        return (
-            this.isPlayerReadyToPlay(playerUUID) &&
-            this.getPlayersReadyToPlay().length >= 2 &&
-            !this.isGameInProgress() &&
-            this.isPlayerAdmin(playerUUID)
-        );
+        return this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress() && this.isPlayerAdmin(playerUUID);
     }
 
     /**
@@ -1235,9 +1230,12 @@ export class GameStateManager {
 
     isAllInRunOut(): boolean {
         const playersAllIn = this.getPlayersAllIn();
-        if (playersAllIn.length === 0) return false;
-
         const playersInHand = this.getPlayersInHand();
+        // there must be a least two player in the hand
+        // and at least one player all in
+        if (playersAllIn.length < 1 || playersInHand.length < 2) return false;
+
+        // then if everyone or everyone but one player(s) all in, its a runouttttt!!
         return playersAllIn.length >= playersInHand.length - 1;
     }
 

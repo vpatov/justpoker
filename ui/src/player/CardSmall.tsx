@@ -74,9 +74,6 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '20%',
         fontSize: '3vmin',
     },
-    isBeingShownAndHero: {
-        boxShadow: `0vmin 0px 0.4vmin 0.25vmin ${theme.palette.primary.main}`,
-    },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
     },
@@ -99,7 +96,7 @@ function CardSmall(props) {
 
     useEffect(() => {
         if (!prevIsBeingShown && isBeingShown) {
-            flipCard(cardId);
+            flipCard(cardId, hero);
         }
     }, [isBeingShown, prevIsBeingShown]);
 
@@ -118,7 +115,6 @@ function CardSmall(props) {
             className={classnames(classes.root, classes[suit], className, {
                 ['ani_notWinningCard']: !partOfWinningHand,
                 [classes.sideCard]: shouldFlex,
-                [classes.isBeingShownAndHero]: isBeingShown && hero,
             })}
             id={cardId}
         >
