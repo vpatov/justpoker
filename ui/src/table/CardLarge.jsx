@@ -10,6 +10,9 @@ import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
 
+const CARD_HEIGHT = 11;
+const CARD_WIDTH = 8.6;
+
 const useStyles = makeStyles((theme) => ({
     root: {
         borderRadius: 6,
@@ -17,12 +20,14 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         position: 'relative',
         backgroundColor: 'white',
-        height: '11vmin',
-        width: '8.6vmin',
+        height: `${CARD_HEIGHT}vmin`,
+        width: `${CARD_WIDTH}vmin`,
         margin: '0.5vmin',
         overflow: 'hidden',
         transform: 'translateY(0)',
         transition: 'transform 0.5s ease-in-out',
+        flex: 'none',
+        boxShadow: theme.shadows[4],
     },
     text: {
         letterSpacing: '-0.5vmin',
@@ -44,6 +49,8 @@ const useStyles = makeStyles((theme) => ({
     },
 
     smallWidth: {
+        height: `${CARD_HEIGHT * 0.8}vmin`,
+        width: `${CARD_WIDTH * 0.8}vmin`,
         '& > *': {
             fontSize: '4vmin',
             width: '4vmin',
@@ -52,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
     },
     partOfWinningHand: {
         transform: 'translateY(33%)',
+        zIndex: 1,
         ...theme.custom.WINNING_CARD,
     },
     [SUITS.HEARTS]: {

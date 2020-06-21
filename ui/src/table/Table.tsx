@@ -87,7 +87,6 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         top: 0,
         left: 0,
-        // transform: 'translateY(-20%) translateX(-50%)',
     },
     hoverEmptyCont: {
         height: `${TABLE_HEIGHT + 16}${H_UNIT}`,
@@ -95,7 +94,6 @@ const useStyles = makeStyles((theme) => ({
         '&:hover $emptySeat': {
             visibility: 'visible',
         },
-
         backgroundColor: 'red',
         top: 0,
         left: 0,
@@ -104,7 +102,6 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         top: 0,
         left: 0,
-        // transform: 'translateY(-20%) translateX(-50%)',
     },
     player: {
         position: 'absolute',
@@ -118,13 +115,12 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '4vmin',
     },
     winningHandDescription: {
-        width: '100%',
+        width: '85vw',
         zIndex: 5,
         position: 'absolute',
-        bottom: '10%',
-
+        top: '25%',
         letterSpacing: '-0.8px',
-        fontSize: '3.1vmin',
+        fontSize: '2.9vmin',
         fontWeight: 'bold',
         textAlign: 'center',
         color: 'white',
@@ -154,7 +150,6 @@ function Table(props) {
         return mod(index + heroRotation - heroPosition, 9);
     }
 
-    console.log(heroRotation, heroPosition);
     function createSpotsAtTable() {
         const ans = [] as any;
 
@@ -245,7 +240,7 @@ function Table(props) {
                             position: 'absolute',
                             top: `${bPos.y}${H_UNIT}`,
                             left: `${bPos.x}${W_UNIT}`,
-                            transform: 'translateY(-50%) translateX(-50%)',
+                            transform: 'translateY(-20%) translateX(-50%)',
                         }}
                         amount={player.bet}
                     />,
