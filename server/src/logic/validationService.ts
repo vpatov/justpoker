@@ -10,6 +10,8 @@ import {
     AddAdminRequest,
     JoinGameRequest,
     JoinGameAndTableRequest,
+    SetChipsRequest,
+    BuyChipsRequest,
     SeatChangeRequest,
 } from '../../../ui/src/shared/models/api/api';
 
@@ -744,5 +746,54 @@ export class ValidationService {
         ];
 
         return minMaxErrors.find((err) => err !== undefined);
+    }
+
+    validateSetChipsRequest(clientUUID: ClientUUID, req: SetChipsRequest) {
+        let error = this.ensureClientIsAdmin(clientUUID);
+        if (error) {
+            return error;
+        }
+
+        const playerToModify = this.gsm.getPlayer(req.playerUUID);
+        if (!playerToModify) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
+        error = this.validateMinMaxValues(req.chipAmount, MIN_VALUES.BUY_IN, MAX_VALUES.BUY_IN, 'buyIn');
+        if (error) {
+            return error;
+        }
+        return undefined;
+    }
+
+    validateBuyChipsRequest(clientUUID: ClientUUID, req: BuyChipsRequest) {
+        const player = this.gsm.getPlayer(req.playerUUID);
+        if (!player) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
+        if (player.willAddChips) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player ${req.playerUUID} already has buying queued for ${player.willAddChips} amount.`,
+            };
+        }
+
+        const error = this.validateMinMaxValues(
+            player.chips + req.chipAmount,
+            MIN_VALUES.BUY_IN,
+            this.gsm.getMaxBuyin(),
+            'gameMaxBuyin',
+        );
+        if (error) {
+            return error;
+        }
+        return undefined;
     }
 }

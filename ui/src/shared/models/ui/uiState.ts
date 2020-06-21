@@ -70,6 +70,7 @@ export declare interface Global {
     isHeroAtTable: boolean;
     heroTotalChips: number;
     numberOfSpectators: number;
+    willAddChips?: number;
 }
 
 export declare interface Controller {
@@ -268,6 +269,11 @@ export const LEDGER_BUTTON: MenuButton = {
     label: 'Ledger',
 };
 
+export const BUY_CHIPS_BUTTON: MenuButton = {
+    action: UiActionType.OPEN_ADD_CHIPS,
+    label: 'Buy Chips',
+};
+
 export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
 
 export const FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, RAISE_BUTTON];
@@ -281,6 +287,7 @@ export const ALL_MENU_BUTTONS = [
     VOLUME_BUTTON,
     USER_SETTINGS_BUTTON,
     GAME_SETTINGS_BUTTON,
+    BUY_CHIPS_BUTTON,
 ];
 
 /* Common bet sizes */
@@ -315,7 +322,6 @@ export function getCleanController(): Controller {
 export function getCleanGlobal(): Global {
     return {
         heroTotalChips: 0,
-        isHeroInHand: false,
         heroIsAdmin: false,
         isGameInProgress: false,
         canStartGame: false,
@@ -328,6 +334,7 @@ export function getCleanGlobal(): Global {
         isSpectator: true,
         isHeroAtTable: false,
         numberOfSpectators: 0,
+        isHeroInHand: false,
     };
 }
 
@@ -428,7 +435,6 @@ export const TestGame: UiGameState = {
     ],
     global: {
         heroIsAdmin: true,
-        isHeroInHand: true,
         isGameInProgress: true,
         canStartGame: false,
         gameWillStopAfterHand: true,
@@ -441,6 +447,8 @@ export const TestGame: UiGameState = {
         isHeroAtTable: false,
         heroTotalChips: 17,
         numberOfSpectators: 4,
+        willAddChips: 1430,
+        isHeroInHand: true,
     },
     controller: {
         showWarningOnFold: true,

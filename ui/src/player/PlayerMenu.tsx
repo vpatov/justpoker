@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import AddChipDialog from '../game/AddChipDialog';
+import AddChipDialog from '../game/SetChipDialog';
 import { WsServer } from '../api/ws';
 import { useSelector } from 'react-redux';
 import { isHeroAdminSelector, heroPlayerUUIDSelector } from '../store/selectors';

@@ -69,6 +69,9 @@ export declare interface Player {
 
     /** Indicates which avatar the player is using */
     avatarKey: AvatarKeys;
+
+    /** The amount of chips that will be added to player's stack after hand. */
+    willAddChips: number;
 }
 
 /* Represents the partial of Player that is cleared after every hand. */
@@ -118,5 +121,6 @@ export function getCleanPlayer(): Player {
         chipDelta: 0,
         timeBanksLeft: 0,
         avatarKey: AvatarKeys.shark,
+        willAddChips: 0,
     };
 }

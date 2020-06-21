@@ -25,6 +25,7 @@ import {
     ShowCardButton,
     LEAVE_TABLE_BUTTON,
     QUIT_GAME_BUTTON,
+    BUY_CHIPS_BUTTON,
 } from '../../../ui/src/shared/models/ui/uiState';
 import { GameType } from '../../../ui/src/shared/models/game/game';
 import { GameStateManager } from '../state/gameStateManager';
@@ -146,12 +147,10 @@ export class StateConverter {
 
     getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const clientPlayerIsSeated = heroPlayer?.isAtTable;
         const gameStage = this.gameStateManager.getGameStage();
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
-            isHeroInHand: heroPlayer ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
             heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
@@ -167,6 +166,8 @@ export class StateConverter {
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
             heroTotalChips: heroPlayer?.chips,
+            willAddChips: heroPlayer?.willAddChips,
+            isHeroInHand: heroPlayer?.uuid ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
         };
 
         return global;
@@ -283,7 +284,7 @@ export class StateConverter {
     getValidMenuButtons(clientUUID: ClientUUID): MenuButton[] {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
 
-        const menuButtons = [USER_SETTINGS_BUTTON, GAME_SETTINGS_BUTTON, VOLUME_BUTTON, LEDGER_BUTTON]; // currently these are always visible
+        const menuButtons = [USER_SETTINGS_BUTTON, GAME_SETTINGS_BUTTON, VOLUME_BUTTON]; // currently these are always visible
 
         if (this.gameStateManager.isClientAdmin(clientUUID)) {
             if (
@@ -296,14 +297,23 @@ export class StateConverter {
             }
         }
 
-        // if player is in game they can leave
-        // TODO how to communicate to people that this is how they "stand up"
-        if (heroPlayer && !heroPlayer.leaving && !heroPlayer.quitting && heroPlayer.isAtTable) {
-            menuButtons.push(LEAVE_TABLE_BUTTON);
-        }
+        // only if hero is player, not for spectator
+        if (heroPlayer) {
+            menuButtons.push(LEDGER_BUTTON);
 
-        if (heroPlayer && !heroPlayer.quitting) {
-            menuButtons.push(QUIT_GAME_BUTTON);
+            // dont allow player to queue multiple buys
+            if (!heroPlayer.willAddChips) {
+                menuButtons.push(BUY_CHIPS_BUTTON);
+            }
+
+            // TODO how to communicate to people that this is how they "stand up"
+            if (!heroPlayer.leaving && !heroPlayer.quitting && heroPlayer.isAtTable) {
+                menuButtons.push(LEAVE_TABLE_BUTTON);
+            }
+
+            if (!heroPlayer.quitting) {
+                menuButtons.push(QUIT_GAME_BUTTON);
+            }
         }
 
         return menuButtons;

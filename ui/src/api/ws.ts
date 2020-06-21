@@ -13,6 +13,7 @@ import {
     JoinGameRequest,
     SetChipsRequest,
     JoinTableRequest,
+    BuyChipsRequest,
     SeatChangeRequest,
 } from '../shared/models/api/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
@@ -172,6 +173,14 @@ export class WsServer {
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 
+    static sendBuyChipsMessage(playerUUID: PlayerUUID, chipAmount: number) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.BUYCHIPS,
+            request: ({ playerUUID, chipAmount } as BuyChipsRequest) as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
     static subscribe(key: string, onMessage) {
         if (WsServer.subscriptions[key]) {
             WsServer.subscriptions[key].push(onMessage);
