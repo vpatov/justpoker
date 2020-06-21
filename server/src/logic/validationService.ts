@@ -12,6 +12,7 @@ import {
     JoinGameAndTableRequest,
     SetChipsRequest,
     BuyChipsRequest,
+    SeatChangeRequest,
 } from '../../../ui/src/shared/models/api/api';
 
 import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/api/validation';
@@ -223,13 +224,37 @@ export class ValidationService {
         return undefined;
     }
 
-    validateStandUpRequest(clientUUID: ClientUUID): ValidationResponse {
+    validateSeatChangeRequest(clientUUID: ClientUUID, request: SeatChangeRequest): ValidationResponse {
+        const seatNumber = request.seatNumber;
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) {
             return error;
         }
+
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
-        return this.ensurePlayerIsAtTable(player.uuid);
+
+        if (!this.gsm.isValidSeat(seatNumber)) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Cannot switch seats: Seat ${seatNumber} is not a valid seat.`,
+            };
+        }
+
+        if (this.gsm.isSeatTaken(seatNumber)) {
+            return {
+                errorType: ErrorType.SEAT_IS_TAKEN,
+                errorString: `Cannot switch seats: Seat ${seatNumber} is taken. Please pick another.`,
+            };
+        }
+
+        if (this.gsm.isPlayerInHand(player.uuid)) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Cannot switch seats while you are playing a hand.`,
+            };
+        }
+
+        return undefined;
     }
 
     validateSitInOrOutAction(clientUUID: ClientUUID): ValidationResponse {

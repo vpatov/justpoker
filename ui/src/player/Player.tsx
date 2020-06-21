@@ -27,9 +27,10 @@ const useStyles = makeStyles((theme) => ({
 
     labelText: {
         margin: '0.3vmin 0.8vmin',
-        width: '9vmin',
+        minWidth: '4vmin',
+        maxWidth: '90%',
         textAlign: 'center',
-        fontSize: '1.4vmin',
+        fontSize: '1.5vmin',
     },
     disconnected: {},
     hero: {
@@ -63,28 +64,26 @@ function Player(props) {
     };
 
     function getPlayerLabelComponent() {
+        const comps: any = [];
         if (disconnected) {
-            return (
-                <Typography className={classnames(classes.labelText, classes.disconnected)}>Disconnected</Typography>
+            comps.push(
+                <Typography className={classnames(classes.labelText, classes.disconnected)}>Disconnected</Typography>,
             );
-        }
-        if (playerTimer) {
-            return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
-        }
-        if (quitting) {
-            return <Typography className={classes.labelText}>Quitting</Typography>;
-        }
-        if (leaving) {
-            return <Typography className={classes.labelText}>Leaving</Typography>;
-        }
-        if (sittingOut) {
-            return <Typography className={classes.labelText}>Sitting Out</Typography>;
-        }
-        if (folded) {
-            return <Typography className={classes.labelText}>Folded</Typography>;
+        } else if (quitting) {
+            comps.push(<Typography className={classes.labelText}>Quitting</Typography>);
+        } else if (leaving) {
+            comps.push(<Typography className={classes.labelText}>Leaving</Typography>);
+        } else if (sittingOut) {
+            comps.push(<Typography className={classes.labelText}>Sitting Out</Typography>);
+        } else if (folded) {
+            comps.push(<Typography className={classes.labelText}>Folded</Typography>);
         }
 
-        return undefined;
+        if (playerTimer) {
+            comps.push(<PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />);
+        }
+
+        return comps;
     }
 
     const playerLabelComponent = getPlayerLabelComponent();

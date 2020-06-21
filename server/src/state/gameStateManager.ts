@@ -11,7 +11,12 @@ import {
     Pot,
 } from '../../../ui/src/shared/models/game/betting';
 import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
-import { Player, getCleanPlayer } from '../../../ui/src/shared/models/player/player';
+import {
+    Player,
+    getCleanPlayer,
+    getPlayerCleanHandDefaults,
+    getPlayerCleanTableDefaults,
+} from '../../../ui/src/shared/models/player/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api/api';
@@ -672,12 +677,7 @@ export class GameStateManager {
      * if the game is not currently in progress, and if there are enough players to play.
      */
     canPlayerStartGame(playerUUID: PlayerUUID) {
-        return (
-            this.isPlayerReadyToPlay(playerUUID) &&
-            this.getPlayersReadyToPlay().length >= 2 &&
-            !this.isGameInProgress() &&
-            this.isPlayerAdmin(playerUUID)
-        );
+        return this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress() && this.isPlayerAdmin(playerUUID);
     }
 
     /**
@@ -983,6 +983,11 @@ export class GameStateManager {
         player.seatNumber = seatNumber;
     }
 
+    changeSeats(playerUUID: PlayerUUID, seatNumber: number) {
+        const player = this.getPlayer(playerUUID);
+        player.seatNumber = seatNumber;
+    }
+
     playerLeaveTable(playerUUID: PlayerUUID) {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
@@ -991,11 +996,7 @@ export class GameStateManager {
             });
             this.getPlayer(playerUUID).leaving = true;
         } else {
-            const player = this.getPlayer(playerUUID);
-            player.isAtTable = false;
-            player.sittingOut = false;
-            player.seatNumber = -1;
-            this.getPlayer(playerUUID).leaving = false;
+            this.updatePlayer(playerUUID, getPlayerCleanTableDefaults());
         }
     }
 
@@ -1183,17 +1184,7 @@ export class GameStateManager {
     }
 
     clearStateOfHandInfo() {
-        this.updatePlayers((_) => ({
-            lastActionType: BettingRoundActionType.NOT_IN_HAND,
-            holeCards: [],
-            handDescription: '',
-            bestHand: null,
-            winner: false,
-            betAmount: 0,
-            timeBanksUsedThisAction: 0,
-            chipDelta: 0,
-            chipsAtStartOfHand: 0,
-        }));
+        this.updatePlayers((_) => getPlayerCleanHandDefaults());
 
         // TODO make gameState partial that represents a clean pre-hand state.
         this.updateGameState({
@@ -1253,9 +1244,12 @@ export class GameStateManager {
 
     isAllInRunOut(): boolean {
         const playersAllIn = this.getPlayersAllIn();
-        if (playersAllIn.length === 0) return false;
-
         const playersInHand = this.getPlayersInHand();
+        // there must be a least two player in the hand
+        // and at least one player all in
+        if (playersAllIn.length < 1 || playersInHand.length < 2) return false;
+
+        // then if everyone or everyone but one player(s) all in, its a runouttttt!!
         return playersAllIn.length >= playersInHand.length - 1;
     }
 

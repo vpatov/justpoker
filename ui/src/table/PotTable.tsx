@@ -74,7 +74,7 @@ function PotTable(props) {
             {awardPots ? (
                 <div className={classes.awardPotCont}>
                     {awardPots.map((ap, index) => (
-                        <PotAward awardPot={ap} index={index} key={index} />
+                        <PotAward awardPot={ap} index={index} key={`${JSON.stringify(ap)}`} />
                     ))}
                 </div>
             ) : null}

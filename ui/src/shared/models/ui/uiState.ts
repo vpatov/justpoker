@@ -57,6 +57,7 @@ export declare interface UiGameState {
 
 export declare interface Global {
     heroIsAdmin: boolean;
+    isHeroInHand: boolean;
     isGameInProgress: boolean;
     canStartGame: boolean;
     gameWillStopAfterHand: boolean;
@@ -70,7 +71,6 @@ export declare interface Global {
     heroTotalChips: number;
     numberOfSpectators: number;
     willAddChips?: number;
-    isHeroInHand: boolean;
 }
 
 export declare interface Controller {
@@ -443,7 +443,7 @@ export const TestGame: UiGameState = {
         gameParametersWillChangeAfterHand: true,
         computedMaxBuyin: 1000,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
-        isSpectator: true,
+        isSpectator: false,
         isHeroAtTable: false,
         heroTotalChips: 17,
         numberOfSpectators: 4,
