@@ -121,7 +121,7 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         zIndex: 5,
         position: 'absolute',
-        bottom: '15%',
+        bottom: '10%',
 
         letterSpacing: '-0.8px',
         fontSize: '3.1vmin',

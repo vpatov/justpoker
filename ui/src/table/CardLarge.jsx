@@ -87,7 +87,7 @@ function CardLarge(props) {
         <div
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
-                ['ani_notWinningCard']: !partOfWinningHand,
+                ani_notWinningCard: !partOfWinningHand,
                 [classes.smallWidth]: smallWidth,
             })}
         >

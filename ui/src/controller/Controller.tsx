@@ -91,6 +91,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         checkLabel: {
             fontSize: '1.4vmin',
+            textAlign: 'right',
         },
         formControlLabel: {
             margin: 0,
