@@ -31,14 +31,14 @@ const BET_WIDTH = 38;
 
 const HERO_DEFAULT_ROTATION = 5;
 
-function positionToPlacement(width, height, virtualPositon) {
-    const xInc = width / 8;
-    const yInc = height / 6;
+function positionToPlacement(virtualPositon) {
+    const xInc = 100 / 8;
+    const yInc = 100 / 6;
     const dict = {
         0: { x: xInc * 2, y: 0 },
         1: { x: xInc * 6, y: 0 },
-        2: { x: width, y: yInc * 2 },
-        3: { x: width, y: yInc * 4 },
+        2: { x: xInc * 8, y: yInc * 2 },
+        3: { x: xInc * 8, y: yInc * 4 },
         4: { x: xInc * 6.5, y: yInc * 5.75 },
         5: { x: xInc * 4, y: yInc * 6 },
         6: { x: xInc * 1.5, y: yInc * 5.75 },
@@ -155,7 +155,7 @@ function Table(props) {
 
         for (let index = 0; index < spots; index++) {
             const virtualPosition = computeVirtualPosition(index, heroRotation, heroPosition);
-            const pPos = positionToPlacement(100, 100, virtualPosition);
+            const pPos = positionToPlacement(virtualPosition);
             const player = players.find((p) => p.position === index);
 
             if (player) {
@@ -230,7 +230,7 @@ function Table(props) {
         for (let index = 0; index < spots; index++) {
             const virtualPosition = computeVirtualPosition(index, heroRotation, heroPosition);
 
-            const bPos = positionToPlacement(100, 100, virtualPosition);
+            const bPos = positionToPlacement(virtualPosition);
             const player = players.find((p) => p.position === index);
             if (player && player.bet) {
                 ans.push(
