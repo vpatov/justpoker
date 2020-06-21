@@ -30,7 +30,7 @@ export const PlayerPositionString: { [key in PlayerPosition]: string } = {
     [PP.LJ]: 'Lojack',
     [PP.HJ]: 'Hijack',
     [PP.CUTOFF]: 'Cutoff',
-    [PP.NOT_PLAYING]: 'Not Playing',
+    [PP.NOT_PLAYING]: 'Not In The Hand',
 };
 
 /** Hardcoded map of player positions with respect to how many people are at the table. */
