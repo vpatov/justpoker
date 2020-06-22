@@ -524,18 +524,20 @@ export class GameStateManager {
         return this.gameState.playerPositionMap;
     }
 
-    /** 
-     * Updates the player seats for the current hand. Assumes that dealerSeatNumber has 
-     * been incremented, and that the readyToPlay status of each player is finalized for 
+    /**
+     * Updates the player seats for the current hand. Assumes that dealerSeatNumber has
+     * been incremented, and that the readyToPlay status of each player is finalized for
      * the hand. Also updates the playerPositionMap.
-    */
+     */
     updateTableSeatsAndPlayerPositionMap() {
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersReadyToPlay().length] || [];
 
         const activePlayerSeats: ActivePlayerSeat[] = [];
         const seatNumbers: [number, PlayerUUID][] = this.getSortedSeatNumbers();
-        const startIndex = seatNumbers.findIndex(([number, playerUUID]) => this.getPlayerSeatNumber(playerUUID) === this.getDealerSeatNumber());
+        const startIndex = seatNumbers.findIndex(
+            ([number, playerUUID]) => this.getPlayerSeatNumber(playerUUID) === this.getDealerSeatNumber(),
+        );
 
         let index = 0;
         let relativeSeatNumber = 0;
@@ -544,15 +546,15 @@ export class GameStateManager {
             const [_, playerUUID] = seatNumbers[(startIndex + index) % seatNumbers.length];
             let position = PlayerPosition.NOT_PLAYING;
 
-            if (this.isPlayerReadyToPlay(playerUUID)){
+            if (this.isPlayerReadyToPlay(playerUUID)) {
                 activePlayerSeats.push({
                     playerUUID,
-                    seatNumber: this.getPlayerSeatNumber(playerUUID)
+                    seatNumber: this.getPlayerSeatNumber(playerUUID),
                 });
                 position = positions[relativeSeatNumber] || PlayerPosition.NOT_PLAYING;
                 relativeSeatNumber++;
             }
-    
+
             playerPositionMap.set(playerUUID, position);
         }
 
@@ -568,39 +570,39 @@ export class GameStateManager {
         this.gameState.dealerSeatNumber = dealerSeatNumber;
     }
 
-    doesSeatContainPlayerReadyToPlay(seatNumber: number){
+    doesSeatContainPlayerReadyToPlay(seatNumber: number) {
         const activePlayerSeats = this.getPlayersDealtInThisHand();
         const playerUUID = activePlayerSeats[seatNumber]?.playerUUID;
         return playerUUID ? this.isPlayerReadyToPlay(playerUUID) : false;
     }
 
-    /** 
-     * Increments the dealer seat to the next valid seat number (seat has a player at table and is sitting in). 
+    /**
+     * Increments the dealer seat to the next valid seat number (seat has a player at table and is sitting in).
      * TODO: Incorporate logic that skips players that just sat down either here, or have logic elsewhere that doesn't allow
      * a player to be "sitting in" until the button skips them.
-     * */ 
+     * */
+
     incrementDealerSeatNumber() {
         const maxNumPlayers = this.getMaxPlayers();
         let seatNumber = this.getDealerSeatNumber();
         let i = 0;
-        for (; i < maxNumPlayers; i++){
-            seatNumber = seatNumber + 1 % (maxNumPlayers);
-            if (this.doesSeatContainPlayerReadyToPlay(seatNumber)){
+        for (; i < maxNumPlayers; i++) {
+            seatNumber = seatNumber + (1 % maxNumPlayers);
+            if (this.doesSeatContainPlayerReadyToPlay(seatNumber)) {
                 this.setDealerSeatNumber(seatNumber);
                 break;
             }
-
         }
         // This shouldn't happen because this code should only execute if the game is in progress, which should only be the case if
         // | players ready to play | >= 2
-        if (i === maxNumPlayers){
-            logger.warn('incrementDealerSeatNumber iterated through all seats and could not find a seat containing a player that is ready to play.');
+        if (i === maxNumPlayers) {
+            logger.warn(
+                'incrementDealerSeatNumber iterated through all seats and could not find a seat containing a player that is ready to play.',
+            );
         }
-
     }
 
-
-    /** 
+    /**
      * Absolute seat numbers refer to the seat slots from 0 - numMaxPlayers.
      * Each player's seatNumber property is their absolute seat number.
      * Relative seat numbers are relative to the dealer seat number.
@@ -613,7 +615,6 @@ export class GameStateManager {
         return seats;
     }
 
-
     getPlayerPositionString(playerUUID: PlayerUUID): string | undefined {
         return PlayerPositionString[this.getPlayerPositionMap()?.get(playerUUID)];
     }
@@ -621,16 +622,19 @@ export class GameStateManager {
     /** Player must be in hand. */
     getSeatNumberRelativeToDealer(playerUUID: PlayerUUID): number {
         const activePlayerSeats = this.getPlayersDealtInThisHand();
-        for (let i = 0; i < activePlayerSeats.length; i++){
-            if (activePlayerSeats[i].playerUUID === playerUUID){
+        for (let i = 0; i < activePlayerSeats.length; i++) {
+            if (activePlayerSeats[i].playerUUID === playerUUID) {
                 return activePlayerSeats[i].seatNumber;
             }
         }
-        throw Error(`getSeatNumberRelativeToDealer called with player `+
-        `${this.getPlayerName(playerUUID)}: ${playerUUID} is not in the hand.`);
+        throw Error(
+            `getSeatNumberRelativeToDealer called with player ` +
+                `${this.getPlayerName(playerUUID)}: ${playerUUID} is not in the hand.`,
+        );
     }
 
-    /** playerA and playerB must be in the hand. */ 
+    /** playerA and playerB must be in the hand. */
+
     comparePositions(playerA: PlayerUUID, playerB: PlayerUUID) {
         const posA = this.getSeatNumberRelativeToDealer(playerA);
         const posB = this.getSeatNumberRelativeToDealer(playerB);
