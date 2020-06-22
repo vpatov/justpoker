@@ -1242,8 +1242,21 @@ export class GameStateManager {
         return this.filterPlayerUUIDs((playerUUID) => this.isPlayerAllIn(playerUUID));
     }
 
+    /** Should not be called in the middle of a betting round. */
     isAllInRunOut(): boolean {
-        return this.getPlayersAllIn().length >= this.getPlayersInHand().length - 1;
+        const gameStage = this.getGameStage();
+        if (gameStage !== GameStage.SHOW_START_OF_BETTING_ROUND && gameStage != GameStage.FINISH_BETTING_ROUND) {
+            throw Error(
+                `isAllInRunOut can only be called at start or end of betting round. Was called during ${gameStage}.`,
+            );
+        }
+        const [playersAllIn, playersInHand] = [this.getPlayersAllIn(), this.getPlayersInHand()];
+
+        // there must be a least two player in the hand and at least one player all in at the minimum
+        if (playersAllIn.length < 1 || playersInHand.length < 2) return false;
+
+        // If everyone is all in, or everyone but one player is all in, isAllInRunOut === true
+        return playersAllIn.length >= playersInHand.length - 1;
     }
 
     hasPlayerPutAllChipsInThePot(playerUUID: PlayerUUID): boolean {
