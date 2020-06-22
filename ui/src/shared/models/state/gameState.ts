@@ -8,7 +8,7 @@ import { getCleanGameParameters } from '../game/game';
 import { QueuedServerAction } from '../system/server';
 import { PlayerPosition } from '../player/playerPosition';
 
-export declare interface TableSeat {
+export declare interface ActivePlayerSeat {
     playerUUID: PlayerUUID;
     seatNumber: number;
 }
@@ -31,9 +31,11 @@ export declare interface GameState {
      * Represents the seating arrangement at the start of the hand. This is the only data structure that deals
      * with relative seat numbers, all other objects use the absolute seat number (i.e. player.seatNumber, dealerSeatNumber)
      * */
-    tableSeats: TableSeat[];
+    playersDealtInThisHand: ActivePlayerSeat[];
 
     dealerSeatNumber: number;
+
+    currentTableSeatIndex: number;
 
     playerPositionMap: Map<PlayerUUID, PlayerPosition>;
 
@@ -112,8 +114,9 @@ export function getCleanGameState(): GameState {
         players: {},
         board: [],
         gameParameters: getCleanGameParameters(),
-        tableSeats: [],
+        playersDealtInThisHand: [],
         dealerSeatNumber: 0,
+        currentTableSeatIndex: 0,
         playerPositionMap: new Map(),
         dealerUUID: makeBlankUUID(),
         smallBlindUUID: makeBlankUUID(),

@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 
-import { GameState, getCleanGameState, TableSeat } from '../../../ui/src/shared/models/state/gameState';
+import { GameState, getCleanGameState, ActivePlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 import { ServerStateKey, ALL_STATE_KEYS, QueuedServerAction } from '../../../ui/src/shared/models/system/server';
 import { GameType, GameParameters, MaxBuyinType, ConnectedClient } from '../../../ui/src/shared/models/game/game';
 import {
@@ -516,8 +516,8 @@ export class GameStateManager {
         return this.gameState.bettingRoundStage;
     }
 
-    getTableSeats() {
-        return this.gameState.tableSeats;
+    getPlayersDealtInThisHand() {
+        return this.gameState.playersDealtInThisHand;
     }
 
     getPlayerPositionMap(): Map<PlayerUUID, PlayerPosition> {
@@ -533,7 +533,7 @@ export class GameStateManager {
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersReadyToPlay().length] || [];
 
-        const tableSeats: TableSeat[] = [];
+        const activePlayerSeats: ActivePlayerSeat[] = [];
         const seatNumbers: [number, PlayerUUID][] = this.getSortedSeatNumbers();
         const startIndex = seatNumbers.findIndex(([number, playerUUID]) => this.getPlayerSeatNumber(playerUUID) === this.getDealerSeatNumber());
 
@@ -545,7 +545,7 @@ export class GameStateManager {
             let position = PlayerPosition.NOT_PLAYING;
 
             if (this.isPlayerReadyToPlay(playerUUID)){
-                tableSeats.push({
+                activePlayerSeats.push({
                     playerUUID,
                     seatNumber: this.getPlayerSeatNumber(playerUUID)
                 });
@@ -556,7 +556,7 @@ export class GameStateManager {
             playerPositionMap.set(playerUUID, position);
         }
 
-        this.gameState.tableSeats = tableSeats;
+        this.gameState.playersDealtInThisHand = activePlayerSeats;
         this.gameState.playerPositionMap = playerPositionMap;
     }
 
@@ -569,8 +569,8 @@ export class GameStateManager {
     }
 
     doesSeatContainPlayerReadyToPlay(seatNumber: number){
-        const tableSeats = this.getTableSeats();
-        const playerUUID = tableSeats[seatNumber]?.playerUUID;
+        const activePlayerSeats = this.getPlayersDealtInThisHand();
+        const playerUUID = activePlayerSeats[seatNumber]?.playerUUID;
         return playerUUID ? this.isPlayerReadyToPlay(playerUUID) : false;
     }
 
@@ -614,19 +614,23 @@ export class GameStateManager {
     }
 
 
-
     getPlayerPositionString(playerUUID: PlayerUUID): string | undefined {
         return PlayerPositionString[this.getPlayerPositionMap()?.get(playerUUID)];
     }
 
-    getSeatNumberRelativeToDealer(playerUUID: PlayerUUID) {
-        const numPlayers = this.getPlayersDealtIn().length;
-        return (
-            this.getPlayer(playerUUID).seatNumber +
-            ((numPlayers - this.getPlayer(this.getDealerUUID()).seatNumber) % numPlayers)
-        );
+    /** Player must be in hand. */
+    getSeatNumberRelativeToDealer(playerUUID: PlayerUUID): number {
+        const activePlayerSeats = this.getPlayersDealtInThisHand();
+        for (let i = 0; i < activePlayerSeats.length; i++){
+            if (activePlayerSeats[i].playerUUID === playerUUID){
+                return activePlayerSeats[i].seatNumber;
+            }
+        }
+        throw Error(`getSeatNumberRelativeToDealer called with player `+
+        `${this.getPlayerName(playerUUID)}: ${playerUUID} is not in the hand.`);
     }
 
+    /** playerA and playerB must be in the hand. */ 
     comparePositions(playerA: PlayerUUID, playerB: PlayerUUID) {
         const posA = this.getSeatNumberRelativeToDealer(playerA);
         const posB = this.getSeatNumberRelativeToDealer(playerB);
@@ -771,6 +775,18 @@ export class GameStateManager {
         const player = this.getPlayer(playerUUID);
         return player.willStraddle;
     }
+
+    // TODO figure out how to name everything and finish implementing getNExt methods
+
+    // getNextTableSeatReadyToPlay(n: number){
+    //     const activePlayerSeats = this.getPlayersDealtInThisHand();
+
+    //     for (let i = 0; i < activePlayerSeats.length; i++){
+    //         if (activePlayerSeats[i].playerUUID === playerUUID){
+    //             return activePlayerSeats[i].seatNumber;
+    //         }
+    //     }
+    // }
 
     getNextPlayerReadyToPlayUUID(currentPlayerUUID: PlayerUUID) {
         //TODO is this method ever called while nobody is sitting?
