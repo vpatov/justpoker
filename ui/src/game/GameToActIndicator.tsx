@@ -16,9 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         rootToAct: {
             opacity: 1,
-            background: `radial-gradient(circle, ${Color(theme.palette.primary.main)
-                .alpha(0.35)
-                .toString()} 0%, ${Color(theme.palette.primary.main).alpha(0.45).toString()} 100%) `,
+            background: `radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.25) 100%) `,
             transition: 'opacity 0.25s linear',
         },
     }),
