@@ -273,7 +273,11 @@ export class StateConverter {
         buttons.push(FOLD_BUTTON);
 
         buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
-        buttons.push(BET_BUTTON);
+
+        const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
+        const heroPlayerStack = this.gameStateManager.getPlayerByClientUUID(clientUUID).chips;
+
+        buttons.push(heroPlayerStack <= callAmount ? this.disableButton(BET_BUTTON) : BET_BUTTON);
         return buttons;
     }
 

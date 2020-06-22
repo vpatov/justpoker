@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         justifyContent: 'flex-end',
         filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
+        transform: 'translateY(-50%) translateX(-50%)',
     },
     folded: {
         opacity: 0.5,
@@ -33,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
     disconnected: {},
     hero: {
-        transform: 'translateY(-50%) translateX(-50%) scale(1.21)',
+        transform: 'translateY(-50%) translateX(-50%) scale(1.2)',
     },
     moreIcon: {
         zIndex: 10,

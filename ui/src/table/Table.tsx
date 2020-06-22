@@ -20,7 +20,7 @@ import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 const W_UNIT = '%';
 const H_UNIT = '%';
 
-const TABLE_HEIGHT = 50;
+const TABLE_HEIGHT = 46;
 const TABLE_WIDTH = 50;
 
 const BET_HEIGHT = 35;
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     },
     playersCont: {
         position: 'absolute',
-        height: `calc(calc(${TABLE_HEIGHT}${H_UNIT} + ${theme.custom.PLAYER_HEIGHT}vmin ) + 72px)`,
+        height: `calc(calc(${TABLE_HEIGHT}${H_UNIT} + ${theme.custom.PLAYER_HEIGHT}vmin ) + 58px)`,
         width: `calc(calc(${TABLE_WIDTH}${W_UNIT} + ${theme.custom.PLAYER_WIDTH}vmin ) + 24px)`,
         border: '6vmin solid transparent', // inscrease size for better hover radius
         '&:hover $emptySeat': {
@@ -168,7 +168,6 @@ function Table(props) {
                         style={{
                             top: `${pPos.y}${H_UNIT}`,
                             left: `${pPos.x}${W_UNIT}`,
-                            transform: 'translateY(-50%) translateX(-50%)',
                         }}
                     />,
                 );
