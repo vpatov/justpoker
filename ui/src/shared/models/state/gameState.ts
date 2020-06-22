@@ -26,7 +26,7 @@ export declare interface GameState {
 
     gameParameters: GameParameters;
 
-    /** 
+    /**
      * Index into this array is the relative seat number (relative to the dealer). Dealer is at position 0.
      * Represents the seating arrangement at the start of the hand. This is the only data structure that deals
      * with relative seat numbers, all other objects use the absolute seat number (i.e. player.seatNumber, dealerSeatNumber)
