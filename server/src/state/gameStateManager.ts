@@ -1243,7 +1243,7 @@ export class GameStateManager {
     }
 
     isAllInRunOut(): boolean {
-        return this.getPlayersAllIn().length === this.getPlayersInHand().length;
+        return this.getPlayersAllIn().length >= this.getPlayersInHand().length - 1;
     }
 
     hasPlayerPutAllChipsInThePot(playerUUID: PlayerUUID): boolean {
