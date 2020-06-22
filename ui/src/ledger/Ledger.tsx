@@ -31,6 +31,9 @@ const useStyles = makeStyles((theme) => ({
     table: {
         minWidth: 750,
     },
+    timeString: {
+        fontSize: '1.2vmin',
+    },
     visuallyHidden: {
         border: 0,
         clip: 'rect(0 0 0 0)',
@@ -290,8 +293,12 @@ function LedgerTable(props) {
                                             <TableCell align="right">{row.handsWon}</TableCell>
                                             <TableCell align="right">{row.flopsSeen}</TableCell>
                                             <TableCell align="right">{row.vpip}</TableCell>
-                                            <TableCell align="right">{row.timeStartedPlaying}</TableCell>
-                                            <TableCell align="right">{row.timeMostRecentHand}</TableCell>
+                                            <TableCell className={classes.timeString} align="right">
+                                                {row.timeStartedPlaying ? new Date(row.timeStartedPlaying).toLocaleString().replace(',', '') : 'N/A'}
+                                            </TableCell>
+                                            <TableCell className={classes.timeString} align="right">
+                                                {row.timeMostRecentHand ? new Date(row.timeMostRecentHand).toLocaleString().replace(',', '') : 'N/A'}
+                                            </TableCell>
                                         </TableRow>
                                     );
                                 })}
