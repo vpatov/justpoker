@@ -186,7 +186,7 @@ export class StateConverter {
         const curBet = this.gameStateManager.getPreviousRaise();
         const curCall = hero.betAmount;
         const toAct =
-            this.gameStateManager.getCurrentPlayerToAct() === heroPlayerUUID &&
+            this.gameStateManager.getCurrentPlayerToActUUID() === heroPlayerUUID &&
             this.gameStateManager.gameIsWaitingForBetAction();
         const minBet = this.getMinimumBetSize(heroPlayerUUID);
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
@@ -409,7 +409,7 @@ export class StateConverter {
 
     transformPlayer(player: Player, heroPlayerUUID: PlayerUUID): UiPlayer {
         const herosTurnToAct =
-            this.gameStateManager.getCurrentPlayerToAct() === player.uuid &&
+            this.gameStateManager.getCurrentPlayerToActUUID() === player.uuid &&
             this.gameStateManager.gameIsWaitingForBetAction();
         const uiPlayer = {
             stack: player.chips - player.betAmount,

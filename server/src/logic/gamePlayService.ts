@@ -42,7 +42,7 @@ export class GamePlayService {
     }
 
     computeAndSetCurrentPlayerToAct() {
-        const previousPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const previousPlayerToAct = this.gsm.getCurrentPlayerToActUUID();
 
         // if there is nor previous player to act, then we are starting the betting round.
         const currentPlayerToAct = previousPlayerToAct
@@ -60,7 +60,6 @@ export class GamePlayService {
     }
 
     computeTimeRemainingToAct() {
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
         const timeRemaining =
             this.gsm.getTimeToAct() +
             this.gsm.getSumTimeBankValueThisAction() -
@@ -69,7 +68,7 @@ export class GamePlayService {
     }
 
     timeOutPlayer() {
-        const playerUUID = this.gsm.getCurrentPlayerToAct();
+        const playerUUID = this.gsm.getCurrentPlayerToActUUID();
         if (!playerUUID) {
             logger.error(
                 `timeOutPlayer was called and there is no currentPlayerToAct. GameState:` +
@@ -115,7 +114,7 @@ export class GamePlayService {
     }
 
     useTimeBankAction() {
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const currentPlayerToAct = this.gsm.getCurrentPlayerToActUUID();
         this.gsm.incrementTimeBanksUsedThisAction();
         this.gsm.decrementTimeBanksLeft(currentPlayerToAct);
     }
@@ -148,7 +147,7 @@ export class GamePlayService {
         }
 
         this.gameInstanceLogService.pushBetAction(
-            this.gsm.getCurrentPlayerToAct(),
+            this.gsm.getCurrentPlayerToActUUID(),
             { type: action.type, amount: betAmount },
             getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
         );
@@ -159,12 +158,12 @@ export class GamePlayService {
     // the CHECK_ACTION / FOLD_ACTION constants
     check() {
         this.audioService.playCheckSFX();
-        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.CHECK);
+        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToActUUID(), BettingRoundActionType.CHECK);
     }
 
     fold() {
         this.audioService.playFoldSFX();
-        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.FOLD);
+        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToActUUID(), BettingRoundActionType.FOLD);
 
         // TODO only if player is facing bet
     }
@@ -172,7 +171,7 @@ export class GamePlayService {
     bet(betAmount: number, playerPlacingBlindBetUUID?: PlayerUUID) {
         const playerPlacingBet = playerPlacingBlindBetUUID
             ? playerPlacingBlindBetUUID
-            : this.gsm.getCurrentPlayerToAct();
+            : this.gsm.getCurrentPlayerToActUUID();
 
         // It is possible that this bet method is called with a betAmount greater
         // than the amount of chips the player has (for example, player is placing
@@ -227,7 +226,7 @@ export class GamePlayService {
 
     callBet() {
         this.audioService.playCallSFX();
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const currentPlayerToAct = this.gsm.getCurrentPlayerToActUUID();
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
         // TODO find the cleanest way to do this. Should that logic be handled in setPlayerBetAmount, or here?
@@ -243,30 +242,16 @@ export class GamePlayService {
         return callAmount;
     }
 
-    initializeDealerButton() {
-        const seats = this.gsm.getSeats();
-        const [_, seatZeroPlayerUUID] = seats[0];
-        const dealerUUID = this.gsm.getDealerUUID();
-        const newDealerUUID = dealerUUID ? this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID) : seatZeroPlayerUUID;
-
-        this.gsm.setDealerUUID(newDealerUUID);
-    }
-
     initializeNewHand() {
         this.gsm.incrementHandNumber();
         this.gsm.initializeNewDeck();
-        this.initializeDealerButton();
+        this.gsm.incrementDealerSeatNumber();
 
         this.gsm.recordPlayerChipsAtStartOfHand();
         this.placeBlinds();
         this.gameInstanceLogService.initNewHand();
     }
 
-    /*
-        TODO ensure that the players have enough to cover the blinds, and if not, put them
-        all-in. Don't let a player get this point if they have zero chips, stand them up earlier.
-        TODO substract chips from the players
-    */
     placeBlinds() {
         const numPlayersReadyToPlay = this.gsm.getPlayersReadyToPlay().length;
         const dealerUUID = this.gsm.getDealerUUID();
@@ -274,9 +259,9 @@ export class GamePlayService {
         const BB = this.gsm.getBB();
 
         const smallBlindUUID =
-            numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID);
-        const bigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(smallBlindUUID);
-        const straddleUUID = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+            numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(0);
+        const bigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(1);
+        const straddleUUID = this.gsm.getNextPlayerReadyToPlayUUID(2);
 
         const willPlayerStraddle = this.gsm.willPlayerStraddle(straddleUUID);
         const placeStraddle = willPlayerStraddle && numPlayersReadyToPlay > 2;
@@ -323,7 +308,7 @@ export class GamePlayService {
             } else if (straddleUUID) {
                 firstToAct = this.gsm.getNextPlayerInHandUUID(straddleUUID);
             } else {
-                firstToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+                firstToAct = this.gsm.getNextPlayerInHandUUID(bigBlindUUID);
             }
         } else {
             firstToAct = this.gsm.getNextPlayerInHandUUID(dealerUUID);

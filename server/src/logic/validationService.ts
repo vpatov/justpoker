@@ -139,7 +139,7 @@ export class ValidationService {
         if (error) {
             return error;
         }
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const currentPlayerToAct = this.gsm.getCurrentPlayerToActUUID();
         const gameIsWaitingForBetAction = this.gsm.gameIsWaitingForBetAction();
         if (player.uuid !== currentPlayerToAct || !gameIsWaitingForBetAction) {
             return {

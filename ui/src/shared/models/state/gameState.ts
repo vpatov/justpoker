@@ -31,11 +31,11 @@ export declare interface GameState {
      * Represents the seating arrangement at the start of the hand. This is the only data structure that deals
      * with relative seat numbers, all other objects use the absolute seat number (i.e. player.seatNumber, dealerSeatNumber)
      * */
-    playersDealtInThisHand: ActivePlayerSeat[];
+    activePlayerSeats: ActivePlayerSeat[];
 
     dealerSeatNumber: number;
 
-    currentTableSeatIndex: number;
+    currentPlayerToActPosition: number;
 
     playerPositionMap: Map<PlayerUUID, PlayerPosition>;
 
@@ -57,7 +57,7 @@ export declare interface GameState {
 
     firstToAct: PlayerUUID;
 
-    currentPlayerToAct: PlayerUUID;
+    currentPlayerToActUUID: PlayerUUID;
 
     lastBettingRoundAction: BettingRoundAction;
 
@@ -114,9 +114,9 @@ export function getCleanGameState(): GameState {
         players: {},
         board: [],
         gameParameters: getCleanGameParameters(),
-        playersDealtInThisHand: [],
+        activePlayerSeats: [],
         dealerSeatNumber: 0,
-        currentTableSeatIndex: 0,
+        currentPlayerToActPosition: 0,
         playerPositionMap: new Map(),
         dealerUUID: makeBlankUUID(),
         smallBlindUUID: makeBlankUUID(),
@@ -127,7 +127,7 @@ export function getCleanGameState(): GameState {
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToAct: makeBlankUUID(),
         admins: [],
-        currentPlayerToAct: makeBlankUUID(),
+        currentPlayerToActUUID: makeBlankUUID(),
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,
         activeConnections: new Map(),
