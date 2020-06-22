@@ -34,7 +34,7 @@ export const PlayerPositionString: { [key in PlayerPosition]: string } = {
 };
 
 /** Map player position enum to string representation. */
-export const AbbreviatedPlayerPositionString: {[key in PlayerPosition]: string} = {
+export const AbbreviatedPlayerPositionString: { [key in PlayerPosition]: string } = {
     [PP.DEALER]: 'BTN',
     [PP.SB]: 'SB',
     [PP.BB]: 'BB',

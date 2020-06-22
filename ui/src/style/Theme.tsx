@@ -37,7 +37,7 @@ const CUSTOM_PALETTE = {
     },
 };
 
-export const ASPECT_RATIO_BREAK_POINT = '(max-aspect-ratio: 5/4)';
+export const ASPECT_RATIO_BREAK_POINT = '(max-aspect-ratio: 4/3)';
 
 export const CUSTOM_THEME = {
     custom: {
