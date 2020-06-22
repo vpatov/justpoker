@@ -15,6 +15,7 @@ import GameKeepAliveListener from './GameKeepAliveListener';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { useStickyState } from '../utils';
+import GameToActIndicator from './GameToActIndicator';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,6 +59,7 @@ function Game(props) {
                 <GameMenu mute={mute} SET_mute={SET_mute} />
                 <ReactionPicker />
                 <div className={classes.gameTableCont}>
+                    <GameToActIndicator />
                     <GameLabel />
                     <Table className={classes.table} />
                     <ControllerTimer />

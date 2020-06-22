@@ -81,3 +81,22 @@ export function getDefaultGameParameters() {
         canShowHeadsUp: false,
     };
 }
+
+export function getTestGameParameters() {
+    return {
+        smallBlind: 100,
+        bigBlind: 200,
+        gameType: GameType.NLHOLDEM,
+        maxBuyin: 200000,
+        minBuyin: 5000,
+        dynamicMaxBuyin: false,
+        maxBuyinType: MaxBuyinType.TopStack,
+        timeToAct: 1200,
+        maxPlayers: 9,
+        timeBankTime: 30,
+        numberTimeBanks: 11,
+        allowTimeBanks: true,
+        allowStraddle: true,
+        canShowHeadsUp: true,
+    };
+}

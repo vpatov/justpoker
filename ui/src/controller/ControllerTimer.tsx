@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 import { heroPlayerTimerSelector, heroPlayerToAct } from '../store/selectors';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import Fade from '@material-ui/core/Fade';
-import { readFile } from 'fs';
 
 const updateIntervalS = 0.4;
 
@@ -15,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '100%',
             opacity: 1,
             transition: `transform ${updateIntervalS}s 10ms linear`,
-            boxShadow: `0px 5px 2vmin 1vmin ${theme.palette.primary.main}`,
+            boxShadow: `0px 5px 2vmin 1vmin white`,
             animation: '1s ease-in-out 0s 1 $fadeIn;',
         },
         '@keyframes fadeIn': {
