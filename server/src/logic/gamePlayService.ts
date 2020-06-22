@@ -401,7 +401,7 @@ export class GamePlayService {
     }
 
     showDown() {
-        const playersHands: [PlayerUUID, any][] = this.gsm
+        const playersHands: [PlayerUUID, Hand][] = this.gsm
             .getPlayersInHand()
             .map((playerUUID) => [playerUUID, this.gsm.getPlayerBestHand(playerUUID)]);
 
