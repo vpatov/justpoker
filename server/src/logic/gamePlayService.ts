@@ -42,6 +42,8 @@ export class GamePlayService {
     }
 
     computeAndSetCurrentPlayerToAct() {
+        
+        this.gsm.updateCurrentPlayerToActPosition();
         const previousPlayerToAct = this.gsm.getCurrentPlayerToActUUID();
 
         // if there is nor previous player to act, then we are starting the betting round.
@@ -306,12 +308,12 @@ export class GamePlayService {
             if (headsUp) {
                 firstToAct = dealerUUID;
             } else if (straddleUUID) {
-                firstToAct = this.gsm.getNextPlayerInHandUUID(straddleUUID);
+                firstToAct = this.gsm.getNextPlayerInHandUUID(3);
             } else {
-                firstToAct = this.gsm.getNextPlayerInHandUUID(bigBlindUUID);
+                firstToAct = this.gsm.getNextPlayerInHandUUID(2);
             }
         } else {
-            firstToAct = this.gsm.getNextPlayerInHandUUID(dealerUUID);
+            firstToAct = this.gsm.getNextPlayerInHandUUID(0);
         }
 
         this.gsm.setFirstToAct(firstToAct);
