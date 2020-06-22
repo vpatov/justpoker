@@ -235,9 +235,10 @@ export class GamePlayService {
         this.gsm.setPlayerBetAmount(currentPlayerToAct, callAmount);
 
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
+        const isPlayerCallingAllInRunOut = this.gsm.getPlayersAllIn.length === this.gsm.getPlayersInHand.length - 1;
         this.gsm.setPlayerLastActionType(
             currentPlayerToAct,
-            isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
+            isPlayerAllIn || isPlayerCallingAllInRunOut ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
         );
 
         return callAmount;

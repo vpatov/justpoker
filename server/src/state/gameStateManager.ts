@@ -1243,14 +1243,7 @@ export class GameStateManager {
     }
 
     isAllInRunOut(): boolean {
-        const playersAllIn = this.getPlayersAllIn();
-        const playersInHand = this.getPlayersInHand();
-        // there must be a least two player in the hand
-        // and at least one player all in
-        if (playersAllIn.length < 1 || playersInHand.length < 2) return false;
-
-        // then if everyone or everyone but one player(s) all in, its a runouttttt!!
-        return playersAllIn.length >= playersInHand.length - 1;
+        return this.getPlayersAllIn().length === this.getPlayersInHand().length;
     }
 
     hasPlayerPutAllChipsInThePot(playerUUID: PlayerUUID): boolean {
