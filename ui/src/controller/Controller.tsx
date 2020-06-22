@@ -29,6 +29,7 @@ import { BettingRoundActionButton } from '../shared/models/ui/uiState';
 import red from '@material-ui/core/colors/red';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
+import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,7 +41,14 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-between',
             alignItems: 'center',
             color: 'white',
-            ...theme.custom.CONTROLLER,
+            backgroundColor: 'rgba(0, 0, 0, 0.42)',
+            background: 'unset',
+            transition: 'background-color 0.25s linear',
+        },
+        rootToAct: {
+            transition: 'background-color 0.25s linear',
+            backgroundColor: grey[900],
+            background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
         },
         gameInfoCont: {
             marginLeft: '2vw',
