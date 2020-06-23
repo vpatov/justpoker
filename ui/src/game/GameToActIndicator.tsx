@@ -15,9 +15,9 @@ const useStyles = makeStyles((theme: Theme) =>
             transition: 'opacity 0.25s linear',
         },
         rootToAct: {
-            opacity: 1,
-            background: `radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.25) 100%) `,
-            transition: 'opacity 0.25s linear',
+            // opacity: 1,
+            // background: `radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.25) 100%) `,
+            // transition: 'opacity 0.25s linear',
         },
     }),
 );
