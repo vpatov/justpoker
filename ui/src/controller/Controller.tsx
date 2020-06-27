@@ -47,14 +47,14 @@ const useStyles = makeStyles((theme: Theme) =>
         gameInfoCont: {
             marginLeft: '2vw',
             height: '100%',
-            width: '20%',
+            width: '15%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'self-start',
             justifyContent: 'center',
         },
         sizeAndBetActionsCont: {
-            width: '60%',
+            width: '65%',
             height: '100%',
             display: 'flex',
             flexDirection: 'row',
@@ -82,8 +82,8 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
         },
         actionButton: {
-            height: '40%',
-            width: '12vmin',
+            height: '58%',
+            width: '16vmin',
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
         },
@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: theme.palette.primary.main,
         },
         handLabelSmaller: {
-            fontSize: '1.6vmin',
+            fontSize: '1.5vmin',
         },
         playerPositonString: {
             fontSize: '1.8vmin',

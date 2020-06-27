@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
     disconnected: {},
     hero: {
+        zIndex: 1,
         transform: 'translateY(-50%) translateX(-50%) scale(1.2)',
     },
     moreIcon: {

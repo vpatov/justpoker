@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '60%',
             width: '12vw',
             maxWidth: '250px',
+            fontSize: '2.4vmin',
         },
     }),
 );
