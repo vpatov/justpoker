@@ -9,11 +9,6 @@ import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
-import Color from 'color';
-
-function computeColor(color: string) {
-    return color;
-}
 
 export const Background = {
     blue: blue[600],
@@ -28,17 +23,17 @@ export const Background = {
 };
 
 export const PlayerColors: { [color: string]: string } = {
-    blue: computeColor(blue[500]),
-    purple: computeColor(deepPurple[400]),
-    teal: computeColor(teal[300]),
-    yellow: computeColor(yellow[300]),
-    indigo: computeColor(indigo[400]),
-    red: computeColor(red[400]),
-    green: computeColor(green[400]),
-    orange: computeColor(orange[300]),
-    pink: computeColor(pink[300]),
-    brown: computeColor(brown[400]),
-    lime: computeColor(lime[400]),
+    blue: blue[500],
+    purple: deepPurple[400],
+    teal: teal[300],
+    yellow: yellow[300],
+    indigo: indigo[400],
+    red: red[400],
+    green: green[400],
+    orange: orange[300],
+    pink: pink[300],
+    brown: brown[400],
+    lime: lime[400],
 };
 
 const playerColorKeys = Object.keys(PlayerColors);
@@ -46,5 +41,5 @@ const playerColorKeys = Object.keys(PlayerColors);
 export function getPlayerNameColor(seatNumber: number) {
     if (seatNumber >= 0 || seatNumber < playerColorKeys.length) {
         return PlayerColors[playerColorKeys[seatNumber]];
-    } else return computeColor(grey[400]);
+    } else return grey[400];
 }

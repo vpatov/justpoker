@@ -32,6 +32,17 @@ const useStyles = makeStyles((theme: Theme) =>
             width: 200,
             margin: '0px 12px',
         },
+        menuRow: {
+            display: 'flex',
+            alignItems: 'center',
+        },
+        sample: {
+            marginLeft: 12,
+            height: '2vmin',
+            width: '2vmin',
+            boxShadow: theme.shadows[3],
+            borderRadius: '0.4vmin',
+        },
     }),
 );
 
@@ -76,7 +87,10 @@ function SettingsDialog(props) {
                     <Select value={background} onChange={(event) => setBackground(event.target.value as any)}>
                         {Object.entries(Background).map(([k, v]) => (
                             <MenuItem key={k} value={v}>
-                                {capitalize(k)}
+                                <div className={classes.menuRow}>
+                                    {capitalize(k)}
+                                    <div className={classes.sample} style={{ backgroundColor: v }} />
+                                </div>
                             </MenuItem>
                         ))}
                     </Select>
