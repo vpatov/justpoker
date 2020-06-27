@@ -23,8 +23,8 @@ const H_UNIT = '%';
 const TABLE_HEIGHT = 44;
 const TABLE_WIDTH = 50;
 
-const BET_HEIGHT = 35;
-const BET_WIDTH = 38;
+const BET_HEIGHT = 32;
+const BET_WIDTH = 40;
 
 const HERO_DEFAULT_ROTATION = 5;
 

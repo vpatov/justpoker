@@ -10,7 +10,7 @@ import Suit from '../reuseable/Suit';
 import { Tooltip } from '@material-ui/core';
 import { grey, blueGrey } from '@material-ui/core/colors';
 
-const NORMAL_CARD_SIZE = '3.6vmin';
+const NORMAL_CARD_SIZE = '3.4vmin';
 const SIZE_CARD_SIZE = '2.5vmin';
 
 const useStyles = makeStyles((theme) => ({
@@ -47,8 +47,8 @@ const useStyles = makeStyles((theme) => ({
         position: 'absolute',
         width: NORMAL_CARD_SIZE,
         height: NORMAL_CARD_SIZE,
-        top: '40%',
-        right: '3%',
+        top: '39%',
+        right: '1%',
     },
     sideRank: {
         fontWeight: 'bold',
