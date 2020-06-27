@@ -15,7 +15,7 @@ const USER_PREFS_LOCAL_STORAGE_KEY = 'jp-user-prefs';
 
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);
-    newTheme.custom.BACKGROUND.background = prefs.background;
+    newTheme.custom.BACKGROUND.backgroundColor = prefs.backgroundColor;
 
     if (prefs.twoColor) {
         newTheme.custom.DIAMONDS = newTheme.custom.HEARTS as any;

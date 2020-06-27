@@ -39,14 +39,14 @@ function SettingsDialog(props) {
     const classes = useStyles();
     const { open, handleClose } = props;
     const { curfPrefs, themeSetter } = useContext(ThemeSetter);
-    const [background, setBackground] = useState(curfPrefs.background);
+    const [background, setBackground] = useState(curfPrefs.backgroundColor);
 
     const [cards, setCards] = React.useState(curfPrefs.twoColor);
 
     function createThemePreferences(): ThemePreferences {
         const prefs = {
             twoColor: cards,
-            background: background as any,
+            backgroundColor: background as any,
         };
         return prefs;
     }

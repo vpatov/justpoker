@@ -12,26 +12,19 @@ import { brown, lime } from '@material-ui/core/colors';
 import Color from 'color';
 
 function computeColor(color: string) {
-    return color.toString();
-}
-
-function computeBackgroundGradient(color: string) {
-    const c = Color(color);
-    const light = c.darken(0).desaturate(0.1);
-    const dark = c.darken(0.3).desaturate(0.6);
-    return `linear-gradient(360deg, ${dark.string()} 0%, ${light.string()})`;
+    return color;
 }
 
 export const Background = {
-    blue: computeBackgroundGradient(blue[600]),
-    purple: computeBackgroundGradient(deepPurple[600]),
-    brown: computeBackgroundGradient(brown[400]),
-    yellow: computeBackgroundGradient(yellow[700]),
-    grey: computeBackgroundGradient(grey[500]),
-    indigo: computeBackgroundGradient(indigo[800]),
-    red: computeBackgroundGradient(red[700]),
-    green: computeBackgroundGradient(green[700]),
-    orange: computeBackgroundGradient(orange[600]),
+    blue: blue[600],
+    purple: deepPurple[600],
+    brown: brown[400],
+    yellow: yellow[700],
+    grey: grey[500],
+    indigo: indigo[800],
+    red: red[700],
+    green: green[700],
+    orange: orange[600],
 };
 
 export const PlayerColors: { [color: string]: string } = {
@@ -54,12 +47,4 @@ export function getPlayerNameColor(seatNumber: number) {
     if (seatNumber >= 0 || seatNumber < playerColorKeys.length) {
         return PlayerColors[playerColorKeys[seatNumber]];
     } else return computeColor(grey[400]);
-}
-
-export function getPlayerAvatarBackground(seatNumber: number) {
-    const color = getPlayerNameColor(seatNumber);
-    const c = Color(color);
-    const light = c.lighten(0.2).desaturate(0.2);
-    const dark = c.darken(0.3).desaturate(0);
-    return `radial-gradient(${dark.string()} 0%, ${light.string()})`;
 }
