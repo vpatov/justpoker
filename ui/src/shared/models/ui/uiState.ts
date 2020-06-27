@@ -523,7 +523,10 @@ export const TestGame: UiGameState = {
             handLabel: 'Full House, Queens over Threes',
             bet: genRandomInt(0, 10),
             hand: {
-                cards: [{ ...genRandomCard(), isBeingShown: true }, genRandomCard()],
+                cards: [
+                    { ...genRandomCard(), isBeingShown: true, partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
+                ],
             },
             avatarKey: getRandomAvatarKey(),
             admin: true,
