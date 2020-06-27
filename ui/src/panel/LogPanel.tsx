@@ -30,10 +30,12 @@ const useStyles = makeStyles((theme: Theme) =>
         hideButtonGroup: {
             zIndex: 5,
             position: 'absolute',
-            bottom: 'calc(15% + 15px)',
+            bottom: 'calc(15% + 25px)',
             right: 15,
         },
         hideButton: {
+            borderColor: theme.custom.BACKGROUND_CONTRAST_COLOR,
+            color: theme.custom.BACKGROUND_CONTRAST_COLOR,
             fontSize: '1vmin',
         },
         unread: {

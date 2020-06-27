@@ -10,12 +10,18 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import Home from './Home';
 import Ledger from '../ledger/Ledger';
 import ErrorBoundary from './ErrorBoundry';
+import Color from 'color';
 
 const USER_PREFS_LOCAL_STORAGE_KEY = 'jp-user-prefs';
 
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);
     newTheme.custom.BACKGROUND.backgroundColor = prefs.backgroundColor;
+    if (Color(prefs.backgroundColor).isDark()) {
+        newTheme.custom.BACKGROUND_CONTRAST_COLOR = 'white';
+    } else {
+        newTheme.custom.BACKGROUND_CONTRAST_COLOR = 'black';
+    }
 
     if (prefs.twoColor) {
         newTheme.custom.DIAMONDS = newTheme.custom.HEARTS as any;

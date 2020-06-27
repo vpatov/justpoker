@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: '50%',
         justifyContent: 'center',
         alignItems: 'center',
-        border: `0.2vmin solid ${grey[300]}`,
+        border: `0.2vmin solid ${theme.custom.BACKGROUND_CONTRAST_COLOR}`,
         visibility: 'hidden',
     },
     container: {
@@ -28,6 +28,8 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: 'unset',
         width: `${size * 2}vmin`,
         height: `${size}vmin`,
+
+        color: theme.custom.BACKGROUND_CONTRAST_COLOR,
     },
     topButtonText: {
         marginTop: '1vmin',

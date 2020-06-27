@@ -59,8 +59,9 @@ export const CUSTOM_THEME = {
         },
         BACKGROUND: {
             background: `linear-gradient(360deg, rgba(0,0,0,0.5) 0%,  rgba(0,0,0,0))`,
-            backgroundColor: 'blue',
+            backgroundColor: blue[600],
         },
+        BACKGROUND_CONTRAST_COLOR: 'black',
         TABLE: {
             border: `0.7vmin solid rgba(0,0,0,0.5)`,
             boxShadow: '0 2px 6px 3px rgba(40,40,40,0.4)',
