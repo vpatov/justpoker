@@ -70,7 +70,6 @@ export const CUSTOM_THEME = {
         STACK: {
             color: 'black',
             backgroundColor: blueGrey[200],
-            borderRadius: '0.6vmin',
         },
         STACK_TO_ACT: {
             boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',
