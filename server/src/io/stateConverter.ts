@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { Player } from '../../../ui/src/shared/models/player/player';
 import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
-import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
+import { BettingRoundStage, BettingRoundActionType } from '../../../ui/src/shared/models/game/betting';
 
 import {
     UiState,
@@ -443,10 +443,27 @@ export class StateConverter {
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
             admin: this.gameStateManager.isPlayerAdmin(player.uuid),
+            lastAction: this.getLastActionString(player.lastActionType),
         };
         return uiPlayer;
     }
 
+    getLastActionString(bettingRoundActionType: BettingRoundActionType): string | undefined {
+        switch (bettingRoundActionType) {
+            case BettingRoundActionType.BET:
+                return 'Bet';
+            case BettingRoundActionType.CHECK:
+                return 'Check';
+            case BettingRoundActionType.CALL:
+                return 'Call';
+            case BettingRoundActionType.FOLD:
+                return 'Fold';
+            case BettingRoundActionType.ALL_IN:
+                return 'All In';
+            default:
+                return undefined;
+        }
+    }
     getPlayerPositionIndicator(playerUUID: PlayerUUID): PositionIndicator | undefined {
         if (!this.gameStateManager.isGameInProgress()) {
             return undefined;

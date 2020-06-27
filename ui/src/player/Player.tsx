@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
     const classes = useStyles();
     const { className, player, style, setHeroRotation, virtualPositon } = props;
-    const { hand, playerTimer, folded, uuid, sittingOut, hero } = player;
+    const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
         event.preventDefault();
@@ -64,16 +64,15 @@ function Player(props) {
     };
 
     function getPlayerLabelComponent() {
-        const comps: any = [];
-        if (folded) {
-            comps.push(<Typography className={classes.labelText}>Fold</Typography>);
+        if (lastAction) {
+            return <Typography className={classes.labelText}>{lastAction}</Typography>;
         }
 
         if (playerTimer) {
-            comps.push(<PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />);
+            return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
         }
 
-        return comps;
+        return null;
     }
 
     const playerLabelComponent = getPlayerLabelComponent();

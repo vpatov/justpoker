@@ -166,6 +166,7 @@ export declare interface UiPlayer {
         cards: UiCard[];
     };
     avatarKey: AvatarKeys;
+    lastAction?: string;
 }
 
 export declare interface RatHolePlayer {
@@ -581,6 +582,7 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            lastAction: 'All In',
         },
         {
             name: 'Lenny',
@@ -605,6 +607,7 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            lastAction: 'Check',
         },
         {
             name: 'Nicki Lam',
@@ -629,6 +632,7 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            lastAction: 'Fold',
         },
     ],
 };
