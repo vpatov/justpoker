@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
         },
         actionButton: {
-            height: '65%',
+            height: '58%',
             width: '16vmin',
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
