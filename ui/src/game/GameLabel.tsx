@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
             position: 'absolute',
             textAlign: 'right',
             lineHeight: 0,
+            color: theme.custom.BACKGROUND_CONTRAST_COLOR,
         },
         gameText: {
             fontSize: '2vmin',
@@ -26,11 +27,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         pause: {
             fontSize: '1.3vmin',
-            color: theme.palette.error.contrastText,
         },
         spectating: {
             fontSize: '1.8vmin',
-            color: theme.palette.error.contrastText,
         },
         icons: {
             marginRight: '.3vmin',

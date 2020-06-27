@@ -22,7 +22,7 @@ declare module '@material-ui/core/styles/createMuiTheme' {
 export const DEFAULT_PREFERENCES: UserPreferences = {
     theme: {
         twoColor: false,
-        background: Background.blue,
+        backgroundColor: Background.blue,
     },
 };
 
@@ -54,8 +54,10 @@ export const CUSTOM_THEME = {
             backgroundColor: lightGreen[900],
         },
         BACKGROUND: {
-            background: 'linear-gradient(360deg, rgba(50,50,63) 0%, rgb(25,25,40));',
+            background: `linear-gradient(360deg, rgba(0,0,0,0.5) 0%,  rgba(0,0,0,0))`,
+            backgroundColor: blue[600],
         },
+        BACKGROUND_CONTRAST_COLOR: 'black',
         TABLE: {
             border: `0.7vmin solid rgba(0,0,0,0.5)`,
             boxShadow: '0 2px 6px 3px rgba(40,40,40,0.4)',

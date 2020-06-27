@@ -4,5 +4,5 @@ export declare interface UserPreferences {
 
 export declare interface ThemePreferences {
     twoColor: boolean;
-    background: string;
+    backgroundColor: string;
 }

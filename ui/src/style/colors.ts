@@ -9,43 +9,31 @@ import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { brown, lime } from '@material-ui/core/colors';
-import Color from 'color';
-
-function computeColor(color: string) {
-    return color.toString();
-}
-
-function computeBackgroundGradient(color: string) {
-    const c = Color(color);
-    const light = c.darken(0).desaturate(0.1);
-    const dark = c.darken(0.3).desaturate(0.6);
-    return `linear-gradient(360deg, ${dark.string()} 0%, ${light.string()})`;
-}
 
 export const Background = {
-    blue: computeBackgroundGradient(blue[600]),
-    purple: computeBackgroundGradient(deepPurple[600]),
-    brown: computeBackgroundGradient(brown[400]),
-    yellow: computeBackgroundGradient(yellow[700]),
-    grey: computeBackgroundGradient(grey[500]),
-    indigo: computeBackgroundGradient(indigo[800]),
-    red: computeBackgroundGradient(red[700]),
-    green: computeBackgroundGradient(green[700]),
-    orange: computeBackgroundGradient(orange[600]),
+    blue: blue[600],
+    indigo: indigo[800],
+    purple: deepPurple[600],
+    red: red[700],
+    orange: orange[600],
+    yellow: yellow[700],
+    green: green[700],
+    brown: brown[400],
+    grey: grey[500],
 };
 
 export const PlayerColors: { [color: string]: string } = {
-    blue: computeColor(blue[500]),
-    purple: computeColor(deepPurple[400]),
-    teal: computeColor(teal[300]),
-    yellow: computeColor(yellow[300]),
-    indigo: computeColor(indigo[400]),
-    red: computeColor(red[400]),
-    green: computeColor(green[400]),
-    orange: computeColor(orange[300]),
-    pink: computeColor(pink[300]),
-    brown: computeColor(brown[400]),
-    lime: computeColor(lime[400]),
+    blue: blue[500],
+    purple: deepPurple[400],
+    teal: teal[300],
+    yellow: yellow[300],
+    indigo: indigo[400],
+    red: red[400],
+    green: green[400],
+    orange: orange[300],
+    pink: pink[300],
+    brown: brown[400],
+    lime: lime[400],
 };
 
 const playerColorKeys = Object.keys(PlayerColors);
@@ -53,13 +41,5 @@ const playerColorKeys = Object.keys(PlayerColors);
 export function getPlayerNameColor(seatNumber: number) {
     if (seatNumber >= 0 || seatNumber < playerColorKeys.length) {
         return PlayerColors[playerColorKeys[seatNumber]];
-    } else return computeColor(grey[400]);
-}
-
-export function getPlayerAvatarBackground(seatNumber: number) {
-    const color = getPlayerNameColor(seatNumber);
-    const c = Color(color);
-    const light = c.lighten(0.2).desaturate(0.2);
-    const dark = c.darken(0.3).desaturate(0);
-    return `radial-gradient(${dark.string()} 0%, ${light.string()})`;
+    } else return grey[400];
 }
