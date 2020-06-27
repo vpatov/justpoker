@@ -159,7 +159,7 @@ export function flipCard(id, hero) {
         targets: [`#${id}`],
 
         rotateY: [-180, 0],
-        translateY: hero ? '-2vmin' : '0',
+        translateY: hero ? '-2.4vmin' : '0',
         easing: 'easeOutExpo',
     });
 }

@@ -12,10 +12,8 @@ const useStyles = makeStyles((theme) => ({
         opacity: 0,
         transition: 'opacity 0.1s ease-in-out',
     },
-    heroHover: {
-        '&:hover': {
-            opacity: 1,
-        },
+    heroCard: {
+        transform: 'scale(1.25)',
     },
 }));
 
@@ -25,7 +23,7 @@ function Hand(props) {
     const { cards } = hand;
 
     return (
-        <div className={classnames(classes.root, className)}>
+        <div className={classnames(classes.root, className, { [classes.heroCard]: hero })}>
             {cards.map((c, i) => (
                 <CardSmall
                     {...c}

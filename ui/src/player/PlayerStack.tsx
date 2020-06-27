@@ -42,29 +42,15 @@ const useStyles = makeStyles((theme) => ({
     },
     name: {
         paddingBottom: '0.8vmin',
-
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
-
-        fontSize: '1.3vmin',
+        fontSize: '1.6vmin',
     },
     stack: {
-        paddingTop: '0.8vmin',
+        paddingTop: '1vmin',
         fontWeight: 'bold',
-        fontSize: '1.7vmin',
-    },
-    buttonR: {
-        fontWeight: 'bold',
-        fontSize: '1.7vmin',
-        paddingTop: '0.3vmin',
-        paddingRight: '0.3vmin',
-        float: 'right',
-        height: '2vmin',
-        width: '2vmin',
-    },
-    act: {
-        backgroundColor: 'rgba(0, 236, 255, 1)',
+        fontSize: '2vmin',
     },
     winnerAnimojiCont: {
         position: 'absolute',
