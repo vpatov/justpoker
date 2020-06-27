@@ -97,6 +97,7 @@ function SettingsDialog(props) {
                     <Paper className={classes.pickerCont}>
                         <ChromePicker
                             color={customColor}
+                            disableAlpha
                             onChange={(color) => {
                                 SET_customColor(color.hex);
                                 setBackground(color.hex);

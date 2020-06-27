@@ -12,14 +12,14 @@ import { brown, lime } from '@material-ui/core/colors';
 
 export const Background = {
     blue: blue[600],
-    purple: deepPurple[600],
-    brown: brown[400],
-    yellow: yellow[700],
-    grey: grey[500],
     indigo: indigo[800],
+    purple: deepPurple[600],
     red: red[700],
-    green: green[700],
     orange: orange[600],
+    yellow: yellow[700],
+    green: green[700],
+    brown: brown[400],
+    grey: grey[500],
 };
 
 export const PlayerColors: { [color: string]: string } = {
