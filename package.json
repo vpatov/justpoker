@@ -9,9 +9,5 @@
     },
     "devDependencies": {
         "concurrently": "^5.2.0"
-    },
-    "dependencies": {
-        "material-ui-color-picker": "^3.5.0",
-        "react-color": "^2.18.1"
     }
 }

@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         mainPot: {
             display: 'inline-block',
-            fontSize: '2.3vmin',
+            fontSize: '3vmin',
             textAlign: 'center',
             backgroundColor: 'rgba(0,0,0,0.5)',
             borderRadius: '1vmin',
@@ -53,9 +53,9 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: '0.5vmin 0.8vmin',
             backgroundColor: 'rgba(0,0,0,0.3)',
             color: 'white',
-            top: '-10%',
+            top: '-12.5%',
             position: 'absolute',
-            fontSize: '1vmin',
+            fontSize: '1.5vmin',
         },
     }),
 );

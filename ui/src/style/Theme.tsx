@@ -53,10 +53,6 @@ export const CUSTOM_THEME = {
         CLUBS: {
             backgroundColor: lightGreen[900],
         },
-        HIDDEN: {
-            backgroundColor: `${grey[900]}`,
-            backgroundImage: ``,
-        },
         BACKGROUND: {
             background: `linear-gradient(360deg, rgba(0,0,0,0.5) 0%,  rgba(0,0,0,0))`,
             backgroundColor: blue[600],
@@ -67,12 +63,11 @@ export const CUSTOM_THEME = {
             boxShadow: '0 2px 6px 3px rgba(40,40,40,0.4)',
             background: `radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%)`,
         },
-        PLAYER_WIDTH: 19,
-        PLAYER_HEIGHT: 12,
+        PLAYER_WIDTH: 21,
+        PLAYER_HEIGHT: 14,
         STACK: {
             color: 'black',
             backgroundColor: blueGrey[200],
-            borderRadius: '0.6vmin',
         },
         STACK_TO_ACT: {
             boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',

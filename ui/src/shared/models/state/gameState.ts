@@ -20,6 +20,8 @@ export declare interface GameState {
 
     gameParameters: GameParameters;
 
+    isAllInRunOut: boolean;
+
     dealerUUID: PlayerUUID;
 
     smallBlindUUID: PlayerUUID;
@@ -95,6 +97,7 @@ export function getCleanGameState(): GameState {
         players: {},
         board: [],
         gameParameters: getCleanGameParameters(),
+        isAllInRunOut: false,
         dealerUUID: makeBlankUUID(),
         smallBlindUUID: makeBlankUUID(),
         bigBlindUUID: makeBlankUUID(),

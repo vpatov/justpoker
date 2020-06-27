@@ -235,9 +235,10 @@ export class GamePlayService {
         this.gsm.setPlayerBetAmount(currentPlayerToAct, callAmount);
 
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
+        const isPlayerCallingAllInRunOut = this.gsm.getPlayersAllIn().length === this.gsm.getPlayersInHand().length - 1;
         this.gsm.setPlayerLastActionType(
             currentPlayerToAct,
-            isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
+            isPlayerAllIn || isPlayerCallingAllInRunOut ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
         );
 
         return callAmount;
@@ -584,6 +585,23 @@ export class GamePlayService {
             this.gsm.subtractBetAmountFromChips(playerUUID);
             this.gsm.setPlayerBetAmount(playerUUID, 0);
         });
+    }
+
+    updateIsAllInRunOut() {
+        if (this.gsm.isAllInRunOut()) {
+            return;
+        }
+        const [playersAllIn, playersInHand] = [this.gsm.getPlayersAllIn(), this.gsm.getPlayersInHand()];
+
+        // there must be a least two player in the hand and at least one player all in at the minimum
+        if (playersAllIn.length < 1 || playersInHand.length < 2) {
+            return;
+        }
+
+        // If everyone is all in, or everyone but one player is all in, isAllInRunOut === true
+        if (playersAllIn.length >= playersInHand.length - 1) {
+            this.gsm.setIsAllInRunOut(true);
+        }
     }
 
     flipCardsIfAllInRunOut() {
