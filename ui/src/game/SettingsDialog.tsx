@@ -86,26 +86,30 @@ function SettingsDialog(props) {
     const onSelectColor = (event) => {
         setBackground(event.target.value);
     };
-    return (
-        <>
-            {showColorPicker ? (
-                <ClickAwayListener
-                    onClickAway={() => {
-                        SET_showColorPicker(false);
-                    }}
-                >
-                    <Paper className={classes.pickerCont}>
-                        <ChromePicker
-                            color={customColor}
-                            disableAlpha
-                            onChange={(color) => {
-                                SET_customColor(color.hex);
-                                setBackground(color.hex);
-                            }}
-                        />
-                    </Paper>
-                </ClickAwayListener>
-            ) : null}
+
+    const renderColorPicker = () => {
+        return (
+            <ClickAwayListener
+                onClickAway={() => {
+                    SET_showColorPicker(false);
+                }}
+            >
+                <Paper className={classes.pickerCont}>
+                    <ChromePicker
+                        color={customColor}
+                        disableAlpha
+                        onChange={(color) => {
+                            SET_customColor(color.hex);
+                            setBackground(color.hex);
+                        }}
+                    />
+                </Paper>
+            </ClickAwayListener>
+        );
+    };
+
+    const renderUserSettingsDialog = () => {
+        return (
             <Dialog open={open} maxWidth="md" fullWidth>
                 <DialogTitle>{`User Settings`}</DialogTitle>
                 <DialogContent className={classes.content}>
@@ -148,6 +152,13 @@ function SettingsDialog(props) {
                     </Button>
                 </DialogActions>
             </Dialog>
+        );
+    };
+
+    return (
+        <>
+            {showColorPicker ? renderColorPicker() : null}
+            {renderUserSettingsDialog()}
         </>
     );
 }
