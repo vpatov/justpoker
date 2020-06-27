@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero } = props;
+    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero, style } = props;
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
 
@@ -105,7 +105,10 @@ function CardSmall(props) {
 
     if (hidden) {
         return (
-            <div className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}>
+            <div
+                className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}
+                style={style}
+            >
                 <Typography className={classnames(classes.hiddenText, { [classes.sideTextHidden]: shouldFlex })}>
                     JP
                 </Typography>
@@ -120,6 +123,7 @@ function CardSmall(props) {
                 [classes.sideCard]: shouldFlex,
             })}
             id={cardId}
+            style={style}
         >
             <Typography
                 className={shouldFlex ? classes.sideRank : classes.rank}

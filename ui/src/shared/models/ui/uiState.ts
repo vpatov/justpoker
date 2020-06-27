@@ -524,7 +524,9 @@ export const TestGame: UiGameState = {
             bet: genRandomInt(0, 10),
             hand: {
                 cards: [
-                    { ...genRandomCard(), isBeingShown: true, partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
                     { ...genRandomCard(), partOfWinningHand: true },
                 ],
             },
