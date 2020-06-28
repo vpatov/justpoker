@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 
-import { GameState, getCleanGameState, ActivePlayerSeat } from '../../../ui/src/shared/models/state/gameState';
+import { GameState, getCleanGameState, PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 import { ServerStateKey, ALL_STATE_KEYS, QueuedServerAction } from '../../../ui/src/shared/models/system/server';
 import { GameType, GameParameters, MaxBuyinType, ConnectedClient } from '../../../ui/src/shared/models/game/game';
 import {
@@ -266,70 +266,61 @@ export class GameStateManager {
         this.gameState.minRaiseDiff = minRaiseDiff;
     }
 
-    getCurrentPlayerToActUUID() {
-        return this.gameState.currentPlayerToActUUID;
+    getCurrentPlayerSeatToAct() {
+        return this.gameState.currentPlayerSeatToAct;
     }
 
-    getCurrentPlayerToActPosition() {
-        return this.gameState.currentPlayerToActPosition;
+    /**
+     * Sets the current player to act to either the first player to act at the start of the betting round,
+     * or increments the current player to act to the next player in the hand.
+     */
+    updateCurrentPlayerSeatToAct() {
+        const previousPlayerSeat = this.getCurrentPlayerSeatToAct();
+        const currentPlayerSeat = previousPlayerSeat
+            ? this.getNextPlayerSeatInHand(previousPlayerSeat.positionIndex)
+            : this.getFirstSeatToAct();
+
+        this.setCurrentPlayerSeatToAct(currentPlayerSeat);
     }
 
-    incrementCurrentPlayerToActPosition() {
-        const activePlayerSeats = this.getActivePlayerSeats();
-        const currentPlayerToActPosition = this.getCurrentPlayerToActPosition();
-
-        for (let i = 1; i < activePlayerSeats.length; i++) {
-            const position = (currentPlayerToActPosition + i) % activePlayerSeats.length;
-            const seat = activePlayerSeats[position];
-            if (this.isPlayerInHand(seat.playerUUID)) {
-                this.gameState.currentPlayerToActPosition = position;
-                return;
-            }
-        }
-
-        throw Error(`incrementCurrentPlayerToActPosition couldn't find the next player in the hand.`);
-    }
-
-    getDealerUUID(): PlayerUUID {
-        const activePlayerSeats = this.getActivePlayerSeats();
+    getDealerSeat(): PlayerSeat {
+        const seatsDealtIn = this.getSeatsDealtIn();
         const dealerSeatNumber = this.getDealerSeatNumber();
         // if the player sitting in the dealerSeat is the same player who was sitting in the dealerSeat
         // at the start of the hand, return their playerUUID
-        return this.getPlayerSeatNumber(activePlayerSeats[0].playerUUID) === dealerSeatNumber
-            ? activePlayerSeats[0].playerUUID
-            : makeBlankUUID();
+        return this.getPlayerSeatNumber(seatsDealtIn[0].playerUUID) === dealerSeatNumber ? seatsDealtIn[0] : undefined;
     }
 
-    getBigBlindUUID(): PlayerUUID {
-        return this.gameState.bigBlindUUID;
+    getBigBlindSeat(): PlayerSeat {
+        return this.gameState.bigBlindSeat;
     }
 
-    setBigBlindUUID(bigBlindUUID: PlayerUUID): void {
-        this.gameState.bigBlindUUID = bigBlindUUID;
+    setBigBlindSeat(bigBlindSeat: PlayerSeat): void {
+        this.gameState.bigBlindSeat = bigBlindSeat;
     }
 
-    getSmallBlindUUID(): PlayerUUID {
-        return this.gameState.smallBlindUUID;
+    getSmallBlindSeat(): PlayerSeat {
+        return this.gameState.smallBlindSeat;
     }
 
-    setSmallBlindUUID(smallBlindUUID: PlayerUUID) {
-        this.gameState.smallBlindUUID = smallBlindUUID;
+    setSmallBlindSeat(smallBlindSeat: PlayerSeat) {
+        this.gameState.smallBlindSeat = smallBlindSeat;
     }
 
-    getStraddleUUID(): PlayerUUID {
-        return this.gameState.straddleUUID;
+    getStraddleSeat(): PlayerSeat {
+        return this.gameState.straddleSeat;
     }
 
-    setStraddleUUID(straddleUUID: PlayerUUID) {
-        this.gameState.straddleUUID = straddleUUID;
+    setStraddleSeat(straddleSeat: PlayerSeat) {
+        this.gameState.straddleSeat = straddleSeat;
     }
 
-    setPrevBigBlindUUID(playerUUID: PlayerUUID) {
-        this.gameState.prevBigBlindUUID = playerUUID;
+    setPrevBigBlindSeat(playerSeat: PlayerSeat) {
+        this.gameState.prevBigBlindSeat = playerSeat;
     }
 
-    getPrevBigBlindUUID(): PlayerUUID {
-        return this.gameState.prevBigBlindUUID;
+    getPrevBigBlindSeat(): PlayerSeat {
+        return this.gameState.prevBigBlindSeat;
     }
 
     getHandNumber() {
@@ -538,8 +529,8 @@ export class GameStateManager {
         return this.gameState.bettingRoundStage;
     }
 
-    getActivePlayerSeats() {
-        return this.gameState.activePlayerSeats;
+    getSeatsDealtIn() {
+        return this.gameState.seatsDealtIn;
     }
 
     getPlayerPositionMap(): Map<PlayerUUID, PlayerPosition> {
@@ -555,7 +546,7 @@ export class GameStateManager {
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersReadyToPlay().length] || [];
 
-        const activePlayerSeats: ActivePlayerSeat[] = [];
+        const seatsDealtIn: PlayerSeat[] = [];
         const seatNumbers: [number, PlayerUUID][] = this.getSortedSeatNumbers();
         const startIndex = seatNumbers.findIndex(
             ([number, playerUUID]) => this.getPlayerSeatNumber(playerUUID) === this.getDealerSeatNumber(),
@@ -569,10 +560,12 @@ export class GameStateManager {
             let playerPositionName = PlayerPosition.NOT_PLAYING;
 
             if (this.isPlayerReadyToPlay(playerUUID)) {
-                activePlayerSeats.push({
+                seatsDealtIn.push({
                     playerUUID,
                     seatNumber: this.getPlayerSeatNumber(playerUUID),
+                    positionIndex: index,
                 });
+
                 playerPositionName = positions[positionNumber] || PlayerPosition.NOT_PLAYING;
                 positionNumber++;
             }
@@ -580,7 +573,7 @@ export class GameStateManager {
             playerPositionMap.set(playerUUID, playerPositionName);
         }
 
-        this.gameState.activePlayerSeats = activePlayerSeats;
+        this.gameState.seatsDealtIn = seatsDealtIn;
         this.gameState.playerPositionMap = playerPositionMap;
     }
 
@@ -592,10 +585,12 @@ export class GameStateManager {
         this.gameState.dealerSeatNumber = dealerSeatNumber;
     }
 
-    doesSeatContainPlayerReadyToPlay(seatNumber: number) {
-        const activePlayerSeats = this.getActivePlayerSeats();
-        const playerUUID = activePlayerSeats[seatNumber]?.playerUUID;
-        return playerUUID ? this.isPlayerReadyToPlay(playerUUID) : false;
+    getAllSeats() {
+        const seats = Array(this.getMaxPlayers());
+        this.forEveryPlayer((player) => {
+            seats[player.seatNumber] = player.uuid;
+        });
+        return seats;
     }
 
     /**
@@ -606,11 +601,14 @@ export class GameStateManager {
 
     incrementDealerSeatNumber() {
         const maxNumPlayers = this.getMaxPlayers();
-        let seatNumber = this.getDealerSeatNumber();
-        let i = 0;
+        const seats = this.getAllSeats();
+
+        const dealerSeatNumber = this.getDealerSeatNumber();
+        let i = 1;
         for (; i < maxNumPlayers; i++) {
-            seatNumber = seatNumber + (1 % maxNumPlayers);
-            if (this.doesSeatContainPlayerReadyToPlay(seatNumber)) {
+            const seatNumber = (dealerSeatNumber + i) % maxNumPlayers;
+            const playerUUID = seats[seatNumber];
+            if (playerUUID && this.isPlayerReadyToPlay(playerUUID)) {
                 this.setDealerSeatNumber(seatNumber);
                 break;
             }
@@ -643,10 +641,10 @@ export class GameStateManager {
 
     /** Player must be in hand. */
     getPositionNumber(playerUUID: PlayerUUID): number {
-        const activePlayerSeats = this.getActivePlayerSeats();
-        for (let i = 0; i < activePlayerSeats.length; i++) {
-            if (activePlayerSeats[i].playerUUID === playerUUID) {
-                return activePlayerSeats[i].seatNumber;
+        const seatsDealtIn = this.getSeatsDealtIn();
+        for (let i = 0; i < seatsDealtIn.length; i++) {
+            if (seatsDealtIn[i].playerUUID === playerUUID) {
+                return seatsDealtIn[i].seatNumber;
             }
         }
         throw Error(
@@ -803,16 +801,16 @@ export class GameStateManager {
     }
 
     /** Given the positionNumber, find the next player that is ready to play. */
-    getNextPlayerReadyToPlayUUID(positionNumber: number) {
-        const activePlayerSeats = this.getActivePlayerSeats();
-        for (let i = 1; i < activePlayerSeats.length; i++) {
-            const nextIndex = (positionNumber + i) % activePlayerSeats.length;
-            const seat = activePlayerSeats[nextIndex];
+    getNextPlayerSeatReadyToPlay(positionNumber: number): PlayerSeat {
+        const seatsDealtIn = this.getSeatsDealtIn();
+        for (let i = 1; i < seatsDealtIn.length; i++) {
+            const nextIndex = (positionNumber + i) % seatsDealtIn.length;
+            const seat = seatsDealtIn[nextIndex];
             if (
                 this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber &&
                 this.isPlayerReadyToPlay(seat.playerUUID)
             ) {
-                return seat.playerUUID;
+                return seat;
             }
         }
 
@@ -820,89 +818,23 @@ export class GameStateManager {
     }
 
     /** Given the positionNumber, find the next player that is in the hand. */
-    getNextPlayerInHandUUID(positionNumebr: number) {
-        const activePlayerSeats = this.getActivePlayerSeats();
-        for (let i = 1; i < activePlayerSeats.length; i++) {
-            const nextIndex = (positionNumebr + i) % activePlayerSeats.length;
-            const seat = activePlayerSeats[nextIndex];
+    getNextPlayerSeatInHand(positionNumber: number): PlayerSeat {
+        const seatsDealtIn = this.getSeatsDealtIn();
+        for (let i = 1; i < seatsDealtIn.length; i++) {
+            const nextIndex = (positionNumber + i) % seatsDealtIn.length;
+            const seat = seatsDealtIn[nextIndex];
             if (this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber && this.isPlayerInHand(seat.playerUUID)) {
-                return seat.playerUUID;
+                return seat;
             }
         }
 
         throw Error(`Went through all players and didnt find the next player ready to play.`);
     }
 
-    getNextPlayerReadyToPlayUUID2(currentPlayerUUID: PlayerUUID) {
-        //TODO is this method ever called while nobody is sitting?
-        // in a single-threaded env, probably
-
-        const seats = this.getSortedSeatNumbers();
-        const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
-
-        // find the next player that is in the hand
-        let nextIndex = (currentIndex + 1) % seats.length;
-        let [_, nextPlayerUUID] = seats[nextIndex];
-        let counted = 0;
-
-        while (!this.isPlayerReadyToPlay(nextPlayerUUID) && counted < seats.length) {
-            nextIndex = (nextIndex + 1) % seats.length;
-            [_, nextPlayerUUID] = seats[nextIndex];
-            counted += 1;
-        }
-        if (counted == seats.length) {
-            // TODO remove safeguard - only here to identify bugs
-            throw Error(`Went through all players and didnt find the next player ready to play.`);
-        }
-        return nextPlayerUUID;
-    }
-
-    getNextPlayerInHandUUID2(currentPlayerUUID: PlayerUUID) {
-        //TODO duplicate safeguard.
-        if (this.haveAllPlayersActed()) {
-            throw Error('getNextPlayerInHandUUID shouldnt be called if all plalyers have acted.');
-        }
-        if (!currentPlayerUUID) {
-            throw Error('getNextPlayerInHandUUID shouldnt be called without a currentPlalyerUUID');
-        }
-        const seats = this.getSortedSeatNumbers();
-        const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === currentPlayerUUID);
-
-        // find the next player that is in the hand
-        let nextIndex = (currentIndex + 1) % seats.length;
-        let [_, nextPlayerUUID] = seats[nextIndex];
-        let counted = 0;
-
-        while (!this.isPlayerEligibleToActNext(nextPlayerUUID) && counted < seats.length) {
-            nextIndex = (nextIndex + 1) % seats.length;
-            [_, nextPlayerUUID] = seats[nextIndex];
-            counted += 1;
-        }
-
-        if (counted == seats.length) {
-            // TODO remove safeguard - only here to identify bugs
-            throw Error(`Went through all players and didnt find the next player ready in hand.`);
-        }
-        return nextPlayerUUID;
-    }
-
-    getPlayerInBetween(firstPlayerUUID: PlayerUUID, secondPlayerUUID: PlayerUUID): PlayerUUID[] {
-        const seats = this.getSortedSeatNumbers();
-        const currentIndex = seats.findIndex(([seatNumber, uuid]) => uuid === firstPlayerUUID);
-        // find the next player that is in the hand
-        let nextIndex = (currentIndex + 1) % seats.length;
-        let [_, nextPlayerUUID] = seats[nextIndex];
-        let counted = 0;
-
-        const playersInBetween: PlayerUUID[] = [];
-        while (nextPlayerUUID !== secondPlayerUUID && counted < seats.length) {
-            playersInBetween.push(nextPlayerUUID);
-            nextIndex = (nextIndex + 1) % seats.length;
-            [_, nextPlayerUUID] = seats[nextIndex];
-            counted += 1;
-        }
-
-        return playersInBetween;
+    getPlayersInBetween(firstPlayerSeat: PlayerSeat, secondPlayerSeat: PlayerSeat): PlayerUUID[] {
+        return this.getSeatsDealtIn()
+            .slice(firstPlayerSeat.positionIndex, secondPlayerSeat.positionIndex)
+            .map((seat) => seat.playerUUID);
     }
 
     isSeatTaken(seatNumber: number) {
@@ -913,7 +845,6 @@ export class GameStateManager {
         return seatNumber >= 0 && seatNumber < this.gameState.gameParameters.maxPlayers;
     }
 
-    // TODO deck breaks immutability
     drawCard() {
         return this.deckService.drawCard(this.gameState.deck);
     }
@@ -1181,20 +1112,20 @@ export class GameStateManager {
         });
     }
 
-    getFirstToAct() {
-        return this.gameState.firstToAct;
+    getFirstSeatToAct() {
+        return this.gameState.firstToActSeat;
     }
 
     getLastAggressorUUID(): string {
         return this.gameState.lastAggressorUUID;
     }
 
-    setFirstToAct(playerUUID: PlayerUUID) {
-        this.gameState.firstToAct = playerUUID;
+    setFirstSeatToAct(firstToAct: PlayerSeat) {
+        this.gameState.firstToActSeat = firstToAct;
     }
 
-    setCurrentPlayerToAct(playerUUID: PlayerUUID) {
-        this.gameState.currentPlayerToActUUID = playerUUID;
+    setCurrentPlayerSeatToAct(playerSeat: PlayerSeat) {
+        this.gameState.currentPlayerSeatToAct = playerSeat;
     }
 
     setBettingRoundStage(bettingRoundStage: BettingRoundStage) {
@@ -1321,17 +1252,17 @@ export class GameStateManager {
         this.updateGameState({
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
-            firstToAct: makeBlankUUID(),
-            currentPlayerToActUUID: makeBlankUUID(),
+            firstToActSeat: undefined,
+            currentPlayerSeatToAct: undefined,
             pots: [],
             deck: {
                 cards: [],
             },
             handWinners: new Set<PlayerUUID>(),
             winningHand: undefined,
-            smallBlindUUID: makeBlankUUID(),
-            bigBlindUUID: makeBlankUUID(),
-            straddleUUID: makeBlankUUID(),
+            smallBlindSeat: undefined,
+            bigBlindSeat: undefined,
+            straddleSeat: undefined,
         });
     }
 
@@ -1349,7 +1280,7 @@ export class GameStateManager {
     }
 
     clearCurrentPlayerToAct() {
-        this.gameState.currentPlayerToActUUID = makeBlankUUID();
+        this.gameState.currentPlayerSeatToAct = undefined;
     }
 
     getHighestBet() {

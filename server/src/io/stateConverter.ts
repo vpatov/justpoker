@@ -46,6 +46,7 @@ import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getHoleCardNickname } from '../../../ui/src/shared/models/game/cards';
+import { PlayerPosition } from '../../../ui/src/shared/models/player/playerPosition';
 
 declare interface CardInformation {
     hand: {
@@ -186,7 +187,7 @@ export class StateConverter {
         const curBet = this.gameStateManager.getPreviousRaise();
         const curCall = hero.betAmount;
         const toAct =
-            this.gameStateManager.getCurrentPlayerToActUUID() === heroPlayerUUID &&
+            this.gameStateManager.getCurrentPlayerSeatToAct()?.playerUUID === heroPlayerUUID &&
             this.gameStateManager.gameIsWaitingForBetAction();
         const minBet = this.getMinimumBetSize(heroPlayerUUID);
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
@@ -409,7 +410,7 @@ export class StateConverter {
 
     transformPlayer(player: Player, heroPlayerUUID: PlayerUUID): UiPlayer {
         const herosTurnToAct =
-            this.gameStateManager.getCurrentPlayerToActUUID() === player.uuid &&
+            this.gameStateManager.getCurrentPlayerSeatToAct()?.playerUUID === player.uuid &&
             this.gameStateManager.gameIsWaitingForBetAction();
         const uiPlayer = {
             stack: player.chips - player.betAmount,
@@ -447,16 +448,14 @@ export class StateConverter {
         if (!this.gameStateManager.isGameInProgress()) {
             return undefined;
         }
-        const dealer = this.gameStateManager.getDealerUUID();
-        const smallBlind = this.gameStateManager.getSmallBlindUUID();
-        const bigBlind = this.gameStateManager.getBigBlindUUID();
+        const position = this.gameStateManager.getPlayerPositionMap().get(playerUUID);
 
-        switch (playerUUID) {
-            case dealer:
+        switch (position) {
+            case PlayerPosition.DEALER:
                 return PositionIndicator.BUTTON;
-            case smallBlind:
+            case PlayerPosition.SB:
                 return PositionIndicator.SMALL_BLIND;
-            case bigBlind:
+            case PlayerPosition.BB:
                 return PositionIndicator.BIG_BLIND;
             default:
                 break;

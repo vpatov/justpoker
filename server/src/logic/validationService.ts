@@ -139,9 +139,9 @@ export class ValidationService {
         if (error) {
             return error;
         }
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToActUUID();
+        const currentPlayerToActUUID = this.gsm.getCurrentPlayerSeatToAct()?.playerUUID;
         const gameIsWaitingForBetAction = this.gsm.gameIsWaitingForBetAction();
-        if (player.uuid !== currentPlayerToAct || !gameIsWaitingForBetAction) {
+        if (player.uuid !== currentPlayerToActUUID || !gameIsWaitingForBetAction) {
             return {
                 errorType: ErrorType.OUT_OF_TURN,
                 errorString: `Not your turn!\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
