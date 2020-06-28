@@ -460,7 +460,7 @@ export const TestGame: UiGameState = {
     },
     controller: {
         showWarningOnFold: true,
-        toAct: true,
+        toAct: false,
         lastBettingRoundAction: CHECK_ACTION,
         min: 25,
         max: 43000,
