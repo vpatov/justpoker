@@ -85,7 +85,7 @@ export declare interface Controller {
     willStraddle: boolean;
     lastBettingRoundAction: BettingRoundAction;
     showWarningOnFold: boolean;
-    callAmount: number;
+    amountToCall: number;
     playerPositionString?: string;
 }
 
@@ -316,7 +316,7 @@ export function getCleanController(): Controller {
         bettingRoundActionButtons: [],
         timeBanks: 0,
         showWarningOnFold: false,
-        callAmount: 0,
+        amountToCall: 0,
     };
 }
 
@@ -457,7 +457,7 @@ export const TestGame: UiGameState = {
         lastBettingRoundAction: CHECK_ACTION,
         min: 25,
         max: 43000,
-        callAmount: 54323,
+        amountToCall: 54323,
         timeBanks: 11,
         dealInNextHand: false,
         playerPositionString: 'Hijack',

@@ -236,7 +236,7 @@ export class StateConverter {
             showWarningOnFold:
                 !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ||
                 this.gameStateManager.getAllCommitedBets() === 0,
-            callAmount: this.gameStateManager.computeCallAmount(heroPlayerUUID),
+            amountToCall: this.gameStateManager.computeCallAmount(heroPlayerUUID) - curCall,
         };
 
         return controller;
@@ -273,7 +273,12 @@ export class StateConverter {
         // player can always queue a bet or fold action but we decide if it is check or call
         buttons.push(FOLD_BUTTON);
 
-        buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
+        buttons.push(
+            this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) &&
+                !this.gameStateManager.isGameStageInBetweenHands()
+                ? CALL_BUTTON
+                : CHECK_BUTTON,
+        );
 
         const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
         const heroPlayerStack = this.gameStateManager.getPlayerByClientUUID(clientUUID).chips;

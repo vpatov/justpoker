@@ -96,13 +96,13 @@ export class GamePlayService {
     }
 
     startOfBettingRound() {
-        // During preflop the previousRaise is set by placing the blinds
-        if (this.gsm.getBettingRoundStage() !== BettingRoundStage.PREFLOP) {
-            this.gsm.setPreviousRaise(0);
-        }
         this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPartialAllInLeftOver(0);
         this.updatePlayersBestHands();
+    }
+
+    endOfBettingRound() {
+        this.gsm.setPreviousRaise(0);
     }
 
     resetBettingRoundActions() {

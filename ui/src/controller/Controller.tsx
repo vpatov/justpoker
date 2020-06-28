@@ -153,7 +153,7 @@ function ControllerComp(props: ControllerProps) {
         timeBanks,
         willStraddle,
         showWarningOnFold,
-        callAmount,
+        amountToCall,
         playerPositionString,
     } = useSelector(controllerSelector);
 
@@ -285,7 +285,7 @@ function ControllerComp(props: ControllerProps) {
     function getBetActionButtonText(button: BettingRoundActionButton): string {
         switch (button.action) {
             case BettingRoundActionType.CALL:
-                return `${button.label} ${callAmount || ''}`;
+                return `${button.label} ${amountToCall || ''}`;
             case BettingRoundActionType.BET:
                 return `${button.label} ${betAmt || ''}`;
             case BettingRoundActionType.CHECK:
