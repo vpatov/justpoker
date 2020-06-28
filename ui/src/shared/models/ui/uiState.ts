@@ -78,7 +78,7 @@ export declare interface Controller {
     max: number;
     timeBanks: number;
     sizingButtons: SizingButton[];
-    bettingRoundActionButtons: BettingRoundActionButton[];
+    bettingActionButtons: BettingActionButtons;
     showCardButtons?: ShowCardButton[];
     dealInNextHand: boolean;
     toAct?: boolean;
@@ -89,6 +89,19 @@ export declare interface Controller {
     playerPositionString?: string;
 }
 
+export declare interface BettingActionButtons {
+    [BettingRoundActionType.FOLD]?: BettingActionButton;
+    [BettingRoundActionType.CHECK]?: BettingActionButton;
+    [BettingRoundActionType.CALL]?: BettingActionButton;
+    [BettingRoundActionType.BET]?: BettingActionButton;
+}
+
+export declare interface BettingActionButton {
+    label: string;
+    action: BettingRoundActionType;
+    disabled?: boolean;
+}
+
 export declare interface SizingButton {
     label: string;
     value: number;
@@ -97,12 +110,6 @@ export declare interface SizingButton {
 export declare interface ActionButton {
     label: string;
     action: ClientActionType;
-    disabled?: boolean;
-}
-
-export declare interface BettingRoundActionButton {
-    label: string;
-    action: BettingRoundActionType;
     disabled?: boolean;
 }
 
@@ -205,27 +212,27 @@ export declare interface UiHandLogEntry {
 }
 
 /* Action Buttons */
-export const FOLD_BUTTON: BettingRoundActionButton = {
+export const FOLD_BUTTON: BettingActionButton = {
     action: BettingRoundActionType.FOLD,
     label: 'Fold',
 };
 
-export const CHECK_BUTTON: BettingRoundActionButton = {
+export const CHECK_BUTTON: BettingActionButton = {
     action: BettingRoundActionType.CHECK,
     label: 'Check',
 };
 
-export const CALL_BUTTON: BettingRoundActionButton = {
+export const CALL_BUTTON: BettingActionButton = {
     action: BettingRoundActionType.CALL,
     label: 'Call',
 };
 
-export const BET_BUTTON: BettingRoundActionButton = {
+export const BET_BUTTON: BettingActionButton = {
     action: BettingRoundActionType.BET,
     label: 'Bet',
 };
 
-export const RAISE_BUTTON: BettingRoundActionButton = {
+export const RAISE_BUTTON: BettingActionButton = {
     action: BettingRoundActionType.BET,
     label: 'Raise',
 };
@@ -275,11 +282,11 @@ export const BUY_CHIPS_BUTTON: MenuButton = {
     label: 'Buy Chips',
 };
 
-export const NOT_FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CHECK_BUTTON, BET_BUTTON];
-
-export const FACING_BET_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, RAISE_BUTTON];
-
-export const ALL_ACTION_BUTTONS = [FOLD_BUTTON, CALL_BUTTON, BET_BUTTON];
+export const ALL_ACTION_BUTTONS = {
+    [BettingRoundActionType.FOLD]: FOLD_BUTTON,
+    [BettingRoundActionType.CHECK]: CHECK_BUTTON,
+    [BettingRoundActionType.BET]: BET_BUTTON,
+};
 
 export const ALL_MENU_BUTTONS = [
     START_GAME_BUTTON,
@@ -313,7 +320,7 @@ export function getCleanController(): Controller {
         willStraddle: false,
         dealInNextHand: true,
         sizingButtons: [],
-        bettingRoundActionButtons: [],
+        bettingActionButtons: {},
         timeBanks: 0,
         showWarningOnFold: false,
         amountToCall: 0,
@@ -490,7 +497,7 @@ export const TestGame: UiGameState = {
                 value: 43000,
             },
         ],
-        bettingRoundActionButtons: ALL_ACTION_BUTTONS,
+        bettingActionButtons: ALL_ACTION_BUTTONS,
     },
     table: {
         spots: 9,

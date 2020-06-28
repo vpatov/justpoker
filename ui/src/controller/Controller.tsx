@@ -25,7 +25,7 @@ import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
 import BuyChipsDialog from '../game/BuyChipsDialog';
-import { BettingRoundActionButton } from '../shared/models/ui/uiState';
+import { BettingActionButton } from '../shared/models/ui/uiState';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 import { grey } from '@material-ui/core/colors';
@@ -147,7 +147,7 @@ function ControllerComp(props: ControllerProps) {
         min,
         max,
         sizingButtons,
-        bettingRoundActionButtons: actionButtons,
+        bettingActionButtons,
         showCardButtons,
         dealInNextHand,
         timeBanks,
@@ -282,20 +282,89 @@ function ControllerComp(props: ControllerProps) {
         setQueuedActionType('');
     }
 
-    function getBetActionButtonText(button: BettingRoundActionButton): string {
-        switch (button.action) {
-            case BettingRoundActionType.CALL:
-                return `${button.label} ${amountToCall || ''}`;
-            case BettingRoundActionType.BET:
-                return `${button.label} ${betAmt || ''}`;
-            case BettingRoundActionType.CHECK:
-                return button.label;
-            case BettingRoundActionType.FOLD:
-                return button.label;
+    function generateBetActionButtons() {
+        const buttons = [] as any;
 
-            default:
-                return button.label;
+        // FOLD BUTTON
+        let button = bettingActionButtons[BettingRoundActionType.FOLD];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <Button
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                        [classes.semiDisabledFold]: showWarningOnFold,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled}
+                >
+                    {label}
+                </Button>,
+            );
         }
+
+        // CHECK BUTTON
+        button = bettingActionButtons[BettingRoundActionType.CHECK];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <Button
+                    id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled}
+                >
+                    {label}
+                </Button>,
+            );
+        }
+
+        // CALL BUTTON
+        button = bettingActionButtons[BettingRoundActionType.CALL];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <Button
+                    id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled}
+                >
+                    {`${label} (${amountToCall})`}
+                </Button>,
+            );
+        }
+
+        // BET BUTTON
+        button = bettingActionButtons[BettingRoundActionType.BET];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <Button
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled || betAmt < min}
+                >
+                    {label}
+                </Button>,
+            );
+        }
+
+        return buttons;
     }
 
     if (isSpectator)
@@ -342,32 +411,7 @@ function ControllerComp(props: ControllerProps) {
                 ) : null}
             </div>
             <div className={classes.sizeAndBetActionsCont}>
-                <div className={classes.betActionsCont}>
-                    {actionButtons.map((button) => {
-                        return (
-                            <Button
-                                id={
-                                    button.action === BettingRoundActionType.CHECK ||
-                                    button.action === BettingRoundActionType.CALL
-                                        ? `${SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}`
-                                        : ''
-                                }
-                                variant="outlined"
-                                className={classnames(classes.actionButton, classes[button.action], {
-                                    [classes[`${button.action}_QUEUED`]]: button.action === queuedActionType,
-                                    [classes.semiDisabledFold]:
-                                        button.action === BettingRoundActionType.FOLD && showWarningOnFold,
-                                })}
-                                disabled={
-                                    button.disabled || (button.action === BettingRoundActionType.BET && betAmt < min)
-                                }
-                                onClick={() => onClickActionButton(button.action)}
-                            >
-                                {getBetActionButtonText(button)}
-                            </Button>
-                        );
-                    })}
-                </div>
+                <div className={classes.betActionsCont}>{generateBetActionButtons()}</div>
                 <ControllerBetSizer
                     sizingButtons={sizingButtons}
                     min={min}
