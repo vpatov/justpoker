@@ -37,6 +37,13 @@ export class AudioService {
         return this.audioQueue.global !== SoundByte.NONE;
     }
 
+    playFlopSFX() {
+        this.setGlobalSound(SoundByte.FLOP);
+    }
+    playTurnRiverSFX() {
+        this.setGlobalSound(SoundByte.TURN_RIVER);
+    }
+
     playCheckSFX() {
         this.setGlobalSound(SoundByte.CHECK);
     }

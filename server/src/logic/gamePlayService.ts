@@ -378,18 +378,21 @@ export class GamePlayService {
                         this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(playerUUID));
                     }
                 });
+                this.audioService.playFlopSFX();
                 break;
             }
 
             case BettingRoundStage.TURN: {
                 const cards = this.gsm.dealCardsToBoard(1);
                 this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
+                this.audioService.playTurnRiverSFX();
                 break;
             }
 
             case BettingRoundStage.RIVER: {
                 const cards = this.gsm.dealCardsToBoard(1);
                 this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
+                this.audioService.playTurnRiverSFX();
                 break;
             }
 
