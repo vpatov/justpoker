@@ -270,7 +270,7 @@ export class GameStateManager {
         return this.gameState.currentPlayerToActUUID;
     }
 
-    getCurrentPlayerToActPosition(){
+    getCurrentPlayerToActPosition() {
         return this.gameState.currentPlayerToActPosition;
     }
 
@@ -278,17 +278,16 @@ export class GameStateManager {
         const activePlayerSeats = this.getActivePlayerSeats();
         const currentPlayerToActPosition = this.getCurrentPlayerToActPosition();
 
-        for (let i = 1; i < activePlayerSeats.length; i++){
+        for (let i = 1; i < activePlayerSeats.length; i++) {
             const position = (currentPlayerToActPosition + i) % activePlayerSeats.length;
             const seat = activePlayerSeats[position];
-            if (this.isPlayerInHand(seat.playerUUID)){
+            if (this.isPlayerInHand(seat.playerUUID)) {
                 this.gameState.currentPlayerToActPosition = position;
                 return;
             }
         }
 
         throw Error(`incrementCurrentPlayerToActPosition couldn't find the next player in the hand.`);
-
     }
 
     getDealerUUID(): PlayerUUID {
@@ -804,30 +803,33 @@ export class GameStateManager {
     }
 
     /** Given the positionNumber, find the next player that is ready to play. */
-    getNextPlayerReadyToPlayUUID(positionNumber: number){
+    getNextPlayerReadyToPlayUUID(positionNumber: number) {
         const activePlayerSeats = this.getActivePlayerSeats();
-        for (let i = 1; i < activePlayerSeats.length; i++){
+        for (let i = 1; i < activePlayerSeats.length; i++) {
             const nextIndex = (positionNumber + i) % activePlayerSeats.length;
             const seat = activePlayerSeats[nextIndex];
-            if (this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber && this.isPlayerReadyToPlay(seat.playerUUID)){
+            if (
+                this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber &&
+                this.isPlayerReadyToPlay(seat.playerUUID)
+            ) {
                 return seat.playerUUID;
             }
         }
-        
+
         throw Error(`Went through all players and didnt find the next player ready to play.`);
     }
 
     /** Given the positionNumber, find the next player that is in the hand. */
-    getNextPlayerInHandUUID(positionNumebr: number){
+    getNextPlayerInHandUUID(positionNumebr: number) {
         const activePlayerSeats = this.getActivePlayerSeats();
-        for (let i = 1; i < activePlayerSeats.length; i++){
+        for (let i = 1; i < activePlayerSeats.length; i++) {
             const nextIndex = (positionNumebr + i) % activePlayerSeats.length;
             const seat = activePlayerSeats[nextIndex];
-            if (this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber && this.isPlayerInHand(seat.playerUUID)){
+            if (this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber && this.isPlayerInHand(seat.playerUUID)) {
                 return seat.playerUUID;
             }
         }
-        
+
         throw Error(`Went through all players and didnt find the next player ready to play.`);
     }
 

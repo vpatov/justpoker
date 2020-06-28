@@ -42,7 +42,6 @@ export class GamePlayService {
     }
 
     computeAndSetCurrentPlayerToAct() {
-        
         this.gsm.updateCurrentPlayerToActPosition();
         const previousPlayerToAct = this.gsm.getCurrentPlayerToActUUID();
 
@@ -260,8 +259,7 @@ export class GamePlayService {
         const SB = this.gsm.getSB();
         const BB = this.gsm.getBB();
 
-        const smallBlindUUID =
-            numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(0);
+        const smallBlindUUID = numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(0);
         const bigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(1);
         const straddleUUID = this.gsm.getNextPlayerReadyToPlayUUID(2);
 
