@@ -207,13 +207,15 @@ function GameMenu(props) {
                 </Paper>
             </div>
             <SettingsDialog handleClose={handleSettingsClose} open={settingsOpen} />
-            <GameParamatersDialog
-                open={gameParametersOpen}
-                gameParameters={gameParameters}
-                onCancel={() => SET_gameParametersOpen(false)}
-                onSave={onGameParamatersDialogSave}
-                disabled={!isHeroAdmin}
-            />
+            {gameParametersOpen ? (
+                <GameParamatersDialog
+                    open={gameParametersOpen}
+                    gameParameters={gameParameters}
+                    onCancel={() => SET_gameParametersOpen(false)}
+                    onSave={onGameParamatersDialogSave}
+                    disabled={!isHeroAdmin}
+                />
+            ) : null}
             {buyChipsDialog ? (
                 <BuyChipsDialog
                     open={buyChipsDialog}
