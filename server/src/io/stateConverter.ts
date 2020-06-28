@@ -117,7 +117,7 @@ export class StateConverter {
                                       ? 0
                                       : this.gameStateManager.getActivePotValue(),
                               awardPots: this.gameStateManager.getAwardPots(),
-                              fullPot: this.gameStateManager.getFullPot(),
+                              fullPot: this.gameStateManager.getFullPotValue(),
                               inactivePots:
                                   this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER
                                       ? []
@@ -183,7 +183,7 @@ export class StateConverter {
 
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
-        const fullPot = this.gameStateManager.getFullPot();
+        const fullPot = this.gameStateManager.getFullPotValue();
         const curBet = this.gameStateManager.getPreviousRaise();
         const curCall = hero.betAmount;
         const toAct =

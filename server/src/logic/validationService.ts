@@ -447,7 +447,7 @@ export class ValidationService {
                     errorType: ErrorType.ILLEGAL_BETTING_ACTION,
                     errorString:
                         `${errorPrefix} Player cannot bet ${betAmount}\nmaximum bet is ${maximumBetSize} in PLOMAHA` +
-                        ` previousRaise is ${this.gsm.getPreviousRaise()}, fullPot is ${this.gsm.getFullPot()}.`,
+                        ` previousRaise is ${this.gsm.getPreviousRaise()}, fullPot is ${this.gsm.getFullPotValue()}.`,
                 };
             }
         }

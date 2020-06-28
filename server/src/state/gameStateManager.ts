@@ -258,15 +258,15 @@ export class GameStateManager {
         this.gameState.partialAllInLeftOver = partialAllInLeftOver;
     }
 
-    getMinRaiseDiff() {
+    getMinRaiseDiff(): number {
         return this.gameState.minRaiseDiff;
     }
 
-    setMinRaiseDiff(minRaiseDiff: number) {
+    setMinRaiseDiff(minRaiseDiff: number): void {
         this.gameState.minRaiseDiff = minRaiseDiff;
     }
 
-    getCurrentPlayerSeatToAct() {
+    getCurrentPlayerSeatToAct(): PlayerSeat {
         return this.gameState.currentPlayerSeatToAct;
     }
 
@@ -274,7 +274,7 @@ export class GameStateManager {
      * Sets the current player to act to either the first player to act at the start of the betting round,
      * or increments the current player to act to the next player in the hand.
      */
-    updateCurrentPlayerSeatToAct() {
+    updateCurrentPlayerSeatToAct(): void {
         const previousPlayerSeat = this.getCurrentPlayerSeatToAct();
         const currentPlayerSeat = previousPlayerSeat
             ? this.getNextPlayerSeatInHand(previousPlayerSeat.positionIndex)
@@ -323,11 +323,11 @@ export class GameStateManager {
         return this.gameState.prevBigBlindSeat;
     }
 
-    getHandNumber() {
+    getHandNumber(): number {
         return this.gameState.handNumber;
     }
 
-    incrementHandNumber() {
+    incrementHandNumber(): void {
         this.gameState.handNumber += 1;
     }
 
@@ -344,7 +344,7 @@ export class GameStateManager {
         return callAmount;
     }
 
-    buyChipsPlayerAction(playerUUID: PlayerUUID, numChips: number) {
+    buyChipsPlayerAction(playerUUID: PlayerUUID, numChips: number): void {
         if (this.isPlayerInHand(playerUUID)) {
             this.queueAction({
                 actionType: ClientActionType.BUYCHIPS,
@@ -362,88 +362,88 @@ export class GameStateManager {
         }
     }
 
-    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number) {
+    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number): void {
         const chipDifference = chipAmt - this.getPlayerChips(playerUUID);
         if (chipDifference !== 0) this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
         this.setPlayerChips(playerUUID, chipAmt);
     }
 
-    subtractBetAmountFromChips(playerUUID: PlayerUUID) {
+    subtractBetAmountFromChips(playerUUID: PlayerUUID): void {
         const player = this.getPlayer(playerUUID);
         player.chips -= player.betAmount;
     }
 
-    addPlayerChips(playerUUID: PlayerUUID, addChips: number) {
+    addPlayerChips(playerUUID: PlayerUUID, addChips: number): void {
         this.getPlayer(playerUUID).chips += addChips;
     }
 
-    setPlayerChips(playerUUID: PlayerUUID, chips: number) {
+    setPlayerChips(playerUUID: PlayerUUID, chips: number): void {
         this.getPlayer(playerUUID).chips = chips;
     }
 
-    setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean) {
+    setPlayerQuitting(playerUUID: PlayerUUID, quitting: boolean): void {
         this.getPlayer(playerUUID).quitting = quitting;
     }
 
-    setPlayerWillAddChips(playerUUID: PlayerUUID, numChips: number) {
+    setPlayerWillAddChips(playerUUID: PlayerUUID, numChips: number): void {
         this.getPlayer(playerUUID).willAddChips = numChips;
     }
 
-    getPlayerName(playerUUID: PlayerUUID) {
+    getPlayerName(playerUUID: PlayerUUID): string {
         return this.getPlayer(playerUUID).name;
     }
 
-    getPlayerSeatNumber(playerUUID: PlayerUUID) {
+    getPlayerSeatNumber(playerUUID: PlayerUUID): number {
         return this.getPlayer(playerUUID).seatNumber;
     }
 
     // returns time in milliseconds
-    getTimeCurrentPlayerTurnStarted() {
+    getTimeCurrentPlayerTurnStarted(): number {
         return this.gameState.timeCurrentPlayerTurnStarted;
     }
 
-    setTimeCurrentPlayerTurnStarted(timeCurrentPlayerTurnStarted: number) {
+    setTimeCurrentPlayerTurnStarted(timeCurrentPlayerTurnStarted: number): void {
         this.gameState.timeCurrentPlayerTurnStarted = timeCurrentPlayerTurnStarted;
     }
 
     // returns time in milliseconds
-    getCurrentPlayerTurnElapsedTime() {
+    getCurrentPlayerTurnElapsedTime(): number {
         return Date.now() - this.getTimeCurrentPlayerTurnStarted();
     }
 
-    getTimeToAct() {
+    getTimeToAct(): number {
         return this.gameState.gameParameters.timeToAct * 1000;
     }
 
-    getTotalPlayerTimeToAct() {
+    getTotalPlayerTimeToAct(): number {
         return this.getTimeToAct() + this.getSumTimeBankValueThisAction();
     }
 
-    getTimeBanksLeft(playerUUID: PlayerUUID) {
+    getTimeBanksLeft(playerUUID: PlayerUUID): number {
         return this.getPlayer(playerUUID).timeBanksLeft;
     }
 
-    decrementTimeBanksLeft(playerUUID: PlayerUUID) {
+    decrementTimeBanksLeft(playerUUID: PlayerUUID): void {
         this.getPlayer(playerUUID).timeBanksLeft -= 1;
     }
 
-    getTimeBanksUsedThisAction() {
+    getTimeBanksUsedThisAction(): number {
         return this.gameState.timeBanksUsedThisAction;
     }
 
-    getSumTimeBankValueThisAction() {
+    getSumTimeBankValueThisAction(): number {
         return this.getTimeBanksUsedThisAction() * this.getTimeBankValue();
     }
 
-    incrementTimeBanksUsedThisAction() {
+    incrementTimeBanksUsedThisAction(): void {
         this.gameState.timeBanksUsedThisAction += 1;
     }
 
-    clearTimeBanksUsedThisAction() {
+    clearTimeBanksUsedThisAction(): void {
         this.gameState.timeBanksUsedThisAction = 0;
     }
 
-    getPots() {
+    getPots(): Pot[] {
         return this.gameState.pots;
     }
 
@@ -451,7 +451,7 @@ export class GameStateManager {
         this.gameState.pots = pots;
     }
 
-    getActivePotValue() {
+    getActivePotValue(): number {
         // get pot with least number of contestors
         const activePot = this.gameState.pots.reduce(
             (minPot, pot, i) => (i === 0 || pot.contestors.length < minPot.contestors.length ? pot : minPot),
@@ -460,18 +460,18 @@ export class GameStateManager {
         return activePot.value;
     }
 
-    getInactivePotsValues() {
-        const ans: number[] = [];
+    getInactivePotsValues(): number[] {
+        const potValues: number[] = [];
         let [min, minI] = [Number.POSITIVE_INFINITY, 0];
         this.gameState.pots.forEach((pot, i) => {
             if (min > pot.contestors.length) {
                 min = pot.contestors.length;
                 minI = i;
             }
-            ans.push(pot.value);
+            potValues.push(pot.value);
         });
-        ans.splice(minI, 1);
-        return ans;
+        potValues.splice(minI, 1);
+        return potValues;
     }
 
     popPot(): Pot {
@@ -486,36 +486,36 @@ export class GameStateManager {
         return this.gameState.pots.shift();
     }
 
-    getTotalPot() {
+    getTotalPotValue(): number {
         return this.gameState.pots.reduce((sum, pot) => pot.value + sum, 0);
     }
 
-    getAllCommitedBets() {
+    getAllCommitedBets(): number {
         return Object.values(this.getPlayers()).reduce((sum, player) => player.betAmount + sum, 0);
     }
 
     // pots plus all commited bets
-    getFullPot() {
-        return this.getTotalPot() + this.getAllCommitedBets();
+    getFullPotValue(): number {
+        return this.getTotalPotValue() + this.getAllCommitedBets();
     }
 
     getHandWinners(): Set<PlayerUUID> {
         return this.gameState.handWinners;
     }
 
-    addHandWinner(playerUUID: PlayerUUID) {
+    addHandWinner(playerUUID: PlayerUUID): void {
         this.gameState.handWinners.add(playerUUID);
     }
 
-    getSB() {
+    getSB(): number {
         return this.gameState.gameParameters.smallBlind;
     }
 
-    getBB() {
+    getBB(): number {
         return this.gameState.gameParameters.bigBlind;
     }
 
-    getTimeBankValue() {
+    getTimeBankValue(): number {
         return this.gameState.gameParameters.timeBankTime * 1000;
     }
 
@@ -525,11 +525,11 @@ export class GameStateManager {
         );
     }
 
-    getBettingRoundStage() {
+    getBettingRoundStage(): BettingRoundStage {
         return this.gameState.bettingRoundStage;
     }
 
-    getSeatsDealtIn() {
+    getSeatsDealtIn(): PlayerSeat[] {
         return this.gameState.seatsDealtIn;
     }
 
@@ -542,7 +542,7 @@ export class GameStateManager {
      * been incremented, and that the readyToPlay status of each player is finalized for
      * the hand. Also updates the playerPositionMap.
      */
-    updateTableSeatsAndPlayerPositionMap() {
+    updateTableSeatsAndPlayerPositionMap(): void {
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersReadyToPlay().length] || [];
 
@@ -581,11 +581,11 @@ export class GameStateManager {
         return this.gameState.dealerSeatNumber;
     }
 
-    setDealerSeatNumber(dealerSeatNumber: number) {
+    setDealerSeatNumber(dealerSeatNumber: number): void {
         this.gameState.dealerSeatNumber = dealerSeatNumber;
     }
 
-    getAllSeats() {
+    getAllSeats(): Array<PlayerUUID | undefined> {
         const seats = Array(this.getMaxPlayers());
         this.forEveryPlayer((player) => {
             seats[player.seatNumber] = player.uuid;
@@ -599,7 +599,7 @@ export class GameStateManager {
      * a player to be "sitting in" until the button skips them.
      * */
 
-    incrementDealerSeatNumber() {
+    incrementDealerSeatNumber(): void {
         const maxNumPlayers = this.getMaxPlayers();
         const seats = this.getAllSeats();
 
@@ -627,7 +627,7 @@ export class GameStateManager {
      * Each player's seatNumber property is their absolute seat number.
      * Position (relative seat numbers) are relative to the dealer seat number.
      */
-    getSortedSeatNumbers() {
+    getSortedSeatNumbers(): [number, PlayerUUID][] {
         const seats: [number, PlayerUUID][] = Object.values(this.gameState.players)
             .filter((player) => player.seatNumber >= 0)
             .map((player) => [player.seatNumber, player.uuid]);
@@ -655,7 +655,7 @@ export class GameStateManager {
 
     /** playerA and playerB must be in the hand. */
 
-    comparePositions(playerA: PlayerUUID, playerB: PlayerUUID) {
+    comparePositions(playerA: PlayerUUID, playerB: PlayerUUID): -1 | 1 {
         const posA = this.getPositionNumber(playerA);
         const posB = this.getPositionNumber(playerB);
 
@@ -687,7 +687,7 @@ export class GameStateManager {
         return this.filterPlayerUUIDs((playerUUID) => this.isPlayerEligibleToActNext(playerUUID));
     }
 
-    gameIsWaitingForBetAction() {
+    gameIsWaitingForBetAction(): boolean {
         return this.gameState.gameStage === GameStage.WAITING_FOR_BET_ACTION;
     }
 
@@ -700,7 +700,7 @@ export class GameStateManager {
         );
     }
 
-    getMinimumBetSize() {
+    getMinimumBetSize(): number {
         const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise() + this.getPartialAllInLeftOver();
         return minimumBet;
     }
@@ -713,7 +713,7 @@ export class GameStateManager {
 
     getPotSizedBetForPlayer(playerUUID: PlayerUUID) {
         const player = this.getPlayer(playerUUID);
-        return this.getFullPot() + this.getPreviousRaise() * 2 - player.betAmount;
+        return this.getFullPotValue() + this.getPreviousRaise() * 2 - player.betAmount;
     }
 
     shouldDealNextHand() {
