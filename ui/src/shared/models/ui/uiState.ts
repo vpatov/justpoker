@@ -94,6 +94,7 @@ export declare interface BettingActionButtons {
     [BettingRoundActionType.CHECK]?: BettingActionButton;
     [BettingRoundActionType.CALL]?: BettingActionButton;
     [BettingRoundActionType.BET]?: BettingActionButton;
+    [BettingRoundActionType.CHECK_FOLD]?: BettingActionButton;
 }
 
 export declare interface BettingActionButton {
@@ -219,6 +220,11 @@ export const FOLD_BUTTON: BettingActionButton = {
 
 export const CHECK_BUTTON: BettingActionButton = {
     action: BettingRoundActionType.CHECK,
+    label: 'Check',
+};
+
+export const CHECK_FOLD_BUTTON: BettingActionButton = {
+    action: BettingRoundActionType.CHECK_FOLD,
     label: 'Check',
 };
 

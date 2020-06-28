@@ -151,7 +151,6 @@ export interface ControllerProps {
     className?: string;
 }
 
-const CHECKFOLD_ACTION = 'CHECKFOLD';
 function ControllerComp(props: ControllerProps) {
     const classes = useStyles();
     const { className } = props;
@@ -193,7 +192,7 @@ function ControllerComp(props: ControllerProps) {
 
     useEffect(() => {
         for (const actionType of bettingRoundActionTypesToUnqueue) {
-            if (actionType === BettingRoundActionType.CHECK && queuedActionType === CHECKFOLD_ACTION) {
+            if (actionType === BettingRoundActionType.CHECK && queuedActionType === BettingRoundActionType.CHECK_FOLD) {
                 setQueuedActionType(BettingRoundActionType.FOLD);
                 setBetAmt(0);
                 break;
@@ -296,7 +295,7 @@ function ControllerComp(props: ControllerProps) {
     }
 
     if (toAct && queuedActionType !== '') {
-        if (queuedActionType === CHECKFOLD_ACTION) {
+        if (queuedActionType === BettingRoundActionType.CHECK_FOLD) {
             sendBettingRoundAction(BettingRoundActionType.CHECK);
         } else {
             sendBettingRoundAction(queuedActionType);
@@ -332,54 +331,61 @@ function ControllerComp(props: ControllerProps) {
             );
         }
 
+        // CHECK/FOLD BUTOON
+        button = bettingActionButtons[BettingRoundActionType.CHECK_FOLD];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <ButtonGroup
+                    key={BettingRoundActionType.CHECK_FOLD}
+                    orientation="vertical"
+                    className={classes.actionButton}
+                    disabled={disabled}
+                >
+                    <Button
+                        id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                        variant="outlined"
+                        className={classnames(classes.checkFoldButton, classes[BettingRoundActionType.CHECK], {
+                            [classes[`${BettingRoundActionType.CHECK}_QUEUED`]]:
+                                BettingRoundActionType.CHECK === queuedActionType,
+                        })}
+                        onClick={() => onClickActionButton(BettingRoundActionType.CHECK)}
+                    >
+                        {label}
+                    </Button>
+                    <Button
+                        id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                        variant="outlined"
+                        className={classnames(classes.checkFoldButton, classes[BettingRoundActionType.CHECK], {
+                            [classes[`${BettingRoundActionType.CHECK}_QUEUED`]]:
+                                BettingRoundActionType.CHECK_FOLD === queuedActionType,
+                        })}
+                        onClick={() => onClickActionButton(BettingRoundActionType.CHECK_FOLD)}
+                    >
+                        CHECK FOLD
+                    </Button>
+                </ButtonGroup>,
+            );
+        }
+
         // CHECK BUTTON
         button = bettingActionButtons[BettingRoundActionType.CHECK];
         if (button) {
             const { action, label, disabled } = button;
-            // CHECK/FOLD
-            if (!toAct && bettingActionButtons[BettingRoundActionType.FOLD]) {
-                buttons.push(
-                    <ButtonGroup key={CHECKFOLD_ACTION} orientation="vertical" className={classes.actionButton}>
-                        <Button
-                            id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
-                            variant="outlined"
-                            className={classnames(classes.checkFoldButton, classes[action], {
-                                [classes[`${action}_QUEUED`]]: action === queuedActionType,
-                            })}
-                            onClick={() => onClickActionButton(action)}
-                            disabled={disabled}
-                        >
-                            {label}
-                        </Button>
-                        <Button
-                            id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
-                            variant="outlined"
-                            className={classnames(classes.checkFoldButton, classes[action], {
-                                [classes[`${action}_QUEUED`]]: CHECKFOLD_ACTION === queuedActionType,
-                            })}
-                            onClick={() => onClickActionButton(CHECKFOLD_ACTION)}
-                            disabled={disabled}
-                        >
-                            CHECK FOLD
-                        </Button>
-                    </ButtonGroup>,
-                );
-            } else {
-                buttons.push(
-                    <Button
-                        id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
-                        key={action}
-                        variant="outlined"
-                        className={classnames(classes.actionButton, classes[action], {
-                            [classes[`${action}_QUEUED`]]: action === queuedActionType,
-                        })}
-                        onClick={() => onClickActionButton(action)}
-                        disabled={disabled}
-                    >
-                        {label}
-                    </Button>,
-                );
-            }
+            buttons.push(
+                <Button
+                    id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled}
+                >
+                    {label}
+                </Button>,
+            );
         }
 
         // CALL BUTTON

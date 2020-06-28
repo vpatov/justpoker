@@ -9,6 +9,7 @@ import {
     UiPlayer,
     FOLD_BUTTON,
     CHECK_BUTTON,
+    CHECK_FOLD_BUTTON,
     CALL_BUTTON,
     BET_BUTTON,
     START_GAME_BUTTON,
@@ -229,7 +230,7 @@ export class StateConverter {
             max: maxBet,
             sizingButtons: getSizingButtons(),
             showCardButtons: this.getShowCardButtons(clientUUID),
-            bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
+            bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID, toAct),
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
             timeBanks: hero.timeBanksLeft,
@@ -256,7 +257,11 @@ export class StateConverter {
         return { ...button, disabled: true };
     }
 
-    getValidBettingRoundActions(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): BettingActionButtons {
+    getValidBettingRoundActions(
+        clientUUID: ClientUUID,
+        heroPlayerUUID: PlayerUUID,
+        toAct: boolean,
+    ): BettingActionButtons {
         if (!this.gameStateManager.isGameInProgress()) {
             return {};
         }
@@ -284,7 +289,11 @@ export class StateConverter {
         ) {
             buttons[BettingRoundActionType.CALL] = CALL_BUTTON;
         } else {
-            buttons[BettingRoundActionType.CHECK] = CHECK_BUTTON;
+            if (!toAct) {
+                buttons[BettingRoundActionType.CHECK_FOLD] = CHECK_FOLD_BUTTON;
+            } else {
+                buttons[BettingRoundActionType.CHECK] = CHECK_BUTTON;
+            }
         }
 
         const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
