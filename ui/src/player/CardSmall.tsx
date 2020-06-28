@@ -8,6 +8,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Suit from '../reuseable/Suit';
 import { Tooltip } from '@material-ui/core';
+import { grey, blueGrey } from '@material-ui/core/colors';
+
+const NORMAL_CARD_SIZE = '3.4vmin';
+const SIZE_CARD_SIZE = '2.5vmin';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -15,8 +19,8 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         position: 'relative',
         backgroundColor: 'white',
-        height: '7vmin',
-        width: '6vmin',
+        height: '8.8vmin',
+        width: '6.7vmin',
         display: 'flex',
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
@@ -33,18 +37,18 @@ const useStyles = makeStyles((theme) => ({
     rank: {
         letterSpacing: '-0.4vmin',
         position: 'absolute',
-        fontSize: '2.8vmin',
-        lineHeight: '2.8vmin',
+        fontSize: NORMAL_CARD_SIZE,
+        lineHeight: NORMAL_CARD_SIZE,
         fontWeight: 'bold',
         top: '6%',
         left: '10%',
     },
     suit: {
         position: 'absolute',
-        width: '2.8vmin',
-        height: '2.8vmin',
-        top: '42%',
-        right: '3%',
+        width: NORMAL_CARD_SIZE,
+        height: NORMAL_CARD_SIZE,
+        top: '39%',
+        right: '1%',
     },
     sideRank: {
         fontWeight: 'bold',
@@ -52,23 +56,22 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '0.5vmin',
         width: '100%',
         textAlign: 'left',
-        fontSize: '1.9vmin',
+        fontSize: SIZE_CARD_SIZE,
     },
     sideSuit: {
         marginLeft: '0.4vmin',
         textAlign: 'left',
-        width: '1.7vmin',
-        height: '1.7vmin',
+        width: SIZE_CARD_SIZE,
+        height: SIZE_CARD_SIZE,
     },
     hidden: {
-        ...theme.custom.HIDDEN,
+        backgroundColor: grey[900],
     },
     hiddenText: {
-        marginTop: '12%',
+        marginTop: '20%',
         fontWeight: 'bold',
         fontSize: '3vmin',
         color: theme.palette.primary.light,
-        textShadow: `0.16vmin 0.13vmin ${theme.palette.primary.main}`,
     },
     sideTextHidden: {
         marginLeft: '20%',
@@ -90,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero } = props;
+    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero, style } = props;
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
 
@@ -102,7 +105,10 @@ function CardSmall(props) {
 
     if (hidden) {
         return (
-            <div className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}>
+            <div
+                className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}
+                style={style}
+            >
                 <Typography className={classnames(classes.hiddenText, { [classes.sideTextHidden]: shouldFlex })}>
                     JP
                 </Typography>
@@ -113,10 +119,11 @@ function CardSmall(props) {
     const visibleCardComponent = (
         <div
             className={classnames(classes.root, classes[suit], className, {
-                ['ani_notWinningCard']: !partOfWinningHand,
+                ani_notWinningCard: !partOfWinningHand,
                 [classes.sideCard]: shouldFlex,
             })}
             id={cardId}
+            style={style}
         >
             <Typography
                 className={shouldFlex ? classes.sideRank : classes.rank}

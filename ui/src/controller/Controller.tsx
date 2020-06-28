@@ -26,9 +26,9 @@ import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
 import BuyChipsDialog from '../game/BuyChipsDialog';
 import { BettingRoundActionButton } from '../shared/models/ui/uiState';
-import red from '@material-ui/core/colors/red';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
+import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,19 +40,21 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-between',
             alignItems: 'center',
             color: 'white',
-            ...theme.custom.CONTROLLER,
+            backgroundColor: grey[900],
+            background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
         },
+        rootToAct: {},
         gameInfoCont: {
             marginLeft: '2vw',
             height: '100%',
-            width: '20%',
+            width: '15%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'self-start',
             justifyContent: 'center',
         },
         sizeAndBetActionsCont: {
-            width: '60%',
+            width: '65%',
             height: '100%',
             display: 'flex',
             flexDirection: 'row',
@@ -80,8 +82,8 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
         },
         actionButton: {
-            height: '40%',
-            width: '12vmin',
+            height: '58%',
+            width: '16vmin',
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
         },
@@ -91,7 +93,12 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         checkLabel: {
             fontSize: '1.4vmin',
+            textAlign: 'right',
         },
+        formControlLabel: {
+            margin: 0,
+        },
+
         adminButton: {
             fontSize: '1.4vmin',
         },
@@ -104,7 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: theme.palette.primary.main,
         },
         handLabelSmaller: {
-            fontSize: '1.6vmin',
+            fontSize: '1.5vmin',
         },
         playerPositonString: {
             fontSize: '1.8vmin',
@@ -389,6 +396,7 @@ function ControllerComp(props: ControllerProps) {
                 </div>
                 {allowStraddle ? (
                     <FormControlLabel
+                        className={classes.formControlLabel}
                         classes={{ label: classes.checkLabel }}
                         control={
                             <Checkbox className={classes.button} checked={willStraddle} onChange={onToggleStraddle} />
@@ -397,6 +405,7 @@ function ControllerComp(props: ControllerProps) {
                     />
                 ) : null}
                 <FormControlLabel
+                    className={classes.formControlLabel}
                     classes={{ label: classes.checkLabel }}
                     control={
                         <Checkbox

@@ -22,7 +22,7 @@ declare module '@material-ui/core/styles/createMuiTheme' {
 export const DEFAULT_PREFERENCES: UserPreferences = {
     theme: {
         twoColor: false,
-        background: Background.blue,
+        backgroundColor: Background.blue,
     },
 };
 
@@ -36,6 +36,8 @@ const CUSTOM_PALETTE = {
         light: orange['100'],
     },
 };
+
+export const ASPECT_RATIO_BREAK_POINT = '(max-aspect-ratio: 4/3)';
 
 export const CUSTOM_THEME = {
     custom: {
@@ -51,24 +53,21 @@ export const CUSTOM_THEME = {
         CLUBS: {
             backgroundColor: lightGreen[900],
         },
-        HIDDEN: {
-            backgroundColor: `${grey[900]}`,
-            backgroundImage: ``,
-        },
         BACKGROUND: {
-            background: 'linear-gradient(360deg, rgba(50,50,63) 0%, rgb(25,25,40));',
+            background: `linear-gradient(360deg, rgba(0,0,0,0.5) 0%,  rgba(0,0,0,0))`,
+            backgroundColor: blue[600],
         },
+        BACKGROUND_CONTRAST_COLOR: 'black',
         TABLE: {
             border: `0.7vmin solid rgba(0,0,0,0.5)`,
             boxShadow: '0 2px 6px 3px rgba(40,40,40,0.4)',
             background: `radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%)`,
         },
-        PLAYER_WIDTH: 19,
-        PLAYER_HEIGHT: 12,
+        PLAYER_WIDTH: 21,
+        PLAYER_HEIGHT: 14,
         STACK: {
             color: 'black',
             backgroundColor: blueGrey[200],
-            borderRadius: '0.6vmin',
         },
         STACK_TO_ACT: {
             boxShadow: '0px 0px 10px 1px rgba(255,255,255,0.4)',
@@ -78,12 +77,6 @@ export const CUSTOM_THEME = {
         STACK_WINNER: {
             boxShadow: '0 0px 10px rgba(255,255,255,0.8)',
             background: `linear-gradient(90deg, ${CUSTOM_PALETTE.secondary.light} -33%, ${CUSTOM_PALETTE.secondary.main} 50%, ${CUSTOM_PALETTE.secondary.light} 133%)`,
-        },
-        CONTROLLER: {
-            backgroundColor: grey[900],
-            background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
-            boxSizing: 'border-box',
-            transition: 'box-shadow 0.4s ease-in-out;',
         },
         BET: {
             border: '1px solid white',

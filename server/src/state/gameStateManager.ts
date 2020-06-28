@@ -1253,6 +1253,7 @@ export class GameStateManager {
             board: [],
             bettingRoundStage: BettingRoundStage.WAITING,
             firstToActSeat: undefined,
+            isAllInRunOut: false,
             currentPlayerSeatToAct: undefined,
             pots: [],
             deck: {
@@ -1305,14 +1306,11 @@ export class GameStateManager {
     }
 
     isAllInRunOut(): boolean {
-        const playersAllIn = this.getPlayersAllIn();
-        const playersInHand = this.getPlayersInHand();
-        // there must be a least two player in the hand
-        // and at least one player all in
-        if (playersAllIn.length < 1 || playersInHand.length < 2) return false;
+        return this.gameState.isAllInRunOut;
+    }
 
-        // then if everyone or everyone but one player(s) all in, its a runouttttt!!
-        return playersAllIn.length >= playersInHand.length - 1;
+    setIsAllInRunOut(isAllInRunOut: boolean) {
+        this.gameState.isAllInRunOut = isAllInRunOut;
     }
 
     hasPlayerPutAllChipsInThePot(playerUUID: PlayerUUID): boolean {

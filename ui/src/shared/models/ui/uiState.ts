@@ -14,7 +14,7 @@ import {
     BettingRoundStage,
 } from '../game/betting';
 
-import { GameParameters, getCleanGameParameters, getDefaultGameParameters } from '../game/game';
+import { GameParameters, getCleanGameParameters, getTestGameParameters } from '../game/game';
 import { PlayerUUID, makeBlankUUID } from '../system/uuid';
 import { getRandomAvatarKey, AvatarKeys } from './assets';
 import { PlayerSummary, BettingRoundLog, PotSummary } from '../state/handLog';
@@ -166,6 +166,7 @@ export declare interface UiPlayer {
         cards: UiCard[];
     };
     avatarKey: AvatarKeys;
+    lastAction?: string;
 }
 
 export declare interface RatHolePlayer {
@@ -415,7 +416,7 @@ shuffle(positions);
 
 export const TestGame: UiGameState = {
     menu: ALL_MENU_BUTTONS,
-    gameParameters: getDefaultGameParameters(),
+    gameParameters: getTestGameParameters(),
     ratHole: [
         {
             name: 'Ratty Ratman',
@@ -444,7 +445,7 @@ export const TestGame: UiGameState = {
         computedMaxBuyin: 1000,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
         isSpectator: false,
-        isHeroAtTable: false,
+        isHeroAtTable: true,
         heroTotalChips: 17,
         numberOfSpectators: 4,
         willAddChips: 1430,
@@ -457,7 +458,7 @@ export const TestGame: UiGameState = {
         min: 25,
         max: 43000,
         callAmount: 54323,
-        timeBanks: 2,
+        timeBanks: 11,
         dealInNextHand: false,
         playerPositionString: 'Hijack',
         showCardButtons: [
@@ -523,7 +524,12 @@ export const TestGame: UiGameState = {
             handLabel: 'Full House, Queens over Threes',
             bet: genRandomInt(0, 10),
             hand: {
-                cards: [{ ...genRandomCard(), isBeingShown: true }, genRandomCard()],
+                cards: [
+                    { ...genRandomCard(), partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
+                    { ...genRandomCard(), partOfWinningHand: true },
+                ],
             },
             avatarKey: getRandomAvatarKey(),
             admin: true,
@@ -581,6 +587,7 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            lastAction: 'All In',
         },
         {
             name: 'Lenny',
@@ -605,6 +612,7 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            lastAction: 'Check',
         },
         {
             name: 'Nicki Lam',
@@ -629,6 +637,7 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            lastAction: 'Fold',
         },
     ],
 };

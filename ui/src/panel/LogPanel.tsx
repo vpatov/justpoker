@@ -22,12 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
             flexShrink: 0,
             ...theme.custom.LOGPANEL,
         },
-        transparentPanel: {
-            height: '85%',
-            position: 'absolute',
-            right: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-        },
+
         noDisplay: {
             display: 'none',
         },
@@ -35,10 +30,12 @@ const useStyles = makeStyles((theme: Theme) =>
         hideButtonGroup: {
             zIndex: 5,
             position: 'absolute',
-            bottom: 'calc(15% + 15px)',
+            bottom: 'calc(15% + 25px)',
             right: 15,
         },
         hideButton: {
+            borderColor: theme.custom.BACKGROUND_CONTRAST_COLOR,
+            color: theme.custom.BACKGROUND_CONTRAST_COLOR,
             fontSize: '1vmin',
         },
         unread: {
@@ -63,7 +60,6 @@ function LogPanel(props: LogPanelProps) {
     const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
     const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
     const [unreadChats, setUnreadChats] = useState(false);
-    const smallWidth = useMediaQuery('(max-aspect-ratio: 5/4)');
 
     function renderMessagePanelButtons() {
         return (
@@ -121,7 +117,7 @@ function LogPanel(props: LogPanelProps) {
         return (
             <>
                 <div
-                    className={classnames(classes.root, { [classes.transparentPanel]: smallWidth }, className)}
+                    className={classnames(classes.root, className)}
                     style={hideChatLog && hideHandLog ? { display: 'none' } : {}}
                 >
                     {renderHandLog()}

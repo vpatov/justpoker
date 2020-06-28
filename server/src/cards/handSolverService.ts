@@ -55,14 +55,26 @@ export class HandSolverService {
 
     computeBestPLOHand(holeCards: Readonly<Card[]>, board: Readonly<Card[]>) {
         const holeCardCombos = getTwoCardCombinations(holeCards);
-        const boardCombos = getThreeCardCombinations(board);
+        const boardCombos = board ? getThreeCardCombinations(board) : [];
         const bestHands = [];
-        for (const holeCardCombo of holeCardCombos) {
-            for (const boardCombo of boardCombos) {
-                bestHands.push(this.computeBestHandFromCards([...holeCardCombo, ...boardCombo]));
+        if (boardCombos.length > 0) {
+            for (const holeCardCombo of holeCardCombos) {
+                for (const boardCombo of boardCombos) {
+                    bestHands.push(this.computeBestHandFromCards([...holeCardCombo, ...boardCombo]));
+                }
+            }
+        } else {
+            for (const holeCardCombo of holeCardCombos) {
+                bestHands.push(this.computeBestHandFromCards([...holeCardCombo]));
             }
         }
+
         const winningHands = this.getWinningHands(bestHands);
+        if (!winningHands.length) {
+            throw Error(
+                `computeBestPLOHand is returning undefined winner. holeCards.length: ${holeCards.length}, board.length: ${board.length}`,
+            );
+        }
         return winningHands[0];
     }
 }

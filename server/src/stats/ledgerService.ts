@@ -88,6 +88,24 @@ export class LedgerService {
         for (const clientUUID of clientUUIDs) {
             this.incrementHandsWon(clientUUID);
         }
+        this.verifyNetSum();
+    }
+
+    /**
+     * Verify that the sum of winnings/losses is equal to 0.
+     * Should only be called in between hands (when no money is in the pot).
+     */
+    verifyNetSum() {
+        const winningsSum = Object.entries(this.ledger).reduce((prev, [uuid, row]) => {
+            const totalBuyin = row.buyins.reduce((sum, buyin) => buyin + sum, 0);
+            const walkaway = row.walkaways.reduce((sum, walkaway) => walkaway + sum, 0) + row.currentChips;
+            return totalBuyin - walkaway + prev;
+        }, 0);
+        if (winningsSum != 0) {
+            logger.error(
+                `Ledger winnings sum is not equal to zero: ${winningsSum}. Ledger: ${JSON.stringify(this.ledger)}`,
+            );
+        }
     }
 
     /** Called everytime the client wins a hand. Incremented only once even if there are multiple pots. */
@@ -132,9 +150,9 @@ export class LedgerService {
     }
 
     convertServerLedgerToUILedger(ledger: ServerLedger): UILedger {
-        const uiLedger: UILedger = Object.entries(ledger).map(([clientUUID, serverLedgerRow]) =>
-            this.convertServerLedgerRowToUILedgerRow(serverLedgerRow),
-        );
+        const uiLedger: UILedger = Object.entries(ledger)
+            .filter(([clientUUID, serverLedgerRow]) => serverLedgerRow.aliases.size > 0)
+            .map(([clientUUID, serverLedgerRow]) => this.convertServerLedgerRowToUILedgerRow(serverLedgerRow));
         return uiLedger;
     }
 }

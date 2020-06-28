@@ -16,6 +16,7 @@ import { TimerManager } from '../state/timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
 import { LedgerService } from '../stats/ledgerService';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
+import { takeRightWhile } from 'lodash';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -224,6 +225,7 @@ export class StateGraphManager {
 
             case GameStage.FINISH_BETTING_ROUND: {
                 this.gamePlayService.placeBetsInPot();
+                this.gamePlayService.updateIsAllInRunOut();
                 this.gamePlayService.flipCardsIfAllInRunOut();
                 this.gameStateManager.clearCurrentPlayerToAct();
                 break;

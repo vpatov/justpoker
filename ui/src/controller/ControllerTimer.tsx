@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 import { heroPlayerTimerSelector, heroPlayerToAct } from '../store/selectors';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import Fade from '@material-ui/core/Fade';
-import { readFile } from 'fs';
 
 const updateIntervalS = 0.4;
 

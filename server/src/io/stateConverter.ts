@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { Player } from '../../../ui/src/shared/models/player/player';
 import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
-import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
+import { BettingRoundStage, BettingRoundActionType } from '../../../ui/src/shared/models/game/betting';
 
 import {
     UiState,
@@ -263,6 +263,7 @@ export class StateConverter {
 
         if (
             this.gameStateManager.isPlayerAllIn(heroPlayerUUID) ||
+            this.gameStateManager.isAllInRunOut() ||
             !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
             this.gameStateManager.isGameStageInBetweenHands()
         ) {
@@ -274,7 +275,11 @@ export class StateConverter {
         buttons.push(FOLD_BUTTON);
 
         buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
-        buttons.push(BET_BUTTON);
+
+        const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
+        const heroPlayerStack = this.gameStateManager.getPlayerByClientUUID(clientUUID).chips;
+
+        buttons.push(heroPlayerStack <= callAmount ? this.disableButton(BET_BUTTON) : BET_BUTTON);
         return buttons;
     }
 
@@ -440,10 +445,27 @@ export class StateConverter {
             folded: this.gameStateManager.hasPlayerFolded(player.uuid),
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
             admin: this.gameStateManager.isPlayerAdmin(player.uuid),
+            lastAction: this.getLastActionString(player.lastActionType),
         };
         return uiPlayer;
     }
 
+    getLastActionString(bettingRoundActionType: BettingRoundActionType): string | undefined {
+        switch (bettingRoundActionType) {
+            case BettingRoundActionType.BET:
+                return 'Bet';
+            case BettingRoundActionType.CHECK:
+                return 'Check';
+            case BettingRoundActionType.CALL:
+                return 'Call';
+            case BettingRoundActionType.FOLD:
+                return 'Fold';
+            case BettingRoundActionType.ALL_IN:
+                return 'All In';
+            default:
+                return undefined;
+        }
+    }
     getPlayerPositionIndicator(playerUUID: PlayerUUID): PositionIndicator | undefined {
         if (!this.gameStateManager.isGameInProgress()) {
             return undefined;

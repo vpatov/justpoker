@@ -16,7 +16,7 @@ import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from '../shared/models/state/handLog';
-import { PlayerPositionString } from '../shared/models/player/playerPosition';
+import { AbbreviatedPlayerPositionString } from '../shared/models/player/playerPosition';
 import Suit from '../reuseable/Suit';
 
 import blueGrey from '@material-ui/core/colors/blueGrey';
@@ -25,6 +25,10 @@ import { PlayerUUID } from '../shared/models/system/uuid';
 import { WsServer } from '../api/ws';
 import { cardsAreEqual, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
+import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
+
+const handLogTextContentSize = '1.5vmin';
+const handLogCardSize = '1.8vmin';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -50,13 +54,13 @@ const useStyles = makeStyles((theme: Theme) =>
         handLogBettingRoundAction: {
             display: 'flex',
             justifyContent: 'space-between',
-            fontSize: '1.8vmin',
+            fontSize: handLogTextContentSize,
         },
         handLogIcon: {
             fontSize: '2.0vmin',
         },
         handNumberString: {
-            fontSize: '1.5vmin',
+            fontSize: handLogTextContentSize,
             letterSpacing: '-0.05vmin',
         },
         timeHandStartedLabel: {
@@ -70,39 +74,43 @@ const useStyles = makeStyles((theme: Theme) =>
             },
             color: grey[200],
         },
+        handLogPlayerPosition: {
+            width: '4.5vmin',
+            display: 'inline-block',
+        },
         handLogContentLabel: {
-            fontSize: '1.8vmin',
+            fontSize: handLogTextContentSize,
         },
         handLogSectionLabel: {
             textTransform: 'uppercase',
-            fontSize: '2.2vmin',
+            fontSize: '1.6vmin',
             color: blueGrey[500],
         },
         handLogPotWinnerLabel: {
-            fontSize: '1.8vmin',
+            fontSize: handLogTextContentSize,
         },
         handLogShowHandLabel: {
-            fontSize: '1.8vmin',
+            fontSize: handLogTextContentSize,
         },
         handLogInlineCards: {
             display: 'flex',
             alignItems: 'center',
 
-            fontSize: '2.2vmin',
+            fontSize: handLogCardSize,
             '& > *': {
                 marginRight: '0.3vw',
             },
         },
         playerNameWithColor: {
-            fontSize: '1.8vmin',
+            fontSize: handLogTextContentSize,
         },
         suit: {
-            width: '2.2vmin',
-            height: '2.2vmin',
+            width: handLogCardSize,
+            height: handLogCardSize,
             marginLeft: '0.1vw',
         },
         handLogPlayerSummary: {
-            fontSize: '1.8vmin',
+            fontSize: handLogTextContentSize,
         },
 
         hideButton: {
@@ -124,7 +132,7 @@ function HandLog(props: HandLogProps) {
 
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
-    const smallWidth = useMediaQuery('(max-aspect-ratio: 5/4)');
+    const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
     const smallCurrentHandText = smallWidth || `${currentHandNumber}${handLogEntries.length}`.length >= 4;
 
     useEffect(() => {
@@ -226,7 +234,9 @@ function HandLog(props: HandLogProps) {
         const playerSummary = handLogEntries[currentHandNumber].playerSummaries[playerUUID];
         return playerSummary.wasDealtIn ? (
             <Typography className={classnames(classes.handLogPlayerSummary)} key={index}>
-                <span>{`${PlayerPositionString[playerSummary.position]}: `}</span>
+                <span className={classes.handLogPlayerPosition}>
+                    {`${AbbreviatedPlayerPositionString[playerSummary.position]}: `}
+                </span>
                 {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
                 <span>{` (${playerSummary.startingChips})`}</span>
             </Typography>

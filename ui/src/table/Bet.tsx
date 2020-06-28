@@ -11,12 +11,14 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
+        zIndex: 5,
     },
     amount: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: '1.6vmin',
-        marginTop: '0.3vmin',
+        fontSize: '2vmin',
+        textShadow: `0.16vmin 0.13vmin black`,
+        marginTop: '0.1vmin',
     },
 }));
 

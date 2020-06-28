@@ -135,9 +135,10 @@ function GameMenu(props) {
                 break;
             case ClientActionType.QUITGAME:
                 SET_confirmationQuit(true);
+                break;
             case UiActionType.OPEN_ADD_CHIPS:
                 SET_buyChipsDialog(true);
-
+                break;
             default:
                 break;
         }

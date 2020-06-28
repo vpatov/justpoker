@@ -3,10 +3,15 @@ import { usePrevious } from '../utils';
 import { animateWinningCards } from '../game/AnimiationModule';
 import { generateStringFromRank, SUITS } from '../utils';
 import classnames from 'classnames';
+import Suit from '../reuseable/Suit';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Suit from '../reuseable/Suit';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
+
+const CARD_HEIGHT = 11;
+const CARD_WIDTH = 8.6;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -15,12 +20,14 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         position: 'relative',
         backgroundColor: 'white',
-        height: '11vmin',
-        width: '8.6vmin',
+        height: `${CARD_HEIGHT}vmin`,
+        width: `${CARD_WIDTH}vmin`,
         margin: '0.5vmin',
         overflow: 'hidden',
         transform: 'translateY(0)',
         transition: 'transform 0.5s ease-in-out',
+        flex: 'none',
+        boxShadow: theme.shadows[4],
     },
     text: {
         letterSpacing: '-0.5vmin',
@@ -40,8 +47,19 @@ const useStyles = makeStyles((theme) => ({
         bottom: '5%',
         right: '5%',
     },
+
+    smallWidth: {
+        height: `${CARD_HEIGHT * 0.8}vmin`,
+        width: `${CARD_WIDTH * 0.8}vmin`,
+        '& > *': {
+            fontSize: '4vmin',
+            width: '4vmin',
+            height: '4vmin',
+        },
+    },
     partOfWinningHand: {
         transform: 'translateY(33%)',
+        zIndex: 1,
         ...theme.custom.WINNING_CARD,
     },
     [SUITS.HEARTS]: {
@@ -61,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
 function CardLarge(props) {
     const classes = useStyles();
     const { suit, rank, partOfWinningHand, className } = props;
+    const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
 
     // this function could be located in many different componets
     // we could also do it at a global level, maybe the animation module is peforming these diff?
@@ -76,7 +95,8 @@ function CardLarge(props) {
         <div
             className={classnames(classes.root, classes[suit], className, {
                 [classes.partOfWinningHand]: partOfWinningHand,
-                ['ani_notWinningCard']: !partOfWinningHand,
+                ani_notWinningCard: !partOfWinningHand,
+                [classes.smallWidth]: smallWidth,
             })}
         >
             <Typography

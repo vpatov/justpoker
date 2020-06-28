@@ -8,9 +8,22 @@ import { getCleanGameParameters } from '../game/game';
 import { QueuedServerAction } from '../system/server';
 import { PlayerPosition } from '../player/playerPosition';
 
+/**
+ * Represents a seat occupied by a player. Each playerSeat in the seatsDealtIn is a
+ * snapshot of the seat at the beginning of the hand (so that when players switch seats
+ * while a hand is in progress, the gameplay logic uses the snapshot rather than the
+ * players' current positions).
+ */
 export declare interface PlayerSeat {
     playerUUID: PlayerUUID;
+
+    /* Ranges from [0,maxNumPlayers), represents the absolute seat number. */
     seatNumber: number;
+
+    /**
+     * Ranges from [0, numPlayersDealtIn), represents the seats relative position with
+     * respect to the current hand (0 -> dealer, 1 -> SB, so forth..)
+     */
     positionIndex: number;
 }
 
@@ -39,6 +52,8 @@ export declare interface GameState {
     playerPositionMap: Map<PlayerUUID, PlayerPosition>;
 
     dealerSeat: PlayerSeat | undefined;
+
+    isAllInRunOut: boolean;
 
     smallBlindSeat: PlayerSeat | undefined;
 
@@ -115,6 +130,7 @@ export function getCleanGameState(): GameState {
         gameParameters: getCleanGameParameters(),
         seatsDealtIn: [],
         dealerSeatNumber: 0,
+        isAllInRunOut: false,
         playerPositionMap: new Map(),
         dealerSeat: undefined,
         smallBlindSeat: undefined,

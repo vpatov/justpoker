@@ -33,6 +33,22 @@ export const PlayerPositionString: { [key in PlayerPosition]: string } = {
     [PP.NOT_PLAYING]: 'Not In The Hand',
 };
 
+/** Map player position enum to string representation. */
+export const AbbreviatedPlayerPositionString: { [key in PlayerPosition]: string } = {
+    [PP.DEALER]: 'BTN',
+    [PP.SB]: 'SB',
+    [PP.BB]: 'BB',
+    [PP.UTG]: 'UTG',
+    [PP['UTG+1']]: 'UTG+1',
+    [PP['UTG+2']]: 'UTG+2',
+    [PP.MP]: 'MP',
+    [PP['MP+1']]: 'MP+1',
+    [PP.LJ]: 'LJ',
+    [PP.HJ]: 'HJ',
+    [PP.CUTOFF]: 'CUT',
+    [PP.NOT_PLAYING]: 'N/A',
+};
+
 /** Hardcoded map of player positions with respect to how many people are at the table. */
 export const PLAYER_POSITIONS_BY_HEADCOUNT: { [key: number]: PlayerPosition[] } = {
     2: [PP.DEALER, PP.BB],

@@ -5,8 +5,6 @@ import { WsServer } from '../api/ws';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import Avatar from '../reuseable/Avatar';
-import { grey } from '@material-ui/core/colors';
-import { getPlayerAvatarBackground } from '../style/colors';
 import Animoji from '../reuseable/Animoji';
 import { AnimationState, AnimationType } from '../shared/models/state/animationState';
 
