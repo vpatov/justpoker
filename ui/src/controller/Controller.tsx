@@ -10,6 +10,7 @@ import {
     globalGameStateSelector,
     heroPlayerUUIDSelector,
 } from '../store/selectors';
+import { useFocus } from '../utils';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -25,7 +26,6 @@ import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
 import BuyChipsDialog from '../game/BuyChipsDialog';
-import { BettingActionButton } from '../shared/models/ui/uiState';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 import { grey } from '@material-ui/core/colors';
@@ -132,6 +132,10 @@ const useStyles = makeStyles((theme: Theme) =>
             borderColor: Color(theme.custom.ACTION_BUTTONS.FOLD.borderColor).desaturate(0.7).darken(0.5).string(),
             color: Color(theme.custom.ACTION_BUTTONS.FOLD.color).desaturate(0.7).darken(0.5).string(),
         },
+        semiDisabledBet: {
+            borderColor: Color(theme.custom.ACTION_BUTTONS.BET.borderColor).desaturate(0.7).darken(0.5).string(),
+            color: Color(theme.custom.ACTION_BUTTONS.BET.color).desaturate(0.7).darken(0.5).string(),
+        },
     }),
 );
 
@@ -170,6 +174,7 @@ function ControllerComp(props: ControllerProps) {
 
     const [warning, setWarning] = useState(false);
 
+    const [betInputRef, setBetInputFocus] = useFocus();
     // if there is selected betAmt and min changes rest betAmt
     useEffect(() => {
         if (betAmt !== 0 && betAmt < min) {
@@ -282,6 +287,10 @@ function ControllerComp(props: ControllerProps) {
         setQueuedActionType('');
     }
 
+    function onClickSemiDisabledBet() {
+        setBetInputFocus();
+    }
+
     function generateBetActionButtons() {
         const buttons = [] as any;
 
@@ -340,7 +349,7 @@ function ControllerComp(props: ControllerProps) {
                     onClick={() => onClickActionButton(action)}
                     disabled={disabled}
                 >
-                    {`${label} (${amountToCall})`}
+                    {`${label} ${amountToCall}`}
                 </Button>,
             );
         }
@@ -349,17 +358,25 @@ function ControllerComp(props: ControllerProps) {
         button = bettingActionButtons[BettingRoundActionType.BET];
         if (button) {
             const { action, label, disabled } = button;
+            const betSemiDisabled = betAmt < min;
             buttons.push(
                 <Button
                     key={action}
                     variant="outlined"
                     className={classnames(classes.actionButton, classes[action], {
                         [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                        [classes.semiDisabledBet]: betSemiDisabled,
                     })}
-                    onClick={() => onClickActionButton(action)}
-                    disabled={disabled || betAmt < min}
+                    onClick={() => {
+                        if (betSemiDisabled) {
+                            onClickSemiDisabledBet();
+                        } else {
+                            onClickActionButton(action);
+                        }
+                    }}
+                    disabled={disabled}
                 >
-                    {label}
+                    {`${label}${betAmt ? ` ${betAmt}` : ''}`}
                 </Button>,
             );
         }
@@ -419,6 +436,7 @@ function ControllerComp(props: ControllerProps) {
                     value={betAmt}
                     onChange={(val) => changeBetAmount(val)}
                     onClickActionButton={onClickActionButton}
+                    betInputRef={betInputRef}
                 />
             </div>
 
