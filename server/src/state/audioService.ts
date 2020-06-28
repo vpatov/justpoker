@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { AudioQueue, getCleanAudioQueue, SoundByte } from '../../../ui/src/shared/models/state/audioQueue';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
+import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 
 @Service()
 export class AudioService {
@@ -20,7 +21,7 @@ export class AudioService {
         this.audioQueue.global = soundByte;
     }
 
-    private setPersonalSound(playerUUID: string, soundByte: SoundByte) {
+    private setPersonalSound(playerUUID: PlayerUUID, soundByte: SoundByte) {
         this.audioQueue.personal[playerUUID] = soundByte;
     }
 
@@ -52,11 +53,15 @@ export class AudioService {
         this.setGlobalSound(SoundByte.START_OF_HAND);
     }
 
-    playHeroWinSFX(playerUUID: string) {
+    playHeroWinSFX(playerUUID: PlayerUUID) {
         this.setPersonalSound(playerUUID, SoundByte.HERO_WIN);
     }
 
-    playHeroTurnToActSFX(playerUUID: string) {
+    playVillianWinSFX(playerUUID: PlayerUUID) {
+        this.setPersonalSound(playerUUID, SoundByte.VILLAIN_WIN);
+    }
+
+    playHeroTurnToActSFX(playerUUID: PlayerUUID) {
         this.setPersonalSound(playerUUID, SoundByte.HERO_TO_ACT);
     }
 }

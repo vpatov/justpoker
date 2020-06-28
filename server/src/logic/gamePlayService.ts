@@ -20,6 +20,7 @@ import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
+import e from 'express';
 
 @Service()
 export class GamePlayService {
@@ -485,6 +486,11 @@ export class GamePlayService {
             this.gsm.setPlayerChipDelta(playerUUID, amountWon);
             this.gsm.addHandWinner(playerUUID);
             this.gameInstanceLogService.addWinnerToPotSummary(playerUUID, amountWon);
+        });
+        eligiblePlayers.forEach(([playerUUID, _]) => {
+            if (!Object.values(winningPlayers).includes(playerUUID)) {
+                this.audioService.playVillianWinSFX(playerUUID);
+            }
         });
     }
 
