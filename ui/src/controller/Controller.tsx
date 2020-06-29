@@ -331,7 +331,7 @@ function ControllerComp(props: ControllerProps) {
             );
         }
 
-        // CHECK/FOLD BUTOON
+        // CHECK/FOLD BUTTON
         button = bettingActionButtons[BettingRoundActionType.CHECK_FOLD];
         if (button) {
             const { action, label, disabled } = button;
