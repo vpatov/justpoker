@@ -127,7 +127,7 @@ function MakeGame(props) {
                 />
                 <TextFieldWrap
                     className={classes.field}
-                    label="Time To Act"
+                    label="Time To Act (seconds)"
                     variant="standard"
                     onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
                     value={timeToAct}
