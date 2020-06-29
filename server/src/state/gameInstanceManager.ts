@@ -50,7 +50,6 @@ export class GameInstanceManager {
         this.loadGameInstance(gameInstanceUUID);
         this.gameInstanceLogService.initGameInstanceLog(gameInstanceUUID);
         this.gameStateManager.initGame(gameParameters);
-        this.timerManager.cancelStateTimer();
         return gameInstanceUUID;
     }
 
@@ -114,7 +113,7 @@ export class GameInstanceManager {
             animationState: this.animationService.getAnimationState(),
             ledger: this.ledgerService.getLedger(),
             gameInstanceLog: this.gameInstanceLogService.getGameInstanceLog(),
-            stateTimer: this.timerManager.getStateTimer(),
+            timerGroup: this.timerManager.getTimerGroup(),
             lastActive: getEpochTimeMs(),
         };
         this.gameInstances[this.activeGameInstanceUUID] = activeGameInstance;
@@ -141,7 +140,7 @@ export class GameInstanceManager {
         this.audioService.loadAudioState(gameInstance.audioQueue);
         this.animationService.loadAnimationState(gameInstance.animationState);
         this.ledgerService.loadLedger(gameInstance.ledger);
-        this.timerManager.loadStateTimer(gameInstance.stateTimer);
+        this.timerManager.loadTimerGroup(gameInstance.timerGroup);
         this.gameInstanceLogService.loadGameInstanceLog(gameInstance.gameInstanceLog);
         this.activeGameInstanceUUID = gameInstanceUUID;
     }

@@ -19,6 +19,7 @@ import {
     EventType,
     ClientWsMessage,
     createWSCloseEvent,
+    createServerMessageEvent,
 } from '../../../ui/src/shared/models/api/api';
 
 import { logger, debugFunc } from '../logger';
@@ -27,6 +28,8 @@ import { getDefaultGame404 } from '../../../ui/src/shared/models/ui/uiState';
 import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameParameters } from '../../../ui/src/shared/models/game/game';
 import { CONFIGS, Config, ENVIRONMENT } from '../../../ui/src/shared/models/config/config';
+import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
+import { TimerManager } from '../state/timerManager';
 
 @Service()
 class Server {
@@ -43,6 +46,7 @@ class Server {
         private stateConverter: StateConverter,
         private readonly gameInstanceManager: GameInstanceManager,
         private readonly connectedClientManager: ConnectedClientManager,
+        private readonly timerManager: TimerManager,
     ) {}
 
     private initHTTPRoutes(): void {
@@ -71,6 +75,10 @@ class Server {
             const gameParameters: GameParameters = req.body.gameParameters;
             const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
             this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
+            const welcomeMessageEvent = createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME);
+            this.timerManager.setMessageAnnouncementTimer(() => {
+                this.eventProcessorService.processEvent(welcomeMessageEvent);
+            }, 30 * 1000);
 
             logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
             res.send({ gameInstanceUUID: gameInstanceUUID });
