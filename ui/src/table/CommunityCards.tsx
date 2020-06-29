@@ -11,17 +11,24 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    communityCard: {},
 }));
 function CommunityCards(props) {
     const classes = useStyles();
     const { communityCards } = props;
 
+    function generatePlaceholders() {
+        const placeHolders: any[] = [];
+        for (let i = communityCards.length; i < 5; i++) {
+            placeHolders.push(<CardLarge key={`${i}pl`} placeHolder />);
+        }
+        return placeHolders;
+    }
     return (
         <div className={classes.communityCardsCont}>
             {communityCards.map((c, i) => (
-                <CardLarge {...c} fontSize={'2.5vmin'} className={classes.communityCard} />
+                <CardLarge {...c} key={i} />
             ))}
+            {generatePlaceholders()}
         </div>
     );
 }
