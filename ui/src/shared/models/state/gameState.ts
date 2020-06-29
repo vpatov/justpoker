@@ -6,6 +6,26 @@ import { Card, Deck, Hand } from '../game/cards';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../system/uuid';
 import { getCleanGameParameters } from '../game/game';
 import { QueuedServerAction } from '../system/server';
+import { PlayerPosition } from '../player/playerPosition';
+
+/**
+ * Represents a seat occupied by a player. Each playerSeat in the seatsDealtIn is a
+ * snapshot of the seat at the beginning of the hand (so that when players switch seats
+ * while a hand is in progress, the gameplay logic uses the snapshot rather than the
+ * players' current positions).
+ */
+export declare interface PlayerSeat {
+    playerUUID: PlayerUUID;
+
+    /* Ranges from [0,maxNumPlayers), represents the absolute seat number. */
+    seatNumber: number;
+
+    /**
+     * Ranges from [0, numPlayersDealtIn), represents the seats relative position with
+     * respect to the current hand (0 -> dealer, 1 -> SB, so forth..)
+     */
+    positionIndex: number;
+}
 
 export declare interface GameState {
     gameStage: GameStage;
@@ -20,27 +40,38 @@ export declare interface GameState {
 
     gameParameters: GameParameters;
 
+    /**
+     * Index into this array is the relative seat number (relative to the dealer). Dealer is at position 0.
+     * Represents the seating arrangement at the start of the hand. This is the only data structure that deals
+     * with relative seat numbers, all other objects use the absolute seat number (i.e. player.seatNumber, dealerSeatNumber)
+     * */
+    seatsDealtIn: PlayerSeat[];
+
+    dealerSeatNumber: number;
+
+    playerPositionMap: Map<PlayerUUID, PlayerPosition>;
+
+    dealerSeat: PlayerSeat | undefined;
+
     isAllInRunOut: boolean;
 
-    dealerUUID: PlayerUUID;
+    smallBlindSeat: PlayerSeat | undefined;
 
-    smallBlindUUID: PlayerUUID;
+    bigBlindSeat: PlayerSeat | undefined;
 
-    bigBlindUUID: PlayerUUID;
-
-    straddleUUID: PlayerUUID;
+    straddleSeat: PlayerSeat | undefined;
 
     // used to see who should post blinds
-    prevBigBlindUUID: PlayerUUID;
+    prevBigBlindSeat: PlayerSeat | undefined;
 
     // playerUUID of last player to bet or raise
-    lastAggressorUUID: PlayerUUID;
+    lastAggressorUUID: PlayerUUID | undefined;
 
     bettingRoundStage: BettingRoundStage;
 
-    firstToAct: PlayerUUID;
+    firstToActSeat: PlayerSeat | undefined;
 
-    currentPlayerToAct: PlayerUUID;
+    currentPlayerSeatToAct: PlayerSeat | undefined;
 
     lastBettingRoundAction: BettingRoundAction;
 
@@ -97,17 +128,20 @@ export function getCleanGameState(): GameState {
         players: {},
         board: [],
         gameParameters: getCleanGameParameters(),
+        seatsDealtIn: [],
+        dealerSeatNumber: 0,
         isAllInRunOut: false,
-        dealerUUID: makeBlankUUID(),
-        smallBlindUUID: makeBlankUUID(),
-        bigBlindUUID: makeBlankUUID(),
-        straddleUUID: makeBlankUUID(),
-        prevBigBlindUUID: makeBlankUUID(),
+        playerPositionMap: new Map(),
+        dealerSeat: undefined,
+        smallBlindSeat: undefined,
+        bigBlindSeat: undefined,
+        straddleSeat: undefined,
+        prevBigBlindSeat: undefined,
         lastAggressorUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
-        firstToAct: makeBlankUUID(),
+        firstToActSeat: undefined,
         admins: [],
-        currentPlayerToAct: makeBlankUUID(),
+        currentPlayerSeatToAct: undefined,
         lastBettingRoundAction: { type: BettingRoundActionType.NOT_IN_HAND },
         shouldDealNextHand: false,
         activeConnections: new Map(),

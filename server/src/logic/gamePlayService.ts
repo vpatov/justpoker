@@ -20,6 +20,7 @@ import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
 import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
+import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 
 @Service()
 export class GamePlayService {
@@ -42,15 +43,8 @@ export class GamePlayService {
     }
 
     computeAndSetCurrentPlayerToAct() {
-        const previousPlayerToAct = this.gsm.getCurrentPlayerToAct();
-
-        // if there is nor previous player to act, then we are starting the betting round.
-        const currentPlayerToAct = previousPlayerToAct
-            ? this.gsm.getNextPlayerInHandUUID(previousPlayerToAct)
-            : this.gsm.getFirstToAct();
-
-        this.gsm.setCurrentPlayerToAct(currentPlayerToAct);
-        this.audioService.playHeroTurnToActSFX(currentPlayerToAct);
+        this.gsm.updateCurrentPlayerSeatToAct();
+        this.audioService.playHeroTurnToActSFX(this.gsm.getCurrentPlayerSeatToAct().playerUUID);
     }
 
     setTimeCurrentPlayerTurnStarted() {
@@ -60,7 +54,6 @@ export class GamePlayService {
     }
 
     computeTimeRemainingToAct() {
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
         const timeRemaining =
             this.gsm.getTimeToAct() +
             this.gsm.getSumTimeBankValueThisAction() -
@@ -69,21 +62,21 @@ export class GamePlayService {
     }
 
     timeOutPlayer() {
-        const playerUUID = this.gsm.getCurrentPlayerToAct();
-        if (!playerUUID) {
+        const playerSeat = this.gsm.getCurrentPlayerSeatToAct();
+        if (!playerSeat || !playerSeat.playerUUID) {
             logger.error(
-                `timeOutPlayer was called and there is no currentPlayerToAct. GameState:` +
+                `timeOutPlayer was called and there is no currentPlayerSeatToAct. GameState:` +
                     `${getLoggableGameState(this.gsm.getGameState())}`,
             );
             return;
         }
-        const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
+        const clientUUID = this.gsm.getClientByPlayerUUID(playerSeat.playerUUID);
         const error = this.validationService.validateBettingRoundAction(clientUUID, CHECK_ACTION);
         if (!error) {
             this.performBettingRoundAction({ type: BettingRoundActionType.CHECK, amount: 0 });
         } else {
             this.performBettingRoundAction({ type: BettingRoundActionType.FOLD, amount: 0 });
-            this.gsm.sitOutPlayer(playerUUID);
+            this.gsm.sitOutPlayer(playerSeat.playerUUID);
         }
     }
 
@@ -115,9 +108,9 @@ export class GamePlayService {
     }
 
     useTimeBankAction() {
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const currentPlayerSeatToAct = this.gsm.getCurrentPlayerSeatToAct();
         this.gsm.incrementTimeBanksUsedThisAction();
-        this.gsm.decrementTimeBanksLeft(currentPlayerToAct);
+        this.gsm.decrementTimeBanksLeft(currentPlayerSeatToAct.playerUUID);
     }
 
     /* Betting Round Actions */
@@ -148,7 +141,7 @@ export class GamePlayService {
         }
 
         this.gameInstanceLogService.pushBetAction(
-            this.gsm.getCurrentPlayerToAct(),
+            this.gsm.getCurrentPlayerSeatToAct().playerUUID,
             { type: action.type, amount: betAmount },
             getEpochTimeMs() - this.gsm.getTimeCurrentPlayerTurnStarted(),
         );
@@ -159,12 +152,12 @@ export class GamePlayService {
     // the CHECK_ACTION / FOLD_ACTION constants
     check() {
         this.audioService.playCheckSFX();
-        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.CHECK);
+        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerSeatToAct().playerUUID, BettingRoundActionType.CHECK);
     }
 
     fold() {
         this.audioService.playFoldSFX();
-        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerToAct(), BettingRoundActionType.FOLD);
+        this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerSeatToAct().playerUUID, BettingRoundActionType.FOLD);
 
         // TODO only if player is facing bet
     }
@@ -172,7 +165,7 @@ export class GamePlayService {
     bet(betAmount: number, playerPlacingBlindBetUUID?: PlayerUUID) {
         const playerPlacingBet = playerPlacingBlindBetUUID
             ? playerPlacingBlindBetUUID
-            : this.gsm.getCurrentPlayerToAct();
+            : this.gsm.getCurrentPlayerSeatToAct().playerUUID;
 
         // It is possible that this bet method is called with a betAmount greater
         // than the amount of chips the player has (for example, player is placing
@@ -227,72 +220,58 @@ export class GamePlayService {
 
     callBet() {
         this.audioService.playCallSFX();
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const currentPlayerToActUUID = this.gsm.getCurrentPlayerSeatToAct().playerUUID;
 
         // If player is facing a bet that is larger than their stack, they can CALL and go all-in.
         // TODO find the cleanest way to do this. Should that logic be handled in setPlayerBetAmount, or here?
-        const callAmount = this.gsm.computeCallAmount(currentPlayerToAct);
-        this.gsm.setPlayerBetAmount(currentPlayerToAct, callAmount);
+        const callAmount = this.gsm.computeCallAmount(currentPlayerToActUUID);
+        this.gsm.setPlayerBetAmount(currentPlayerToActUUID, callAmount);
 
-        const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToAct);
+        const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToActUUID);
         const isPlayerCallingAllInRunOut = this.gsm.getPlayersAllIn().length === this.gsm.getPlayersInHand().length - 1;
         this.gsm.setPlayerLastActionType(
-            currentPlayerToAct,
+            currentPlayerToActUUID,
             isPlayerAllIn || isPlayerCallingAllInRunOut ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
         );
 
         return callAmount;
     }
 
-    initializeDealerButton() {
-        const seats = this.gsm.getSeats();
-        const [_, seatZeroPlayerUUID] = seats[0];
-        const dealerUUID = this.gsm.getDealerUUID();
-        const newDealerUUID = dealerUUID ? this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID) : seatZeroPlayerUUID;
-
-        this.gsm.setDealerUUID(newDealerUUID);
-    }
-
     initializeNewHand() {
         this.gsm.incrementHandNumber();
         this.gsm.initializeNewDeck();
-        this.initializeDealerButton();
+        this.gsm.incrementDealerSeatNumber();
+        this.gsm.updateTableSeatsAndPlayerPositionMap();
 
         this.gsm.recordPlayerChipsAtStartOfHand();
         this.placeBlinds();
         this.gameInstanceLogService.initNewHand();
     }
 
-    /*
-        TODO ensure that the players have enough to cover the blinds, and if not, put them
-        all-in. Don't let a player get this point if they have zero chips, stand them up earlier.
-        TODO substract chips from the players
-    */
     placeBlinds() {
         const numPlayersReadyToPlay = this.gsm.getPlayersReadyToPlay().length;
-        const dealerUUID = this.gsm.getDealerUUID();
+        const dealerSeat = this.gsm.getDealerSeat();
         const SB = this.gsm.getSB();
         const BB = this.gsm.getBB();
 
-        const smallBlindUUID =
-            numPlayersReadyToPlay === 2 ? dealerUUID : this.gsm.getNextPlayerReadyToPlayUUID(dealerUUID);
-        const bigBlindUUID = this.gsm.getNextPlayerReadyToPlayUUID(smallBlindUUID);
-        const straddleUUID = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+        const smallBlindSeat = numPlayersReadyToPlay === 2 ? dealerSeat : this.gsm.getNextPlayerSeatReadyToPlay(0);
+        const bigBlindSeat = this.gsm.getNextPlayerSeatReadyToPlay(numPlayersReadyToPlay === 2 ? 0 : 1);
+        const straddleSeat = this.gsm.getNextPlayerSeatReadyToPlay(2);
 
-        const willPlayerStraddle = this.gsm.willPlayerStraddle(straddleUUID);
+        const willPlayerStraddle = this.gsm.willPlayerStraddle(straddleSeat.playerUUID);
         const placeStraddle = willPlayerStraddle && numPlayersReadyToPlay > 2;
 
         // if you are sitting out and in between the prevBigBlindUUID & bigBlindUUID
         // then you missed a big blind and must most a big blind when you rejoin
-        const prevBigBlindUUID = this.gsm.getPrevBigBlindUUID();
-        if (prevBigBlindUUID) {
-            this.gsm.getPlayerInBetween(prevBigBlindUUID, bigBlindUUID).forEach((playerUUID) => {
+        const prevBigBlindSeat = this.gsm.getPrevBigBlindSeat();
+        if (prevBigBlindSeat) {
+            this.gsm.getPlayersInBetween(prevBigBlindSeat, bigBlindSeat).forEach((playerUUID) => {
                 if (this.gsm.getPlayer(playerUUID).sittingOut) this.gsm.setPlayerWillPostBlind(playerUUID, true);
             });
         }
         // this.bet() is a setter, not adder, so we proceed by placing smallest blinds first
         // and larger blinds will then take priority as desired.
-        this.bet(SB, smallBlindUUID);
+        this.bet(SB, smallBlindSeat.playerUUID);
 
         this.gsm.getPlayersThatWillPostBlind().forEach((player) => {
             if (!player.sittingOut) {
@@ -301,36 +280,40 @@ export class GamePlayService {
             }
         });
 
-        this.bet(BB, bigBlindUUID);
+        this.bet(BB, bigBlindSeat.playerUUID);
+
+        // TODO Should a player be allowed to straddle if they have less than the straddle amount?
+        // i.e. in 1/2 they have 3 chips so they are put all-in by straddling "4"
         if (placeStraddle) {
-            this.bet(BB * 2, straddleUUID);
+            this.bet(BB * 2, straddleSeat.playerUUID);
         }
 
-        this.gsm.setSmallBlindUUID(smallBlindUUID);
-        this.gsm.setBigBlindUUID(bigBlindUUID);
-        this.gsm.setStraddleUUID(placeStraddle ? straddleUUID : makeBlankUUID());
+        this.gsm.setSmallBlindSeat(smallBlindSeat);
+        this.gsm.setBigBlindSeat(bigBlindSeat);
+        this.gsm.setStraddleSeat(placeStraddle ? straddleSeat : undefined);
     }
 
+    /** Assumes that players have been dealt in already. */
     setFirstToActAtStartOfBettingRound() {
-        const bigBlindUUID = this.gsm.getBigBlindUUID();
-        const dealerUUID = this.gsm.getDealerUUID();
-        const straddleUUID = this.gsm.getStraddleUUID();
-        const headsUp = this.gsm.getPlayersReadyToPlay().length === 2;
-        let firstToAct: PlayerUUID = makeBlankUUID();
+        const bigBlindSeat = this.gsm.getBigBlindSeat();
+        const dealerSeat = this.gsm.getDealerSeat();
+        const straddleSeat = this.gsm.getStraddleSeat();
+        const headsUp = this.gsm.getSeatsDealtIn().length === 2;
+        let firstToAct: PlayerSeat = null;
 
         if (this.gsm.getBettingRoundStage() === BettingRoundStage.PREFLOP) {
             if (headsUp) {
-                firstToAct = dealerUUID;
-            } else if (straddleUUID) {
-                firstToAct = this.gsm.getNextPlayerInHandUUID(straddleUUID);
+                firstToAct = dealerSeat;
+            } else if (straddleSeat) {
+                firstToAct = this.gsm.getNextPlayerSeatInHand(3);
             } else {
-                firstToAct = this.gsm.getNextPlayerReadyToPlayUUID(bigBlindUUID);
+                firstToAct = this.gsm.getNextPlayerSeatInHand(2);
             }
         } else {
-            firstToAct = this.gsm.getNextPlayerInHandUUID(dealerUUID);
+            firstToAct = this.gsm.getNextPlayerSeatInHand(0);
         }
 
-        this.gsm.setFirstToAct(firstToAct);
+        this.gsm.setFirstSeatToAct(firstToAct);
     }
 
     dealHoleCards(playerUUID: PlayerUUID) {
@@ -613,6 +596,6 @@ export class GamePlayService {
     }
 
     savePreviousHandInfo() {
-        this.gsm.setPrevBigBlindUUID(this.gsm.getBigBlindUUID());
+        this.gsm.setPrevBigBlindSeat(this.gsm.getBigBlindSeat());
     }
 }
