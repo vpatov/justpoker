@@ -309,8 +309,8 @@ function HandLog(props: HandLogProps) {
     }
 
     function renderTimeTookToAct(timeTookToAct: number) {
-        // 1512 -> (1.5s)
-        return `(${Math.round(timeTookToAct / 100) / 10}s)`;
+        // 1512 -> (2s)
+        return `(${Math.round(timeTookToAct / 1000)}s)`;
     }
 
     function renderBettingRoundActions(actions: BetActionRecord[]) {
