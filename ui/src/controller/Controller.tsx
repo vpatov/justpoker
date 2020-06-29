@@ -10,6 +10,7 @@ import {
     globalGameStateSelector,
     heroPlayerUUIDSelector,
 } from '../store/selectors';
+import { useFocus } from '../utils';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -17,7 +18,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 
 import { ClientActionType, ClientWsMessageRequest, ClientStraddleRequest } from '../shared/models/api/api';
-import { Typography, Tooltip } from '@material-ui/core';
+import { Typography, Tooltip, ButtonGroup } from '@material-ui/core';
 import { BettingRoundActionType } from '../shared/models/game/betting';
 
 import ControllerSpectator from './ControllerSpectator';
@@ -25,7 +26,6 @@ import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerShowCard from './ControllerShowCard';
 import BuyChipsDialog from '../game/BuyChipsDialog';
-import { BettingRoundActionButton } from '../shared/models/ui/uiState';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 import { grey } from '@material-ui/core/colors';
@@ -81,6 +81,14 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-evenly',
             alignItems: 'center',
         },
+        checkFoldButton: {
+            fontSize: '1.6vmin',
+            width: '100%',
+            height: '100%',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+        },
         actionButton: {
             height: '58%',
             width: '16vmin',
@@ -132,6 +140,10 @@ const useStyles = makeStyles((theme: Theme) =>
             borderColor: Color(theme.custom.ACTION_BUTTONS.FOLD.borderColor).desaturate(0.7).darken(0.5).string(),
             color: Color(theme.custom.ACTION_BUTTONS.FOLD.color).desaturate(0.7).darken(0.5).string(),
         },
+        semiDisabledBet: {
+            borderColor: Color(theme.custom.ACTION_BUTTONS.BET.borderColor).desaturate(0.7).darken(0.5).string(),
+            color: Color(theme.custom.ACTION_BUTTONS.BET.color).desaturate(0.7).darken(0.5).string(),
+        },
     }),
 );
 
@@ -147,13 +159,13 @@ function ControllerComp(props: ControllerProps) {
         min,
         max,
         sizingButtons,
-        bettingRoundActionButtons: actionButtons,
+        bettingActionButtons,
         showCardButtons,
         dealInNextHand,
         timeBanks,
         willStraddle,
         showWarningOnFold,
-        callAmount,
+        amountToCall,
         playerPositionString,
     } = useSelector(controllerSelector);
 
@@ -170,6 +182,7 @@ function ControllerComp(props: ControllerProps) {
 
     const [warning, setWarning] = useState(false);
 
+    const [betInputRef, setBetInputFocus] = useFocus();
     // if there is selected betAmt and min changes rest betAmt
     useEffect(() => {
         if (betAmt !== 0 && betAmt < min) {
@@ -179,7 +192,11 @@ function ControllerComp(props: ControllerProps) {
 
     useEffect(() => {
         for (const actionType of bettingRoundActionTypesToUnqueue) {
-            if (queuedActionType === actionType) {
+            if (actionType === BettingRoundActionType.CHECK && queuedActionType === BettingRoundActionType.CHECK_FOLD) {
+                setQueuedActionType(BettingRoundActionType.FOLD);
+                setBetAmt(0);
+                break;
+            } else if (queuedActionType === actionType) {
                 setQueuedActionType('');
                 setBetAmt(0);
                 break;
@@ -278,24 +295,147 @@ function ControllerComp(props: ControllerProps) {
     }
 
     if (toAct && queuedActionType !== '') {
-        sendBettingRoundAction(queuedActionType);
+        if (queuedActionType === BettingRoundActionType.CHECK_FOLD) {
+            sendBettingRoundAction(BettingRoundActionType.CHECK);
+        } else {
+            sendBettingRoundAction(queuedActionType);
+        }
+
         setQueuedActionType('');
     }
 
-    function getBetActionButtonText(button: BettingRoundActionButton): string {
-        switch (button.action) {
-            case BettingRoundActionType.CALL:
-                return `${button.label} ${callAmount || ''}`;
-            case BettingRoundActionType.BET:
-                return `${button.label} ${betAmt || ''}`;
-            case BettingRoundActionType.CHECK:
-                return button.label;
-            case BettingRoundActionType.FOLD:
-                return button.label;
+    function onClickSemiDisabledBet() {
+        setBetInputFocus();
+    }
 
-            default:
-                return button.label;
+    function generateBetActionButtons() {
+        const buttons = [] as any;
+
+        // FOLD BUTTON
+        let button = bettingActionButtons[BettingRoundActionType.FOLD];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <Button
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                        [classes.semiDisabledFold]: showWarningOnFold,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled}
+                >
+                    {label}
+                </Button>,
+            );
         }
+
+        // CHECK/FOLD BUTTON
+        button = bettingActionButtons[BettingRoundActionType.CHECK_FOLD];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <ButtonGroup
+                    key={BettingRoundActionType.CHECK_FOLD}
+                    orientation="vertical"
+                    className={classes.actionButton}
+                    disabled={disabled}
+                >
+                    <Button
+                        id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                        variant="outlined"
+                        className={classnames(classes.checkFoldButton, classes[BettingRoundActionType.CHECK], {
+                            [classes[`${BettingRoundActionType.CHECK}_QUEUED`]]:
+                                BettingRoundActionType.CHECK === queuedActionType,
+                        })}
+                        onClick={() => onClickActionButton(BettingRoundActionType.CHECK)}
+                    >
+                        {label}
+                    </Button>
+                    <Button
+                        id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                        variant="outlined"
+                        className={classnames(classes.checkFoldButton, classes[BettingRoundActionType.CHECK], {
+                            [classes[`${BettingRoundActionType.CHECK}_QUEUED`]]:
+                                BettingRoundActionType.CHECK_FOLD === queuedActionType,
+                        })}
+                        onClick={() => onClickActionButton(BettingRoundActionType.CHECK_FOLD)}
+                    >
+                        CHECK FOLD
+                    </Button>
+                </ButtonGroup>,
+            );
+        }
+
+        // CHECK BUTTON
+        button = bettingActionButtons[BettingRoundActionType.CHECK];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <Button
+                    id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled}
+                >
+                    {label}
+                </Button>,
+            );
+        }
+
+        // CALL BUTTON
+        button = bettingActionButtons[BettingRoundActionType.CALL];
+        if (button) {
+            const { action, label, disabled } = button;
+            buttons.push(
+                <Button
+                    id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                    })}
+                    onClick={() => onClickActionButton(action)}
+                    disabled={disabled}
+                >
+                    {`${label} ${amountToCall}`}
+                </Button>,
+            );
+        }
+
+        // BET BUTTON
+        button = bettingActionButtons[BettingRoundActionType.BET];
+        if (button) {
+            const { action, label, disabled } = button;
+            const betSemiDisabled = betAmt < min;
+            buttons.push(
+                <Button
+                    key={action}
+                    variant="outlined"
+                    className={classnames(classes.actionButton, classes[action], {
+                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
+                        [classes.semiDisabledBet]: betSemiDisabled,
+                    })}
+                    onClick={() => {
+                        if (betSemiDisabled) {
+                            onClickSemiDisabledBet();
+                        } else {
+                            onClickActionButton(action);
+                        }
+                    }}
+                    disabled={disabled}
+                >
+                    {`${label}${betAmt ? ` ${betAmt}` : ''}`}
+                </Button>,
+            );
+        }
+
+        return buttons;
     }
 
     if (isSpectator)
@@ -342,32 +482,7 @@ function ControllerComp(props: ControllerProps) {
                 ) : null}
             </div>
             <div className={classes.sizeAndBetActionsCont}>
-                <div className={classes.betActionsCont}>
-                    {actionButtons.map((button) => {
-                        return (
-                            <Button
-                                id={
-                                    button.action === BettingRoundActionType.CHECK ||
-                                    button.action === BettingRoundActionType.CALL
-                                        ? `${SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}`
-                                        : ''
-                                }
-                                variant="outlined"
-                                className={classnames(classes.actionButton, classes[button.action], {
-                                    [classes[`${button.action}_QUEUED`]]: button.action === queuedActionType,
-                                    [classes.semiDisabledFold]:
-                                        button.action === BettingRoundActionType.FOLD && showWarningOnFold,
-                                })}
-                                disabled={
-                                    button.disabled || (button.action === BettingRoundActionType.BET && betAmt < min)
-                                }
-                                onClick={() => onClickActionButton(button.action)}
-                            >
-                                {getBetActionButtonText(button)}
-                            </Button>
-                        );
-                    })}
-                </div>
+                <div className={classes.betActionsCont}>{generateBetActionButtons()}</div>
                 <ControllerBetSizer
                     sizingButtons={sizingButtons}
                     min={min}
@@ -375,6 +490,7 @@ function ControllerComp(props: ControllerProps) {
                     value={betAmt}
                     onChange={(val) => changeBetAmount(val)}
                     onClickActionButton={onClickActionButton}
+                    betInputRef={betInputRef}
                 />
             </div>
 

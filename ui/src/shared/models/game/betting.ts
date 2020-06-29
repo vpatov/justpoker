@@ -10,6 +10,7 @@ export declare interface BettingRoundAction {
 export enum BettingRoundActionType {
     CALL = 'CALL',
     CHECK = 'CHECK',
+    CHECK_FOLD = 'CHECK_FOLD',
     BET = 'BET',
     FOLD = 'FOLD',
     WAITING_TO_ACT = 'WAITING_TO_ACT',
