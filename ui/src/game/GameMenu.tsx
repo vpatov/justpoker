@@ -30,6 +30,7 @@ import ConfirmationDialog from '../reuseable/ConfirmationDialog';
 
 import { GameParameters } from '../shared/models/game/game';
 import BuyChipsDialog from './BuyChipsDialog';
+import { MenuButton } from '../shared/models/ui/uiState';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -51,7 +52,6 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             flexDirection: 'column',
             transition: 'all 0.3s ease-in-out',
-            maxHeight: '5vmin',
             overflow: 'hidden',
         },
         rootExpanded: {
@@ -71,6 +71,13 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }),
 );
+
+const ALWAYS_SHOW = [
+    UiActionType.OPEN_ADD_CHIPS,
+    UiActionType.USER_SETTINGS,
+    ClientActionType.LEAVETABLE,
+    ClientActionType.QUITGAME,
+];
 
 function GameMenu(props) {
     const { mute, SET_mute } = props;
@@ -179,6 +186,26 @@ function GameMenu(props) {
         SET_gameParametersOpen(false);
     };
 
+    let alwaysShowMenuButtons: MenuButton[] = [];
+    let hiddenMenuButtons: MenuButton[] = [];
+    menuButtons.forEach((button) => {
+        if (ALWAYS_SHOW.includes(button.action)) {
+            alwaysShowMenuButtons.push(button);
+        } else {
+            hiddenMenuButtons.push(button);
+        }
+    });
+
+    function generateButtonsFromArray(buttons) {
+        return buttons.map((button) => (
+            <Tooltip key={button.label} title={button.label} placement="right">
+                <IconButton className={classes.iconButton} onClick={() => handleClickButton(button.action)}>
+                    {getIcon(button.action, classes.icon)}
+                </IconButton>
+            </Tooltip>
+        ));
+    }
+
     return (
         <>
             <div className={classes.hoverArea} onMouseOver={handleOpen} onMouseLeave={handleClose}>
@@ -187,22 +214,15 @@ function GameMenu(props) {
                     className={classnames(classes.root, {
                         [classes.rootExpanded]: open,
                     })}
+                    style={open ? {} : { maxHeight: `${5 * alwaysShowMenuButtons.length}vmin` }}
                 >
                     {open ? (
-                        menuButtons.map((button) => (
-                            <Tooltip key={button.label} title={button.label} placement="right">
-                                <IconButton
-                                    className={classes.iconButton}
-                                    onClick={() => handleClickButton(button.action)}
-                                >
-                                    {getIcon(button.action, classes.icon)}
-                                </IconButton>
-                            </Tooltip>
-                        ))
+                        <>
+                            {generateButtonsFromArray(alwaysShowMenuButtons)}
+                            {generateButtonsFromArray(hiddenMenuButtons)}
+                        </>
                     ) : (
-                        <IconButton className={classes.iconButton}>
-                            <MenuIcon className={classes.icon} />
-                        </IconButton>
+                        generateButtonsFromArray(alwaysShowMenuButtons)
                     )}
                 </Paper>
             </div>
