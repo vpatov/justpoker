@@ -28,8 +28,6 @@ import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { AnimationService } from '../state/animationService';
-import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { TimerManager } from '../state/timerManager';
 
 declare interface ActionProcessor {
     validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -52,7 +50,6 @@ export class EventProcessorService {
         private readonly gameInstanceManager: GameInstanceManager,
         private readonly connectedClientManager: ConnectedClientManager,
         private readonly animationService: AnimationService,
-        private readonly timerManager: TimerManager,
     ) {}
 
     eventProcessor: EventProcessor = {
