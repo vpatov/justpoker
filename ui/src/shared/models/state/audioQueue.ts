@@ -20,6 +20,8 @@ export enum SoundByte {
     VILLAIN_WIN = 'VILLAIN_WIN',
     HERO_TO_ACT = 'HERO_TO_ACT',
     START_OF_HAND = 'START_OF_HAND',
+    FLOP = 'FLOP',
+    TURN_RIVER = 'TURN_RIVER',
     // START_OF_BETTING_ROUND = "START_OF_BETTING_ROUND",
 }
 

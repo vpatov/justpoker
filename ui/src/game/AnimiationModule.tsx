@@ -163,6 +163,16 @@ export function flipCard(id, hero) {
         easing: 'easeOutExpo',
     });
 }
+
+export function animateDealCommunityCard(id) {
+    const duration = 250;
+
+    const a = anime({
+        targets: [`#${id}`],
+        rotateY: [90, 0],
+        easing: 'easeOutExpo',
+    });
+}
 // utility functions
 
 function getCenterOfRef(ref) {
