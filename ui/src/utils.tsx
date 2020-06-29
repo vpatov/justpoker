@@ -56,6 +56,15 @@ export function useStickyState(defaultValue, key) {
     return [value, setValue];
 }
 
+export function useFocus(): [any, Function] {
+    const htmlElRef = useRef(null);
+    const setFocus = () => {
+        htmlElRef.current && (htmlElRef.current as any).focus();
+    };
+
+    return [htmlElRef, setFocus];
+}
+
 export function importAllFromRequire(r) {
     let images = {};
     r.keys().map((item, index) => {

@@ -139,9 +139,9 @@ export class ValidationService {
         if (error) {
             return error;
         }
-        const currentPlayerToAct = this.gsm.getCurrentPlayerToAct();
+        const currentPlayerToActUUID = this.gsm.getCurrentPlayerSeatToAct()?.playerUUID;
         const gameIsWaitingForBetAction = this.gsm.gameIsWaitingForBetAction();
-        if (player.uuid !== currentPlayerToAct || !gameIsWaitingForBetAction) {
+        if (player.uuid !== currentPlayerToActUUID || !gameIsWaitingForBetAction) {
             return {
                 errorType: ErrorType.OUT_OF_TURN,
                 errorString: `Not your turn!\nplayerUUID: ${player.uuid}\nname: ${player.name}\n`,
@@ -447,7 +447,7 @@ export class ValidationService {
                     errorType: ErrorType.ILLEGAL_BETTING_ACTION,
                     errorString:
                         `${errorPrefix} Player cannot bet ${betAmount}\nmaximum bet is ${maximumBetSize} in PLOMAHA` +
-                        ` previousRaise is ${this.gsm.getPreviousRaise()}, fullPot is ${this.gsm.getFullPot()}.`,
+                        ` previousRaise is ${this.gsm.getPreviousRaise()}, fullPot is ${this.gsm.getFullPotValue()}.`,
                 };
             }
         }
