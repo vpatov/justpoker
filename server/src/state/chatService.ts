@@ -16,7 +16,7 @@ const changeNameCommandRegEx = /\/name\s(.+)$/;
 const jpVersion = '0.1.0';
 const welcomeMessage =
     `Welcome to JustPoker ${jpVersion}! Check out the menu in the ` +
-    `top left to change the app's appearance, and to set to game parameters. May luck be with you.`;
+    `top left to change the app's appearance, and to set game parameters. May the suits be with you.`;
 
 @Service()
 export class ChatService {
