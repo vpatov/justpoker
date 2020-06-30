@@ -114,7 +114,7 @@ function GameMenu(props) {
         const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
         const gameInstanceUUID = queryParams.gameInstanceUUID || null;
         const stringifiedUrl = queryString.stringifyUrl({ url: '/ledger', query: { gameInstanceUUID } });
-        window.open(stringifiedUrl, '_blank');
+        window.open(stringifiedUrl, 'JustPoker Ledger', `width=${window.innerWidth},height=600`);
     };
 
     function handleClickButton(action) {
