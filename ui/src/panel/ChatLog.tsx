@@ -34,7 +34,6 @@ const useStyles = makeStyles((theme: Theme) =>
             overflowY: 'auto',
             overflowWrap: 'anywhere',
         },
-
         chatLogInputSection: {
             display: 'flex',
             flexDirection: 'row',

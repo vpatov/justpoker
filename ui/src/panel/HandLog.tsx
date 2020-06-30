@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: grey[200],
         },
         handLogPlayerPosition: {
-            width: '4.5vmin',
+            width: '6.2vmin',
             display: 'inline-block',
         },
         handLogContentLabel: {
@@ -235,6 +235,7 @@ function HandLog(props: HandLogProps) {
         );
     }
 
+    // TODO this would probably look best as a small table
     function renderPlayerPosition(playerUUID: PlayerUUID, index: number) {
         const playerSummary = handLogEntries[currentHandNumber].playerSummaries[playerUUID];
         return playerSummary.wasDealtIn ? (
