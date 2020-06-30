@@ -18,7 +18,7 @@ import { ValidationService } from './validationService';
 import { Hand, Card } from '../../../ui/src/shared/models/game/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
-import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
+import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 
@@ -89,13 +89,13 @@ export class GamePlayService {
     }
 
     startOfBettingRound() {
-        // During preflop the previousRaise is set by placing the blinds
-        if (this.gsm.getBettingRoundStage() !== BettingRoundStage.PREFLOP) {
-            this.gsm.setPreviousRaise(0);
-        }
         this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPartialAllInLeftOver(0);
         this.updatePlayersBestHands();
+    }
+
+    endOfBettingRound() {
+        this.gsm.setPreviousRaise(0);
     }
 
     resetBettingRoundActions() {
@@ -360,18 +360,21 @@ export class GamePlayService {
                         this.ledgerService.incrementFlopsSeen(this.gsm.getClientByPlayerUUID(playerUUID));
                     }
                 });
+                this.audioService.playFlopSFX();
                 break;
             }
 
             case BettingRoundStage.TURN: {
                 const cards = this.gsm.dealCardsToBoard(1);
                 this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
+                this.audioService.playTurnRiverSFX();
                 break;
             }
 
             case BettingRoundStage.RIVER: {
                 const cards = this.gsm.dealCardsToBoard(1);
                 this.gameInstanceLogService.updateCardsDealtThisBettingRound(cards);
+                this.audioService.playTurnRiverSFX();
                 break;
             }
 
@@ -468,6 +471,11 @@ export class GamePlayService {
             this.gsm.setPlayerChipDelta(playerUUID, amountWon);
             this.gsm.addHandWinner(playerUUID);
             this.gameInstanceLogService.addWinnerToPotSummary(playerUUID, amountWon);
+        });
+        eligiblePlayers.forEach(([playerUUID, _]) => {
+            if (!Object.values(winningPlayers).includes(playerUUID)) {
+                this.audioService.playVillianWinSFX(playerUUID);
+            }
         });
     }
 

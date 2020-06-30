@@ -9,6 +9,7 @@ import {
     UiPlayer,
     FOLD_BUTTON,
     CHECK_BUTTON,
+    CHECK_FOLD_BUTTON,
     CALL_BUTTON,
     BET_BUTTON,
     START_GAME_BUTTON,
@@ -17,7 +18,7 @@ import {
     USER_SETTINGS_BUTTON,
     VOLUME_BUTTON,
     UiChatMessage,
-    BettingRoundActionButton,
+    BettingActionButton,
     UiCard,
     MenuButton,
     LEDGER_BUTTON,
@@ -26,6 +27,7 @@ import {
     LEAVE_TABLE_BUTTON,
     QUIT_GAME_BUTTON,
     BUY_CHIPS_BUTTON,
+    BettingActionButtons,
 } from '../../../ui/src/shared/models/ui/uiState';
 import { GameType } from '../../../ui/src/shared/models/game/game';
 import { GameStateManager } from '../state/gameStateManager';
@@ -229,7 +231,7 @@ export class StateConverter {
             max: maxBet,
             sizingButtons: getSizingButtons(),
             showCardButtons: this.getShowCardButtons(clientUUID),
-            bettingRoundActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID),
+            bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID, toAct),
             dealInNextHand: !hero.sittingOut,
             willStraddle: hero.willStraddle,
             timeBanks: hero.timeBanksLeft,
@@ -237,7 +239,7 @@ export class StateConverter {
             showWarningOnFold:
                 !this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ||
                 this.gameStateManager.getAllCommitedBets() === 0,
-            callAmount: this.gameStateManager.computeCallAmount(heroPlayerUUID),
+            amountToCall: this.gameStateManager.computeCallAmount(heroPlayerUUID) - curCall,
         };
 
         return controller;
@@ -252,13 +254,17 @@ export class StateConverter {
             : this.gameStateManager.getPlayer(playerUUID).chips;
     }
 
-    disableButton(button: BettingRoundActionButton) {
+    disableButton(button: BettingActionButton) {
         return { ...button, disabled: true };
     }
 
-    getValidBettingRoundActions(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): BettingRoundActionButton[] {
+    getValidBettingRoundActions(
+        clientUUID: ClientUUID,
+        heroPlayerUUID: PlayerUUID,
+        toAct: boolean,
+    ): BettingActionButtons {
         if (!this.gameStateManager.isGameInProgress()) {
-            return [];
+            return {};
         }
 
         if (
@@ -267,19 +273,38 @@ export class StateConverter {
             !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
             this.gameStateManager.isGameStageInBetweenHands()
         ) {
-            return [this.disableButton(FOLD_BUTTON), this.disableButton(CHECK_BUTTON), this.disableButton(BET_BUTTON)];
+            return {
+                [BettingRoundActionType.FOLD]: this.disableButton(FOLD_BUTTON),
+                [BettingRoundActionType.CHECK]: this.disableButton(CHECK_BUTTON),
+                [BettingRoundActionType.BET]: this.disableButton(BET_BUTTON),
+            };
         }
 
-        const buttons = [] as BettingRoundActionButton[];
+        const buttons: BettingActionButtons = {};
         // player can always queue a bet or fold action but we decide if it is check or call
-        buttons.push(FOLD_BUTTON);
+        buttons[BettingRoundActionType.FOLD] = FOLD_BUTTON;
 
-        buttons.push(this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) ? CALL_BUTTON : CHECK_BUTTON);
+        if (
+            this.gameStateManager.isPlayerFacingBet(heroPlayerUUID) &&
+            !this.gameStateManager.isGameStageInBetweenHands()
+        ) {
+            buttons[BettingRoundActionType.CALL] = CALL_BUTTON;
+        } else {
+            if (!toAct) {
+                buttons[BettingRoundActionType.CHECK_FOLD] = CHECK_FOLD_BUTTON;
+            } else {
+                buttons[BettingRoundActionType.CHECK] = CHECK_BUTTON;
+            }
+        }
 
         const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
         const heroPlayerStack = this.gameStateManager.getPlayerByClientUUID(clientUUID).chips;
 
-        buttons.push(heroPlayerStack <= callAmount ? this.disableButton(BET_BUTTON) : BET_BUTTON);
+        if (heroPlayerStack <= callAmount) {
+            buttons[BettingRoundActionType.BET] = this.disableButton(BET_BUTTON);
+        } else {
+            buttons[BettingRoundActionType.BET] = BET_BUTTON;
+        }
         return buttons;
     }
 

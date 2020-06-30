@@ -13,6 +13,7 @@ export declare interface Config {
     SERVER_PORT: number;
     CLIENT_NEED_PORT: boolean;
     SECURE_WS: boolean;
+    HTTPS: boolean;
 }
 
 export const CONFIGS: Configs = {
@@ -21,6 +22,7 @@ export const CONFIGS: Configs = {
         SERVER_PORT: 8080,
         CLIENT_NEED_PORT: true,
         SECURE_WS: false,
+        HTTPS: false,
     },
 
     PROD: {
@@ -28,5 +30,10 @@ export const CONFIGS: Configs = {
         SERVER_PORT: 8080,
         CLIENT_NEED_PORT: false,
         SECURE_WS: true,
+        HTTPS: true,
     },
 };
+
+export function getEnvConfig(): Config {
+    return process.env.NODE_SERVER_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+}

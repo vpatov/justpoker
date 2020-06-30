@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { GameInstance, getCleanGameInstance } from '../../../ui/src/shared/models/state/gameInstance';
-import { generateUUID, getEpochTimeMs } from '../../../ui/src/shared/util/util';
+import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 
 import { AudioService } from './audioService';
 import { AnimationService } from './animationService';
@@ -24,11 +24,13 @@ export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
 }
 const EXPIRE_GAME_INSTANCE_TIME = 1000 * 60 * 60 * 2; // expire games after 2 hours of inactivity
+const MAX_GEN_ID_RETRIES = 1000;
 
 @Service()
 export class GameInstanceManager {
     private gameInstances: GameInstances = {};
     private activeGameInstanceUUID: GameInstanceUUID = makeBlankUUID();
+    private globalUUIDIncrement = 0;
 
     constructor(
         private readonly gameStateManager: GameStateManager,
@@ -43,9 +45,21 @@ export class GameInstanceManager {
         setInterval(() => this.clearStaleGames(), 1000 * 60 * 60); // attempt to expire games every hour
     }
 
-    @debugFunc()
+    makeGameInstanceUUID(): GameInstanceUUID {
+        let gameInstanceUUID = generateGameInstanceUUID();
+        let retries = 0;
+        for (; retries < MAX_GEN_ID_RETRIES && !!this.gameInstances[gameInstanceUUID]; retries++) {
+            gameInstanceUUID = generateGameInstanceUUID();
+        }
+        if (retries === MAX_GEN_ID_RETRIES) {
+            gameInstanceUUID = (gameInstanceUUID + this.globalUUIDIncrement.toString()) as GameInstanceUUID;
+            this.globalUUIDIncrement++;
+        }
+        return gameInstanceUUID;
+    }
+
     createNewGameInstance(gameParameters: GameParameters): GameInstanceUUID {
-        const gameInstanceUUID = generateGameInstanceUUID();
+        const gameInstanceUUID = this.makeGameInstanceUUID();
         this.gameInstances[gameInstanceUUID] = getCleanGameInstance();
         this.loadGameInstance(gameInstanceUUID);
         this.gameInstanceLogService.initGameInstanceLog(gameInstanceUUID);

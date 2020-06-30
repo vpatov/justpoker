@@ -49,16 +49,16 @@ interface LogPanelProps {
     className?: string;
 }
 
-const CHAT_OPEN_LOCAL_STORAGE_KEY = 'jp-chat-open';
-const HANDLOG_OPEN_LOCAL_STORAGE_KEY = 'jp-handlog-open';
+const CHAT_HIDDEN_LOCAL_STORAGE_KEY = 'jp-hide-chat';
+const HANDLOG_HIDDEN_LOCAL_STORAGE_KEY = 'jp-hide-handlog';
 
 function LogPanel(props: LogPanelProps) {
     const classes = useStyles();
 
     const { className } = props;
 
-    const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_OPEN_LOCAL_STORAGE_KEY);
-    const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_OPEN_LOCAL_STORAGE_KEY);
+    const [hideChatLog, setHideChatLog] = useStickyState(false, CHAT_HIDDEN_LOCAL_STORAGE_KEY);
+    const [hideHandLog, setHideHandLog] = useStickyState(false, HANDLOG_HIDDEN_LOCAL_STORAGE_KEY);
     const [unreadChats, setUnreadChats] = useState(false);
 
     function renderMessagePanelButtons() {

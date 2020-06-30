@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { usePrevious } from '../utils';
-import { animateWinningCards } from '../game/AnimiationModule';
+import { animateWinningCards, animateDealCommunityCard } from '../game/AnimiationModule';
 import { generateStringFromRank, SUITS } from '../utils';
 import classnames from 'classnames';
 import Suit from '../reuseable/Suit';
@@ -12,7 +12,7 @@ import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
 
 const CARD_HEIGHT = 11;
 const CARD_WIDTH = 8.6;
-
+const BORDER_SIZE = 0.28;
 const useStyles = makeStyles((theme) => ({
     root: {
         borderRadius: 6,
@@ -28,6 +28,15 @@ const useStyles = makeStyles((theme) => ({
         transition: 'transform 0.5s ease-in-out',
         flex: 'none',
         boxShadow: theme.shadows[4],
+        border: `${BORDER_SIZE}vmin solid transparent`,
+        boxSizing: 'border-box',
+    },
+    placeholder: {
+        backgroundColor: 'transparent',
+        border: `${BORDER_SIZE}vmin solid rgba(255,255,255,0.9)`,
+        boxShadow: 'none',
+        height: `${CARD_HEIGHT - BORDER_SIZE}vmin`,
+        width: `${CARD_WIDTH - BORDER_SIZE}vmin`,
     },
     text: {
         letterSpacing: '-0.5vmin',
@@ -78,9 +87,10 @@ const useStyles = makeStyles((theme) => ({
 
 function CardLarge(props) {
     const classes = useStyles();
-    const { suit, rank, partOfWinningHand, className } = props;
+    const { suit, rank, partOfWinningHand, className, placeHolder } = props;
     const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
 
+    const id = `${suit}${rank}`;
     // this function could be located in many different componets
     // we could also do it at a global level, maybe the animation module is peforming these diff?
     // or we could do it explictly as part of the backend animation flow
@@ -91,21 +101,39 @@ function CardLarge(props) {
         }
     }, [prevWinner, partOfWinningHand]);
 
+    useEffect(() => {
+        animateDealCommunityCard(id);
+    }, []);
+
+    if (placeHolder) {
+        return (
+            <div>
+                <div
+                    className={classnames(classes.root, classes.placeholder, {
+                        [classes.smallWidth]: smallWidth,
+                    })}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div
-            className={classnames(classes.root, classes[suit], className, {
-                [classes.partOfWinningHand]: partOfWinningHand,
-                ani_notWinningCard: !partOfWinningHand,
-                [classes.smallWidth]: smallWidth,
-            })}
-        >
-            <Typography
-                className={classnames(classes.text, classes.rank)}
-                style={rank === 'T' ? { marginLeft: '-0.5vmin' } : {}}
+        <div id={id}>
+            <div
+                className={classnames(classes.root, classes[suit], className, {
+                    [classes.partOfWinningHand]: partOfWinningHand,
+                    ani_notWinningCard: !partOfWinningHand,
+                    [classes.smallWidth]: smallWidth,
+                })}
             >
-                {generateStringFromRank(rank)}
-            </Typography>
-            <Suit suit={suit} className={classes.suit} />
+                <Typography
+                    className={classnames(classes.text, classes.rank)}
+                    style={rank === 'T' ? { marginLeft: '-0.5vmin' } : {}}
+                >
+                    {generateStringFromRank(rank)}
+                </Typography>
+                <Suit suit={suit} className={classes.suit} />
+            </div>
         </div>
     );
 }

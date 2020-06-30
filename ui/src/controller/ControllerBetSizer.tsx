@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function ControllerBetSizer(props) {
     const classes = useStyles();
     const theme = useTheme();
-    const { sizingButtons, min, max, value, onChange, onClickActionButton } = props;
+    const { sizingButtons, min, max, value, onChange, onClickActionButton, betInputRef } = props;
 
     function isBetValid() {
         if (0 < value && value < min) return true;
@@ -159,6 +159,7 @@ function ControllerBetSizer(props) {
                             error={isBetValid()}
                             helperText={isBetValid() ? `Min Bet is ${min}` : ''}
                             onKeyPress={(event) => onPressEnter(event)}
+                            inputRef={betInputRef}
                         />
                         <Button
                             variant="outlined"

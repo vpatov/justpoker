@@ -233,6 +233,7 @@ export class StateGraphManager {
                 this.gamePlayService.updateIsAllInRunOut();
                 this.gamePlayService.flipCardsIfAllInRunOut();
                 this.gameStateManager.clearCurrentPlayerToAct();
+                this.gamePlayService.endOfBettingRound();
                 break;
             }
 

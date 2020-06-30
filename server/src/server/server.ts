@@ -27,9 +27,9 @@ import { ConnectedClientManager } from './connectedClientManager';
 import { getDefaultGame404 } from '../../../ui/src/shared/models/ui/uiState';
 import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameParameters } from '../../../ui/src/shared/models/game/game';
-import { CONFIGS, Config, ENVIRONMENT } from '../../../ui/src/shared/models/config/config';
 import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
+import { Config, getEnvConfig } from '../../../ui/src/shared/models/config/config';
 
 @Service()
 class Server {
@@ -37,7 +37,7 @@ class Server {
     server: http.Server;
     wss: WebSocket.Server;
 
-    config: Config = process.env.NODE_SERVER_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+    config: Config = getEnvConfig();
 
     rootServerDir = process.env.ROOT_SERVER_DIR || '';
 
