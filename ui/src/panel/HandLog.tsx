@@ -28,7 +28,7 @@ import { WsServer } from '../api/ws';
 import { cardsAreEqual, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
 import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
-import { parseHTTPParams } from '../shared/util/util';
+import { getGameInstanceUUID } from '../shared/util/util';
 import { computeHandLogGETurl } from '../api/http';
 import { useLocation } from 'react-router';
 
@@ -151,7 +151,7 @@ function HandLog(props: HandLogProps) {
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
     const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
-    const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
+    const gameInstanceUUID = getGameInstanceUUID(location.pathname || '');
     const smallCurrentHandText = smallWidth || `${currentHandNumber}${handLogEntries.length}`.length >= 4;
 
     useEffect(() => {
@@ -220,7 +220,7 @@ function HandLog(props: HandLogProps) {
     }
 
     function handleClickDownloadButton() {
-        window.open(computeHandLogGETurl(queryParams.gameInstanceUUID), '_blank')
+        window.open(computeHandLogGETurl(gameInstanceUUID), '_blank')
     }
 
     function renderHandLogControls() {

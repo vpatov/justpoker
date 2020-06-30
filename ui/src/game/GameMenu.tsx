@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router';
-import { parseHTTPParams } from '../shared/util/util';
+import { getGameInstanceUUID } from '../shared/util/util';
 import queryString from 'query-string';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
@@ -111,9 +111,8 @@ function GameMenu(props) {
     };
 
     const handleOpenLedger = () => {
-        const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
-        const gameInstanceUUID = queryParams.gameInstanceUUID || null;
-        const stringifiedUrl = queryString.stringifyUrl({ url: '/ledger', query: { gameInstanceUUID } });
+        const gameInstanceUUID = getGameInstanceUUID(location.pathname);
+        const stringifiedUrl = queryString.stringifyUrl({ url: `/ledger/${gameInstanceUUID}`, query:{}});
         window.open(stringifiedUrl, 'JustPoker Ledger', `width=${window.innerWidth},height=600`);
     };
 

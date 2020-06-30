@@ -8,7 +8,7 @@ import Game from './Game';
 import { WsServer } from '../api/ws';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { parseHTTPParams, getGameInstanceUUID } from '../shared/util/util';
+import {  getGameInstanceUUID } from '../shared/util/util';
 import { ErrorDisplay } from '../shared/models/ui/uiState';
 import { GameInstanceUUID } from '../shared/models/system/uuid';
 
@@ -35,7 +35,7 @@ function GameContainer(props): any {
     const [error, setError] = useState<ErrorDisplay | undefined>();
     const [wsConnClosed, SET_wsConnClosed] = useState(false);
 
-    const gameInstanceUUID = (getGameInstanceUUID(get(props, 'location.pathname', '')) || '') as GameInstanceUUID;
+    const gameInstanceUUID = getGameInstanceUUID(get(props, 'location.pathname', ''));
 
     useEffect(() => {
         if (props.useTestGame) {

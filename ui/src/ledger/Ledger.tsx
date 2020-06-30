@@ -6,7 +6,7 @@ import { getLedger } from '../api/http';
 import { makeStyles } from '@material-ui/core/styles';
 import { UILedger, UILedgerRow } from '../shared/models/state/ledger';
 import { ErrorDisplay } from '../shared/models/ui/uiState';
-import { parseHTTPParams, getEpochTimeMs } from '../shared/util/util';
+import { getEpochTimeMs, getGameInstanceUUID } from '../shared/util/util';
 import ErrorMessage from '../root/ErrorMessage';
 import MaterialTable from 'material-table';
 
@@ -26,12 +26,12 @@ const useStyles = makeStyles((theme) => ({
 function Ledger(props) {
     const classes = useStyles();
     const [ledger, setLedger] = useState<UILedger>([]);
-    const queryParams = parseHTTPParams(queryString.parseUrl(props.location.search));
+    const gameInstanceUUID = getGameInstanceUUID(get(props, 'location.pathname', ''));
     const [error, setError] = useState<ErrorDisplay | undefined>();
 
     useEffect(() => {
         document.title = 'Ledger';
-        getLedger(queryParams.gameInstanceUUID, onFetchLedgerSuccess, onFetchLedgerFailure);
+        getLedger(gameInstanceUUID, onFetchLedgerSuccess, onFetchLedgerFailure);
     }, []);
 
     const onFetchLedgerSuccess = (response) => {
@@ -52,7 +52,7 @@ function Ledger(props) {
         if (error !== undefined) {
             return <ErrorMessage errorDisplay={error} />;
         }
-        return <LedgerTable ledger={ledger} gameInstanceUUID={queryParams.gameInstanceUUID} />;
+        return <LedgerTable ledger={ledger} gameInstanceUUID={gameInstanceUUID} />;
     }
 
     return (

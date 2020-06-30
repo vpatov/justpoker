@@ -23,20 +23,12 @@ export function getLoggableGameState(gameState: GameState) {
     return JSON.stringify(minimizedGameState);
 }
 
-export function parseHTTPParams(parsedQuery: queryString.ParsedUrl) {
-    const queryParams: HTTPParams = {
-        gameInstanceUUID: parsedQuery.query.gameInstanceUUID as GameInstanceUUID,
-    };
-    return queryParams;
-}
-
-export function getGameInstanceUUID(locationPathname: string){
+export function getGameInstanceUUID(locationPathname: string): GameInstanceUUID {
     // due to how exec works this regex should be defined inside the function
     const TABLE_URL_PATTERN = new RegExp(/(table|ledger)\/(\w+\-\w+\-\d+)(\/|\?)?/g);
     const url = queryString.parseUrl(locationPathname)?.url || '';
     const res = TABLE_URL_PATTERN.exec(url);
-    return res?.[2];
-
+    return (res?.[2] || '') as GameInstanceUUID;
 }
 
 export function getEpochTimeMs(): number {
