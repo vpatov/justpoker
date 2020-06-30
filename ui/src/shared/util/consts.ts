@@ -1,3 +1,5 @@
+export const JP_VERSION = '0.1.0';
+
 export const MIN_VALUES = {
     TIME_TO_ACT: 1,
     BIG_BLIND: 1,

@@ -10,13 +10,13 @@ import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
+import { JP_VERSION } from '../../../ui/src/shared/util/consts';
 
 const changeNameCommandRegEx = /\/name\s(.+)$/;
 
-const jpVersion = '0.1.0';
 const welcomeMessage =
-    `Welcome to JustPoker ${jpVersion}! Check out the menu in the ` +
-    `top left to change the app's appearance, and to set game parameters. May the suits be with you.`;
+    `Welcome to JustPoker ${JP_VERSION}! Check out the menu in the ` +
+    `top left to change the app's appearance, and (for admins) to set game parameters. May the suits be with you.`;
 
 @Service()
 export class ChatService {
