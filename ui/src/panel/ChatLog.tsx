@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'column',
+            backgroundColor: '#171719',
         },
         chatLogMessages: {
             paddingTop: '1vh',
