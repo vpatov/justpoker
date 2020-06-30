@@ -33,3 +33,7 @@ export const CONFIGS: Configs = {
         HTTPS: true,
     },
 };
+
+export function getEnvConfig(): Config {
+    return process.env.NODE_SERVER_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+}

@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config/config';
+import { Config, getEnvConfig } from '../shared/models/config/config';
 
 const api = axios.create({
     baseURL: '', // for local dev currenly handled by proxy in package.json
 });
 
-const config: Config = process.env.REACT_APP_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+const config: Config = getEnvConfig();
 
 // onSuccess = (response) => {}
 // onError = (err) => {}

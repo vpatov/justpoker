@@ -18,14 +18,14 @@ import {
 } from '../shared/models/api/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
-import { CONFIGS, Config, ENVIRONMENT } from '../shared/models/config/config';
+import { Config, getEnvConfig } from '../shared/models/config/config';
 import { AvatarKeys } from '../shared/models/ui/assets';
 import { getEpochTimeMs } from '../shared/util/util';
 
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
 
-const config: Config = process.env.REACT_APP_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+const config: Config = getEnvConfig();
 
 export class WsServer {
     static clientUUID: ClientUUID | null = null;
