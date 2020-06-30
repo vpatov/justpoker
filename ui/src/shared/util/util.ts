@@ -4,6 +4,7 @@ import { HTTPParams } from '../models/api/api';
 import queryString from 'query-string';
 import { GameInstanceUUID } from '../models/system/uuid';
 
+
 export function printObj(obj: any) {
     console.log(util.inspect(obj, false, null, true));
 }
@@ -27,6 +28,15 @@ export function parseHTTPParams(parsedQuery: queryString.ParsedUrl) {
         gameInstanceUUID: parsedQuery.query.gameInstanceUUID as GameInstanceUUID,
     };
     return queryParams;
+}
+
+export function getGameInstanceUUID(locationPathname: string){
+    // due to how exec works this regex should be defined inside the function
+    const TABLE_URL_PATTERN = new RegExp(/(table|ledger)\/(\w+\-\w+\-\d+)(\/|\?)?/g);
+    const url = queryString.parseUrl(locationPathname)?.url || '';
+    const res = TABLE_URL_PATTERN.exec(url);
+    return res?.[2];
+
 }
 
 export function getEpochTimeMs(): number {
