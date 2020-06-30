@@ -32,10 +32,12 @@ const handLogCardSize = '1.8vmin';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        handLogContainer: {
+        root: {
             display: 'flex',
             justifyContent: 'space-between',
             flexDirection: 'column',
+        },
+        handLogContainer: {
             height: '100%',
             overflowY: 'auto',
         },
@@ -75,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
             color: grey[200],
         },
         handLogPlayerPosition: {
-            width: '4.5vmin',
+            width: '6.2vmin',
             display: 'inline-block',
         },
         handLogContentLabel: {
@@ -116,6 +118,9 @@ const useStyles = makeStyles((theme: Theme) =>
         hideButton: {
             fontSize: '1vmin',
         },
+        logPanelDivider: {
+            border: '0.25vmin solid #252527'
+        }
     }),
 );
 
@@ -230,6 +235,7 @@ function HandLog(props: HandLogProps) {
         );
     }
 
+    // TODO this would probably look best as a small table
     function renderPlayerPosition(playerUUID: PlayerUUID, index: number) {
         const playerSummary = handLogEntries[currentHandNumber].playerSummaries[playerUUID];
         return playerSummary.wasDealtIn ? (
@@ -459,15 +465,15 @@ function HandLog(props: HandLogProps) {
 
     function renderLogPanelDivider() {
         return !hideHandLog && !hideChatLog ? (
-            <div>
+            <div className={classes.logPanelDivider}>
                 <Divider />
             </div>
         ) : null;
     }
 
     return (
-        <div className={classnames(classes.handLogContainer)} style={displayStyle()}>
-            <div>
+        <div className={classes.root} style={displayStyle()}>
+            <div className={classnames(classes.handLogContainer)}>
                 {renderHandLogControls()}
                 {renderHandLogEntry()}
             </div>
