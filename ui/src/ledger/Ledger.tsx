@@ -10,9 +10,6 @@ import { parseHTTPParams } from '../shared/util/util';
 import ErrorMessage from '../root/ErrorMessage';
 import MaterialTable from 'material-table';
 
-import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
-
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100vh',
@@ -99,6 +96,7 @@ function LedgerTable(props) {
             Number.POSITIVE_INFINITY,
         ),
     ).toLocaleDateString();
+
     return (
         <div className={classes.tableCont}>
             <MaterialTable
@@ -107,7 +105,6 @@ function LedgerTable(props) {
                 data={transformed}
                 options={{
                     sorting: true,
-                    // exportAllData: true,
                     exportButton: true,
                     exportFileName: `JustPokerLedger~${gameDate}~${props.gameInstanceUUID}`,
                     paging: false,
