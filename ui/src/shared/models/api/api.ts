@@ -31,11 +31,6 @@ export declare interface ServerAction extends BaseAction {
     clientUUID?: ClientUUID;
 }
 
-export declare interface WSParams {
-    clientUUID: ClientUUID;
-    gameInstanceUUID: GameInstanceUUID;
-}
-
 export declare interface HTTPParams {
     gameInstanceUUID: GameInstanceUUID;
 }
