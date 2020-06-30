@@ -30,6 +30,7 @@ const MAX_GEN_ID_RETRIES = 1000;
 export class GameInstanceManager {
     private gameInstances: GameInstances = {};
     private activeGameInstanceUUID: GameInstanceUUID = makeBlankUUID();
+    private globalUUIDIncrement = 0;
 
     constructor(
         private readonly gameStateManager: GameStateManager,
@@ -51,7 +52,8 @@ export class GameInstanceManager {
             gameInstanceUUID = generateGameInstanceUUID();
         }
         if (retries === MAX_GEN_ID_RETRIES) {
-            gameInstanceUUID = (gameInstanceUUID + Math.random().toString().substring(2, 10)) as GameInstanceUUID;
+            gameInstanceUUID = (gameInstanceUUID + this.globalUUIDIncrement.toString()) as GameInstanceUUID;
+            this.globalUUIDIncrement++;
         }
         return gameInstanceUUID;
     }
