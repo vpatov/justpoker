@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { playTimerWarning } from '../game/AudioModule';
 import { animateTimeBankButton } from '../game/AnimiationModule';
 
-import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 

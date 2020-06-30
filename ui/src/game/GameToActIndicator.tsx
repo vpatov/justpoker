@@ -10,17 +10,30 @@ const useStyles = makeStyles((theme: Theme) =>
         root: {
             position: 'absolute',
             width: '100%',
-            height: '100%',
+            height: '85%',
             opacity: 0,
             transition: 'opacity 0.25s linear',
         },
         rootToAct: {
             opacity: 1,
-            background: `radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.25) 100%) `,
+            background: getColor(theme.custom.BACKGROUND.backgroundColor),
             transition: 'opacity 0.25s linear',
         },
     }),
 );
+
+function getColor(bg) {
+    const backgroundColor = Color(bg);
+
+    const hslBg = backgroundColor.hsl().array();
+    const hslShift = [30, 25, 30];
+    const hslMax = [360, 100, 100];
+
+    const newColor = Color.hsl(
+        hslBg.map((cur, i) => (cur + hslShift[i] >= hslMax[i] ? cur - hslShift[i] : cur + hslShift[i])),
+    );
+    return `radial-gradient(${newColor} 0%,  ${backgroundColor} 85%)`;
+}
 
 function GameToActIndicator(props) {
     const classes = useStyles();
