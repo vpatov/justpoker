@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactPropTypes } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -13,6 +13,8 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import queryString from 'query-string';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from '../shared/models/state/handLog';
@@ -26,6 +28,9 @@ import { WsServer } from '../api/ws';
 import { cardsAreEqual, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
 import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
+import { parseHTTPParams } from '../shared/util/util';
+import { computeHandLogGETurl } from '../api/http';
+import { useLocation } from 'react-router';
 
 const handLogTextContentSize = '1.5vmin';
 const handLogCardSize = '1.8vmin';
@@ -58,9 +63,6 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'space-between',
             fontSize: handLogTextContentSize,
         },
-        handLogIcon: {
-            fontSize: '2.0vmin',
-        },
         handNumberString: {
             fontSize: handLogTextContentSize,
             letterSpacing: '-0.05vmin',
@@ -88,11 +90,21 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.6vmin',
             color: blueGrey[500],
         },
+        handLogEntryButtonPanel: {
+            marginBottom: '0.4vmin',
+            display: 'flex',
+            justifyContent: 'space-between',
+        },
         handLogPotWinnerLabel: {
             fontSize: handLogTextContentSize,
         },
         handLogShowHandLabel: {
             fontSize: handLogTextContentSize,
+        },
+        downloadIconButton: {
+            width: '3vmin',
+            height: '3vmin',
+            transform: 'scale(0.9)'
         },
         handLogInlineCards: {
             display: 'flex',
@@ -134,10 +146,12 @@ interface HandLogProps {
 function HandLog(props: HandLogProps) {
     const classes = useStyles();
     const { hideChatLog, hideHandLog } = props;
+    const location = useLocation();
 
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
     const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
+    const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
     const smallCurrentHandText = smallWidth || `${currentHandNumber}${handLogEntries.length}`.length >= 4;
 
     useEffect(() => {
@@ -203,6 +217,10 @@ function HandLog(props: HandLogProps) {
         if (currentHandNumber > 0) {
             setCurrentHandNumber((currentHandNumber) => currentHandNumber - 1);
         }
+    }
+
+    function handleClickDownloadButton() {
+        window.open(computeHandLogGETurl(queryParams.gameInstanceUUID), '_blank')
     }
 
     function renderHandLogControls() {
@@ -434,6 +452,20 @@ function HandLog(props: HandLogProps) {
         );
     }
 
+    function renderHandLogEntryButtonPanel(handLogEntry: UiHandLogEntry){
+        return (
+            <div className={classnames(classes.handLogEntryButtonPanel)}>
+                {renderTimeHandStarted(handLogEntry.timeHandStarted)}
+                <IconButton 
+                    className={classnames(classes.downloadIconButton)}
+                    onClick={() => handleClickDownloadButton()}
+                    >
+                    <GetAppIcon/>
+                </IconButton>
+            </div>
+        )
+    }
+
     function renderHandLogEntry() {
         if (handLogEntries.length === 0) {
             return null;
@@ -445,13 +477,15 @@ function HandLog(props: HandLogProps) {
         }
 
         return (
-            <div className={classnames(classes.handLogContents)}>
-                {renderTimeHandStarted(handLogEntry.timeHandStarted)}
-                {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
-                {renderBoard(handLogEntry.board)}
-                {renderBettingRoundLogs(handLogEntry.bettingRounds, handLogEntry.board)}
-                {handLogEntry.potSummaries.length ? renderPotSummaries(handLogEntry.potSummaries) : null}
-            </div>
+            <>
+                <div className={classnames(classes.handLogContents)}>
+                    {renderHandLogEntryButtonPanel(handLogEntry)}
+                    {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
+                    {renderBoard(handLogEntry.board)}
+                    {renderBettingRoundLogs(handLogEntry.bettingRounds, handLogEntry.board)}
+                    {handLogEntry.potSummaries.length ? renderPotSummaries(handLogEntry.potSummaries) : null}
+                </div>
+            </>
         );
     }
 
