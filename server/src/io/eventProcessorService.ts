@@ -28,7 +28,6 @@ import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { AnimationService } from '../state/animationService';
-import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 
 declare interface ActionProcessor {
     validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -229,7 +228,7 @@ export class EventProcessorService {
 
     processServerAction(serverAction: ServerAction) {
         switch (serverAction.actionType) {
-            case ServerActionType.TIMEOUT: {
+            case ServerActionType.GAMEPLAY_TIMEOUT: {
                 if (this.gameStateManager.getGameStage() === GameStage.WAITING_FOR_BET_ACTION) {
                     this.gamePlayService.timeOutPlayer();
                 }
@@ -242,6 +241,10 @@ export class EventProcessorService {
                 }
 
                 break;
+            }
+            case ServerActionType.SEND_MESSAGE: {
+                this.chatService.prepareServerMessage(serverAction.serverMessageType);
+                this.gameStateManager.addUpdatedKeys(ServerStateKey.CHAT);
             }
         }
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);

@@ -1,23 +1,28 @@
 import { Service } from 'typedi';
+import { getCleanTimerGroup, TimerGroup } from '../../../ui/src/shared/models/state/timers';
 
 @Service()
 export class TimerManager {
-    private stateTimer: NodeJS.Timer;
+    private timerGroup: TimerGroup = getCleanTimerGroup();
 
-    getStateTimer() {
-        return this.stateTimer;
+    getTimerGroup() {
+        return this.timerGroup;
     }
 
-    loadStateTimer(stateTimer: NodeJS.Timer) {
-        this.stateTimer = stateTimer;
+    loadTimerGroup(timerGroup: TimerGroup) {
+        this.timerGroup = timerGroup;
     }
 
     setStateTimer(fn: Function, timeout: number) {
         this.cancelStateTimer();
-        this.stateTimer = global.setTimeout(() => fn(), timeout);
+        this.timerGroup.stateTimer = global.setTimeout(() => fn(), timeout);
     }
 
     cancelStateTimer() {
-        global.clearTimeout(this.stateTimer);
+        global.clearTimeout(this.timerGroup.stateTimer);
+    }
+
+    setMessageAnnouncementTimer(fn: Function, timeout: number) {
+        this.timerGroup.messageAnnouncementTimer = global.setTimeout(() => fn(), timeout);
     }
 }

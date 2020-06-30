@@ -1,5 +1,11 @@
 import { PlayerUUID, ClientUUID } from '../system/uuid';
 
+export const MAGIC_SERVER_SEAT_NUMBER = 9452;
+
+export enum ServerMessageType {
+    WELCOME = 'WELCOME',
+}
+
 export declare interface ChatLog {
     messages: ChatMessage[];
 }

@@ -4,6 +4,7 @@ import { Card } from '../game/cards';
 import { GameInstanceUUID, ClientUUID, PlayerUUID } from '../system/uuid';
 import { ReactionTrigger } from '../state/animationState';
 import { AvatarKeys } from '../ui/assets';
+import { ServerMessageType } from '../state/chat';
 
 export enum EventType {
     SERVER_ACTION = 'SERVER_ACTION',
@@ -29,6 +30,7 @@ export declare interface ClientAction extends BaseAction {
 export declare interface ServerAction extends BaseAction {
     actionType: ServerActionType;
     clientUUID?: ClientUUID;
+    serverMessageType?: ServerMessageType;
 }
 
 export declare interface HTTPParams {
@@ -63,7 +65,8 @@ export enum ClientActionType {
 }
 
 export enum ServerActionType {
-    TIMEOUT = 'TIMEOUT',
+    GAMEPLAY_TIMEOUT = 'TIMEOUT',
+    SEND_MESSAGE = 'SEND_MESSAGE',
     WS_CLOSE = 'WS_CLOSE',
 }
 
@@ -158,23 +161,40 @@ export declare interface ClientWsMessage {
     request: ClientWsMessageRequest;
 }
 
-export function createTimeoutEvent(gameInstanceUUID: GameInstanceUUID): Event {
+export function createServerMessageEvent(
+    gameInstanceUUID: GameInstanceUUID,
+    serverMessageType: ServerMessageType,
+): Event {
+    const body: ServerAction = {
+        actionType: ServerActionType.SEND_MESSAGE,
+        gameInstanceUUID,
+        serverMessageType,
+    };
     return {
         eventType: EventType.SERVER_ACTION,
-        body: {
-            actionType: ServerActionType.TIMEOUT,
-            gameInstanceUUID,
-        } as ServerAction,
+        body,
+    };
+}
+
+export function createTimeoutEvent(gameInstanceUUID: GameInstanceUUID): Event {
+    const body: ServerAction = {
+        actionType: ServerActionType.GAMEPLAY_TIMEOUT,
+        gameInstanceUUID,
+    };
+    return {
+        eventType: EventType.SERVER_ACTION,
+        body,
     };
 }
 
 export function createWSCloseEvent(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID): Event {
+    const body: ServerAction = {
+        actionType: ServerActionType.WS_CLOSE,
+        gameInstanceUUID,
+        clientUUID,
+    };
     return {
         eventType: EventType.SERVER_ACTION,
-        body: {
-            actionType: ServerActionType.WS_CLOSE,
-            gameInstanceUUID,
-            clientUUID,
-        } as ServerAction,
+        body,
     };
 }

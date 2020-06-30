@@ -15,8 +15,6 @@ import { GamePlayService } from './gamePlayService';
 import { TimerManager } from '../state/timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
 import { LedgerService } from '../stats/ledgerService';
-import { GameInstanceLogService } from '../stats/gameInstanceLogService';
-import { takeRightWhile } from 'lodash';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -27,7 +25,6 @@ export class StateGraphManager {
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
         private readonly ledgerService: LedgerService,
-        private readonly gameInstanceLogService: GameInstanceLogService,
     ) {}
 
     canContinueGameCondition: Condition = {
@@ -69,19 +66,27 @@ export class StateGraphManager {
             [ClientActionType.JOINGAMEANDJOINTABLE, this.canContinueGameCondition],
             [ClientActionType.SITIN, this.canContinueGameCondition],
         ]),
-        [GameStage.INITIALIZE_NEW_HAND]: new Map([[ServerActionType.TIMEOUT, GameStage.SHOW_START_OF_HAND]]),
-        [GameStage.SHOW_START_OF_HAND]: new Map([[ServerActionType.TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND]]),
-        [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([[ServerActionType.TIMEOUT, this.isAllInRunOutCondition]]),
-        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([[ServerActionType.TIMEOUT, GameStage.WAITING_FOR_BET_ACTION]]),
+        [GameStage.INITIALIZE_NEW_HAND]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_HAND]]),
+        [GameStage.SHOW_START_OF_HAND]: new Map([
+            [ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND],
+        ]),
+        [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([
+            [ServerActionType.GAMEPLAY_TIMEOUT, this.isAllInRunOutCondition],
+        ]),
+        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([
+            [ServerActionType.GAMEPLAY_TIMEOUT, GameStage.WAITING_FOR_BET_ACTION],
+        ]),
         [GameStage.WAITING_FOR_BET_ACTION]: new Map([
             [ClientActionType.BETACTION, GameStage.SHOW_BET_ACTION],
             [ClientActionType.USETIMEBANK, GameStage.WAITING_FOR_BET_ACTION],
-            [ServerActionType.TIMEOUT as any, GameStage.SHOW_BET_ACTION],
+            [ServerActionType.GAMEPLAY_TIMEOUT as any, GameStage.SHOW_BET_ACTION],
         ]),
-        [GameStage.SHOW_BET_ACTION]: new Map([[ServerActionType.TIMEOUT, this.isBettingRoundOverCondition]]),
-        [GameStage.FINISH_BETTING_ROUND]: new Map([[ServerActionType.TIMEOUT, this.isHandGamePlayOverCondition]]),
-        [GameStage.SHOW_WINNER]: new Map([[ServerActionType.TIMEOUT, this.sidePotsRemainingCondition]]),
-        [GameStage.POST_HAND_CLEANUP]: new Map([[ServerActionType.TIMEOUT, this.canContinueGameCondition]]),
+        [GameStage.SHOW_BET_ACTION]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, this.isBettingRoundOverCondition]]),
+        [GameStage.FINISH_BETTING_ROUND]: new Map([
+            [ServerActionType.GAMEPLAY_TIMEOUT, this.isHandGamePlayOverCondition],
+        ]),
+        [GameStage.SHOW_WINNER]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, this.sidePotsRemainingCondition]]),
+        [GameStage.POST_HAND_CLEANUP]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, this.canContinueGameCondition]]),
     };
 
     stageDelayMap: StageDelayMap = {

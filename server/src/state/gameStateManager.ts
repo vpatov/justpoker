@@ -912,21 +912,12 @@ export class GameStateManager {
         );
     }
 
-    @debugFunc()
     initGame(gameParameters: GameParameters) {
-        const newGame = {
+        const newGame: GameState = {
             ...getCleanGameState(),
-            table: this.initTable(),
             gameParameters: gameParameters,
         };
         this.gameState = newGame;
-    }
-
-    initTable() {
-        return {
-            activeConnections: new Map(),
-            admin: '',
-        };
     }
 
     initializeNewDeck() {
