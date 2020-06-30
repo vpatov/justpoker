@@ -6,7 +6,7 @@ import { getLedger } from '../api/http';
 import { makeStyles } from '@material-ui/core/styles';
 import { UILedger, UILedgerRow } from '../shared/models/state/ledger';
 import { ErrorDisplay } from '../shared/models/ui/uiState';
-import { parseHTTPParams } from '../shared/util/util';
+import { parseHTTPParams, getEpochTimeMs } from '../shared/util/util';
 import ErrorMessage from '../root/ErrorMessage';
 import MaterialTable from 'material-table';
 
@@ -94,9 +94,10 @@ function LedgerTable(props) {
         ledger.reduce(
             (min, row) => (row.timeStartedPlaying < min ? row.timeStartedPlaying : min),
             Number.POSITIVE_INFINITY,
-        ),
+        ) || getEpochTimeMs(),
     ).toLocaleDateString();
 
+    console.log(ledger, gameDate);
     return (
         <div className={classes.tableCont}>
             <MaterialTable
