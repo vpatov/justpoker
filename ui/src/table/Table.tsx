@@ -62,6 +62,12 @@ const useStyles = makeStyles((theme) => ({
             visibility: 'visible',
         },
         zIndex: 3,
+        // used to prevent animation ghosting in safari
+        // https://stackoverflow.com/questions/14383632/webkit-border-radius-and-overflow-bug-when-using-any-animation-transition/16681137
+        '-webkit-backface-visibility': 'hidden',
+        '-moz-backface-visibility': 'hidden',
+        '-webkit-transform': 'translate3d(0, 0, 0)',
+        '-moz-transform': 'translate3d(0, 0, 0)',
     },
 
     table: {

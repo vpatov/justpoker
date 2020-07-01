@@ -12,7 +12,7 @@ import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
 
 const CARD_HEIGHT = 11;
 const CARD_WIDTH = 8.6;
-const BORDER_SIZE = 0.28;
+const BORDER_SIZE = 0.22;
 const useStyles = makeStyles((theme) => ({
     root: {
         borderRadius: 6,
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     },
     placeholder: {
         backgroundColor: 'transparent',
-        border: `${BORDER_SIZE}vmin solid rgba(255,255,255,0.9)`,
+        border: `${BORDER_SIZE}vmin solid rgba(255,255,255,0.6)`,
         boxShadow: 'none',
         height: `${CARD_HEIGHT - BORDER_SIZE}vmin`,
         width: `${CARD_WIDTH - BORDER_SIZE}vmin`,
