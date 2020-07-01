@@ -221,9 +221,12 @@ export class EventProcessorService {
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.CHANGEAVATAR]: {
-            validation: (uuid, req) => this.validationService.validateChangeAvatarRequest(uuid, req),
-            perform: (uuid, req: ChangeAvatarRequest) =>
-                this.gameStateManager.setPlayerAvatar(req.playerUUID, req.avatarKey),
+            validation: (uuid, req) => this.validationService.validateChangeAvatarRequest(uuid),
+            perform: (uuid, req: ChangeAvatarRequest) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+
+                this.gameStateManager.setPlayerAvatar(player.uuid, req.avatarKey);
+            },
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.KEEPALIVE]: {

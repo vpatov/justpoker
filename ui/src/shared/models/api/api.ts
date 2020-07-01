@@ -143,7 +143,6 @@ export declare interface SetGameParametersRequest {
 }
 
 export declare interface ChangeAvatarRequest {
-    playerUUID: PlayerUUID;
     avatarKey: AvatarKeys;
 }
 

@@ -798,20 +798,15 @@ export class ValidationService {
         return undefined;
     }
 
-    validateChangeAvatarRequest(clientUUID: ClientUUID, req: ChangeAvatarRequest) {
+    validateChangeAvatarRequest(clientUUID: ClientUUID) {
         const clientPlayer = this.gsm.getPlayerByClientUUID(clientUUID);
         if (!clientPlayer) {
             return {
                 errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
-                errorString: `Player ${req.playerUUID} does not exist.`,
+                errorString: `Player ${clientPlayer.uuid} does not exist.`,
             };
         }
-        if (clientPlayer.uuid !== req.playerUUID) {
-            return {
-                errorType: ErrorType.CLIENT_NOT_TARGET,
-                errorString: `Client is not player. Players can only change their own avatar.`,
-            };
-        }
+
         return undefined;
     }
 }
