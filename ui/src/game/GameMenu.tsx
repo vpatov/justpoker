@@ -1,6 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router';
-import { getGameInstanceUUID } from '../shared/util/util';
+import { useParams } from 'react-router';
 import queryString from 'query-string';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
@@ -86,8 +85,7 @@ function GameMenu(props) {
     const menuButtons = useSelector(selectMenuButtons);
     const gameParameters = useSelector(selectGameParameters);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
-
-    const location = useLocation();
+    const { gameInstanceUUID } = useParams();
 
     const [settingsOpen, setSettingsOpen] = React.useState(false);
     const [gameParametersOpen, SET_gameParametersOpen] = React.useState(false);
@@ -111,7 +109,7 @@ function GameMenu(props) {
     };
 
     const handleOpenLedger = () => {
-        const gameInstanceUUID = getGameInstanceUUID(location.pathname);
+
         const stringifiedUrl = queryString.stringifyUrl({ url: `/ledger/${gameInstanceUUID}`, query:{}});
         window.open(stringifiedUrl, 'JustPoker Ledger', `width=${window.innerWidth},height=600`);
     };

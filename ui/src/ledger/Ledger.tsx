@@ -6,9 +6,10 @@ import { getLedger } from '../api/http';
 import { makeStyles } from '@material-ui/core/styles';
 import { UILedger, UILedgerRow } from '../shared/models/state/ledger';
 import { ErrorDisplay } from '../shared/models/ui/uiState';
-import { getEpochTimeMs, getGameInstanceUUID } from '../shared/util/util';
+import { getEpochTimeMs } from '../shared/util/util';
 import ErrorMessage from '../root/ErrorMessage';
 import MaterialTable from 'material-table';
+import { useParams } from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 function Ledger(props) {
     const classes = useStyles();
     const [ledger, setLedger] = useState<UILedger>([]);
-    const gameInstanceUUID = getGameInstanceUUID(get(props, 'location.pathname', ''));
+    const { gameInstanceUUID } = useParams();
     const [error, setError] = useState<ErrorDisplay | undefined>();
 
     useEffect(() => {

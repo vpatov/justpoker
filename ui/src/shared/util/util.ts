@@ -1,9 +1,5 @@
 import util from 'util';
 import { GameState } from '../models/state/gameState';
-import { HTTPParams } from '../models/api/api';
-import queryString from 'query-string';
-import { GameInstanceUUID } from '../models/system/uuid';
-
 
 export function printObj(obj: any) {
     console.log(util.inspect(obj, false, null, true));
@@ -21,14 +17,6 @@ export function getLoggableGameState(gameState: GameState) {
         ...gameState,
     };
     return JSON.stringify(minimizedGameState);
-}
-
-export function getGameInstanceUUID(locationPathname: string): GameInstanceUUID {
-    // due to how exec works this regex should be defined inside the function
-    const TABLE_URL_PATTERN = new RegExp(/(table|ledger)\/(\w+\-\w+\-\d+)(\/|\?)?/g);
-    const url = queryString.parseUrl(locationPathname)?.url || '';
-    const res = TABLE_URL_PATTERN.exec(url);
-    return (res?.[2] || '') as GameInstanceUUID;
 }
 
 export function getEpochTimeMs(): number {
