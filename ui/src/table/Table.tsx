@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { Typography, Zoom } from '@material-ui/core';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
+import Color from 'color';
 
 const W_UNIT = '%';
 const H_UNIT = '%';
@@ -74,6 +75,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         flexDirection: 'column',
         ...theme.custom.TABLE,
+        backgroundColor: theme.custom.BACKGROUND.backgroundColor,
     },
     betCont: {
         position: 'absolute',

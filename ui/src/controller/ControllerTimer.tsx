@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '100%',
             opacity: 1,
             transition: `transform ${updateIntervalS}s 10ms linear`,
-            boxShadow: `0px 5px 2vmin 1vmin ${theme.palette.primary.main}`,
+            boxShadow: `0px 5px 0.4vmin 1.3vmin ${theme.palette.primary.main}`,
             animation: '1s ease-in-out 0s 1 $fadeIn;',
         },
         '@keyframes fadeIn': {

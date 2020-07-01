@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
             borderRadius: '0.5vmin',
             zIndex: 5,
             padding: '0.5vmin 0.8vmin',
-            backgroundColor: 'rgba(0,0,0,0.3)',
+            backgroundColor: 'rgba(0,0,0,0.4)',
             color: 'white',
             top: '-12.5%',
             position: 'absolute',
