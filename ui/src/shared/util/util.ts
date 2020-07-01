@@ -1,8 +1,5 @@
 import util from 'util';
 import { GameState } from '../models/state/gameState';
-import { HTTPParams } from '../models/api/api';
-import queryString from 'query-string';
-import { GameInstanceUUID } from '../models/system/uuid';
 
 export function printObj(obj: any) {
     console.log(util.inspect(obj, false, null, true));
@@ -20,13 +17,6 @@ export function getLoggableGameState(gameState: GameState) {
         ...gameState,
     };
     return JSON.stringify(minimizedGameState);
-}
-
-export function parseHTTPParams(parsedQuery: queryString.ParsedUrl) {
-    const queryParams: HTTPParams = {
-        gameInstanceUUID: parsedQuery.query.gameInstanceUUID as GameInstanceUUID,
-    };
-    return queryParams;
 }
 
 export function getEpochTimeMs(): number {

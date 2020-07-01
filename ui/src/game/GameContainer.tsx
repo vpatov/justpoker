@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import get from 'lodash/get';
 import { useDispatch } from 'react-redux';
-import queryString from 'query-string';
 
 import ErrorMessage from '../root/ErrorMessage';
 import Game from './Game';
 import { WsServer } from '../api/ws';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { parseHTTPParams } from '../shared/util/util';
 import { ErrorDisplay } from '../shared/models/ui/uiState';
+import { GameInstanceUUID } from '../shared/models/system/uuid';
+import { useParams } from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -34,14 +33,15 @@ function GameContainer(props): any {
     const [error, setError] = useState<ErrorDisplay | undefined>();
     const [wsConnClosed, SET_wsConnClosed] = useState(false);
 
-    const queryParams = parseHTTPParams(queryString.parseUrl(get(props, 'location.search', '')));
+    const { gameInstanceUUID } = useParams();
+
 
     useEffect(() => {
         if (props.useTestGame) {
             dispatch({ type: 'SET_TEST_GAME' });
             if (!gameLoaded) setGameLoaded(true);
         } else {
-            const succ = WsServer.openWs(queryParams.gameInstanceUUID);
+            const succ = WsServer.openWs(gameInstanceUUID as GameInstanceUUID);
             if (succ) {
                 WsServer.subscribe('game', onReceiveNewGame);
                 WsServer.subscribe('error', onReceiveError);

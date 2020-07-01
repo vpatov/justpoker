@@ -64,9 +64,9 @@ function App() {
                 <ThemeProvider theme={createMuiTheme(theme)}>
                     <Router>
                         <Switch>
-                            <Route exact path="/game/test" render={(props) => <GameContainer useTestGame />} />
-                            <Route path="/game" component={GameContainer} />
-                            <Route path="/ledger" component={Ledger} />
+                            <Route exact path="/table/test" render={(props) => <GameContainer useTestGame />} />
+                            <Route path="/table/:gameInstanceUUID" component={GameContainer} />
+                            <Route path="/ledger/:gameInstanceUUID" component={Ledger} />
                             <Route path="/" component={Home} />
                         </Switch>
                     </Router>

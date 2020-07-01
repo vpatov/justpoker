@@ -23,14 +23,13 @@ import Suit from '../reuseable/Suit';
 
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import { BettingRoundActionType } from '../shared/models/game/betting';
-import { PlayerUUID } from '../shared/models/system/uuid';
+import { PlayerUUID, GameInstanceUUID } from '../shared/models/system/uuid';
 import { WsServer } from '../api/ws';
 import { cardsAreEqual, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
 import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
-import { parseHTTPParams } from '../shared/util/util';
 import { computeHandLogGETurl } from '../api/http';
-import { useLocation } from 'react-router';
+import { useParams } from 'react-router';
 
 const handLogTextContentSize = '1.5vmin';
 const handLogCardSize = '1.8vmin';
@@ -146,22 +145,17 @@ interface HandLogProps {
 function HandLog(props: HandLogProps) {
     const classes = useStyles();
     const { hideChatLog, hideHandLog } = props;
-    const location = useLocation();
+    const { gameInstanceUUID } = useParams();
 
     const [handLogEntries, setHandLogEntries] = useState([] as UiHandLogEntry[]);
     const [currentHandNumber, setCurrentHandNumber] = useState(0);
     const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
-    const queryParams = parseHTTPParams(queryString.parseUrl(location.search));
     const smallCurrentHandText = smallWidth || `${currentHandNumber}${handLogEntries.length}`.length >= 4;
 
     useEffect(() => {
         WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
         WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
     }, []);
-
-    function getCurrentHandNumber() {
-        return currentHandNumber;
-    }
 
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]) {
         if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0]) {
@@ -220,7 +214,7 @@ function HandLog(props: HandLogProps) {
     }
 
     function handleClickDownloadButton() {
-        window.open(computeHandLogGETurl(queryParams.gameInstanceUUID), '_blank')
+        window.open(computeHandLogGETurl(gameInstanceUUID), '_blank')
     }
 
     function renderHandLogControls() {
