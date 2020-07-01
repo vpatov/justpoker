@@ -7,12 +7,25 @@ import AddChipDialog from '../game/SetChipDialog';
 import { WsServer } from '../api/ws';
 import { useSelector } from 'react-redux';
 import { isHeroAdminSelector, heroPlayerUUIDSelector } from '../store/selectors';
+import { AvatarKeys } from '../shared/models/ui/assets';
+import { Paper, IconButton } from '@material-ui/core';
+import Avatar from '../reuseable/Avatar';
+import IconPicker from '../reuseable/IconPicker';
+import ConfirmationDialog from '../reuseable/ConfirmationDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             right: '100%',
         },
+        avatarIcon: {
+            height: '5vmin',
+            width: '5vmin',
+        },
+        avatarButton: {
+            borderRadius: '5%',
+        },
+        pickerMenu: {},
     }),
 );
 
@@ -21,6 +34,7 @@ function PlayerMenu(props) {
     const { anchorEl, handleClose, setHeroRotation, virtualPositon, player } = props;
     const { stack, name, uuid, admin } = player;
     const [chipsDialog, setChipsDialog] = useState(false);
+    const [avatarDialog, SET_avatarDialog] = useState(false);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
@@ -49,6 +63,25 @@ function PlayerMenu(props) {
         handleClose();
     };
 
+    const handleChangeAvatarMenu = () => {
+        SET_avatarDialog(true);
+    };
+
+    const handleSelectNewAvatar = () => {
+        SET_avatarDialog(false);
+    };
+
+    function generateAvatarDialog() {
+        return (
+            <>
+                {Object.keys(AvatarKeys).map((key, index) => (
+                    <IconButton onClick={handleSelectNewAvatar} className={classes.avatarButton}>
+                        <Avatar key={`${key}${index}`} avatarKey={key} className={classes.avatarIcon} />
+                    </IconButton>
+                ))}
+            </>
+        );
+    }
     return (
         <Menu
             className={classes.root}
@@ -67,6 +100,14 @@ function PlayerMenu(props) {
                 <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
             ) : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
+            <MenuItem onClick={handleChangeAvatarMenu}>Change Avatar</MenuItem>
+            <ConfirmationDialog
+                title="Change Avatar"
+                contentComponent={generateAvatarDialog()}
+                open={avatarDialog}
+                onCancel={() => SET_avatarDialog(false)}
+                nullWhenClosed
+            />
             {/* <MenuItem onClick={handleClose}>Mute</MenuItem> */}
         </Menu>
     );
