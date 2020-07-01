@@ -61,6 +61,7 @@ export enum ClientActionType {
     SETGAMEPARAMETERS = 'SETGAMEPARAMETERS',
     ADDADMIN = 'ADDADMIN',
     REMOVEADMIN = 'REMOVEADMIN',
+    CHANGEAVATAR = 'CHANGEAVATAR',
     KEEPALIVE = 'KEEPALIVE',
 }
 
@@ -141,6 +142,11 @@ export declare interface SetGameParametersRequest {
     gameParameters: GameParameters;
 }
 
+export declare interface ChangeAvatarRequest {
+    playerUUID: PlayerUUID;
+    avatarKey: AvatarKeys;
+}
+
 export type ClientWsMessageRequest = JoinTableRequest &
     JoinGameRequest &
     JoinTableRequest &
@@ -154,7 +160,8 @@ export type ClientWsMessageRequest = JoinTableRequest &
     PlayerReactionRequest &
     SetGameParametersRequest &
     AddAdminRequest &
-    RemoveAdminRequest;
+    RemoveAdminRequest &
+    ChangeAvatarRequest;
 
 export declare interface ClientWsMessage {
     actionType: ClientActionType;

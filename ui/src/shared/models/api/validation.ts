@@ -25,6 +25,7 @@ export const enum ErrorType {
     NO_MORE_TIMEBANKS = 'NO_MORE_TIMEBANKS',
     NO_OPEN_SEATS = 'NO_OPEN_SEATS',
     SETTING_NOT_ENABLED = 'SETTING_NOT_ENABLED',
+    CLIENT_NOT_TARGET = 'CLIENT_NOT_TARGET',
 }
 
 export const NOT_IMPLEMENTED_YET: ValidationResponse = {

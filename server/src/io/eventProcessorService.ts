@@ -13,6 +13,7 @@ import {
     SetGameParametersRequest,
     RemoveAdminRequest,
     AddAdminRequest,
+    ChangeAvatarRequest,
 } from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { ValidationService } from '../logic/validationService';
@@ -217,6 +218,12 @@ export class EventProcessorService {
                     this.gameStateManager.setGameParameters(req.gameParameters);
                 }
             },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.CHANGEAVATAR]: {
+            validation: (uuid, req) => this.validationService.validateChangeAvatarRequest(uuid, req),
+            perform: (uuid, req: ChangeAvatarRequest) =>
+                this.gameStateManager.setPlayerAvatar(req.playerUUID, req.avatarKey),
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.KEEPALIVE]: {

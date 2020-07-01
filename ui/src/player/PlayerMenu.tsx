@@ -37,7 +37,7 @@ function PlayerMenu(props) {
     const [avatarDialog, SET_avatarDialog] = useState(false);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
-
+    const isPlayerHero = heroPlayerUUID === uuid;
     const handleCloseDialog = () => {
         setChipsDialog(false);
         handleClose();
@@ -67,7 +67,8 @@ function PlayerMenu(props) {
         SET_avatarDialog(true);
     };
 
-    const handleSelectNewAvatar = () => {
+    const handleSelectNewAvatar = (key) => () => {
+        WsServer.sendChangeAvatarMessage(uuid, key);
         SET_avatarDialog(false);
     };
 
@@ -75,7 +76,7 @@ function PlayerMenu(props) {
         return (
             <>
                 {Object.keys(AvatarKeys).map((key, index) => (
-                    <IconButton onClick={handleSelectNewAvatar} className={classes.avatarButton}>
+                    <IconButton onClick={handleSelectNewAvatar(key)} className={classes.avatarButton}>
                         <Avatar key={`${key}${index}`} avatarKey={key} className={classes.avatarIcon} />
                     </IconButton>
                 ))}
@@ -93,14 +94,10 @@ function PlayerMenu(props) {
             <AddChipDialog open={chipsDialog} handleClose={handleCloseDialog} name={name} stack={stack} uuid={uuid} />
             {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
             {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
-            {isHeroAdmin && heroPlayerUUID === uuid ? (
-                <MenuItem onClick={handleRemoveAdmin}>Remove as Admin</MenuItem>
-            ) : null}
-            {isHeroAdmin && heroPlayerUUID !== uuid ? (
-                <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
-            ) : null}
+            {isHeroAdmin && isPlayerHero ? <MenuItem onClick={handleRemoveAdmin}>Remove as Admin</MenuItem> : null}
+            {isHeroAdmin && !isPlayerHero ? <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem> : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
-            <MenuItem onClick={handleChangeAvatarMenu}>Change Avatar</MenuItem>
+            {isPlayerHero ? <MenuItem onClick={handleChangeAvatarMenu}>Change Avatar</MenuItem> : null}
             <ConfirmationDialog
                 title="Change Avatar"
                 contentComponent={generateAvatarDialog()}

@@ -13,6 +13,7 @@ import {
     SetChipsRequest,
     BuyChipsRequest,
     SeatChangeRequest,
+    ChangeAvatarRequest,
 } from '../../../ui/src/shared/models/api/api';
 
 import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/api/validation';
@@ -793,6 +794,23 @@ export class ValidationService {
         );
         if (error) {
             return error;
+        }
+        return undefined;
+    }
+
+    validateChangeAvatarRequest(clientUUID: ClientUUID, req: ChangeAvatarRequest) {
+        const player = this.gsm.getPlayer(req.playerUUID);
+        if (!player) {
+            return {
+                errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
+                errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+        if (player.uuid !== req.playerUUID) {
+            return {
+                errorType: ErrorType.CLIENT_NOT_TARGET,
+                errorString: `Client is not player. Players can only change their own avatar.`,
+            };
         }
         return undefined;
     }
