@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const NAME_LOCAL_STORAGE_KEY = 'jp-last-used-name';
-const AVATAR_LOCAL_STORAGE_KEY = 'jp-last-used-avatar';
+export const AVATAR_LOCAL_STORAGE_KEY = 'jp-last-used-avatar';
 
 function JoinGameDialog(props) {
     const classes = useStyles();

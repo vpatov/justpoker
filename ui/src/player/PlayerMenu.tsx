@@ -12,6 +12,7 @@ import { Paper, IconButton } from '@material-ui/core';
 import Avatar from '../reuseable/Avatar';
 import IconPicker from '../reuseable/IconPicker';
 import ConfirmationDialog from '../reuseable/ConfirmationDialog';
+import { AVATAR_LOCAL_STORAGE_KEY } from '../game/JoinGameDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -69,6 +70,7 @@ function PlayerMenu(props) {
 
     const handleSelectNewAvatar = (key) => () => {
         WsServer.sendChangeAvatarMessage(uuid, key);
+        window.localStorage.setItem(AVATAR_LOCAL_STORAGE_KEY, JSON.stringify(key));
         SET_avatarDialog(false);
     };
 
