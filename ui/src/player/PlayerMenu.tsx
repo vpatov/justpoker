@@ -67,7 +67,7 @@ function PlayerMenu(props) {
                 <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
             ) : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
-            <MenuItem onClick={handleClose}>Mute</MenuItem>
+            {/* <MenuItem onClick={handleClose}>Mute</MenuItem> */}
         </Menu>
     );
 }

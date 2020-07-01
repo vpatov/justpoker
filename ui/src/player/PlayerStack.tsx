@@ -38,12 +38,12 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     nameStackCont: {
-        width: '60%',
+        width: '54%',
     },
     name: {
         paddingBottom: '0.8vmin',
         whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
+
         overflow: 'hidden',
         fontSize: '1.6vmin',
     },
