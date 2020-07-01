@@ -13,6 +13,8 @@ import { AvatarKeys, getRandomAvatarKey } from '../shared/models/ui/assets';
 import Avatar from '../reuseable/Avatar';
 import { useStickyState } from '../utils';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
+import c from 'config';
+import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
     nameRow: {
@@ -35,9 +37,17 @@ const useStyles = makeStyles((theme) => ({
         height: '80vh',
         maxHeight: 360,
     },
+    pickerButton: {
+        boxShadow: theme.shadows[2],
+        backgroundColor: grey[800],
+        width: '50px !important',
+        height: '50px !important',
+        padding: '5px !important',
+    },
+
     avatarIcon: {
-        width: '6vmin',
-        height: '6vmin',
+        width: '50px',
+        height: '50px',
     },
     pickerMenu: {
         width: '30vmin',
@@ -121,6 +131,7 @@ function JoinGameDialog(props) {
                         }}
                         placement="left"
                         size={'6vmin'}
+                        buttonClass={classes.pickerButton}
                     />
 
                     <TextFieldWrap
