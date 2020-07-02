@@ -95,6 +95,11 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
         },
+        buyBackButton: {
+            height: '58%',
+            width: '25vmin',
+            fontSize: '1.6vmin',
+        },
         timeBankButton: {
             margin: '0.5vmin',
             fontSize: '1.1vmin',
@@ -438,6 +443,24 @@ function ControllerComp(props: ControllerProps) {
         return buttons;
     }
 
+    function generateBuyInButton() {
+        if (heroTotalChips <= 0 && !dealInNextHand) {
+            return (
+                <Button
+                    variant="contained"
+                    className={classes.buyBackButton}
+                    onClick={() => {
+                        setBuyinDialogOpen(true);
+                    }}
+                    color="primary"
+                >
+                    Buy Back
+                </Button>
+            );
+        }
+        return null;
+    }
+
     if (isSpectator)
         return (
             <ControllerSpectator
@@ -481,8 +504,10 @@ function ControllerComp(props: ControllerProps) {
                     </Tooltip>
                 ) : null}
             </div>
+
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>{generateBetActionButtons()}</div>
+                {generateBuyInButton()}
                 <ControllerBetSizer
                     sizingButtons={sizingButtons}
                     min={min}
