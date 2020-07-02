@@ -226,13 +226,13 @@ export class ValidationService {
 
     validateSeatChangeRequest(clientUUID: ClientUUID, request: SeatChangeRequest): ValidationResponse {
         const seatNumber = request.seatNumber;
-        const error = this.ensureClientIsInGame(clientUUID);
-        if (error) {
-            return error;
-        }
+        let error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'switch seats');
+        if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
-
         if (!this.gsm.isValidSeat(seatNumber)) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,

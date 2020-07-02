@@ -39,6 +39,7 @@ import {
 } from '../../../ui/src/shared/models/player/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/ui/assets';
 import sortBy from 'lodash/sortBy';
+import { assert } from 'console';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -280,6 +281,7 @@ export class GameStateManager {
             ? this.getNextPlayerSeatInHand(previousPlayerSeat.positionIndex)
             : this.getFirstSeatToAct();
 
+        assert(previousPlayerSeat !== currentPlayerSeat);
         this.setCurrentPlayerSeatToAct(currentPlayerSeat);
     }
 
@@ -563,7 +565,7 @@ export class GameStateManager {
                 seatsDealtIn.push({
                     playerUUID,
                     seatNumber: this.getPlayerSeatNumber(playerUUID),
-                    positionIndex: index,
+                    positionIndex: positionNumber,
                 });
 
                 playerPositionName = positions[positionNumber] || PlayerPosition.NOT_PLAYING;
@@ -572,6 +574,11 @@ export class GameStateManager {
 
             playerPositionMap.set(playerUUID, playerPositionName);
         }
+
+        // TODO turn into unit test case
+        seatsDealtIn.forEach((seat, i) => {
+            assert(seat.positionIndex === i);
+        });
 
         this.gameState.seatsDealtIn = seatsDealtIn;
         this.gameState.playerPositionMap = playerPositionMap;
