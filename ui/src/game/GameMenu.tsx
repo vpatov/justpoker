@@ -109,8 +109,7 @@ function GameMenu(props) {
     };
 
     const handleOpenLedger = () => {
-
-        const stringifiedUrl = queryString.stringifyUrl({ url: `/ledger/${gameInstanceUUID}`, query:{}});
+        const stringifiedUrl = queryString.stringifyUrl({ url: `/ledger/${gameInstanceUUID}`, query: {} });
         window.open(stringifiedUrl, 'JustPoker Ledger', `width=${window.innerWidth},height=600`);
     };
 
@@ -129,7 +128,7 @@ function GameMenu(props) {
                 handleOpenLedger();
                 break;
             case ClientActionType.LEAVETABLE:
-                sendServerAction(ClientActionType.LEAVETABLE);
+                WsServer.sendLeaveTableMessage();
                 break;
             case ClientActionType.STARTGAME:
                 sendServerAction(ClientActionType.STARTGAME);
@@ -247,7 +246,7 @@ function GameMenu(props) {
                 onCancel={() => SET_confirmationQuit(false)}
                 onConfirm={() => {
                     SET_confirmationQuit(false);
-                    sendServerAction(ClientActionType.QUITGAME);
+                    WsServer.sendQuitGameMessage();
                 }}
                 nullWhenClosed
             />
