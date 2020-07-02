@@ -49,7 +49,8 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            position: 'absolute',
+            position: 'sticky',
+            top: 0,
             backgroundColor: 'black',
             width: '100%',
             zIndex: 10,
@@ -76,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         handLogContents: {
             margin: '0.2vh 0.40vw',
-            marginTop: '5vh',
+
             '& > *': {
                 marginBottom: '1.2vh',
             },
