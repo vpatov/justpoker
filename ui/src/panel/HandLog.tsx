@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
             position: 'sticky',
             top: 0,
-            backgroundColor: 'black',
+            backgroundColor: 'rgb(10,10,10)',
             width: '100%',
             zIndex: 10,
         },

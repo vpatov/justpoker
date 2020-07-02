@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
         transform: 'translateY(-50%) translateX(-50%)',
     },
     outOfHand: {
-        opacity: 0.4,
+        opacity: 0.34,
         filter: 'grayscale(100%)',
     },
     labelText: {
