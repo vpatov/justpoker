@@ -25,4 +25,8 @@ export class TimerManager {
     setMessageAnnouncementTimer(fn: Function, timeout: number) {
         this.timerGroup.messageAnnouncementTimer = global.setTimeout(() => fn(), timeout);
     }
+
+    setTimeBankReplenishTimer(fn: Function, timeout: number) {
+        this.timerGroup.timeBankReplenishTimer = global.setTimeout(() => fn(), timeout);
+    }
 }

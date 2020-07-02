@@ -14,7 +14,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
 import { MIN_VALUES, MAX_VALUES } from '../shared/util/consts';
-import { GameType, MaxBuyinType } from '../shared/models/game/game';
+import { GameType, MaxBuyinType, GameParameters } from '../shared/models/game/game';
 import TextFieldWrap from '../reuseable/TextFieldWrap';
 import RadioForm from '../reuseable/RadioForm';
 import IconTooltip from '../reuseable/IconTooltip';
@@ -74,6 +74,7 @@ function GameParamatersDialog(props) {
         numberTimeBanks,
         timeBankTime,
         allowTimeBanks,
+        timeBankReplenishIntervalMinutes,
         dynamicMaxBuyin,
         maxBuyinType,
     } = curGameParameters;
@@ -85,7 +86,7 @@ function GameParamatersDialog(props) {
         }
     }
 
-    function setIntoGameParameters(field, value) {
+    function setIntoGameParameters(field: keyof GameParameters, value) {
         SET_curGameParameters({ ...curGameParameters, [field]: value });
     }
 
@@ -302,6 +303,24 @@ function GameParamatersDialog(props) {
                         disabled={!allowTimeBanks}
                         min={MIN_VALUES.TIME_BANK_TIME}
                         max={MAX_VALUES.TIME_BANK_TIME}
+                    />
+                </div>
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="Every interval, a player receives one new time bank."
+                        placement="left"
+                    />
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Time Bank Replenish Interval (minutes)"
+                        onChange={(event) => setIntoGameParameters('timeBankReplenishIntervalMinutes', event.target.value)}
+                        value={timeBankReplenishIntervalMinutes}
+                        type="number"
+                        variant="standard"
+                        disabled={!allowTimeBanks}
+                        min={MIN_VALUES.TIME_BANK_REPLENISH_INTERVAL}
+                        max={MAX_VALUES.TIME_BANK_REPLENISH_INTERVAL}
                     />
                 </div>
             </div>
