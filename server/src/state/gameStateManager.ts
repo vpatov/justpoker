@@ -389,6 +389,10 @@ export class GameStateManager {
         this.getPlayer(playerUUID).willAddChips = numChips;
     }
 
+    setPlayerAvatar(playerUUID: PlayerUUID, avatarKey: AvatarKeys) {
+        this.getPlayer(playerUUID).avatarKey = avatarKey;
+    }
+
     getPlayerName(playerUUID: PlayerUUID): string {
         return this.getPlayer(playerUUID).name;
     }

@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '5vmin',
             width: '5vmin',
             borderRadius: '5%',
+            padding: '0.4min',
         },
         popper: {
             zIndex: 9000,
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function IconPicker(props) {
     const classes = useStyles();
-    const { options, paperClass, placement, initIcon, onSelect, size, hoverOpen } = props;
+    const { options, paperClass, placement, initIcon, onSelect, size, hoverOpen, buttonClass, open } = props;
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [renderOptions, SET_renderOptions] = useState(false);
@@ -49,18 +50,18 @@ function IconPicker(props) {
         return clearTimeout(timer);
     }, []);
 
-    const open = Boolean(anchorEl);
+    const showMenu = Boolean(anchorEl);
     return (
         <>
             <IconButton
-                className={classes.iconButton}
+                className={classnames(classes.iconButton, buttonClass)}
                 onClick={hoverOpen ? undefined : handleOpen}
                 onMouseEnter={hoverOpen ? handleOpen : undefined}
                 style={{ width: size, height: size }}
             >
                 {initIcon ? initIcon : <PersonIcon />}
             </IconButton>
-            {open ? (
+            {open || showMenu ? (
                 <Popper className={classes.popper} open={true} anchorEl={anchorEl} transition placement={placement}>
                     {({ TransitionProps }) => (
                         <Grow {...TransitionProps} timeout={350}>
