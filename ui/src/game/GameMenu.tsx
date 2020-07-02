@@ -19,7 +19,7 @@ import StopIcon from '@material-ui/icons/Stop';
 import UserSettingsIcon from '@material-ui/icons/Person';
 import VolumeOnIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeMute';
-import MenuIcon from '@material-ui/icons/Menu';
+import MoreIcon from '@material-ui/icons/MoreHoriz';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
@@ -202,6 +202,15 @@ function GameMenu(props) {
         ));
     }
 
+    function generateMoreIcon() {
+        return (
+            <Tooltip key={'more'} title={'More'} placement="right">
+                <IconButton className={classes.iconButton}>
+                    <MoreIcon className={classes.icon} />
+                </IconButton>
+            </Tooltip>
+        );
+    }
     return (
         <>
             <div className={classes.hoverArea} onMouseOver={handleOpen} onMouseLeave={handleClose}>
@@ -210,7 +219,7 @@ function GameMenu(props) {
                     className={classnames(classes.root, {
                         [classes.rootExpanded]: open,
                     })}
-                    style={open ? {} : { maxHeight: `${5 * alwaysShowMenuButtons.length}vmin` }}
+                    style={open ? {} : { maxHeight: `${6 * alwaysShowMenuButtons.length}vmin` }}
                 >
                     {open ? (
                         <>
@@ -218,7 +227,10 @@ function GameMenu(props) {
                             {generateButtonsFromArray(hiddenMenuButtons)}
                         </>
                     ) : (
-                        generateButtonsFromArray(alwaysShowMenuButtons)
+                        <>
+                            {generateButtonsFromArray(alwaysShowMenuButtons)}
+                            {generateMoreIcon()}
+                        </>
                     )}
                 </Paper>
             </div>
