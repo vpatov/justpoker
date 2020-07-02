@@ -544,7 +544,7 @@ export class GameStateManager {
      * been incremented, and that the readyToPlay status of each player is finalized for
      * the hand. Also updates the playerPositionMap.
      */
-    updateTableSeatsAndPlayerPositionMap(): void {
+    generateTableSeatsAndPlayerPositionMap(): void {
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersReadyToPlay().length] || [];
 
@@ -1046,6 +1046,7 @@ export class GameStateManager {
     changeSeats(playerUUID: PlayerUUID, seatNumber: number) {
         const player = this.getPlayer(playerUUID);
         player.seatNumber = seatNumber;
+        this.setPlayerWillPostBlind(playerUUID, true);
     }
 
     playerLeaveTable(playerUUID: PlayerUUID) {
