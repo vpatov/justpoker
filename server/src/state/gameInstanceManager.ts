@@ -102,7 +102,7 @@ export class GameInstanceManager {
     }
 
     clearStaleGames() {
-        logger.verbose(`attempting to expiring game instances`);
+        logger.verbose(`Clearing expired game instances...`);
         if (this.gameInstances) {
             // TODO implement warning game will be cleared do to inactivity
             const now = getEpochTimeMs();

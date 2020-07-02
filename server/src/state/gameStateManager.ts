@@ -1049,7 +1049,7 @@ export class GameStateManager {
 
         // The player needs to post a blind when they switch seats, unless the game
         // hasn't started or isn't in progress yet.
-        if (this.getGameStage() !== GameStage.NOT_IN_PROGRESS){
+        if (this.getGameStage() !== GameStage.NOT_IN_PROGRESS) {
             this.setPlayerWillPostBlind(playerUUID, true);
         }
     }
