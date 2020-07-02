@@ -1046,7 +1046,12 @@ export class GameStateManager {
     changeSeats(playerUUID: PlayerUUID, seatNumber: number) {
         const player = this.getPlayer(playerUUID);
         player.seatNumber = seatNumber;
-        this.setPlayerWillPostBlind(playerUUID, true);
+
+        // The player needs to post a blind when they switch seats, unless the game
+        // hasn't started or isn't in progress yet.
+        if (this.getGameStage() !== GameStage.NOT_IN_PROGRESS){
+            this.setPlayerWillPostBlind(playerUUID, true);
+        }
     }
 
     playerLeaveTable(playerUUID: PlayerUUID) {
