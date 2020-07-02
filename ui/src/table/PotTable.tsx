@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             width: '100%',
             justifyContent: 'space-around',
+            marginBottom: '1vmin',
         },
         awardPotCont: {
             position: 'absolute',
@@ -40,8 +41,8 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '3vmin',
             textAlign: 'center',
             backgroundColor: 'rgba(0,0,0,0.5)',
-            borderRadius: '1vmin',
-            padding: '0.8vmin 1.5vmin',
+            borderRadius: '0.5vmin',
+            padding: '0.2vmin 1.5vmin',
         },
         sidePot: {
             textAlign: 'center',

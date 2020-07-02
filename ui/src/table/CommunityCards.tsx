@@ -1,6 +1,6 @@
 import React from 'react';
 import CardLarge from './CardLarge';
-
+import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 function CommunityCards(props) {
     const classes = useStyles();
-    const { communityCards } = props;
+    const { communityCards, className } = props;
 
     function generatePlaceholders() {
         const placeHolders: any[] = [];
@@ -24,7 +24,7 @@ function CommunityCards(props) {
         return placeHolders;
     }
     return (
-        <div className={classes.communityCardsCont}>
+        <div className={classnames(classes.communityCardsCont, className)}>
             {communityCards.map((c, i) => (
                 <CardLarge {...c} key={i} />
             ))}
