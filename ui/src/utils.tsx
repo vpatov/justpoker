@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import get from 'lodash/get';
 
 export const SUITS = {
     HEARTS: 'HEARTS',
@@ -72,3 +73,7 @@ export function importAllFromRequire(r) {
     });
     return images;
 }
+
+export const scrollToBottom = (ref) => {
+    (get(ref, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
+};

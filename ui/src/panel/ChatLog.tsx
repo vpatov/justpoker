@@ -13,6 +13,7 @@ import EmojiPicker from '../reuseable/EmojiPicker';
 import { WsServer } from '../api/ws';
 import { UiChatMessage } from '../shared/models/ui/uiState';
 import { getPlayerNameColor } from '../style/colors';
+import { scrollToBottom } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -142,11 +143,8 @@ function ChatLog(props: ChatLogProps) {
     }
 
     const messagesRef = useRef(null);
-    const scrollToBottom = () => {
-        (get(messagesRef, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
-    };
 
-    useEffect(scrollToBottom, [chatMessages, hideChatLog]);
+    useEffect(() => scrollToBottom(messagesRef), [chatMessages, hideChatLog]);
 
     function sendMessage() {
         const trimmedMessage = draftChatMessage.trim();
