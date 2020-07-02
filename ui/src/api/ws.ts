@@ -16,12 +16,14 @@ import {
     BuyChipsRequest,
     SeatChangeRequest,
     ChangeAvatarRequest,
+    ShowCardRequest,
 } from '../shared/models/api/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
 import { Config, getEnvConfig } from '../shared/models/config/config';
 import { AvatarKeys } from '../shared/models/ui/assets';
 import { getEpochTimeMs } from '../shared/util/util';
+import { Card } from '../shared/models/game/cards';
 
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
@@ -191,6 +193,19 @@ export class WsServer {
 
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
+
+    static sendShowCardMessage(playerUUID: PlayerUUID, cards: Card[]) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.SHOWCARD,
+            request: ({
+                playerUUID: playerUUID,
+                cards: cards,
+            } as ShowCardRequest) as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
     static subscribe(key: string, onMessage) {
         if (WsServer.subscriptions[key]) {
             WsServer.subscriptions[key].push(onMessage);

@@ -15,6 +15,7 @@ import Suit from '../reuseable/Suit';
 import { Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
 import Grow from '@material-ui/core/Grow';
+import { PlayerUUID } from '../shared/models/system/uuid';
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -79,14 +80,9 @@ function ControllerShowCard(props: ControllerShowCardProps) {
     }
 
     function sendShowCardRequest(cards: Card[]) {
-        WsServer.send({
-            actionType: ClientActionType.SHOWCARD,
-            request: {
-                playerUUID: heroPlayerUUID,
-                cards: cards,
-            } as ClientWsMessageRequest,
-        });
+        WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, cards);
     }
+
     return (
         <div className={classnames(classes.root, className)} onMouseLeave={handleClose}>
             <Grow in={open}>
