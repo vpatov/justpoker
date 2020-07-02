@@ -10,7 +10,7 @@ import {
     BettingRoundActionType,
     Pot,
 } from '../../../ui/src/shared/models/game/betting';
-import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage, INIT_HAND_STAGES } from '../../../ui/src/shared/models/game/stateGraph';
 import {
     Player,
     getCleanPlayer,
@@ -705,6 +705,10 @@ export class GameStateManager {
             this.gameState.gameStage === GameStage.SHOW_WINNER ||
             this.gameState.gameStage === GameStage.POST_HAND_CLEANUP
         );
+    }
+
+    isGameInHandInitStage(): boolean {
+        return INIT_HAND_STAGES.indexOf(this.getGameStage()) > -1;
     }
 
     getMinimumBetSize(): number {

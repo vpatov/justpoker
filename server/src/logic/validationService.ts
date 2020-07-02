@@ -18,13 +18,10 @@ import {
 import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/api/validation';
 import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { Card, cardsAreEqual } from '../../../ui/src/shared/models/game/cards';
-import { debugFunc } from '../logger';
 import { MIN_VALUES, MAX_VALUES } from '../../../ui/src/shared/util/consts';
-import { errorMonitor } from 'events';
-import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { INIT_HAND_STAGES, GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 
 const MAX_NAME_LENGTH = 32;
-const INIT_HAND_STAGES = [GameStage.SHOW_START_OF_HAND, GameStage.SHOW_START_OF_BETTING_ROUND];
 
 /*
     TODO: Redesign error message construction
