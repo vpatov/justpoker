@@ -3,6 +3,8 @@ import classnames from 'classnames';
 
 import Hand from './Hand';
 import PlayerStack from './PlayerStack';
+import { useSelector } from 'react-redux';
+import { heroPlayerUUIDSelector, selectCanShowHideCards } from '../store/selectors';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import grey from '@material-ui/core/colors/grey';
@@ -74,6 +76,8 @@ function Player(props) {
     const { className, player, style, setHeroRotation, virtualPositon } = props;
     const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const canShowHideCards = useSelector(selectCanShowHideCards);
+
     const handleClick = (event: any) => {
         event.preventDefault();
         setAnchorEl(event.currentTarget as any);
@@ -124,9 +128,11 @@ function Player(props) {
             <IconButton className={classes.moreButton} onClick={handleClick}>
                 <MoreIcon className={classes.moreIcon} />
             </IconButton>
-            <Button onClick={showCard} variant="contained" className={classes.showAllButton}>
-                Show All Cards
-            </Button>
+            {canShowHideCards && hero ? (
+                <Button onClick={showCard} variant="contained" className={classes.showAllButton}>
+                    Show All Cards
+                </Button>
+            ) : null}
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>
     );

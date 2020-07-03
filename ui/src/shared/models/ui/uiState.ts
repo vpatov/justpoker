@@ -72,6 +72,7 @@ export declare interface Global {
     heroTotalChips: number;
     numberOfSpectators: number;
     willAddChips?: number;
+    canShowHideCards: boolean;
 }
 
 export declare interface Controller {
@@ -351,6 +352,7 @@ export function getCleanGlobal(): Global {
         isHeroAtTable: false,
         numberOfSpectators: 0,
         isHeroInHand: false,
+        canShowHideCards: false,
     };
 }
 
@@ -466,6 +468,7 @@ export const TestGame: UiGameState = {
         numberOfSpectators: 4,
         willAddChips: 1430,
         isHeroInHand: true,
+        canShowHideCards: true,
     },
     controller: {
         showWarningOnFold: true,

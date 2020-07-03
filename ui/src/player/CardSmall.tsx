@@ -3,7 +3,7 @@ import { usePrevious } from '../utils';
 import { flipCard } from '../game/AnimiationModule';
 import { generateStringFromRank, SUITS } from '../utils';
 import { useSelector } from 'react-redux';
-import { heroPlayerUUIDSelector } from '../store/selectors';
+import { heroPlayerUUIDSelector, selectCanShowHideCards } from '../store/selectors';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -125,6 +125,7 @@ function CardSmall(props) {
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
+    const canShowHideCards = useSelector(selectCanShowHideCards);
 
     useEffect(() => {
         if (!prevIsBeingShown && isBeingShown) {
@@ -133,7 +134,7 @@ function CardSmall(props) {
     }, [isBeingShown, prevIsBeingShown]);
 
     function showCard() {
-        if (hero) {
+        if (hero && canShowHideCards) {
             WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, [{ suit, rank } as Card]);
         }
     }
@@ -162,9 +163,11 @@ function CardSmall(props) {
                 style={style}
                 onClick={showCard}
             >
-                <Button onClick={showCard} variant="contained" className={classes.showButton}>
-                    {isBeingShown ? 'Hide' : 'Show'}
-                </Button>
+                {hero && canShowHideCards ? (
+                    <Button onClick={showCard} variant="contained" className={classes.showButton}>
+                        {isBeingShown ? 'Hide' : 'Show'}
+                    </Button>
+                ) : null}
 
                 <Typography
                     className={shouldFlex ? classes.sideRank : classes.rank}
