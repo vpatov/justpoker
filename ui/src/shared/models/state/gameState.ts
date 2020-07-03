@@ -118,6 +118,9 @@ export declare interface GameState {
 
     /** The number of the current hand. Starts at 0. */
     handNumber: number;
+
+    /** The time the game was first started. */
+    timeGameStarted: number;
 }
 
 // TODO create partially clean game that can be used to clear state of round info.
@@ -157,5 +160,6 @@ export function getCleanGameState(): GameState {
         previousRaise: 0,
         partialAllInLeftOver: 0,
         handNumber: -1,
+        timeGameStarted: 0,
     };
 }

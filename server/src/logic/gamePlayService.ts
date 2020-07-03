@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { GameStateManager } from '../state/gameStateManager';
-import { GameType } from '../../../ui/src/shared/models/game/game';
+import { GameType, GameParameters } from '../../../ui/src/shared/models/game/game';
 
 import { HandSolverService } from '../cards/handSolverService';
 import {
@@ -21,9 +21,14 @@ import { logger } from '../logger';
 import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
+import { TimerManager } from '../state/timerManager';
+import { Context } from '../state/context';
+import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
 
 @Service()
 export class GamePlayService {
+    private processEventCallback: (event: Event) => void;
+
     constructor(
         private readonly gsm: GameStateManager,
         private readonly handSolverService: HandSolverService,
@@ -32,14 +37,38 @@ export class GamePlayService {
         private readonly ledgerService: LedgerService,
         private readonly validationService: ValidationService,
         private readonly gameInstanceLogService: GameInstanceLogService,
+        private readonly timerManager: TimerManager,
+        private readonly context: Context,
     ) {}
+
+    setProcessEventCallback(fn: (event: Event) => void) {
+        this.processEventCallback = fn;
+    }
 
     startGame() {
         this.gsm.setShouldDealNextHand(true);
+        if (this.gsm.getTimeGameStarted() === 0) {
+            this.gsm.setTimeGameStarted(getEpochTimeMs());
+            this.startTimeBankReplenishTimer();
+        }
     }
 
     stopGame() {
         this.gsm.setShouldDealNextHand(false);
+    }
+
+    startTimeBankReplenishTimer() {
+        this.timerManager.setTimeBankReplenishInterval(() => {
+            this.processEventCallback(createTimeBankReplenishEvent(this.context.getGameInstanceUUID()));
+        }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
+    }
+
+    setGameParameters(gameParameters: GameParameters) {
+        const currentTimeBankReplenishInterval = this.gsm.getTimeBankReplenishIntervalMinutes();
+        this.gsm.setGameParameters(gameParameters);
+        if (gameParameters.timeBankReplenishIntervalMinutes !== currentTimeBankReplenishInterval) {
+            this.startTimeBankReplenishTimer();
+        }
     }
 
     computeAndSetCurrentPlayerToAct() {

@@ -13,6 +13,7 @@ export class TimerManager {
         this.timerGroup = timerGroup;
     }
 
+    /** There can only be one state timer per game instance live at any moment. */
     setStateTimer(fn: Function, timeout: number) {
         this.cancelStateTimer();
         this.timerGroup.stateTimer = global.setTimeout(() => fn(), timeout);
@@ -26,7 +27,13 @@ export class TimerManager {
         this.timerGroup.messageAnnouncementTimer = global.setTimeout(() => fn(), timeout);
     }
 
-    setTimeBankReplenishTimer(fn: Function, timeout: number) {
-        this.timerGroup.timeBankReplenishTimer = global.setTimeout(() => fn(), timeout);
+    /** There can only be one time bank replenish timer per game instance live at any moment.*/
+    setTimeBankReplenishInterval(fn: Function, timeout: number) {
+        this.cancelTimeBankReplenishTimer();
+        this.timerGroup.timeBankReplenishTimer = global.setInterval(() => fn(), timeout);
+    }
+
+    cancelTimeBankReplenishTimer() {
+        global.clearTimeout(this.timerGroup.timeBankReplenishTimer);
     }
 }
