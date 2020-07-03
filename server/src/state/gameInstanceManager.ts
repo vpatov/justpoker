@@ -19,6 +19,7 @@ import {
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { GameParameters } from '../../../ui/src/shared/models/game/game';
+import { Context } from './context';
 
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
@@ -41,6 +42,7 @@ export class GameInstanceManager {
         private readonly gameInstanceLogService: GameInstanceLogService,
         private readonly timerManager: TimerManager,
         private readonly connectedClientManager: ConnectedClientManager,
+        private readonly context: Context,
     ) {
         setInterval(() => this.clearStaleGames(), 1000 * 60 * 60); // attempt to expire games every hour
     }
@@ -102,7 +104,7 @@ export class GameInstanceManager {
     }
 
     clearStaleGames() {
-        logger.verbose(`attempting to expiring game instances`);
+        logger.verbose(`Clearing expired game instances...`);
         if (this.gameInstances) {
             // TODO implement warning game will be cleared do to inactivity
             const now = getEpochTimeMs();
@@ -156,6 +158,7 @@ export class GameInstanceManager {
         this.ledgerService.loadLedger(gameInstance.ledger);
         this.timerManager.loadTimerGroup(gameInstance.timerGroup);
         this.gameInstanceLogService.loadGameInstanceLog(gameInstance.gameInstanceLog);
+        this.context.load(gameInstanceUUID);
         this.activeGameInstanceUUID = gameInstanceUUID;
     }
 

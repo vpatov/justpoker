@@ -162,6 +162,7 @@ export class StateConverter {
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
+            isGameInHandInitStage: this.gameStateManager.isGameInHandInitStage(),
             isHeroAtTable: heroPlayer?.isAtTable,
             isSpectator: !heroPlayer,
             numberOfSpectators: 0, // to be implemented

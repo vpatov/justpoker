@@ -1,31 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-
-export const SUITS = {
-    HEARTS: 'HEARTS',
-    SPADES: 'SPADES',
-    CLUBS: 'CLUBS',
-    DIAMONDS: 'DIAMONDS',
-};
-
-export function generateStringFromSuit(suit) {
-    let suitString = 'ERR_SUIT';
-    switch (suit) {
-        case SUITS.HEARTS:
-            suitString = '\u2665';
-            break;
-        case SUITS.SPADES:
-            suitString = '\u2660';
-            break;
-        case SUITS.CLUBS:
-            suitString = '\u2663';
-            break;
-        case SUITS.DIAMONDS:
-            suitString = '\u2666';
-            break;
-    }
-
-    return suitString;
-}
+import get from 'lodash/get';
 
 export function generateStringFromRank(rank) {
     if (rank === 'T') return '10';
@@ -71,4 +45,39 @@ export function importAllFromRequire(r) {
         images[item.replace('./', '')] = r(item);
     });
     return images;
+}
+
+export class ScrollFixer {
+    ref: any;
+    wasScrolledToBottom: boolean;
+    margin: number;
+    constructor(ref: any, margin?: number) {
+        this.ref = ref;
+        this.wasScrolledToBottom = true;
+        this.margin = margin || 5;
+        const el = get(ref, 'current');
+        if (el) {
+            el.onscroll = () => {
+                this.wasScrolledToBottom = this.isScrolledToBottom();
+            };
+        }
+    }
+    attemptScroll() {
+        const el = get(this.ref, 'current');
+        if (el) {
+            // if el is scrolled to bottom, reset scroll to bottom
+            if (this.wasScrolledToBottom) {
+                el.scrollTop = el.scrollHeight - el.clientHeight;
+            }
+            this.wasScrolledToBottom = this.isScrolledToBottom();
+        }
+    }
+
+    isScrolledToBottom() {
+        const el = get(this.ref, 'current');
+        if (el) {
+            return el.scrollHeight - el.clientHeight <= el.scrollTop + this.margin;
+        }
+        return false;
+    }
 }

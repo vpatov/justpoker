@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -14,26 +14,30 @@ export interface SimpleDialogProps {
     nullWhenClosed?: boolean;
     title: string;
     contextText?: string;
-    onCancel: () => void;
-    onConfirm: () => void;
+    onCancel?: () => void;
+    onConfirm?: () => void;
+    contentComponent?: ReactElement;
 }
 
 function ConfirmationDialog(props: SimpleDialogProps) {
     const classes = useStyles();
-    const { onCancel, onConfirm, contextText, title, open, nullWhenClosed } = props;
+    const { onCancel, onConfirm, contextText, title, open, nullWhenClosed, contentComponent } = props;
 
     if (!open && nullWhenClosed) return null;
     return (
         <Dialog open={open}>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
-                <DialogContentText>{contextText}</DialogContentText>
+                {contentComponent ? contentComponent : null}
+                {contextText ? <DialogContentText>{contextText}</DialogContentText> : null}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>Cancel</Button>
-                <Button onClick={onConfirm} color="primary" autoFocus>
-                    Confirm
-                </Button>
+                {onCancel ? <Button onClick={onCancel}>Cancel</Button> : null}
+                {onConfirm ? (
+                    <Button onClick={onConfirm} color="primary" autoFocus>
+                        Confirm
+                    </Button>
+                ) : null}
             </DialogActions>
         </Dialog>
     );

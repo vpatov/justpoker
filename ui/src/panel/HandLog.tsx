@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactPropTypes } from 'react';
+import React, { useState, useEffect, ReactPropTypes, useRef } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -7,14 +7,13 @@ import Typography from '@material-ui/core/Typography';
 
 import { UiHandLogEntry, UiCard } from '../shared/models/ui/uiState';
 import { getPlayerNameColor } from '../style/colors';
-import { generateStringFromRank } from '../utils';
+import { generateStringFromRank, ScrollFixer } from '../utils';
 import { IconButton, Divider } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import queryString from 'query-string';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import { BettingRoundLog, BetActionRecord, PotSummary, ShowdownHand, PotWinner } from '../shared/models/state/handLog';
@@ -23,7 +22,7 @@ import Suit from '../reuseable/Suit';
 
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import { BettingRoundActionType } from '../shared/models/game/betting';
-import { PlayerUUID, GameInstanceUUID } from '../shared/models/system/uuid';
+import { PlayerUUID } from '../shared/models/system/uuid';
 import { WsServer } from '../api/ws';
 import { cardsAreEqual, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
@@ -44,11 +43,17 @@ const useStyles = makeStyles((theme: Theme) =>
         handLogContainer: {
             height: '100%',
             overflowY: 'auto',
+            position: 'relative',
         },
         handLogControls: {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: 'rgb(10,10,10)',
+            width: '100%',
+            zIndex: 10,
         },
         handLogControlButtonSection: {
             width: '35%',
@@ -72,6 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         handLogContents: {
             margin: '0.2vh 0.40vw',
+
             '& > *': {
                 marginBottom: '1.2vh',
             },
@@ -103,7 +109,7 @@ const useStyles = makeStyles((theme: Theme) =>
         downloadIconButton: {
             width: '3vmin',
             height: '3vmin',
-            transform: 'scale(0.9)'
+            transform: 'scale(0.9)',
         },
         handLogInlineCards: {
             display: 'flex',
@@ -130,8 +136,8 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1vmin',
         },
         logPanelDivider: {
-            border: '0.25vmin solid #252527'
-        }
+            border: '0.25vmin solid #252527',
+        },
     }),
 );
 
@@ -141,7 +147,7 @@ interface HandLogProps {
     hideChatLog: boolean;
     hideHandLog: boolean;
 }
-
+let scrollFixer;
 function HandLog(props: HandLogProps) {
     const classes = useStyles();
     const { hideChatLog, hideHandLog } = props;
@@ -156,6 +162,15 @@ function HandLog(props: HandLogProps) {
         WsServer.subscribe('handLogEntries', onReceiveNewHandLogEntries);
         WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
     }, []);
+
+    const logRef = useRef(null);
+    useEffect(() => {
+        if (scrollFixer) {
+            scrollFixer.attemptScroll();
+        } else {
+            scrollFixer = new ScrollFixer(logRef);
+        }
+    }, [handLogEntries]);
 
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]) {
         if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0]) {
@@ -214,7 +229,7 @@ function HandLog(props: HandLogProps) {
     }
 
     function handleClickDownloadButton() {
-        window.open(computeHandLogGETurl(gameInstanceUUID), '_blank')
+        window.open(computeHandLogGETurl(gameInstanceUUID), '_blank');
     }
 
     function renderHandLogControls() {
@@ -277,7 +292,7 @@ function HandLog(props: HandLogProps) {
                 {cards.map((card) => (
                     <>
                         {generateStringFromRank(card.rank)}
-                        <Suit className={classes.suit} suit={card.suit} color />
+                        <Suit className={classes.suit} suit={card.suit} color lightened />
                     </>
                 ))}
             </Typography>
@@ -446,18 +461,18 @@ function HandLog(props: HandLogProps) {
         );
     }
 
-    function renderHandLogEntryButtonPanel(handLogEntry: UiHandLogEntry){
+    function renderHandLogEntryButtonPanel(handLogEntry: UiHandLogEntry) {
         return (
             <div className={classnames(classes.handLogEntryButtonPanel)}>
                 {renderTimeHandStarted(handLogEntry.timeHandStarted)}
-                <IconButton 
+                <IconButton
                     className={classnames(classes.downloadIconButton)}
                     onClick={() => handleClickDownloadButton()}
-                    >
-                    <GetAppIcon/>
+                >
+                    <GetAppIcon />
                 </IconButton>
             </div>
-        )
+        );
     }
 
     function renderHandLogEntry() {
@@ -501,7 +516,7 @@ function HandLog(props: HandLogProps) {
 
     return (
         <div className={classes.root} style={displayStyle()}>
-            <div className={classnames(classes.handLogContainer)}>
+            <div className={classnames(classes.handLogContainer)} ref={logRef}>
                 {renderHandLogControls()}
                 {renderHandLogEntry()}
             </div>

@@ -10,7 +10,7 @@ import {
     BettingRoundActionType,
     Pot,
 } from '../../../ui/src/shared/models/game/betting';
-import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage, INIT_HAND_STAGES } from '../../../ui/src/shared/models/game/stateGraph';
 import {
     Player,
     getCleanPlayer,
@@ -22,13 +22,7 @@ import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
-import {
-    Hand,
-    Card,
-    cardsAreEqual,
-    convertHandToCardArray,
-    reformatHandDescription,
-} from '../../../ui/src/shared/models/game/cards';
+import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/game/cards';
 import { AwardPot } from '../../../ui/src/shared/models/ui/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/system/uuid';
@@ -39,6 +33,7 @@ import {
 } from '../../../ui/src/shared/models/player/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/ui/assets';
 import sortBy from 'lodash/sortBy';
+import { assert } from 'console';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -280,6 +275,7 @@ export class GameStateManager {
             ? this.getNextPlayerSeatInHand(previousPlayerSeat.positionIndex)
             : this.getFirstSeatToAct();
 
+        assert(previousPlayerSeat !== currentPlayerSeat);
         this.setCurrentPlayerSeatToAct(currentPlayerSeat);
     }
 
@@ -365,6 +361,10 @@ export class GameStateManager {
         this.getPlayer(playerUUID).willAddChips = numChips;
     }
 
+    setPlayerAvatar(playerUUID: PlayerUUID, avatarKey: AvatarKeys) {
+        this.getPlayer(playerUUID).avatarKey = avatarKey;
+    }
+
     getPlayerName(playerUUID: PlayerUUID): string {
         return this.getPlayer(playerUUID).name;
     }
@@ -393,6 +393,19 @@ export class GameStateManager {
 
     getTotalPlayerTimeToAct(): number {
         return this.getTimeToAct() + this.getSumTimeBankValueThisAction();
+    }
+
+    getTimeBankReplenishIntervalMinutes() {
+        return this.gameState.gameParameters.timeBankReplenishIntervalMinutes;
+    }
+
+    replenishTimeBanks() {
+        this.forEveryPlayerUUID((playerUUID) => {
+            const player = this.getPlayer(playerUUID);
+            if (player.timeBanksLeft < this.getGameParameters().numberTimeBanks) {
+                player.timeBanksLeft += 1;
+            }
+        });
     }
 
     getTimeBanksLeft(playerUUID: PlayerUUID): number {
@@ -518,7 +531,7 @@ export class GameStateManager {
      * been incremented, and that the readyToPlay status of each player is finalized for
      * the hand. Also updates the playerPositionMap.
      */
-    updateTableSeatsAndPlayerPositionMap(): void {
+    generateTableSeatsAndPlayerPositionMap(): void {
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersReadyToPlay().length] || [];
 
@@ -539,7 +552,7 @@ export class GameStateManager {
                 seatsDealtIn.push({
                     playerUUID,
                     seatNumber: this.getPlayerSeatNumber(playerUUID),
-                    positionIndex: index,
+                    positionIndex: positionNumber,
                 });
 
                 playerPositionName = positions[positionNumber] || PlayerPosition.NOT_PLAYING;
@@ -548,6 +561,11 @@ export class GameStateManager {
 
             playerPositionMap.set(playerUUID, playerPositionName);
         }
+
+        // TODO turn into unit test case
+        seatsDealtIn.forEach((seat, i) => {
+            assert(seat.positionIndex === i);
+        });
 
         this.gameState.seatsDealtIn = seatsDealtIn;
         this.gameState.playerPositionMap = playerPositionMap;
@@ -676,6 +694,10 @@ export class GameStateManager {
         );
     }
 
+    isGameInHandInitStage(): boolean {
+        return INIT_HAND_STAGES.indexOf(this.getGameStage()) > -1;
+    }
+
     getMinimumBetSize(): number {
         const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise() + this.getPartialAllInLeftOver();
         return minimumBet;
@@ -692,7 +714,15 @@ export class GameStateManager {
         return this.getFullPotValue() + this.getPreviousRaise() * 2 - player.betAmount;
     }
 
-    shouldDealNextHand() {
+    getTimeGameStarted(): number {
+        return this.gameState.timeGameStarted;
+    }
+
+    setTimeGameStarted(timeGameStarted: number) {
+        this.gameState.timeGameStarted = timeGameStarted;
+    }
+
+    shouldDealNextHand(): boolean {
         return this.gameState.shouldDealNextHand;
     }
 
@@ -902,10 +932,6 @@ export class GameStateManager {
 
     /* Updaters */
 
-    updateGameParameters(gameParameters: GameParameters) {
-        this.gameState.gameParameters = gameParameters;
-    }
-
     queueAction(queuedServerAction: QueuedServerAction) {
         this.gameState.queuedServerActions.push(queuedServerAction);
     }
@@ -1015,6 +1041,12 @@ export class GameStateManager {
     changeSeats(playerUUID: PlayerUUID, seatNumber: number) {
         const player = this.getPlayer(playerUUID);
         player.seatNumber = seatNumber;
+
+        // The player needs to post a blind when they switch seats, unless the game
+        // hasn't started or isn't in progress yet.
+        if (this.getGameStage() !== GameStage.NOT_IN_PROGRESS) {
+            this.setPlayerWillPostBlind(playerUUID, true);
+        }
     }
 
     playerLeaveTable(playerUUID: PlayerUUID) {
@@ -1300,7 +1332,7 @@ export class GameStateManager {
     }
 
     getWinningHandDescription(): string | undefined {
-        return this.gameState.winningHand ? reformatHandDescription(this.gameState.winningHand.descr) : undefined;
+        return this.gameState.winningHand?.descr;
     }
 
     setWinningHand(hand: Hand | undefined) {

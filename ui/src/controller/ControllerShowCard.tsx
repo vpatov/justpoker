@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateStringFromRank, SUITS } from '../utils';
+import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
 
 import { WsServer } from '../api/ws';
@@ -11,7 +11,7 @@ import Paper from '@material-ui/core/Paper';
 
 import { ShowCardButton } from '../shared/models/ui/uiState';
 import { Button, ButtonGroup, Tooltip } from '@material-ui/core';
-import Suit from '../reuseable/Suit';
+import SuitComponent from '../reuseable/Suit';
 import { Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
 import Grow from '@material-ui/core/Grow';
@@ -95,7 +95,7 @@ function ControllerShowCard(props: ControllerShowCardProps) {
                         .map((button) => (
                             <Button className={classes.button} onClick={() => handleSingleClickButton(button)}>
                                 {generateStringFromRank(button.rank)}
-                                <Suit className={classes.suit} suit={button.suit}></Suit>
+                                <SuitComponent className={classes.suit} suit={button.suit}></SuitComponent>
                             </Button>
                         ))
                         .concat(

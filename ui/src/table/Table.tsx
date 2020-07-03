@@ -123,7 +123,7 @@ const useStyles = makeStyles((theme) => ({
         width: '85vw',
         zIndex: 5,
         position: 'absolute',
-        top: '25%',
+        bottom: '12%',
         letterSpacing: '-0.8px',
         fontSize: '2.9vmin',
         fontWeight: 'bold',
@@ -140,7 +140,7 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator, isHeroInHand } = useSelector(
+    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator, isHeroInHand, isGameInHandInitStage } = useSelector(
         globalGameStateSelector,
     );
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
@@ -207,6 +207,7 @@ function Table(props) {
                             setHeroRotation(r);
                         }}
                         isHeroInHand={isHeroInHand}
+                        isGameInHandInitStage={isGameInHandInitStage}
                         virtualPositon={virtualPosition}
                     />,
                 );

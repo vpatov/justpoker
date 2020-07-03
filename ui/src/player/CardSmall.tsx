@@ -1,14 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { usePrevious } from '../utils';
 import { flipCard } from '../game/AnimiationModule';
-import { generateStringFromRank, SUITS } from '../utils';
+import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Suit from '../reuseable/Suit';
+import SuitComponent from '../reuseable/Suit';
+import {Suit} from '../shared/models/game/cards';
 import { Tooltip } from '@material-ui/core';
-import { grey, blueGrey } from '@material-ui/core/colors';
+import { grey } from '@material-ui/core/colors';
+import { ThemeSetter } from '../root/App';
+import { useColoredCardBackgroundStyles, useWhiteCardBackgroundStyles } from '../style/colors';
 
 const NORMAL_CARD_SIZE = '3.4vmin';
 const SIZE_CARD_SIZE = '2.5vmin';
@@ -18,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: 6,
         textAlign: 'center',
         position: 'relative',
-        backgroundColor: 'white',
         height: '8.8vmin',
         width: '6.7vmin',
         display: 'flex',
@@ -77,18 +79,6 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '20%',
         fontSize: '3vmin',
     },
-    [SUITS.HEARTS]: {
-        ...theme.custom.HEARTS,
-    },
-    [SUITS.SPADES]: {
-        ...theme.custom.SPADES,
-    },
-    [SUITS.CLUBS]: {
-        ...theme.custom.CLUBS,
-    },
-    [SUITS.DIAMONDS]: {
-        ...theme.custom.DIAMONDS,
-    },
 }));
 
 function CardSmall(props) {
@@ -96,6 +86,16 @@ function CardSmall(props) {
     const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero, style } = props;
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
+    const coloredCardBackgroundClasses = useColoredCardBackgroundStyles();
+    const whiteCardBackgroundClasses = useWhiteCardBackgroundStyles();
+    const { curPrefs } = useContext(ThemeSetter);
+
+    function getCardBackGroundClasses(suit: Suit){
+        const cardClasses = curPrefs.coloredCardBackground ? 
+            coloredCardBackgroundClasses : 
+            whiteCardBackgroundClasses;
+        return [cardClasses.base, cardClasses[suit]];
+    }
 
     useEffect(() => {
         if (!prevIsBeingShown && isBeingShown) {
@@ -106,7 +106,11 @@ function CardSmall(props) {
     if (hidden) {
         return (
             <div
-                className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}
+                className={classnames(
+                    classes.root, 
+                    classes.hidden, 
+                    { [classes.sideCard]: shouldFlex }, 
+                    className)}
                 style={style}
             >
                 <Typography className={classnames(classes.hiddenText, { [classes.sideTextHidden]: shouldFlex })}>
@@ -118,10 +122,15 @@ function CardSmall(props) {
 
     const visibleCardComponent = (
         <div
-            className={classnames(classes.root, classes[suit], className, {
-                ani_notWinningCard: !partOfWinningHand,
-                [classes.sideCard]: shouldFlex,
-            })}
+            className={classnames(
+                    classes.root, 
+                    ...getCardBackGroundClasses(suit), 
+                    className, 
+                    {
+                        ani_notWinningCard: !partOfWinningHand,
+                        [classes.sideCard]: shouldFlex,
+                    }
+            )}
             id={cardId}
             style={style}
         >
@@ -131,7 +140,11 @@ function CardSmall(props) {
             >
                 {generateStringFromRank(rank)}
             </Typography>
-            <Suit suit={suit} className={shouldFlex ? classes.sideSuit : classes.suit} />
+            <SuitComponent
+                suit={suit}
+                className={shouldFlex ? classes.sideSuit : classes.suit}
+                color={!curPrefs.coloredCardBackground}
+            />
         </div>
     );
 

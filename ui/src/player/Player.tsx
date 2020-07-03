@@ -6,10 +6,12 @@ import PlayerStack from './PlayerStack';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import grey from '@material-ui/core/colors/grey';
+import MoreIcon from '@material-ui/icons/MoreHoriz';
 
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import PlayerLabel from './PlayerLabel';
+import { IconButton } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -21,10 +23,10 @@ const useStyles = makeStyles((theme) => ({
         filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
         transform: 'translateY(-50%) translateX(-50%)',
     },
-    folded: {
-        opacity: 0.5,
+    outOfHand: {
+        opacity: 0.34,
+        filter: 'grayscale(100%)',
     },
-
     labelText: {
         margin: '0.3vmin 0.8vmin',
         minWidth: '4vmin',
@@ -32,21 +34,25 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         fontSize: '1.5vmin',
     },
-    disconnected: {},
+
     hero: {
         zIndex: 1,
         transform: 'translateY(-50%) translateX(-50%) scale(1.2)',
     },
-    moreIcon: {
+
+    moreButton: {
         zIndex: 10,
         position: 'absolute',
-        bottom: '3%',
+        bottom: '0',
         right: 0,
-        marginRight: '0vmin',
-        color: grey[700],
+        padding: '0.3vmin',
         '&:hover': {
-            color: 'black',
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
         },
+        borderRadius: '0.6vmin',
+    },
+    moreIcon: {
+        color: grey[900],
     },
 }));
 
@@ -55,7 +61,7 @@ function Player(props) {
     const { className, player, style, setHeroRotation, virtualPositon } = props;
     const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
+    const handleClick = (event: any) => {
         event.preventDefault();
         setAnchorEl(event.currentTarget as any);
     };
@@ -81,7 +87,7 @@ function Player(props) {
     return (
         <div
             className={classnames(classes.root, className, {
-                [classes.folded]: folded || sittingOut,
+                [classes.outOfHand]: folded || sittingOut,
                 [classes.hero]: hero,
             })}
             style={style}
@@ -97,7 +103,10 @@ function Player(props) {
 
             <Hand hand={hand} folded={folded} hero={hero} />
 
-            <PlayerStack onClickStack={handleClick} player={player} />
+            <PlayerStack player={player} onClickStack={handleClick} />
+            <IconButton className={classes.moreButton} onClick={handleClick}>
+                <MoreIcon className={classes.moreIcon} />
+            </IconButton>
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>
     );

@@ -61,6 +61,7 @@ export enum ClientActionType {
     SETGAMEPARAMETERS = 'SETGAMEPARAMETERS',
     ADDADMIN = 'ADDADMIN',
     REMOVEADMIN = 'REMOVEADMIN',
+    CHANGEAVATAR = 'CHANGEAVATAR',
     KEEPALIVE = 'KEEPALIVE',
 }
 
@@ -68,6 +69,7 @@ export enum ServerActionType {
     GAMEPLAY_TIMEOUT = 'TIMEOUT',
     SEND_MESSAGE = 'SEND_MESSAGE',
     WS_CLOSE = 'WS_CLOSE',
+    REPLENISH_TIMEBANK = 'REPLENISH_TIMEBANK',
 }
 
 export enum UiActionType {
@@ -141,6 +143,10 @@ export declare interface SetGameParametersRequest {
     gameParameters: GameParameters;
 }
 
+export declare interface ChangeAvatarRequest {
+    avatarKey: AvatarKeys;
+}
+
 export type ClientWsMessageRequest = JoinTableRequest &
     JoinGameRequest &
     JoinTableRequest &
@@ -154,7 +160,8 @@ export type ClientWsMessageRequest = JoinTableRequest &
     PlayerReactionRequest &
     SetGameParametersRequest &
     AddAdminRequest &
-    RemoveAdminRequest;
+    RemoveAdminRequest &
+    ChangeAvatarRequest;
 
 export declare interface ClientWsMessage {
     actionType: ClientActionType;
@@ -169,6 +176,17 @@ export function createServerMessageEvent(
         actionType: ServerActionType.SEND_MESSAGE,
         gameInstanceUUID,
         serverMessageType,
+    };
+    return {
+        eventType: EventType.SERVER_ACTION,
+        body,
+    };
+}
+
+export function createTimeBankReplenishEvent(gameInstanceUUID: GameInstanceUUID): Event {
+    const body: ServerAction = {
+        actionType: ServerActionType.REPLENISH_TIMEBANK,
+        gameInstanceUUID,
     };
     return {
         eventType: EventType.SERVER_ACTION,

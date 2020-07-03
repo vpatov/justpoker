@@ -3,10 +3,13 @@ import CountUp from 'react-countup';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import AdminIcon from '@material-ui/icons/Stars';
+
 import classnames from 'classnames';
 import TablePositionIndicator from '../table/TablePositionIndicator';
 import PlayerAvatar from './PlayerAvatar';
 import Animoji from '../reuseable/Animoji';
+import { Tooltip } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     stackCont: {
@@ -38,12 +41,14 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     nameStackCont: {
-        width: '60%',
+        width: '54%',
     },
     name: {
         paddingBottom: '0.8vmin',
         whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
+        display: 'flex',
+        justifyContent: 'start',
+        alignItems: 'center',
         overflow: 'hidden',
         fontSize: '1.6vmin',
     },
@@ -81,6 +86,12 @@ const useStyles = makeStyles((theme) => ({
         color: 'white',
         fontSize: '1.8vmin',
     },
+    adminIcon: {
+        width: '1.7vmin',
+        height: '1.7vmin',
+        marginTop: '0.1vmin',
+        marginRight: '0.22vmin',
+    },
 }));
 
 function usePrevious(value) {
@@ -108,6 +119,7 @@ function PlayerStack(props) {
         disconnected,
         quitting,
         leaving,
+        admin,
     } = player;
     const outOfHand = sittingOut || folded;
     const prevStack = usePrevious(stack);
@@ -151,6 +163,11 @@ function PlayerStack(props) {
                     {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
                 </Typography>
                 <Typography variant="body1" className={classes.name}>
+                    {admin ? (
+                        <Tooltip title="Admin">
+                            <AdminIcon className={classes.adminIcon} />
+                        </Tooltip>
+                    ) : null}
                     {name}
                 </Typography>
             </div>

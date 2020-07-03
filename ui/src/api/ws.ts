@@ -15,6 +15,7 @@ import {
     JoinTableRequest,
     BuyChipsRequest,
     SeatChangeRequest,
+    ChangeAvatarRequest,
 } from '../shared/models/api/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
@@ -181,6 +182,34 @@ export class WsServer {
 
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
+
+    static sendChangeAvatarMessage(playerUUID: PlayerUUID, avatarKey: AvatarKeys) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.CHANGEAVATAR,
+            request: ({ playerUUID, avatarKey } as ChangeAvatarRequest) as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendLeaveTableMessage() {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.LEAVETABLE,
+            request: {} as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendQuitGameMessage() {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.QUITGAME,
+            request: {} as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
     static subscribe(key: string, onMessage) {
         if (WsServer.subscriptions[key]) {
             WsServer.subscriptions[key].push(onMessage);

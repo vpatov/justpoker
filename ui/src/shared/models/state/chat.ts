@@ -6,6 +6,7 @@ export const SERVER_PLAYER_UUID = 'jp-server' as PlayerUUID;
 
 export enum ServerMessageType {
     WELCOME = 'WELCOME',
+    REPLENISH_TIMEBANK = 'REPLENISH_TIMEBANK',
 }
 
 export declare interface ChatLog {

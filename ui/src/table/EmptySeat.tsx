@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
 function EmptySeat(props) {
     const classes = useStyles();
-    const { className, style, setHeroRotation, virtualPositon, seatNumber, isHeroInHand } = props;
+    const { className, style, setHeroRotation, virtualPositon, seatNumber, isHeroInHand, isGameInHandInitStage } = props;
 
     function handleRotationButtonClick() {
         setHeroRotation(virtualPositon);
@@ -80,8 +80,8 @@ function EmptySeat(props) {
     return (
         <div className={classnames(classes.emptySeatRoot, className)} style={style}>
             <div className={classes.container}>
-                {isHeroInHand ? renderRotateButton(false) : renderRotateButton(true)}
-                {isHeroInHand ? null : renderSeatChangeButton()}
+                {( isHeroInHand || isGameInHandInitStage ) ? renderRotateButton(false) : renderRotateButton(true)}
+                {( isHeroInHand || isGameInHandInitStage ) ? null : renderSeatChangeButton()}
             </div>
         </div>
     );

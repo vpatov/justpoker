@@ -14,6 +14,7 @@ export declare interface GameParameters {
     maxBuyinType: MaxBuyinType;
     minBuyin: number;
     allowTimeBanks: boolean;
+    timeBankReplenishIntervalMinutes: number;
     timeBankTime: number;
     numberTimeBanks: number;
     allowStraddle: boolean;
@@ -44,7 +45,7 @@ export declare interface ConnectedClient {
     playerUUID: PlayerUUID;
 }
 
-export function getCleanGameParameters() {
+export function getCleanGameParameters(): GameParameters {
     return {
         smallBlind: 0,
         bigBlind: 0,
@@ -58,12 +59,13 @@ export function getCleanGameParameters() {
         timeBankTime: 0,
         numberTimeBanks: 0,
         allowTimeBanks: false,
+        timeBankReplenishIntervalMinutes: 0,
         allowStraddle: false,
         canShowHeadsUp: false,
     };
 }
 
-export function getDefaultGameParameters() {
+export function getDefaultGameParameters(): GameParameters {
     return {
         smallBlind: 1,
         bigBlind: 2,
@@ -77,12 +79,13 @@ export function getDefaultGameParameters() {
         timeBankTime: 30,
         numberTimeBanks: 5,
         allowTimeBanks: true,
+        timeBankReplenishIntervalMinutes: 15,
         allowStraddle: false,
         canShowHeadsUp: false,
     };
 }
 
-export function getTestGameParameters() {
+export function getTestGameParameters(): GameParameters {
     return {
         smallBlind: 100,
         bigBlind: 200,
@@ -96,6 +99,7 @@ export function getTestGameParameters() {
         timeBankTime: 30,
         numberTimeBanks: 11,
         allowTimeBanks: true,
+        timeBankReplenishIntervalMinutes: 15,
         allowStraddle: true,
         canShowHeadsUp: true,
     };

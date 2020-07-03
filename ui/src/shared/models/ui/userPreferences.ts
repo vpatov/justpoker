@@ -5,4 +5,5 @@ export declare interface UserPreferences {
 export declare interface ThemePreferences {
     twoColor: boolean;
     backgroundColor: string;
+    coloredCardBackground: boolean;
 }

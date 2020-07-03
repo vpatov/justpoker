@@ -1,14 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { usePrevious } from '../utils';
 import { animateWinningCards, animateDealCommunityCard } from '../game/AnimiationModule';
-import { generateStringFromRank, SUITS } from '../utils';
+import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
-import Suit from '../reuseable/Suit';
+import SuitComponent from '../reuseable/Suit';
+import {Suit} from '../shared/models/game/cards';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
+import { ThemeSetter } from '../root/App';
+import { useColoredCardBackgroundStyles, useWhiteCardBackgroundStyles } from '../style/colors';
 
 const CARD_HEIGHT = 11;
 const CARD_WIDTH = 8.6;
@@ -19,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
         display: 'inline-block',
         textAlign: 'center',
         position: 'relative',
-        backgroundColor: 'white',
         height: `${CARD_HEIGHT}vmin`,
         width: `${CARD_WIDTH}vmin`,
         margin: '0.5vmin',
@@ -71,24 +73,24 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 1,
         ...theme.custom.WINNING_CARD,
     },
-    [SUITS.HEARTS]: {
-        ...theme.custom.HEARTS,
-    },
-    [SUITS.SPADES]: {
-        ...theme.custom.SPADES,
-    },
-    [SUITS.CLUBS]: {
-        ...theme.custom.CLUBS,
-    },
-    [SUITS.DIAMONDS]: {
-        ...theme.custom.DIAMONDS,
-    },
 }));
+
 
 function CardLarge(props) {
     const classes = useStyles();
+    const coloredCardBackgroundClasses = useColoredCardBackgroundStyles();
+    const whiteCardBackgroundClasses = useWhiteCardBackgroundStyles();
     const { suit, rank, partOfWinningHand, className, placeHolder } = props;
     const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
+    const { curPrefs } = useContext(ThemeSetter);
+
+    function getCardBackGroundClasses(suit: Suit){
+        const cardClasses = curPrefs.coloredCardBackground ? 
+            coloredCardBackgroundClasses : 
+            whiteCardBackgroundClasses;
+        return [cardClasses.base, cardClasses[suit]];
+    }
+
 
     const id = `${suit}${rank}`;
     // this function could be located in many different componets
@@ -120,11 +122,16 @@ function CardLarge(props) {
     return (
         <div id={id}>
             <div
-                className={classnames(classes.root, classes[suit], className, {
-                    [classes.partOfWinningHand]: partOfWinningHand,
-                    ani_notWinningCard: !partOfWinningHand,
-                    [classes.smallWidth]: smallWidth,
-                })}
+                className={classnames(
+                    classes.root, 
+                    className, 
+                    ...getCardBackGroundClasses(suit), 
+                    {
+                        [classes.partOfWinningHand]: partOfWinningHand,
+                        ani_notWinningCard: !partOfWinningHand,
+                        [classes.smallWidth]: smallWidth,
+                    }
+                )}
             >
                 <Typography
                     className={classnames(classes.text, classes.rank)}
@@ -132,7 +139,11 @@ function CardLarge(props) {
                 >
                     {generateStringFromRank(rank)}
                 </Typography>
-                <Suit suit={suit} className={classes.suit} />
+                <SuitComponent
+                    suit={suit}
+                    className={classes.suit}
+                    color={!curPrefs.coloredCardBackground}
+                />
             </div>
         </div>
     );

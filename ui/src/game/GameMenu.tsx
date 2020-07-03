@@ -19,7 +19,7 @@ import StopIcon from '@material-ui/icons/Stop';
 import UserSettingsIcon from '@material-ui/icons/Person';
 import VolumeOnIcon from '@material-ui/icons/VolumeUp';
 import VolumeOffIcon from '@material-ui/icons/VolumeMute';
-import MenuIcon from '@material-ui/icons/Menu';
+import MoreIcon from '@material-ui/icons/MoreHoriz';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import DirectionsRunIcon from '@material-ui/icons/DirectionsRun';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
@@ -109,8 +109,7 @@ function GameMenu(props) {
     };
 
     const handleOpenLedger = () => {
-
-        const stringifiedUrl = queryString.stringifyUrl({ url: `/ledger/${gameInstanceUUID}`, query:{}});
+        const stringifiedUrl = queryString.stringifyUrl({ url: `/ledger/${gameInstanceUUID}`, query: {} });
         window.open(stringifiedUrl, 'JustPoker Ledger', `width=${window.innerWidth},height=600`);
     };
 
@@ -129,7 +128,7 @@ function GameMenu(props) {
                 handleOpenLedger();
                 break;
             case ClientActionType.LEAVETABLE:
-                sendServerAction(ClientActionType.LEAVETABLE);
+                WsServer.sendLeaveTableMessage();
                 break;
             case ClientActionType.STARTGAME:
                 sendServerAction(ClientActionType.STARTGAME);
@@ -203,6 +202,15 @@ function GameMenu(props) {
         ));
     }
 
+    function generateMoreIcon() {
+        return (
+            <Tooltip key={'more'} title={'More'} placement="right">
+                <IconButton className={classes.iconButton}>
+                    <MoreIcon className={classes.icon} />
+                </IconButton>
+            </Tooltip>
+        );
+    }
     return (
         <>
             <div className={classes.hoverArea} onMouseOver={handleOpen} onMouseLeave={handleClose}>
@@ -211,7 +219,7 @@ function GameMenu(props) {
                     className={classnames(classes.root, {
                         [classes.rootExpanded]: open,
                     })}
-                    style={open ? {} : { maxHeight: `${5 * alwaysShowMenuButtons.length}vmin` }}
+                    style={open ? {} : { maxHeight: `${6 * alwaysShowMenuButtons.length}vmin` }}
                 >
                     {open ? (
                         <>
@@ -219,7 +227,10 @@ function GameMenu(props) {
                             {generateButtonsFromArray(hiddenMenuButtons)}
                         </>
                     ) : (
-                        generateButtonsFromArray(alwaysShowMenuButtons)
+                        <>
+                            {generateButtonsFromArray(alwaysShowMenuButtons)}
+                            {generateMoreIcon()}
+                        </>
                     )}
                 </Paper>
             </div>
@@ -247,7 +258,7 @@ function GameMenu(props) {
                 onCancel={() => SET_confirmationQuit(false)}
                 onConfirm={() => {
                     SET_confirmationQuit(false);
-                    sendServerAction(ClientActionType.QUITGAME);
+                    WsServer.sendQuitGameMessage();
                 }}
                 nullWhenClosed
             />

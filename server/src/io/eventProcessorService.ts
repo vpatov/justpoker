@@ -13,6 +13,7 @@ import {
     SetGameParametersRequest,
     RemoveAdminRequest,
     AddAdminRequest,
+    ChangeAvatarRequest,
 } from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from '../state/gameStateManager';
 import { ValidationService } from '../logic/validationService';
@@ -28,6 +29,7 @@ import { logger, debugFunc } from '../logger';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { AnimationService } from '../state/animationService';
+import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 
 declare interface ActionProcessor {
     validation: (clientUUID: ClientUUID, messagePayload: ClientWsMessageRequest) => ValidationResponse;
@@ -35,7 +37,7 @@ declare interface ActionProcessor {
     updates: ServerStateKey[];
 }
 
-declare type EventProcessor = {
+declare type ClientActionProcessor = {
     [key in ClientActionType]: ActionProcessor;
 };
 
@@ -50,9 +52,11 @@ export class EventProcessorService {
         private readonly gameInstanceManager: GameInstanceManager,
         private readonly connectedClientManager: ConnectedClientManager,
         private readonly animationService: AnimationService,
-    ) {}
+    ) {
+        gamePlayService.setProcessEventCallback((event: Event) => this.processEvent(event));
+    }
 
-    eventProcessor: EventProcessor = {
+    clientActionProcessor: ClientActionProcessor = {
         [ClientActionType.STARTGAME]: {
             validation: (uuid, req) => this.validationService.validateStartGameRequest(uuid),
             perform: (uuid, req) => this.gamePlayService.startGame(),
@@ -214,8 +218,17 @@ export class EventProcessorService {
                         args: [req.gameParameters],
                     });
                 } else {
-                    this.gameStateManager.setGameParameters(req.gameParameters);
+                    this.gamePlayService.setGameParameters(req.gameParameters);
                 }
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.CHANGEAVATAR]: {
+            validation: (uuid, req) => this.validationService.validateChangeAvatarRequest(uuid),
+            perform: (uuid, req: ChangeAvatarRequest) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+
+                this.gameStateManager.setPlayerAvatar(player.uuid, req.avatarKey);
             },
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -245,6 +258,14 @@ export class EventProcessorService {
             case ServerActionType.SEND_MESSAGE: {
                 this.chatService.prepareServerMessage(serverAction.serverMessageType);
                 this.gameStateManager.addUpdatedKeys(ServerStateKey.CHAT);
+                break;
+            }
+
+            case ServerActionType.REPLENISH_TIMEBANK: {
+                this.gameStateManager.replenishTimeBanks();
+                this.chatService.prepareServerMessage(ServerMessageType.REPLENISH_TIMEBANK);
+                this.gameStateManager.addUpdatedKeys(ServerStateKey.CHAT);
+                break;
             }
         }
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
@@ -259,7 +280,7 @@ export class EventProcessorService {
             return error;
         }
 
-        const actionProcessor = this.eventProcessor[actionType];
+        const actionProcessor = this.clientActionProcessor[actionType];
         error = actionProcessor.validation(clientUUID, request);
 
         if (error) {
