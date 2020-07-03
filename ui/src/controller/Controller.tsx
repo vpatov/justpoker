@@ -95,6 +95,12 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '1.6vmin',
             marginRight: '0.8vmin',
         },
+        buyBackButton: {
+            height: '58%',
+            width: '25vmin',
+            fontSize: '1.6vmin',
+            marginRight: '2vmin',
+        },
         timeBankButton: {
             margin: '0.5vmin',
             fontSize: '1.1vmin',
@@ -438,6 +444,35 @@ function ControllerComp(props: ControllerProps) {
         return buttons;
     }
 
+    function generatePostBustButtons() {
+        if (heroTotalChips <= 0 && !dealInNextHand) {
+            return (
+                <div className={classes.betActionsCont}>
+                    <Button
+                        variant="outlined"
+                        className={classes.buyBackButton}
+                        onClick={() => {
+                            WsServer.sendLeaveTableMessage();
+                        }}
+                    >
+                        Leave Table
+                    </Button>
+                    <Button
+                        variant="contained"
+                        className={classes.buyBackButton}
+                        onClick={() => {
+                            setBuyinDialogOpen(true);
+                        }}
+                        color="primary"
+                    >
+                        Buy Back
+                    </Button>
+                </div>
+            );
+        }
+        return null;
+    }
+
     if (isSpectator)
         return (
             <ControllerSpectator
@@ -481,8 +516,10 @@ function ControllerComp(props: ControllerProps) {
                     </Tooltip>
                 ) : null}
             </div>
+
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>{generateBetActionButtons()}</div>
+                {generatePostBustButtons()}
                 <ControllerBetSizer
                     sizingButtons={sizingButtons}
                     min={min}
@@ -521,18 +558,20 @@ function ControllerComp(props: ControllerProps) {
                         label="Straddle"
                     />
                 ) : null}
-                <FormControlLabel
-                    className={classes.formControlLabel}
-                    classes={{ label: classes.checkLabel }}
-                    control={
-                        <Checkbox
-                            className={classes.button}
-                            checked={!dealInNextHand}
-                            onChange={onToggleSitOutNextHand}
-                        />
-                    }
-                    label="Sit Out Next Hand"
-                />
+                {isHeroAtTable ? (
+                    <FormControlLabel
+                        className={classes.formControlLabel}
+                        classes={{ label: classes.checkLabel }}
+                        control={
+                            <Checkbox
+                                className={classes.button}
+                                checked={!dealInNextHand}
+                                onChange={onToggleSitOutNextHand}
+                            />
+                        }
+                        label="Sit Out Next Hand"
+                    />
+                ) : null}
             </div>
         </div>
     );

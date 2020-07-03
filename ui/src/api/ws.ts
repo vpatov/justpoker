@@ -191,6 +191,25 @@ export class WsServer {
 
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
+
+    static sendLeaveTableMessage() {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.LEAVETABLE,
+            request: {} as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendQuitGameMessage() {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.QUITGAME,
+            request: {} as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
     static subscribe(key: string, onMessage) {
         if (WsServer.subscriptions[key]) {
             WsServer.subscriptions[key].push(onMessage);

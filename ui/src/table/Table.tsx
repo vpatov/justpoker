@@ -123,7 +123,7 @@ const useStyles = makeStyles((theme) => ({
         width: '85vw',
         zIndex: 5,
         position: 'absolute',
-        top: '25%',
+        bottom: '12%',
         letterSpacing: '-0.8px',
         fontSize: '2.9vmin',
         fontWeight: 'bold',
