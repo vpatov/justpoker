@@ -2,50 +2,62 @@ import React from 'react';
 import classnames from 'classnames';
 import { Suit } from '../shared/models/game/cards';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { SUITS } from '../utils';
 import { grey } from '@material-ui/core/colors';
 import Color from 'color';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useLightenedStyles = makeStyles((theme: Theme) =>
     createStyles({
-        icon: { fill: 'white' },
-        [SUITS.HEARTS]: {
-            fill: Color(theme.custom.HEARTS.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        [Suit.HEARTS]: {
+            fill: Color(theme.custom.HEARTS).lighten(0.7).string(), // needs to be visible on dark
         },
-        [SUITS.SPADES]: {
-            fill: Color(theme.custom.SPADES.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        [Suit.SPADES]: {
+            fill: Color(theme.custom.SPADES).lighten(0.7).string(), // needs to be visible on dark
         },
-        [SUITS.CLUBS]: {
-            fill: Color(theme.custom.CLUBS.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        [Suit.CLUBS]: {
+            fill: Color(theme.custom.CLUBS).lighten(0.7).string(), // needs to be visible on dark
         },
-        [SUITS.DIAMONDS]: {
-            fill: Color(theme.custom.DIAMONDS.backgroundColor).lighten(0.7).string(), // needs to be visible on dark
+        [Suit.DIAMONDS]: {
+            fill: Color(theme.custom.DIAMONDS).lighten(0.7).string(), // needs to be visible on dark
+        },
+    }),
+);
+
+const useNormalStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        whiteFill: { fill: 'white' },
+        [Suit.HEARTS]: {
+            fill: Color(theme.custom.HEARTS).string(),
+        },
+        [Suit.SPADES]: {
+            fill: Color(theme.custom.SPADES).string(), 
+        },
+        [Suit.CLUBS]: {
+            fill: Color(theme.custom.CLUBS).string(),
+        },
+        [Suit.DIAMONDS]: {
+            fill: Color(theme.custom.DIAMONDS).string(),
         },
     }),
 );
 
 function SuitIcon(props) {
-    const classes = useStyles();
-    const { suit, className, color } = props;
+    const lightenedStyles = useLightenedStyles();
+    const normalStyles = useNormalStyles();
+    const { suit, className, color,  lightened} = props;
 
     function generateStringFromSuit(suit) {
-        let suitString;
+        const classes = lightened ? lightenedStyles : normalStyles;
         switch (suit) {
             case Suit.HEARTS:
-                suitString = <Heart className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
-                break;
+                return <Heart className={classnames( className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
             case Suit.SPADES:
-                suitString = <Spade className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
-                break;
+                return <Spade className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
             case Suit.CLUBS:
-                suitString = <Club className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
-                break;
+                return <Club className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
             case Suit.DIAMONDS:
-                suitString = <Diamond className={classnames(classes.icon, className, { [classes[suit]]: color })} />;
-                break;
+                return <Diamond className={classnames( className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
         }
-
-        return suitString;
+        return null;
     }
     return generateStringFromSuit(suit);
 }

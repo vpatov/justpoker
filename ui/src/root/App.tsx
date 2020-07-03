@@ -34,7 +34,7 @@ function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
 }
 
 export const ThemeSetter = React.createContext({
-    curfPrefs: DEFAULT_PREFERENCES.theme,
+    curPrefs: DEFAULT_PREFERENCES.theme,
     themeSetter: (tp: ThemePreferences) => null,
 });
 
@@ -60,7 +60,7 @@ function App() {
 
     return (
         <ErrorBoundary>
-            <ThemeSetter.Provider value={{ curfPrefs: pref, themeSetter: setNewTheme }}>
+            <ThemeSetter.Provider value={{ curPrefs: pref, themeSetter: setNewTheme }}>
                 <ThemeProvider theme={createMuiTheme(theme)}>
                     <Router>
                         <Switch>
