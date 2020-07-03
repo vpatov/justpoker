@@ -22,7 +22,7 @@ export class HandSolverService {
     computeBestHandFromStrCards(cards: string[]): Hand {
         const hand = HandSolver.solve(cards);
         hand.descr = reformatHandDescription(hand.descr);
-        return HandSolver.solve(cards);
+        return hand;
     }
 
     getWinningHands(hands: Hand[]): Hand[] {
