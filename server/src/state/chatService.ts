@@ -109,7 +109,7 @@ export class ChatService {
         const player = this.gameStateManager.getPlayer(playerUUID);
         this.lastMessage = {
             ...this.serverMessageTemplate(),
-            content: `${player.name} has bought and added ${amountAdded} chip(s) to their stack.`,
+            content: `${player.name} has bought ${amountAdded} chip${amountAdded > 1 ? 's' : ''}.`,
         };
         this.chatLog.messages.push(this.lastMessage);
         this.gameStateManager.addUpdatedKeys(ServerStateKey.CHAT);
@@ -119,7 +119,9 @@ export class ChatService {
         const player = this.gameStateManager.getPlayer(playerUUID);
         this.lastMessage = {
             ...this.serverMessageTemplate(),
-            content: `An admin has adjusted ${player.name}'s stack from ${originalChips} to ${chipAmt} chip(s).`,
+            content:
+                `An admin has adjusted ${player.name}'s stack from ${originalChips} ` +
+                `to ${chipAmt} chip${chipAmt > 1 ? 's' : ''}.`,
         };
         this.chatLog.messages.push(this.lastMessage);
         this.gameStateManager.addUpdatedKeys(ServerStateKey.CHAT);
