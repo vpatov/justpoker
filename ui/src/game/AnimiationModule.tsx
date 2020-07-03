@@ -130,13 +130,6 @@ export function animateTimeBankButton() {
         loop: loops,
         easing: 'linear',
     });
-    const b = anime({
-        targets: [`.ani_timeBank`],
-        duration: 1200,
-        'box-shadow': '0px 0px 0.33vmin 0.24vmin white',
-        easing: 'linear',
-    });
-    return b;
 }
 
 export function animateShowCard(id) {

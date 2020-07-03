@@ -11,7 +11,6 @@ function getPercentTimeRemaining(timeElapsed: number, timeLimit: number): number
 }
 
 const WARN_TIME = 8;
-let timeBankAni: any = false;
 function PlayerTimer(props) {
     const { playerTimer, hero, className } = props;
     const { timeLimit, timeElapsed } = playerTimer;
@@ -37,16 +36,6 @@ function PlayerTimer(props) {
         };
     }, [timeElapsed, timeLimit]);
 
-    useEffect(() => {
-        return () => {
-            console.log(timeBankAni);
-            if (timeBankAni) {
-                timeBankAni.reset();
-                timeBankAni = false;
-            }
-        };
-    }, []);
-
     if (completed < 1) {
         clearInterval(timer);
     }
@@ -54,7 +43,7 @@ function PlayerTimer(props) {
     if (hero && !playedWarning && secondsRemaining < WARN_TIME) {
         setPlayedWarning(true);
         playTimerWarning();
-        timeBankAni = animateTimeBankButton();
+        animateTimeBankButton();
     }
 
     return <Typography className={className}>{Math.floor(secondsRemaining)}</Typography>;
