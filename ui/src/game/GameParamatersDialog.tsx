@@ -313,7 +313,7 @@ function GameParamatersDialog(props) {
                     />
                     <TextFieldWrap
                         className={classes.field}
-                        label="Time Bank Replenish Interval (minutes)"
+                        label="Refill Interval (minutes)"
                         onChange={(event) => setIntoGameParameters('timeBankReplenishIntervalMinutes', event.target.value)}
                         value={timeBankReplenishIntervalMinutes}
                         type="number"
