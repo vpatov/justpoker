@@ -241,7 +241,7 @@ export class GamePlayService {
         this.gsm.incrementHandNumber();
         this.gsm.initializeNewDeck();
         this.gsm.incrementDealerSeatNumber();
-        this.gsm.updateTableSeatsAndPlayerPositionMap();
+        this.gsm.generateTableSeatsAndPlayerPositionMap();
 
         this.gsm.recordPlayerChipsAtStartOfHand();
         this.placeBlinds();

@@ -10,7 +10,7 @@ import {
     BettingRoundActionType,
     Pot,
 } from '../../../ui/src/shared/models/game/betting';
-import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage, INIT_HAND_STAGES } from '../../../ui/src/shared/models/game/stateGraph';
 import {
     Player,
     getCleanPlayer,
@@ -39,6 +39,7 @@ import {
 } from '../../../ui/src/shared/models/player/playerPosition';
 import { AvatarKeys } from '../../../ui/src/shared/models/ui/assets';
 import sortBy from 'lodash/sortBy';
+import { assert } from 'console';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -280,6 +281,7 @@ export class GameStateManager {
             ? this.getNextPlayerSeatInHand(previousPlayerSeat.positionIndex)
             : this.getFirstSeatToAct();
 
+        assert(previousPlayerSeat !== currentPlayerSeat);
         this.setCurrentPlayerSeatToAct(currentPlayerSeat);
     }
 
@@ -546,7 +548,7 @@ export class GameStateManager {
      * been incremented, and that the readyToPlay status of each player is finalized for
      * the hand. Also updates the playerPositionMap.
      */
-    updateTableSeatsAndPlayerPositionMap(): void {
+    generateTableSeatsAndPlayerPositionMap(): void {
         const playerPositionMap: Map<PlayerUUID, PlayerPosition> = new Map();
         const positions = PLAYER_POSITIONS_BY_HEADCOUNT[this.getPlayersReadyToPlay().length] || [];
 
@@ -567,7 +569,7 @@ export class GameStateManager {
                 seatsDealtIn.push({
                     playerUUID,
                     seatNumber: this.getPlayerSeatNumber(playerUUID),
-                    positionIndex: index,
+                    positionIndex: positionNumber,
                 });
 
                 playerPositionName = positions[positionNumber] || PlayerPosition.NOT_PLAYING;
@@ -576,6 +578,11 @@ export class GameStateManager {
 
             playerPositionMap.set(playerUUID, playerPositionName);
         }
+
+        // TODO turn into unit test case
+        seatsDealtIn.forEach((seat, i) => {
+            assert(seat.positionIndex === i);
+        });
 
         this.gameState.seatsDealtIn = seatsDealtIn;
         this.gameState.playerPositionMap = playerPositionMap;
@@ -702,6 +709,10 @@ export class GameStateManager {
             this.gameState.gameStage === GameStage.SHOW_WINNER ||
             this.gameState.gameStage === GameStage.POST_HAND_CLEANUP
         );
+    }
+
+    isGameInHandInitStage(): boolean {
+        return INIT_HAND_STAGES.indexOf(this.getGameStage()) > -1;
     }
 
     getMinimumBetSize(): number {
@@ -1043,6 +1054,12 @@ export class GameStateManager {
     changeSeats(playerUUID: PlayerUUID, seatNumber: number) {
         const player = this.getPlayer(playerUUID);
         player.seatNumber = seatNumber;
+
+        // The player needs to post a blind when they switch seats, unless the game
+        // hasn't started or isn't in progress yet.
+        if (this.getGameStage() !== GameStage.NOT_IN_PROGRESS) {
+            this.setPlayerWillPostBlind(playerUUID, true);
+        }
     }
 
     playerLeaveTable(playerUUID: PlayerUUID) {
