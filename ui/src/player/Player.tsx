@@ -23,10 +23,10 @@ const useStyles = makeStyles((theme) => ({
         filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
         transform: 'translateY(-50%) translateX(-50%)',
     },
-    folded: {
-        opacity: 0.5,
+    outOfHand: {
+        opacity: 0.34,
+        filter: 'grayscale(100%)',
     },
-
     labelText: {
         margin: '0.3vmin 0.8vmin',
         minWidth: '4vmin',
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         fontSize: '1.5vmin',
     },
-    disconnected: {},
+
     hero: {
         zIndex: 1,
         transform: 'translateY(-50%) translateX(-50%) scale(1.2)',
@@ -87,7 +87,7 @@ function Player(props) {
     return (
         <div
             className={classnames(classes.root, className, {
-                [classes.folded]: folded || sittingOut,
+                [classes.outOfHand]: folded || sittingOut,
                 [classes.hero]: hero,
             })}
             style={style}

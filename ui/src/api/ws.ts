@@ -201,6 +201,22 @@ export class WsServer {
                 cards: cards,
             } as ShowCardRequest) as ClientWsMessageRequest,
         };
+    }
+
+    static sendLeaveTableMessage() {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.LEAVETABLE,
+            request: {} as ClientWsMessageRequest,
+        };
+
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendQuitGameMessage() {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.QUITGAME,
+            request: {} as ClientWsMessageRequest,
+        };
 
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }

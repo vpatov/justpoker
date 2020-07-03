@@ -3,18 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { playTimerWarning } from '../game/AudioModule';
 import { animateTimeBankButton } from '../game/AnimiationModule';
 
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
-
-const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
 function getPercentTimeRemaining(timeElapsed: number, timeLimit: number): number {
     const timeElapsedPercentage = (timeElapsed * 100.0) / timeLimit;
     return 100.0 - timeElapsedPercentage;
 }
 
+const WARN_TIME = 8;
 function PlayerTimer(props) {
-    const classes = useStyles();
     const { playerTimer, hero, className } = props;
     const { timeLimit, timeElapsed } = playerTimer;
 
@@ -43,7 +40,7 @@ function PlayerTimer(props) {
         clearInterval(timer);
     }
 
-    if (hero && !playedWarning && secondsRemaining < 8) {
+    if (hero && !playedWarning && secondsRemaining < WARN_TIME) {
         setPlayedWarning(true);
         playTimerWarning();
         animateTimeBankButton();

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import get from 'lodash/get';
 
 export const SUITS = {
     HEARTS: 'HEARTS',
@@ -71,4 +72,39 @@ export function importAllFromRequire(r) {
         images[item.replace('./', '')] = r(item);
     });
     return images;
+}
+
+export class ScrollFixer {
+    ref: any;
+    wasScrolledToBottom: boolean;
+    margin: number;
+    constructor(ref: any, margin?: number) {
+        this.ref = ref;
+        this.wasScrolledToBottom = true;
+        this.margin = margin || 5;
+        const el = get(ref, 'current');
+        if (el) {
+            el.onscroll = () => {
+                this.wasScrolledToBottom = this.isScrolledToBottom();
+            };
+        }
+    }
+    attemptScroll() {
+        const el = get(this.ref, 'current');
+        if (el) {
+            // if el is scrolled to bottom, reset scroll to bottom
+            if (this.wasScrolledToBottom) {
+                el.scrollTop = el.scrollHeight - el.clientHeight;
+            }
+            this.wasScrolledToBottom = this.isScrolledToBottom();
+        }
+    }
+
+    isScrolledToBottom() {
+        const el = get(this.ref, 'current');
+        if (el) {
+            return el.scrollHeight - el.clientHeight <= el.scrollTop + this.margin;
+        }
+        return false;
+    }
 }
