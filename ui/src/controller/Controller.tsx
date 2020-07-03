@@ -170,7 +170,7 @@ function ControllerComp(props: ControllerProps) {
     } = useSelector(controllerSelector);
 
     const heroHandLabel = useSelector(heroHandLabelSelector);
-    const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
+    const { allowStraddle, allowTimeBanks, bigBlind } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
     const { isSpectator, isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
     const [buyChipsDialogOpen, setBuyinDialogOpen] = useState(false);
@@ -487,6 +487,7 @@ function ControllerComp(props: ControllerProps) {
                     sizingButtons={sizingButtons}
                     min={min}
                     max={max}
+                    bigBlind={bigBlind}
                     value={betAmt}
                     onChange={(val) => changeBetAmount(val)}
                     onClickActionButton={onClickActionButton}
