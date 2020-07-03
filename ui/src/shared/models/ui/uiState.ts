@@ -81,7 +81,6 @@ export declare interface Controller {
     timeBanks: number;
     sizingButtons: SizingButton[];
     bettingActionButtons: BettingActionButtons;
-    showCardButtons?: ShowCardButton[];
     dealInNextHand: boolean;
     toAct?: boolean;
     willStraddle: boolean;
@@ -480,12 +479,6 @@ export const TestGame: UiGameState = {
         timeBanks: 11,
         dealInNextHand: false,
         playerPositionString: 'Hijack',
-        showCardButtons: [
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-        ],
         willStraddle: true,
         sizingButtons: [
             {

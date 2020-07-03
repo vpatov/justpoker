@@ -24,7 +24,6 @@ import { BettingRoundActionType } from '../shared/models/game/betting';
 import ControllerSpectator from './ControllerSpectator';
 import ControllerWarningDialog from './ControllerWarningDialog';
 import ControllerBetSizer from './ControllerBetSizer';
-import ControllerShowCard from './ControllerShowCard';
 import BuyChipsDialog from '../game/BuyChipsDialog';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
@@ -166,7 +165,6 @@ function ControllerComp(props: ControllerProps) {
         max,
         sizingButtons,
         bettingActionButtons,
-        showCardButtons,
         dealInNextHand,
         timeBanks,
         willStraddle,
@@ -534,9 +532,6 @@ function ControllerComp(props: ControllerProps) {
 
             <div className={classes.additionalGamePlayCont}>
                 <div className={classes.additionalGamePlayTopButtons}>
-                    {showCardButtons?.length ? (
-                        <ControllerShowCard showCardButtons={showCardButtons} heroPlayerUUID={heroPlayerUUID} />
-                    ) : null}
                     {isHeroAtTable && allowTimeBanks ? (
                         <Button
                             className={classnames(classes.timeBankButton, 'ani_timeBank')}
