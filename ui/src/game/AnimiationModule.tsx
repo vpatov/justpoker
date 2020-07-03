@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { WsServer } from '../api/ws';
 import { AnimationType, AnimationState, GameplayTrigger } from '../shared/models/state/animationState';
-import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
 
@@ -131,6 +130,13 @@ export function animateTimeBankButton() {
         loop: loops,
         easing: 'linear',
     });
+    const b = anime({
+        targets: [`.ani_timeBank`],
+        duration: 1200,
+        'box-shadow': '0px 0px 0.33vmin 0.24vmin white',
+        easing: 'linear',
+    });
+    return b;
 }
 
 export function animateShowCard(id) {
