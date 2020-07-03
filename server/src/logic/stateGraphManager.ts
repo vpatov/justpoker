@@ -291,7 +291,7 @@ export class StateGraphManager {
             case ClientActionType.BUYCHIPS: {
                 const playerUUID = action.args[0];
                 const chipAmt = action.args[1];
-                this.gameStateManager.buyChipsPlayerAction(playerUUID, chipAmt);
+                this.gamePlayService.buyChipsPlayerAction(playerUUID, chipAmt);
                 break;
             }
         }

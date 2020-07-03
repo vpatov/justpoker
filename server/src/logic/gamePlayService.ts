@@ -21,6 +21,8 @@ import { logger } from '../logger';
 import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
+import { ClientActionType } from '../../../ui/src/shared/models/api/api';
+import { ChatService } from '../state/chatService';
 import { TimerManager } from '../state/timerManager';
 import { Context } from '../state/context';
 import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
@@ -37,6 +39,7 @@ export class GamePlayService {
         private readonly ledgerService: LedgerService,
         private readonly validationService: ValidationService,
         private readonly gameInstanceLogService: GameInstanceLogService,
+        private readonly chatService: ChatService,
         private readonly timerManager: TimerManager,
         private readonly context: Context,
     ) {}
@@ -634,5 +637,36 @@ export class GamePlayService {
 
     savePreviousHandInfo() {
         this.gsm.setPrevBigBlindSeat(this.gsm.getBigBlindSeat());
+    }
+
+    buyChipsPlayerAction(playerUUID: PlayerUUID, numChips: number): void {
+        if (this.gsm.isPlayerInHand(playerUUID)) {
+            this.gsm.queueAction({
+                actionType: ClientActionType.BUYCHIPS,
+                args: [playerUUID, numChips],
+            });
+            this.gsm.setPlayerWillAddChips(playerUUID, numChips);
+        } else {
+            const maxBuyin = this.gsm.getMaxBuyin();
+            const currentStack = this.gsm.getPlayerChips(playerUUID);
+            const resultingChips = currentStack + numChips > maxBuyin ? currentStack : currentStack + numChips;
+            const amountAdded = resultingChips - currentStack;
+            this.gsm.setPlayerChips(playerUUID, resultingChips);
+            if (amountAdded > 0) {
+                this.ledgerService.addBuyin(this.gsm.getClientByPlayerUUID(playerUUID), amountAdded);
+                this.chatService.announcePlayerBuyin(playerUUID, amountAdded);
+            }
+            this.gsm.setPlayerWillAddChips(playerUUID, 0);
+        }
+    }
+
+    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number): void {
+        const originalChips = this.gsm.getPlayerChips(playerUUID);
+        const chipDifference = chipAmt - originalChips;
+        if (chipDifference !== 0) {
+            this.ledgerService.addBuyin(this.gsm.getClientByPlayerUUID(playerUUID), chipDifference);
+            this.chatService.announceAdminAdjustChips(playerUUID, chipAmt, originalChips);
+        }
+        this.gsm.setPlayerChips(playerUUID, chipAmt);
     }
 }
