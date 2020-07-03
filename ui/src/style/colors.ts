@@ -48,7 +48,7 @@ export function getPlayerNameColor(seatNumber: number) {
 
 export const useColoredCardBackgroundStyles =  makeStyles((theme) => ({
     base: {
-        color: '#f2f0ed',
+        color: 'rgb(242, 240, 237)',
     },
     [Suit.HEARTS]: {
         backgroundColor: theme.custom.HEARTS
@@ -66,7 +66,7 @@ export const useColoredCardBackgroundStyles =  makeStyles((theme) => ({
 
 export const useWhiteCardBackgroundStyles =  makeStyles((theme) => ({
     base: {
-        backgroundColor: '#f2f0ed',
+        backgroundColor: 'rgb(242, 240, 237)',
     },
     [Suit.HEARTS]: {
         color: theme.custom.HEARTS
