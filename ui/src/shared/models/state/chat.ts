@@ -1,6 +1,8 @@
-import { PlayerUUID, ClientUUID } from '../system/uuid';
+import { PlayerUUID } from '../system/uuid';
 
+/** Not sensitive */
 export const MAGIC_SERVER_SEAT_NUMBER = 9452;
+export const SERVER_PLAYER_UUID = 'jp-server' as PlayerUUID;
 
 export enum ServerMessageType {
     WELCOME = 'WELCOME',
@@ -15,7 +17,6 @@ export declare interface ChatMessage {
     content: string;
     senderName: string;
     playerUUID: PlayerUUID;
-    clientUUID: ClientUUID;
     seatNumber: number;
 }
 
