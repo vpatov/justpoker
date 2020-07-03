@@ -1,7 +1,6 @@
 import get from 'lodash/get';
 import docCookies from './cookies';
 import queryString, { ParsedQuery } from 'query-string';
-import isEmpty from 'lodash/isEmpty';
 import {
     ClientWsMessage,
     ClientChatMessage,

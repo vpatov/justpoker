@@ -2,13 +2,18 @@ import React, { useEffect } from 'react';
 import { usePrevious } from '../utils';
 import { flipCard } from '../game/AnimiationModule';
 import { generateStringFromRank, SUITS } from '../utils';
+import { useSelector } from 'react-redux';
+import { heroPlayerUUIDSelector } from '../store/selectors';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Suit from '../reuseable/Suit';
 import { Tooltip } from '@material-ui/core';
-import { grey, blueGrey } from '@material-ui/core/colors';
+import { grey } from '@material-ui/core/colors';
+import { PlayerUUID } from '../shared/models/system/uuid';
+import { WsServer } from '../api/ws';
+import { Card } from '../shared/models/game/cards';
 
 const NORMAL_CARD_SIZE = '3.4vmin';
 const SIZE_CARD_SIZE = '2.5vmin';
@@ -25,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
         boxShadow: '0vmin 0px 0.5vmin 0vmin rgba(0,0,0,0.5)',
+        cursor: 'pointer',
     },
     sideCard: {
         margin: '0 -1.5vmin',
@@ -96,12 +102,19 @@ function CardSmall(props) {
     const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero, style } = props;
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
+    const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
 
     useEffect(() => {
         if (!prevIsBeingShown && isBeingShown) {
             flipCard(cardId, hero);
         }
     }, [isBeingShown, prevIsBeingShown]);
+
+    function onClickCard() {
+        if (hero) {
+            WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, [{ suit, rank } as Card]);
+        }
+    }
 
     if (hidden) {
         return (
@@ -124,6 +137,7 @@ function CardSmall(props) {
             })}
             id={cardId}
             style={style}
+            onClick={onClickCard}
         >
             <Typography
                 className={shouldFlex ? classes.sideRank : classes.rank}
