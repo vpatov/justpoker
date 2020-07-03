@@ -74,6 +74,37 @@ export function importAllFromRequire(r) {
     return images;
 }
 
-export const scrollToBottom = (ref) => {
-    (get(ref, 'current') || { scrollIntoView: (_) => null }).scrollIntoView({ behavior: 'smooth' });
-};
+export class ScrollFixer {
+    ref: any;
+    wasScrolledToBottom: boolean;
+    margin: number;
+    constructor(ref: any, margin?: number) {
+        this.ref = ref;
+        this.wasScrolledToBottom = true;
+        this.margin = margin || 5;
+        const el = get(ref, 'current');
+        if (el) {
+            el.onscroll = () => {
+                this.wasScrolledToBottom = this.isScrolledToBottom();
+            };
+        }
+    }
+    attemptScroll() {
+        const el = get(this.ref, 'current');
+        if (el) {
+            // if el is scrolled to bottom, reset scroll to bottom
+            if (this.wasScrolledToBottom) {
+                el.scrollTop = el.scrollHeight - el.clientHeight;
+            }
+            this.wasScrolledToBottom = this.isScrolledToBottom();
+        }
+    }
+
+    isScrolledToBottom() {
+        const el = get(this.ref, 'current');
+        if (el) {
+            return el.scrollHeight - el.clientHeight <= el.scrollTop + this.margin;
+        }
+        return false;
+    }
+}

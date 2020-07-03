@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { UiHandLogEntry, UiCard } from '../shared/models/ui/uiState';
 import { getPlayerNameColor } from '../style/colors';
-import { generateStringFromRank, scrollToBottom } from '../utils';
+import { generateStringFromRank, ScrollFixer } from '../utils';
 import { IconButton, Divider } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
@@ -147,7 +147,7 @@ interface HandLogProps {
     hideChatLog: boolean;
     hideHandLog: boolean;
 }
-
+let scrollFixer;
 function HandLog(props: HandLogProps) {
     const classes = useStyles();
     const { hideChatLog, hideHandLog } = props;
@@ -164,7 +164,13 @@ function HandLog(props: HandLogProps) {
     }, []);
 
     const logRef = useRef(null);
-    useEffect(() => scrollToBottom(logRef), [handLogEntries]);
+    useEffect(() => {
+        if (scrollFixer) {
+            scrollFixer.attemptScroll();
+        } else {
+            scrollFixer = new ScrollFixer(logRef);
+        }
+    }, [handLogEntries]);
 
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]) {
         if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0]) {
@@ -510,10 +516,9 @@ function HandLog(props: HandLogProps) {
 
     return (
         <div className={classes.root} style={displayStyle()}>
-            <div className={classnames(classes.handLogContainer)}>
+            <div className={classnames(classes.handLogContainer)} ref={logRef}>
                 {renderHandLogControls()}
                 {renderHandLogEntry()}
-                <div ref={logRef} />
             </div>
             {!hideChatLog ? renderLogPanelDivider() : null}
         </div>

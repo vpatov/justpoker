@@ -13,7 +13,7 @@ import EmojiPicker from '../reuseable/EmojiPicker';
 import { WsServer } from '../api/ws';
 import { UiChatMessage } from '../shared/models/ui/uiState';
 import { getPlayerNameColor } from '../style/colors';
-import { scrollToBottom } from '../utils';
+import { ScrollFixer } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -125,6 +125,7 @@ interface ChatLogProps {
     setUnreadChats: Setter<boolean>;
 }
 
+let scrollFixer;
 function ChatLog(props: ChatLogProps) {
     const { hideChatLog, hideHandLog, setUnreadChats } = props;
     const classes = useStyles();
@@ -143,8 +144,13 @@ function ChatLog(props: ChatLogProps) {
     }
 
     const messagesRef = useRef(null);
-
-    useEffect(() => scrollToBottom(messagesRef), [chatMessages, hideChatLog]);
+    useEffect(() => {
+        if (scrollFixer) {
+            scrollFixer.attemptScroll();
+        } else {
+            scrollFixer = new ScrollFixer(messagesRef);
+        }
+    }, [chatMessages, hideChatLog]);
 
     function sendMessage() {
         const trimmedMessage = draftChatMessage.trim();
@@ -167,7 +173,7 @@ function ChatLog(props: ChatLogProps) {
 
     function renderChatMessages() {
         return (
-            <div className={classes.chatLogMessages}>
+            <div className={classes.chatLogMessages} ref={messagesRef}>
                 {chatMessages.map((message) => (
                     <Typography key={message.timestamp} className={classes.chatMessage}>
                         <span className={classes.senderName} style={{ color: getPlayerNameColor(message.seatNumber) }}>
@@ -176,7 +182,6 @@ function ChatLog(props: ChatLogProps) {
                         <span className={classes.messageContent}>{message.content}</span>
                     </Typography>
                 ))}
-                <div ref={messagesRef} />
             </div>
         );
     }
