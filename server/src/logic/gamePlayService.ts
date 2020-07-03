@@ -143,6 +143,7 @@ export class GamePlayService {
         const currentPlayerSeatToAct = this.gsm.getCurrentPlayerSeatToAct();
         this.gsm.incrementTimeBanksUsedThisAction();
         this.gsm.decrementTimeBanksLeft(currentPlayerSeatToAct.playerUUID);
+        this.animationService.setPlayerUseTimeBankAnimation(currentPlayerSeatToAct.playerUUID);
     }
 
     /* Betting Round Actions */

@@ -1,9 +1,10 @@
 import { AnimojiKeys } from '../ui/assets';
+import { PlayerUUID } from '../system/uuid';
 
 export declare interface AnimationState {
     animationType: AnimationType;
     trigger?: AnimationTrigger;
-    target?: string;
+    target?: PlayerUUID;
 }
 
 export declare type AnimationTrigger = ReactionTrigger | GameplayTrigger | EmptyTrigger;

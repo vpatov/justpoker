@@ -130,6 +130,7 @@ export enum AnimojiKeys {
     bomb = 'bomb',
     fireworks = 'fireworks',
     hundred_points = 'hundred_points',
+    umbrella_with_rain_drops = 'umbrella_with_rain_drops',
 }
 
 export const AnimojiKeysDefaultRecentlyUsed = [
