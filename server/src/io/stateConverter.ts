@@ -351,23 +351,6 @@ export class StateConverter {
         return menuButtons;
     }
 
-    // TO DEPRICATE
-    // getShowCardButtons(clientUUID: ClientUUID): ShowCardButton[] {
-    //     // condition to allow for possibility of showing cards
-    //     // still might be empty if all cards are shown
-    //     const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-
-    //     if (this.gameStateManager.canPlayerShowCards(heroPlayer.uuid)) {
-    //         const showCardButtons: ShowCardButton[] = [];
-    //         heroPlayer.holeCards.forEach((card) => {
-    //             if (!card.visible) showCardButtons.push({ suit: card.suit, rank: card.rank });
-    //         });
-
-    //         return showCardButtons;
-    //     }
-    //     return [];
-    // }
-
     transformAudioForPlayer(playerUUID: PlayerUUID): SoundByte {
         const audioQueue = this.audioService.getAudioQueue();
         return audioQueue.personal[playerUUID] || audioQueue.global;
