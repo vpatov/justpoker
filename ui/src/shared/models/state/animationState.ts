@@ -20,7 +20,6 @@ export declare type ReactionTrigger = AnimojiKeys;
 
 export enum GameplayTrigger {
     DEAL_CARDS = 'DEAL_CARDS',
-    USE_TIME_BANK = 'USE_TIME_BANK',
 }
 
 export function getCleanAnimationState(): AnimationState {

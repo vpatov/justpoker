@@ -9,6 +9,7 @@ import {
 import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
+import { AnimojiKeys } from '../../../ui/src/shared/models/ui/assets';
 
 @Service()
 export class AnimationService {
@@ -41,9 +42,11 @@ export class AnimationService {
 
     setPlayerUseTimeBankAnimation(playerUUID: PlayerUUID) {
         this.animationState = {
-            animationType: AnimationType.GAMEPLAY,
-            trigger: GameplayTrigger.USE_TIME_BANK,
+            animationType: AnimationType.REACTION,
+            trigger: AnimojiKeys.clock,
+            target: playerUUID,
         };
+        this.gameStateManager.addUpdatedKeys(ServerStateKey.ANIMATION);
     }
 
     reset() {

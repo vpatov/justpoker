@@ -37,21 +37,10 @@ function handleGamePlayAnimation(animationState: AnimationState) {
             dealCards();
             break;
         }
-        case GameplayTrigger.USE_TIME_BANK: {
-            animatePlayerTimeBankUse(animationState.target as PlayerUUID);
-            break;
-        }
     }
 
 }
 
-function animatePlayerTimeBankUse(playerUUID: PlayerUUID){
-    anime({
-        targets: [`.ani_playerUseTimeBank`],
-        duration: 800,
-        easing: 'linear',
-    });
-}
 
 export function flipTable() {
     const animations = [] as any;
