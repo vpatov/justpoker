@@ -1,10 +1,8 @@
 import { useEffect } from 'react';
 import { WsServer } from '../api/ws';
 import { AnimationType, AnimationState, GameplayTrigger } from '../shared/models/state/animationState';
-import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
-import { PlayerUUID } from '../shared/models/system/uuid';
 
 function AnimiationModule(props) {
     useEffect(() => {
@@ -137,14 +135,7 @@ export function animateTimeBankButton() {
         loop: loops,
         easing: 'linear',
     });
-
-    // tried adding this to anime but it didnt work :(
-    // boxShadow: "rgb(235, 255, 215) 0px 0px 5px 3px",
-
 }
-
-// TODO take ticking time animoji and put it on the right side 
-// of the player stack after that player uses a time bank
 
 export function animateShowCard(id) {
     const duration = 1250;
