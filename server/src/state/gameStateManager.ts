@@ -22,13 +22,7 @@ import { getLoggableGameState } from '../../../ui/src/shared/util/util';
 import { ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
-import {
-    Hand,
-    Card,
-    cardsAreEqual,
-    convertHandToCardArray,
-    reformatHandDescription,
-} from '../../../ui/src/shared/models/game/cards';
+import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/game/cards';
 import { AwardPot } from '../../../ui/src/shared/models/ui/uiState';
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, makeBlankUUID, PlayerUUID, generatePlayerUUID } from '../../../ui/src/shared/models/system/uuid';
@@ -1345,7 +1339,7 @@ export class GameStateManager {
     }
 
     getWinningHandDescription(): string | undefined {
-        return this.gameState.winningHand ? reformatHandDescription(this.gameState.winningHand.descr) : undefined;
+        return this.gameState.winningHand?.descr;
     }
 
     setWinningHand(hand: Hand | undefined) {

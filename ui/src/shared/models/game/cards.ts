@@ -245,7 +245,10 @@ export function reformatHandDescription(handDescription: string): string {
     // Straight, 8 High
     let description = handDescription;
     Object.entries(RankAbbrToFullString).forEach(([abbr, fullStr]) => {
-        const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`; // match abbr with flush suit (h|d|s|c) that follows OR match abbr by itself but not if 'ind' follows
+        // match abbr with flush suit (h|d|s|c) that follows OR
+        // match abbr by itself but not if 'ind' follows
+        const regexStr = `${abbr}(h|d|s|c)|${abbr}(?!ind)`;
+
         const regex = new RegExp(regexStr, 'g');
         description = description.replace(regex, fullStr);
     });
