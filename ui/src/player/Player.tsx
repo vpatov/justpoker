@@ -11,7 +11,7 @@ import MoreIcon from '@material-ui/icons/MoreHoriz';
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import PlayerLabel from './PlayerLabel';
-import { IconButton } from '@material-ui/core';
+import { IconButton, Button } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-end',
         filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
         transform: 'translateY(-50%) translateX(-50%)',
+        '&:hover $showAllButton': {
+            opacity: 1,
+        },
     },
     outOfHand: {
         opacity: 0.34,
@@ -54,6 +57,16 @@ const useStyles = makeStyles((theme) => ({
     moreIcon: {
         color: grey[900],
     },
+    showAllButton: {
+        opacity: 0,
+        padding: '0.6vmin 0.4vmin',
+        position: 'absolute',
+        fontSize: '1.4vmin',
+        bottom: '10%',
+        left: '50%',
+        width: '70%',
+        transform: 'translateX(-50%)',
+    },
 }));
 
 function Player(props) {
@@ -69,6 +82,10 @@ function Player(props) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    function showCard() {
+        // WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, [{ suit, rank } as Card]);
+    }
 
     function getPlayerLabelComponent() {
         if (lastAction) {
@@ -107,6 +124,9 @@ function Player(props) {
             <IconButton className={classes.moreButton} onClick={handleClick}>
                 <MoreIcon className={classes.moreIcon} />
             </IconButton>
+            <Button onClick={showCard} variant="contained" className={classes.showAllButton}>
+                Show All Cards
+            </Button>
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>
     );

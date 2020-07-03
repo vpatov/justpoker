@@ -201,6 +201,7 @@ export class WsServer {
                 cards: cards,
             } as ShowCardRequest) as ClientWsMessageRequest,
         };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 
     static sendLeaveTableMessage() {

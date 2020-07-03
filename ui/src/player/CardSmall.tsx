@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Suit from '../reuseable/Suit';
-import { Tooltip } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
 import { PlayerUUID } from '../shared/models/system/uuid';
 import { WsServer } from '../api/ws';
@@ -31,6 +31,12 @@ const useStyles = makeStyles((theme) => ({
         margin: '0 0.5vmin',
         boxShadow: '0vmin 0px 0.5vmin 0vmin rgba(0,0,0,0.5)',
         cursor: 'pointer',
+        '&:hover $showButton': {
+            opacity: 1,
+        },
+        // '&:hover': {
+        //     zIndex: 9,
+        // },
     },
     sideCard: {
         margin: '0 -1.5vmin',
@@ -83,6 +89,22 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '20%',
         fontSize: '3vmin',
     },
+    showButton: {
+        opacity: 0,
+        padding: '0 0.3vmin',
+        position: 'absolute',
+        fontSize: '1.1vmin',
+        top: '30%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 3,
+        width: '72%',
+    },
+
+    showOverlayText: {
+        color: 'black',
+        fontSize: '1.6vmin',
+    },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
     },
@@ -110,7 +132,7 @@ function CardSmall(props) {
         }
     }, [isBeingShown, prevIsBeingShown]);
 
-    function onClickCard() {
+    function showCard() {
         if (hero) {
             WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, [{ suit, rank } as Card]);
         }
@@ -130,32 +152,31 @@ function CardSmall(props) {
     }
 
     const visibleCardComponent = (
-        <div
-            className={classnames(classes.root, classes[suit], className, {
-                ani_notWinningCard: !partOfWinningHand,
-                [classes.sideCard]: shouldFlex,
-            })}
-            id={cardId}
-            style={style}
-            onClick={onClickCard}
-        >
-            <Typography
-                className={shouldFlex ? classes.sideRank : classes.rank}
-                style={rank === 'T' ? { marginLeft: '-0.5%', left: '2%' } : {}}
+        <>
+            <div
+                className={classnames(classes.root, classes[suit], className, {
+                    ani_notWinningCard: !partOfWinningHand,
+                    [classes.sideCard]: shouldFlex,
+                })}
+                id={cardId}
+                style={style}
+                onClick={showCard}
             >
-                {generateStringFromRank(rank)}
-            </Typography>
-            <Suit suit={suit} className={shouldFlex ? classes.sideSuit : classes.suit} />
-        </div>
+                <Button onClick={showCard} variant="contained" className={classes.showButton}>
+                    {isBeingShown ? 'Hide' : 'Show'}
+                </Button>
+
+                <Typography
+                    className={shouldFlex ? classes.sideRank : classes.rank}
+                    style={rank === 'T' ? { marginLeft: '-0.5%', left: '2%' } : {}}
+                >
+                    {generateStringFromRank(rank)}
+                </Typography>
+                <Suit suit={suit} className={shouldFlex ? classes.sideSuit : classes.suit} />
+            </div>
+        </>
     );
 
-    if (isBeingShown && hero) {
-        return (
-            <Tooltip placement="top" title="This card is flipped and is visible to all players.">
-                {visibleCardComponent}
-            </Tooltip>
-        );
-    }
     return visibleCardComponent;
 }
 

@@ -9,7 +9,8 @@ import classnames from 'classnames';
 import TablePositionIndicator from '../table/TablePositionIndicator';
 import PlayerAvatar from './PlayerAvatar';
 import Animoji from '../reuseable/Animoji';
-import { Tooltip } from '@material-ui/core';
+import { Tooltip, Button } from '@material-ui/core';
+import { WsServer } from '../api/ws';
 
 const useStyles = makeStyles((theme) => ({
     stackCont: {
