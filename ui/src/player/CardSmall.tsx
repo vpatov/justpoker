@@ -3,7 +3,7 @@ import { usePrevious } from '../utils';
 import { flipCard } from '../game/AnimiationModule';
 import { generateStringFromRank, SUITS } from '../utils';
 import { useSelector } from 'react-redux';
-import { heroPlayerUUIDSelector, selectCanShowHideCards } from '../store/selectors';
+import { selectCanShowHideCards } from '../store/selectors';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,7 +11,6 @@ import Typography from '@material-ui/core/Typography';
 import Suit from '../reuseable/Suit';
 import { Button } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
-import { PlayerUUID } from '../shared/models/system/uuid';
 import { WsServer } from '../api/ws';
 import { Card } from '../shared/models/game/cards';
 
@@ -124,18 +123,18 @@ function CardSmall(props) {
     const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero, style } = props;
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
-    const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
     const canShowHideCards = useSelector(selectCanShowHideCards);
 
     useEffect(() => {
-        if (!prevIsBeingShown && isBeingShown) {
+        if (canShowHideCards && prevIsBeingShown !== isBeingShown) {
             flipCard(cardId, hero);
         }
     }, [isBeingShown, prevIsBeingShown]);
 
     function showCard() {
         if (hero && canShowHideCards) {
-            WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, [{ suit, rank } as Card]);
+            const cards: Card[] = [{ suit, rank }];
+            isBeingShown ? WsServer.sendHideCardMessage(cards) : WsServer.sendShowCardMessage(cards);
         }
     }
 
@@ -164,7 +163,12 @@ function CardSmall(props) {
                 onClick={showCard}
             >
                 {hero && canShowHideCards ? (
-                    <Button onClick={showCard} variant="contained" className={classes.showButton}>
+                    <Button
+                        onClick={showCard}
+                        variant="contained"
+                        className={classes.showButton}
+                        style={isBeingShown ? { opacity: 1 } : {}}
+                    >
                         {isBeingShown ? 'Hide' : 'Show'}
                     </Button>
                 ) : null}

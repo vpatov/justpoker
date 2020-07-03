@@ -195,9 +195,19 @@ export class EventProcessorService {
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.SHOWCARD]: {
-            validation: (uuid, req) => this.validationService.validateShowCardAction(uuid, req.cards),
-            perform: (uuid, req: ShowCardRequest) =>
-                req.cards.forEach((card) => this.gamePlayService.setPlayerCardVisible(req.playerUUID, card)),
+            validation: (uuid, req) => this.validationService.validateShowHideCardAction(uuid, req.cards),
+            perform: (uuid, req: ShowCardRequest) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                req.cards.forEach((card) => this.gamePlayService.setPlayerCardVisible(player.uuid, card));
+            },
+            updates: [ServerStateKey.GAMESTATE],
+        },
+        [ClientActionType.HIDECARD]: {
+            validation: (uuid, req) => this.validationService.validateShowHideCardAction(uuid, req.cards),
+            perform: (uuid, req: ShowCardRequest) => {
+                const player = this.gameStateManager.getPlayerByClientUUID(uuid);
+                req.cards.forEach((card) => this.gamePlayService.setPlayerCardNotVisible(player.uuid, card));
+            },
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.REACTION]: {

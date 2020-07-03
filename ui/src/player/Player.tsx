@@ -13,7 +13,8 @@ import MoreIcon from '@material-ui/icons/MoreHoriz';
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import PlayerLabel from './PlayerLabel';
-import { IconButton, Button } from '@material-ui/core';
+import { IconButton, Button, Hidden } from '@material-ui/core';
+import { WsServer } from '../api/ws';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -87,8 +88,8 @@ function Player(props) {
         setAnchorEl(null);
     };
 
-    function showCard() {
-        // WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, [{ suit, rank } as Card]);
+    function flipCards() {
+        areAllCardsVisible ? WsServer.sendHideCardMessage(hand.cards) : WsServer.sendShowCardMessage(hand.cards);
     }
 
     function getPlayerLabelComponent() {
@@ -104,7 +105,7 @@ function Player(props) {
     }
 
     const playerLabelComponent = getPlayerLabelComponent();
-
+    const areAllCardsVisible = hand.cards.reduce((acc, card) => acc && card.visible, true);
     return (
         <div
             className={classnames(classes.root, className, {
@@ -129,8 +130,13 @@ function Player(props) {
                 <MoreIcon className={classes.moreIcon} />
             </IconButton>
             {canShowHideCards && hero ? (
-                <Button onClick={showCard} variant="contained" className={classes.showAllButton}>
-                    Show All Cards
+                <Button
+                    onClick={flipCards}
+                    variant="contained"
+                    className={classes.showAllButton}
+                    style={areAllCardsVisible ? { opacity: 1 } : {}}
+                >
+                    {`${areAllCardsVisible ? 'Hide' : 'Show'} All Cards`}
                 </Button>
             ) : null}
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}

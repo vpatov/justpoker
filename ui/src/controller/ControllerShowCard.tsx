@@ -1,9 +1,8 @@
 import React from 'react';
-import { generateStringFromRank, SUITS } from '../utils';
+import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
 
 import { WsServer } from '../api/ws';
-import { ClientActionType, UiActionType, ClientWsMessageRequest, ShowCardRequest } from '../shared/models/api/api';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
@@ -80,7 +79,7 @@ function ControllerShowCard(props: ControllerShowCardProps) {
     }
 
     function sendShowCardRequest(cards: Card[]) {
-        WsServer.sendShowCardMessage(heroPlayerUUID as PlayerUUID, cards);
+        WsServer.sendShowCardMessage(cards);
     }
 
     return (

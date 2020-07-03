@@ -193,11 +193,20 @@ export class WsServer {
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 
-    static sendShowCardMessage(playerUUID: PlayerUUID, cards: Card[]) {
+    static sendShowCardMessage(cards: Card[]) {
         const clientWsMessage: ClientWsMessage = {
             actionType: ClientActionType.SHOWCARD,
             request: ({
-                playerUUID: playerUUID,
+                cards: cards,
+            } as ShowCardRequest) as ClientWsMessageRequest,
+        };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendHideCardMessage(cards: Card[]) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.HIDECARD,
+            request: ({
                 cards: cards,
             } as ShowCardRequest) as ClientWsMessageRequest,
         };

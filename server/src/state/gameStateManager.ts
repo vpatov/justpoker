@@ -1097,23 +1097,23 @@ export class GameStateManager {
         );
     }
 
-    setPlayerCardVisible(playerUUID: PlayerUUID, matchCard: Card) {
+    setPlayerCardVisibility(playerUUID: PlayerUUID, matchCard: Card, visibility: boolean) {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {
             holeCards: player.holeCards.map((holeCard) => {
                 if (cardsAreEqual(holeCard, matchCard)) {
-                    return { ...holeCard, visible: true };
+                    return { ...holeCard, visible: visibility };
                 }
                 return holeCard;
             }),
         });
     }
 
-    setPlayerCardsAllVisible(playerUUID: PlayerUUID) {
+    setPlayerAllCardsVisibility(playerUUID: PlayerUUID, visibility: boolean) {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {
             holeCards: player.holeCards.map((c) => {
-                return { ...c, visible: true };
+                return { ...c, visible: visibility };
             }),
         });
     }

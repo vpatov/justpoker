@@ -480,12 +480,17 @@ export class GamePlayService {
     }
 
     setPlayerCardsAllVisible(playerUUID: PlayerUUID) {
-        this.gsm.setPlayerCardsAllVisible(playerUUID);
+        this.gsm.setPlayerAllCardsVisibility(playerUUID, true);
         this.gameInstanceLogService.updatePlayerCards(playerUUID);
     }
 
     setPlayerCardVisible(playerUUID: PlayerUUID, card: Card) {
-        this.gsm.setPlayerCardVisible(playerUUID, card);
+        this.gsm.setPlayerCardVisibility(playerUUID, card, true);
+        this.gameInstanceLogService.updatePlayerCards(playerUUID);
+    }
+
+    setPlayerCardNotVisible(playerUUID: PlayerUUID, card: Card) {
+        this.gsm.setPlayerCardVisibility(playerUUID, card, false);
         this.gameInstanceLogService.updatePlayerCards(playerUUID);
     }
 
@@ -598,7 +603,7 @@ export class GamePlayService {
     flipCardsIfAllInRunOut() {
         if (this.gsm.isAllInRunOut()) {
             this.gsm.getPlayersInHand().forEach((playerUUID) => {
-                this.gsm.setPlayerCardsAllVisible(playerUUID);
+                this.gsm.setPlayerAllCardsVisibility(playerUUID, true);
             });
         }
     }
