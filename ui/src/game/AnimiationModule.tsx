@@ -4,6 +4,7 @@ import { AnimationType, AnimationState, GameplayTrigger } from '../shared/models
 import grey from '@material-ui/core/colors/grey';
 
 import anime from 'animejs/lib/anime.es.js';
+import { PlayerUUID } from '../shared/models/system/uuid';
 
 function AnimiationModule(props) {
     useEffect(() => {
@@ -31,9 +32,25 @@ function AnimiationModule(props) {
 export default AnimiationModule;
 
 function handleGamePlayAnimation(animationState: AnimationState) {
-    if (animationState.trigger === GameplayTrigger.DEAL_CARDS) {
-        dealCards();
+    switch (animationState.trigger){
+        case GameplayTrigger.DEAL_CARDS: {
+            dealCards();
+            break;
+        }
+        case GameplayTrigger.USE_TIME_BANK: {
+            animatePlayerTimeBankUse(animationState.target as PlayerUUID);
+            break;
+        }
     }
+
+}
+
+function animatePlayerTimeBankUse(playerUUID: PlayerUUID){
+    anime({
+        targets: [`.ani_playerUseTimeBank`],
+        duration: 800,
+        easing: 'linear',
+    });
 }
 
 export function flipTable() {
@@ -123,7 +140,7 @@ export function animateWinningCards() {
 export function animateTimeBankButton() {
     const duration = 350;
     const loops = 4;
-    const angle = 7;
+    const angle = 10;
     const a = anime({
         targets: [`.ani_timeBank`],
         rotate: [angle, 0, -1 * angle, 0],
@@ -131,7 +148,14 @@ export function animateTimeBankButton() {
         loop: loops,
         easing: 'linear',
     });
+
+    // tried adding this to anime but it didnt work :(
+    // boxShadow: "rgb(235, 255, 215) 0px 0px 5px 3px",
+
 }
+
+// TODO take ticking time animoji and put it on the right side 
+// of the player stack after that player uses a time bank
 
 export function animateShowCard(id) {
     const duration = 1250;

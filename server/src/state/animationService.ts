@@ -39,6 +39,13 @@ export class AnimationService {
         };
     }
 
+    setPlayerUseTimeBankAnimation(playerUUID: PlayerUUID) {
+        this.animationState = {
+            animationType: AnimationType.GAMEPLAY,
+            trigger: GameplayTrigger.USE_TIME_BANK,
+        };
+    }
+
     reset() {
         this.animationState = getCleanAnimationState();
     }
