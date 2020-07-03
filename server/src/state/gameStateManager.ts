@@ -419,6 +419,19 @@ export class GameStateManager {
         return this.getTimeToAct() + this.getSumTimeBankValueThisAction();
     }
 
+    getTimeBankReplenishIntervalMinutes() {
+        return this.gameState.gameParameters.timeBankReplenishIntervalMinutes;
+    }
+
+    replenishTimeBanks() {
+        this.forEveryPlayerUUID((playerUUID) => {
+            const player = this.getPlayer(playerUUID);
+            if (player.timeBanksLeft < this.getGameParameters().numberTimeBanks) {
+                player.timeBanksLeft += 1;
+            }
+        });
+    }
+
     getTimeBanksLeft(playerUUID: PlayerUUID): number {
         return this.getPlayer(playerUUID).timeBanksLeft;
     }
@@ -725,7 +738,15 @@ export class GameStateManager {
         return this.getFullPotValue() + this.getPreviousRaise() * 2 - player.betAmount;
     }
 
-    shouldDealNextHand() {
+    getTimeGameStarted(): number {
+        return this.gameState.timeGameStarted;
+    }
+
+    setTimeGameStarted(timeGameStarted: number) {
+        this.gameState.timeGameStarted = timeGameStarted;
+    }
+
+    shouldDealNextHand(): boolean {
         return this.gameState.shouldDealNextHand;
     }
 
@@ -934,10 +955,6 @@ export class GameStateManager {
     }
 
     /* Updaters */
-
-    updateGameParameters(gameParameters: GameParameters) {
-        this.gameState.gameParameters = gameParameters;
-    }
 
     queueAction(queuedServerAction: QueuedServerAction) {
         this.gameState.queuedServerActions.push(queuedServerAction);

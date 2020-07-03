@@ -280,7 +280,7 @@ export class StateGraphManager {
             }
             case ClientActionType.SETGAMEPARAMETERS: {
                 const gameParameters = action.args[0];
-                this.gameStateManager.setGameParameters(gameParameters);
+                this.gamePlayService.setGameParameters(gameParameters);
                 break;
             }
             case ClientActionType.LEAVETABLE: {

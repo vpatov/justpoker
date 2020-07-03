@@ -18,6 +18,8 @@ const welcomeMessage =
     `Welcome to JustPoker ${JP_VERSION}! Check out the menu in the ` +
     `top left to change the app's appearance, and (for admins) to set game parameters. May the suits be with you.`;
 
+const replenishTimeBankMessage = 'Replenishing one time bank for all players.';
+
 @Service()
 export class ChatService {
     chatLog: ChatLog = {
@@ -84,6 +86,8 @@ export class ChatService {
             switch (messageType) {
                 case ServerMessageType.WELCOME:
                     return welcomeMessage;
+                case ServerMessageType.REPLENISH_TIMEBANK:
+                    return replenishTimeBankMessage;
             }
         })(serverMessageType);
 

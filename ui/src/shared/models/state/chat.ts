@@ -4,6 +4,7 @@ export const MAGIC_SERVER_SEAT_NUMBER = 9452;
 
 export enum ServerMessageType {
     WELCOME = 'WELCOME',
+    REPLENISH_TIMEBANK = 'REPLENISH_TIMEBANK',
 }
 
 export declare interface ChatLog {

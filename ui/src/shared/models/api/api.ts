@@ -69,6 +69,7 @@ export enum ServerActionType {
     GAMEPLAY_TIMEOUT = 'TIMEOUT',
     SEND_MESSAGE = 'SEND_MESSAGE',
     WS_CLOSE = 'WS_CLOSE',
+    REPLENISH_TIMEBANK = 'REPLENISH_TIMEBANK',
 }
 
 export enum UiActionType {
@@ -175,6 +176,17 @@ export function createServerMessageEvent(
         actionType: ServerActionType.SEND_MESSAGE,
         gameInstanceUUID,
         serverMessageType,
+    };
+    return {
+        eventType: EventType.SERVER_ACTION,
+        body,
+    };
+}
+
+export function createTimeBankReplenishEvent(gameInstanceUUID: GameInstanceUUID): Event {
+    const body: ServerAction = {
+        actionType: ServerActionType.REPLENISH_TIMEBANK,
+        gameInstanceUUID,
     };
     return {
         eventType: EventType.SERVER_ACTION,
