@@ -252,7 +252,6 @@ export class EventProcessorService {
                 if (player) {
                     this.gameStateManager.setPlayerDisconnected(player.uuid);
                 }
-
                 break;
             }
             case ServerActionType.SEND_MESSAGE: {

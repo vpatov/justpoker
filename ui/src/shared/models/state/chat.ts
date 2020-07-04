@@ -14,6 +14,7 @@ export enum ServerMessageType {
 
 export declare interface ChatLog {
     messages: ChatMessage[];
+    messageTipIndex: number;
 }
 
 export declare interface ChatMessage {
@@ -27,20 +28,15 @@ export declare interface ChatMessage {
 export function getCleanChatLog(): ChatLog {
     return {
         messages: [],
+        messageTipIndex: 0,
     };
 }
-
-
-
 
 export const replenishTimeBankMessage = 'Replenishing one time bank for all players.';
 
 export const welcomeMessageTip =
     `Welcome to JustPoker ${JP_VERSION}! Check out the menu in the ` +
     `top left to change the app's appearance, and (for admins) to set game parameters. May the suits be with you.`;
-
-
-
 
 const showCardsTip =
     'Tip: To show your cards after a hand, mouse-over your cards and ' +
@@ -61,9 +57,17 @@ const avatarTip = 'Bored of your avatar? Try a different one! Bring up the selec
 
 const handLogTip = 'Forgot who raise pre-flop? Check the handlog! Find it in the log panel on the right-hand side.';
 
-const autoBetTip = 'Made up your mind already? You can pre-select the Check, Fold, and Bet '
-+'buttons to immediately perform that aciton when it is your turn.'
+const autoBetTip =
+    'Made up your mind already? You can pre-select the Check, Fold, and Bet ' +
+    'buttons to immediately perform that aciton when it is your turn.';
 
-
-export const ALL_TIPS = [showCardsTip,showCardsHeadsUpTip,ledgerTip,cardBackgroundTip,avatarTip,handLogTip,autoBetTip];
+export const ALL_TIPS = [
+    showCardsTip,
+    showCardsHeadsUpTip,
+    ledgerTip,
+    cardBackgroundTip,
+    avatarTip,
+    handLogTip,
+    autoBetTip,
+];
 shuffle(ALL_TIPS);

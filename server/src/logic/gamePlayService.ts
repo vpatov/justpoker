@@ -21,11 +21,13 @@ import { logger } from '../logger';
 import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
-import { ClientActionType } from '../../../ui/src/shared/models/api/api';
+import { ClientActionType, createServerMessageEvent } from '../../../ui/src/shared/models/api/api';
 import { ChatService } from '../state/chatService';
 import { TimerManager } from '../state/timerManager';
 import { Context } from '../state/context';
 import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
+import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
+import { TIP_MESSAGE_INTERVAL } from '../../../ui/src/shared/util/consts';
 
 @Service()
 export class GamePlayService {
@@ -53,6 +55,7 @@ export class GamePlayService {
         if (this.gsm.getTimeGameStarted() === 0) {
             this.gsm.setTimeGameStarted(getEpochTimeMs());
             this.startTimeBankReplenishTimer();
+            this.startTipMessageTimer();
         }
     }
 
@@ -64,6 +67,16 @@ export class GamePlayService {
         this.timerManager.setTimeBankReplenishInterval(() => {
             this.processEventCallback(createTimeBankReplenishEvent(this.context.getGameInstanceUUID()));
         }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
+    }
+
+    startTipMessageTimer() {
+        this.timerManager.setTipMessageInterval(
+            () =>
+                this.processEventCallback(
+                    createServerMessageEvent(this.context.getGameInstanceUUID(), ServerMessageType.TIP_MESSAGE),
+                ),
+            TIP_MESSAGE_INTERVAL,
+        );
     }
 
     setGameParameters(gameParameters: GameParameters) {

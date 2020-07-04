@@ -24,7 +24,12 @@ export const MAX_VALUES = {
     TIME_BANK_REPLENISH_INTERVAL: Math.pow(10,5),
 };
 
-export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes
-export const ATTEMPT_EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 15; // 15 minutes
+function minutesToMs(minutes: number): number {
+    return 1000 * 60 * minutes;
+}
+
+export const EXPIRE_CLIENT_INTERVAL = minutesToMs(10);
+export const ATTEMPT_EXPIRE_CLIENT_INTERVAL = minutesToMs(15);
+export const TIP_MESSAGE_INTERVAL = minutesToMs(17);
 
 export const WS_NORMAL_CLOSE = 1000;

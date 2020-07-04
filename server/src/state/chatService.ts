@@ -7,6 +7,8 @@ import {
     SERVER_PLAYER_UUID,
     welcomeMessageTip,
     replenishTimeBankMessage,
+    getCleanChatLog,
+    ALL_TIPS,
 } from '../../../ui/src/shared/models/state/chat';
 import { ClientChatMessage } from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from './gameStateManager';
@@ -19,10 +21,7 @@ const changeNameCommandRegEx = /\/name\s(.+)$/;
 const serverChatName = 'Just Poker Server';
 @Service()
 export class ChatService {
-    chatLog: ChatLog = {
-        messages: [],
-    };
-
+    chatLog: ChatLog = getCleanChatLog();
     lastMessage: ChatMessage | null;
 
     constructor(private readonly gameStateManager: GameStateManager) {}
@@ -44,7 +43,14 @@ export class ChatService {
     }
 
     clearMessages() {
-        this.chatLog = { messages: [] };
+        this.chatLog.messages = [];
+    }
+
+    // ALL_TIPS is shuffled at node runtime start.
+    getNextTip(): string {
+        const tip = ALL_TIPS[this.chatLog.messageTipIndex];
+        this.chatLog.messageTipIndex = (this.chatLog.messageTipIndex + 1) % ALL_TIPS.length;
+        return tip;
     }
 
     processChatMessage(clientUUID: ClientUUID, message: ClientChatMessage) {
@@ -95,8 +101,7 @@ export class ChatService {
                 case ServerMessageType.REPLENISH_TIMEBANK:
                     return replenishTimeBankMessage;
                 case ServerMessageType.TIP_MESSAGE:
-                    // TODO get random tip
-                    return '';
+                    return this.getNextTip();
             }
         })(serverMessageType);
 
