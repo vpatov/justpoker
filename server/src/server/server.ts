@@ -29,7 +29,7 @@ import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/sr
 import { GameParameters } from '../../../ui/src/shared/models/game/game';
 import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
-import { Config, getEnvConfig } from '../../../ui/src/shared/models/config/config';
+import { Config, getServerEnvConfig } from '../../../ui/src/shared/models/config/config';
 
 @Service()
 class Server {
@@ -37,7 +37,7 @@ class Server {
     server: http.Server;
     wss: WebSocket.Server;
 
-    config: Config = getEnvConfig();
+    config: Config = getServerEnvConfig();
 
     rootServerDir = process.env.ROOT_SERVER_DIR || '';
 

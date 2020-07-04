@@ -19,7 +19,7 @@ import {
 } from '../shared/models/api/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
-import { Config, getEnvConfig } from '../shared/models/config/config';
+import { Config, getFrontEndEnvConfig } from '../shared/models/config/config';
 import { AvatarKeys } from '../shared/models/ui/assets';
 import { getEpochTimeMs } from '../shared/util/util';
 import { Card } from '../shared/models/game/cards';
@@ -27,7 +27,7 @@ import { Card } from '../shared/models/game/cards';
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
 
-const config: Config = getEnvConfig();
+const config: Config = getFrontEndEnvConfig();
 
 export class WsServer {
     static clientUUID: ClientUUID | null = null;
