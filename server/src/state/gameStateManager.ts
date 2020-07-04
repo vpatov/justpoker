@@ -340,30 +340,6 @@ export class GameStateManager {
         return callAmount;
     }
 
-    buyChipsPlayerAction(playerUUID: PlayerUUID, numChips: number): void {
-        if (this.isPlayerInHand(playerUUID)) {
-            this.queueAction({
-                actionType: ClientActionType.BUYCHIPS,
-                args: [playerUUID, numChips],
-            });
-            this.setPlayerWillAddChips(playerUUID, numChips);
-        } else {
-            const maxBuyin = this.getMaxBuyin();
-            const currentStack = this.getPlayerChips(playerUUID);
-            const resultingChips = currentStack + numChips > maxBuyin ? currentStack : currentStack + numChips;
-            const amountAdded = resultingChips - currentStack;
-            this.setPlayerChips(playerUUID, resultingChips);
-            if (amountAdded > 0) this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), amountAdded);
-            this.setPlayerWillAddChips(playerUUID, 0);
-        }
-    }
-
-    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number): void {
-        const chipDifference = chipAmt - this.getPlayerChips(playerUUID);
-        if (chipDifference !== 0) this.ledgerService.addBuyin(this.getClientByPlayerUUID(playerUUID), chipDifference);
-        this.setPlayerChips(playerUUID, chipAmt);
-    }
-
     subtractBetAmountFromChips(playerUUID: PlayerUUID): void {
         const player = this.getPlayer(playerUUID);
         player.chips -= player.betAmount;
@@ -417,6 +393,19 @@ export class GameStateManager {
 
     getTotalPlayerTimeToAct(): number {
         return this.getTimeToAct() + this.getSumTimeBankValueThisAction();
+    }
+
+    getTimeBankReplenishIntervalMinutes() {
+        return this.gameState.gameParameters.timeBankReplenishIntervalMinutes;
+    }
+
+    replenishTimeBanks() {
+        this.forEveryPlayerUUID((playerUUID) => {
+            const player = this.getPlayer(playerUUID);
+            if (player.timeBanksLeft < this.getGameParameters().numberTimeBanks) {
+                player.timeBanksLeft += 1;
+            }
+        });
     }
 
     getTimeBanksLeft(playerUUID: PlayerUUID): number {
@@ -725,7 +714,15 @@ export class GameStateManager {
         return this.getFullPotValue() + this.getPreviousRaise() * 2 - player.betAmount;
     }
 
-    shouldDealNextHand() {
+    getTimeGameStarted(): number {
+        return this.gameState.timeGameStarted;
+    }
+
+    setTimeGameStarted(timeGameStarted: number) {
+        this.gameState.timeGameStarted = timeGameStarted;
+    }
+
+    shouldDealNextHand(): boolean {
         return this.gameState.shouldDealNextHand;
     }
 
@@ -934,10 +931,6 @@ export class GameStateManager {
     }
 
     /* Updaters */
-
-    updateGameParameters(gameParameters: GameParameters) {
-        this.gameState.gameParameters = gameParameters;
-    }
 
     queueAction(queuedServerAction: QueuedServerAction) {
         this.gameState.queuedServerActions.push(queuedServerAction);

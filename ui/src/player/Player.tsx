@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
         padding: '0.6vmin 0.4vmin',
         position: 'absolute',
         fontSize: '1.4vmin',
-        bottom: '10%',
+        bottom: '9%',
         left: '50%',
         width: '70%',
         transform: 'translateX(-50%)',

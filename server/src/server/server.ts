@@ -75,9 +75,10 @@ class Server {
             const gameParameters: GameParameters = req.body.gameParameters;
             const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
             this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
-            const welcomeMessageEvent = createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME);
             this.timerManager.setMessageAnnouncementTimer(() => {
-                this.eventProcessorService.processEvent(welcomeMessageEvent);
+                this.eventProcessorService.processEvent(
+                    createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
+                );
             }, 30 * 1000);
 
             logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);

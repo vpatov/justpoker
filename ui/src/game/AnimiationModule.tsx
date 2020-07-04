@@ -30,10 +30,15 @@ function AnimiationModule(props) {
 export default AnimiationModule;
 
 function handleGamePlayAnimation(animationState: AnimationState) {
-    if (animationState.trigger === GameplayTrigger.DEAL_CARDS) {
-        dealCards();
+    switch (animationState.trigger){
+        case GameplayTrigger.DEAL_CARDS: {
+            dealCards();
+            break;
+        }
     }
+
 }
+
 
 export function flipTable() {
     const animations = [] as any;
@@ -122,7 +127,7 @@ export function animateWinningCards() {
 export function animateTimeBankButton() {
     const duration = 350;
     const loops = 4;
-    const angle = 7;
+    const angle = 10;
     const a = anime({
         targets: [`.ani_timeBank`],
         rotate: [angle, 0, -1 * angle, 0],

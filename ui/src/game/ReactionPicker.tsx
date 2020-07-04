@@ -66,7 +66,8 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const RECENTLY_USED_REACTIONS_KEY = 'jp-recent-reaction-keys';
+const animoji_options = Object.keys(AnimojiKeys).filter((key, index) => key !== AnimojiKeys.clock);
+const RECENTLY_USED_REACTIONS_KEY = 'jp-recent-reaction-keys-v2';
 
 function ReactionPicker(props) {
     const classes = useStyles();
@@ -106,7 +107,7 @@ function ReactionPicker(props) {
     }
 
     function getPickerOptions() {
-        return Object.keys(AnimojiKeys).map((key, index) => ({
+        return animoji_options.map((key, index) => ({
             icon: <Animoji key={`${key}${index}`} reaction={key} />,
             reaction: key,
         }));

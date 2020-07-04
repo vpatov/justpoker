@@ -21,8 +21,9 @@ declare module '@material-ui/core/styles/createMuiTheme' {
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
     theme: {
-        twoColor: false,
+        twoColor: true,
         backgroundColor: Background.blue,
+        coloredCardBackground: false,
     },
 };
 
@@ -41,18 +42,10 @@ export const ASPECT_RATIO_BREAK_POINT = '(max-aspect-ratio: 4/3)';
 
 export const CUSTOM_THEME = {
     custom: {
-        HEARTS: {
-            backgroundColor: red['A700'],
-        },
-        DIAMONDS: {
-            backgroundColor: indigo[900],
-        },
-        SPADES: {
-            backgroundColor: grey[800],
-        },
-        CLUBS: {
-            backgroundColor: lightGreen[900],
-        },
+        HEARTS:  red['A700'],
+        DIAMONDS:  indigo[900],
+        SPADES:  grey[800],
+        CLUBS:  lightGreen[900],
         BACKGROUND: {
             background: `linear-gradient(360deg, rgba(0,0,0,0.5) 0%,  rgba(0,0,0,0))`,
             backgroundColor: blue[600],

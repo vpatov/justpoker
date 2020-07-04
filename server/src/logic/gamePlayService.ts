@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { GameStateManager } from '../state/gameStateManager';
-import { GameType } from '../../../ui/src/shared/models/game/game';
+import { GameType, GameParameters } from '../../../ui/src/shared/models/game/game';
 
 import { HandSolverService } from '../cards/handSolverService';
 import {
@@ -21,9 +21,16 @@ import { logger } from '../logger';
 import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
+import { ClientActionType } from '../../../ui/src/shared/models/api/api';
+import { ChatService } from '../state/chatService';
+import { TimerManager } from '../state/timerManager';
+import { Context } from '../state/context';
+import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
 
 @Service()
 export class GamePlayService {
+    private processEventCallback: (event: Event) => void;
+
     constructor(
         private readonly gsm: GameStateManager,
         private readonly handSolverService: HandSolverService,
@@ -32,14 +39,39 @@ export class GamePlayService {
         private readonly ledgerService: LedgerService,
         private readonly validationService: ValidationService,
         private readonly gameInstanceLogService: GameInstanceLogService,
+        private readonly chatService: ChatService,
+        private readonly timerManager: TimerManager,
+        private readonly context: Context,
     ) {}
+
+    setProcessEventCallback(fn: (event: Event) => void) {
+        this.processEventCallback = fn;
+    }
 
     startGame() {
         this.gsm.setShouldDealNextHand(true);
+        if (this.gsm.getTimeGameStarted() === 0) {
+            this.gsm.setTimeGameStarted(getEpochTimeMs());
+            this.startTimeBankReplenishTimer();
+        }
     }
 
     stopGame() {
         this.gsm.setShouldDealNextHand(false);
+    }
+
+    startTimeBankReplenishTimer() {
+        this.timerManager.setTimeBankReplenishInterval(() => {
+            this.processEventCallback(createTimeBankReplenishEvent(this.context.getGameInstanceUUID()));
+        }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
+    }
+
+    setGameParameters(gameParameters: GameParameters) {
+        const currentTimeBankReplenishInterval = this.gsm.getTimeBankReplenishIntervalMinutes();
+        this.gsm.setGameParameters(gameParameters);
+        if (gameParameters.timeBankReplenishIntervalMinutes !== currentTimeBankReplenishInterval) {
+            this.startTimeBankReplenishTimer();
+        }
     }
 
     computeAndSetCurrentPlayerToAct() {
@@ -111,6 +143,7 @@ export class GamePlayService {
         const currentPlayerSeatToAct = this.gsm.getCurrentPlayerSeatToAct();
         this.gsm.incrementTimeBanksUsedThisAction();
         this.gsm.decrementTimeBanksLeft(currentPlayerSeatToAct.playerUUID);
+        this.animationService.setPlayerUseTimeBankAnimation(currentPlayerSeatToAct.playerUUID);
     }
 
     /* Betting Round Actions */
@@ -615,5 +648,36 @@ export class GamePlayService {
 
     savePreviousHandInfo() {
         this.gsm.setPrevBigBlindSeat(this.gsm.getBigBlindSeat());
+    }
+
+    buyChipsPlayerAction(playerUUID: PlayerUUID, numChips: number): void {
+        if (this.gsm.isPlayerInHand(playerUUID)) {
+            this.gsm.queueAction({
+                actionType: ClientActionType.BUYCHIPS,
+                args: [playerUUID, numChips],
+            });
+            this.gsm.setPlayerWillAddChips(playerUUID, numChips);
+        } else {
+            const maxBuyin = this.gsm.getMaxBuyin();
+            const currentStack = this.gsm.getPlayerChips(playerUUID);
+            const resultingChips = currentStack + numChips > maxBuyin ? currentStack : currentStack + numChips;
+            const amountAdded = resultingChips - currentStack;
+            this.gsm.setPlayerChips(playerUUID, resultingChips);
+            if (amountAdded > 0) {
+                this.ledgerService.addBuyin(this.gsm.getClientByPlayerUUID(playerUUID), amountAdded);
+                this.chatService.announcePlayerBuyin(playerUUID, amountAdded);
+            }
+            this.gsm.setPlayerWillAddChips(playerUUID, 0);
+        }
+    }
+
+    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number): void {
+        const originalChips = this.gsm.getPlayerChips(playerUUID);
+        const chipDifference = chipAmt - originalChips;
+        if (chipDifference !== 0) {
+            this.ledgerService.addBuyin(this.gsm.getClientByPlayerUUID(playerUUID), chipDifference);
+            this.chatService.announceAdminAdjustChips(playerUUID, chipAmt, originalChips);
+        }
+        this.gsm.setPlayerChips(playerUUID, chipAmt);
     }
 }

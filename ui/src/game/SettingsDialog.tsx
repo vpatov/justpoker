@@ -15,7 +15,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import { Select, MenuItem, Paper, ClickAwayListener } from '@material-ui/core';
+import { Select, MenuItem, Paper, ClickAwayListener, Checkbox } from '@material-ui/core';
 import { Background } from '../style/colors';
 import { ChromePicker } from 'react-color';
 
@@ -39,7 +39,6 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '100%',
             width: '100%',
         },
-
         sample: {
             marginLeft: 'auto',
             height: '2vmin',
@@ -60,17 +59,20 @@ const useStyles = makeStyles((theme: Theme) =>
 function SettingsDialog(props) {
     const classes = useStyles();
     const { open, handleClose } = props;
-    const { curfPrefs, themeSetter } = useContext(ThemeSetter);
-    const [background, setBackground] = useState(curfPrefs.backgroundColor);
-    const [cards, setCards] = React.useState(curfPrefs.twoColor);
+    const { curPrefs: curfPrefs, themeSetter } = useContext(ThemeSetter);
+    const [background, SET_background] = useState(curfPrefs.backgroundColor);
+    const [twoColor, SET_twoColor] = React.useState(curfPrefs.twoColor);
 
     const [showColorPicker, SET_showColorPicker] = React.useState(false);
     const [customColor, SET_customColor] = React.useState('#FFFFFF');
 
+    const [coloredCardBackground, SET_coloredCardBackground] = React.useState(curfPrefs.coloredCardBackground);
+
     function createThemePreferences(): ThemePreferences {
         const prefs = {
-            twoColor: cards,
+            twoColor,
             backgroundColor: background as any,
+            coloredCardBackground,
         };
         return prefs;
     }
@@ -84,7 +86,7 @@ function SettingsDialog(props) {
         SET_showColorPicker(true);
     };
     const onSelectColor = (event) => {
-        setBackground(event.target.value);
+        SET_background(event.target.value);
     };
 
     const renderColorPicker = () => {
@@ -100,7 +102,7 @@ function SettingsDialog(props) {
                         disableAlpha
                         onChange={(color) => {
                             SET_customColor(color.hex);
-                            setBackground(color.hex);
+                            SET_background(color.hex);
                         }}
                     />
                 </Paper>
@@ -117,8 +119,8 @@ function SettingsDialog(props) {
                         <FormLabel>Suit Color</FormLabel>
                         <RadioGroup
                             className={classes.radioGroup}
-                            value={cards}
-                            onChange={(_, v) => setCards(v === 'true')}
+                            value={twoColor}
+                            onChange={(_, v) => SET_twoColor(v === 'true')}
                         >
                             <FormControlLabel value={true} control={<Radio />} label="Two Color" />
                             <FormControlLabel value={false} control={<Radio />} label="Four Color" />
@@ -144,6 +146,18 @@ function SettingsDialog(props) {
                             </MenuItem>
                         </Select>
                     </FormControl>
+                    <FormControlLabel
+                        className={classes.field}
+                        control={
+                            <Checkbox
+                                checked={coloredCardBackground}
+                                onChange={() => SET_coloredCardBackground(!coloredCardBackground)}
+                                name="coloredCardBackgroundCheckbox"
+                                color="secondary"
+                            />
+                        }
+                        label="Colored Cards"
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>

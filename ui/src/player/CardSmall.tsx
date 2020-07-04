@@ -1,18 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { usePrevious } from '../utils';
 import { flipCard, unflipCard } from '../game/AnimiationModule';
-import { generateStringFromRank, SUITS } from '../utils';
 import { useSelector } from 'react-redux';
 import { selectCanShowHideCards } from '../store/selectors';
+import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Suit from '../reuseable/Suit';
-import { Button } from '@material-ui/core';
+import SuitComponent from '../reuseable/Suit';
+import { Suit, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
+import { ThemeSetter } from '../root/App';
+import { useColoredCardBackgroundStyles, useWhiteCardBackgroundStyles } from '../style/colors';
 import { WsServer } from '../api/ws';
-import { Card } from '../shared/models/game/cards';
+import { Button } from '@material-ui/core';
 
 const NORMAL_CARD_SIZE = '3.4vmin';
 const SIZE_CARD_SIZE = '2.5vmin';
@@ -22,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: 6,
         textAlign: 'center',
         position: 'relative',
-        backgroundColor: 'white',
         height: '8.8vmin',
         width: '6.7vmin',
         display: 'flex',
@@ -102,19 +103,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '1.6vmin',
     },
     isBeingShown: {
-        boxShadow: `0 0 0.3vmin 0.2vmin white`,
-    },
-    [SUITS.HEARTS]: {
-        ...theme.custom.HEARTS,
-    },
-    [SUITS.SPADES]: {
-        ...theme.custom.SPADES,
-    },
-    [SUITS.CLUBS]: {
-        ...theme.custom.CLUBS,
-    },
-    [SUITS.DIAMONDS]: {
-        ...theme.custom.DIAMONDS,
+        boxShadow: `0 0 0.3vmin 0.2vmin ${theme.palette.secondary.main}`,
     },
 }));
 
@@ -135,6 +124,14 @@ function CardSmall(props) {
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
     const canShowHideCards = useSelector(selectCanShowHideCards);
+    const coloredCardBackgroundClasses = useColoredCardBackgroundStyles();
+    const whiteCardBackgroundClasses = useWhiteCardBackgroundStyles();
+    const { curPrefs } = useContext(ThemeSetter);
+
+    function getCardBackGroundClasses(suit: Suit) {
+        const cardClasses = curPrefs.coloredCardBackground ? coloredCardBackgroundClasses : whiteCardBackgroundClasses;
+        return [cardClasses.base, cardClasses[suit]];
+    }
 
     useEffect(() => {
         if (canShowHideCards && prevIsBeingShown !== isBeingShown) {
@@ -171,29 +168,34 @@ function CardSmall(props) {
     }
 
     const visibleCardComponent = (
-        <>
-            <div
-                className={classnames(classes.root, classes[suit], className, {
-                    ani_notWinningCard: !partOfWinningHand,
-                    [classes.sideCard]: shouldFlex,
-                    [classes.isBeingShown]: isBeingShown && hero,
-                })}
-                id={cardId}
-                style={style}
-                onClick={showCard}
-            >
-                {hero && canShowHideCards && !(cannotHideCards && isBeingShown) ? (
-                    <Button onClick={showCard} variant="contained" className={classes.showButton}>
-                        {isBeingShown ? 'Hide' : 'Show'}
-                    </Button>
-                ) : null}
+        <div
+            className={classnames(classes.root, ...getCardBackGroundClasses(suit), className, {
+                ani_notWinningCard: !partOfWinningHand,
+                [classes.sideCard]: shouldFlex,
+                [classes.isBeingShown]: isBeingShown && hero,
+            })}
+            id={cardId}
+            style={style}
+            onClick={showCard}
+        >
+            {hero && canShowHideCards && !(cannotHideCards && isBeingShown) ? (
+                <Button onClick={showCard} variant="contained" className={classes.showButton}>
+                    {isBeingShown ? 'Hide' : 'Show'}
+                </Button>
+            ) : null}
 
-                <Typography className={shouldFlex ? classes.sideRank : classes.rank}>
-                    {generateStringFromRank(rank)}
-                </Typography>
-                <Suit suit={suit} className={shouldFlex ? classes.sideSuit : classes.suit} />
-            </div>
-        </>
+            <Typography
+                className={shouldFlex ? classes.sideRank : classes.rank}
+                style={rank === 'T' ? { marginLeft: '-0.5%', left: '2%' } : {}}
+            >
+                {generateStringFromRank(rank)}
+            </Typography>
+            <SuitComponent
+                suit={suit}
+                className={shouldFlex ? classes.sideSuit : classes.suit}
+                color={!curPrefs.coloredCardBackground}
+            />
+        </div>
     );
 
     return visibleCardComponent;

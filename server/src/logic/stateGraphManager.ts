@@ -280,7 +280,7 @@ export class StateGraphManager {
             }
             case ClientActionType.SETGAMEPARAMETERS: {
                 const gameParameters = action.args[0];
-                this.gameStateManager.setGameParameters(gameParameters);
+                this.gamePlayService.setGameParameters(gameParameters);
                 break;
             }
             case ClientActionType.LEAVETABLE: {
@@ -291,7 +291,7 @@ export class StateGraphManager {
             case ClientActionType.BUYCHIPS: {
                 const playerUUID = action.args[0];
                 const chipAmt = action.args[1];
-                this.gameStateManager.buyChipsPlayerAction(playerUUID, chipAmt);
+                this.gamePlayService.buyChipsPlayerAction(playerUUID, chipAmt);
                 break;
             }
         }
