@@ -176,6 +176,7 @@ export declare interface UiPlayer {
     };
     avatarKey: AvatarKeys;
     lastAction?: string;
+    cannotHideCards?: boolean;
 }
 
 export declare interface RatHolePlayer {

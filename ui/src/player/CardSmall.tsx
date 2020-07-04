@@ -33,9 +33,6 @@ const useStyles = makeStyles((theme) => ({
         '&:hover $showButton': {
             opacity: 1,
         },
-        // '&:hover': {
-        //     zIndex: 9,
-        // },
     },
     sideCard: {
         margin: '0 -1.5vmin',
@@ -120,7 +117,18 @@ const useStyles = makeStyles((theme) => ({
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero, style } = props;
+    const {
+        suit,
+        rank,
+        hidden,
+        className,
+        shouldFlex,
+        partOfWinningHand,
+        isBeingShown,
+        hero,
+        style,
+        cannotHideCards,
+    } = props;
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
     const canShowHideCards = useSelector(selectCanShowHideCards);
@@ -162,7 +170,7 @@ function CardSmall(props) {
                 style={style}
                 onClick={showCard}
             >
-                {hero && canShowHideCards ? (
+                {hero && canShowHideCards && !(cannotHideCards && isBeingShown) ? (
                     <Button
                         onClick={showCard}
                         variant="contained"

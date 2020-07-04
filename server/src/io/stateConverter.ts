@@ -456,6 +456,7 @@ export class StateConverter {
             sittingOut: player.sittingOut && !this.gameStateManager.isPlayerInHand(player.uuid),
             admin: this.gameStateManager.isPlayerAdmin(player.uuid),
             lastAction: this.getLastActionString(player.lastActionType),
+            cannotHideCards: player.cannotHideCards,
         };
         return uiPlayer;
     }

@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
 function Player(props) {
     const classes = useStyles();
     const { className, player, style, setHeroRotation, virtualPositon } = props;
-    const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction } = player;
+    const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction, cannotHideCards } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const canShowHideCards = useSelector(selectCanShowHideCards);
 
@@ -123,13 +123,13 @@ function Player(props) {
                 virtualPositon={virtualPositon}
             />
 
-            <Hand hand={hand} folded={folded} hero={hero} />
+            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} />
 
             <PlayerStack player={player} onClickStack={handleClick} />
             <IconButton className={classes.moreButton} onClick={handleClick}>
                 <MoreIcon className={classes.moreIcon} />
             </IconButton>
-            {canShowHideCards && hero ? (
+            {canShowHideCards && hero && !(cannotHideCards && areAllCardsVisible) ? (
                 <Button
                     onClick={flipCards}
                     variant="contained"

@@ -1097,6 +1097,10 @@ export class GameStateManager {
         );
     }
 
+    setPlayerCannotHideCards(playerUUID: PlayerUUID, value: boolean) {
+        this.getPlayer(playerUUID).cannotHideCards = value;
+    }
+
     setPlayerCardVisibility(playerUUID: PlayerUUID, matchCard: Card, visibility: boolean) {
         const player = this.getPlayer(playerUUID);
         this.updatePlayer(playerUUID, {
