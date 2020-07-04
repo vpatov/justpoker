@@ -6,7 +6,7 @@
 
 ## In order to run the container, run:
 ## $ docker run -d justpoker
-FROM node:13.12.0-alpine
+FROM node:12
 
 # set build_env default
 ARG build_env=PROD
