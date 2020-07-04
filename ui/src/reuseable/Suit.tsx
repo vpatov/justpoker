@@ -2,7 +2,6 @@ import React from 'react';
 import classnames from 'classnames';
 import { Suit } from '../shared/models/game/cards';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { grey } from '@material-ui/core/colors';
 import Color from 'color';
 
 const useLightenedStyles = makeStyles((theme: Theme) =>
@@ -11,10 +10,10 @@ const useLightenedStyles = makeStyles((theme: Theme) =>
             fill: Color(theme.custom.HEARTS).lighten(0.7).string(), // needs to be visible on dark
         },
         [Suit.SPADES]: {
-            fill: Color(theme.custom.SPADES).lighten(0.7).string(), // needs to be visible on dark
+            fill: Color(theme.custom.SPADES).lighten(1.3).string(), // needs to be visible on dark
         },
         [Suit.CLUBS]: {
-            fill: Color(theme.custom.CLUBS).lighten(0.7).string(), // needs to be visible on dark
+            fill: Color(theme.custom.CLUBS).lighten(1.3).string(), // needs to be visible on dark
         },
         [Suit.DIAMONDS]: {
             fill: Color(theme.custom.DIAMONDS).lighten(0.7).string(), // needs to be visible on dark
@@ -29,7 +28,7 @@ const useNormalStyles = makeStyles((theme: Theme) =>
             fill: Color(theme.custom.HEARTS).string(),
         },
         [Suit.SPADES]: {
-            fill: Color(theme.custom.SPADES).string(), 
+            fill: Color(theme.custom.SPADES).string(),
         },
         [Suit.CLUBS]: {
             fill: Color(theme.custom.CLUBS).string(),
@@ -43,19 +42,35 @@ const useNormalStyles = makeStyles((theme: Theme) =>
 function SuitIcon(props) {
     const lightenedStyles = useLightenedStyles();
     const normalStyles = useNormalStyles();
-    const { suit, className, color,  lightened} = props;
+    const { suit, className, color, lightened } = props;
 
     function generateStringFromSuit(suit) {
         const classes = lightened ? lightenedStyles : normalStyles;
         switch (suit) {
             case Suit.HEARTS:
-                return <Heart className={classnames( className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
+                return (
+                    <Heart
+                        className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })}
+                    />
+                );
             case Suit.SPADES:
-                return <Spade className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
+                return (
+                    <Spade
+                        className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })}
+                    />
+                );
             case Suit.CLUBS:
-                return <Club className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
+                return (
+                    <Club
+                        className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })}
+                    />
+                );
             case Suit.DIAMONDS:
-                return <Diamond className={classnames( className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })} />;
+                return (
+                    <Diamond
+                        className={classnames(className, { [classes[suit]]: color, [normalStyles.whiteFill]: !color })}
+                    />
+                );
         }
         return null;
     }
