@@ -12,7 +12,7 @@ import Ledger from '../ledger/Ledger';
 import ErrorBoundary from './ErrorBoundry';
 import Color from 'color';
 
-const USER_PREFS_LOCAL_STORAGE_KEY = 'jp-user-prefs';
+const USER_PREFS_LOCAL_STORAGE_KEY = 'jp-user-prefs-v2';
 
 function loadPreferencesIntoTheme(curTheme, prefs: ThemePreferences) {
     const newTheme = cloneDeep(curTheme);

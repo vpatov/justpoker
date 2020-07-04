@@ -11,8 +11,7 @@ export class DeckService {
     }
 
     shuffleDeck(deck: Deck): void {
-        let i,
-            j = 0;
+        let i, j = 0;
         let temp = null;
         const cards = deck.cards;
 

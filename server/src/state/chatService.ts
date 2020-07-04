@@ -5,22 +5,18 @@ import {
     MAGIC_SERVER_SEAT_NUMBER,
     ServerMessageType,
     SERVER_PLAYER_UUID,
+    welcomeMessageTip,
+    replenishTimeBankMessage,
 } from '../../../ui/src/shared/models/state/chat';
 import { ClientChatMessage } from '../../../ui/src/shared/models/api/api';
 import { GameStateManager } from './gameStateManager';
 import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
-import { JP_VERSION } from '../../../ui/src/shared/util/consts';
 
 const changeNameCommandRegEx = /\/name\s(.+)$/;
 
-const welcomeMessage =
-    `Welcome to JustPoker ${JP_VERSION}! Check out the menu in the ` +
-    `top left to change the app's appearance, and (for admins) to set game parameters. May the suits be with you.`;
-
-const replenishTimeBankMessage = 'Replenishing one time bank for all players.';
-
+const serverChatName = 'Just Poker Server';
 @Service()
 export class ChatService {
     chatLog: ChatLog = {
@@ -84,7 +80,7 @@ export class ChatService {
     serverMessageTemplate(): ChatMessage {
         return {
             content: '',
-            senderName: 'Server',
+            senderName: serverChatName,
             seatNumber: MAGIC_SERVER_SEAT_NUMBER,
             timestamp: getEpochTimeMs(),
             playerUUID: SERVER_PLAYER_UUID,
@@ -95,9 +91,12 @@ export class ChatService {
         const content = ((messageType: ServerMessageType) => {
             switch (messageType) {
                 case ServerMessageType.WELCOME:
-                    return welcomeMessage;
+                    return welcomeMessageTip;
                 case ServerMessageType.REPLENISH_TIMEBANK:
                     return replenishTimeBankMessage;
+                case ServerMessageType.TIP_MESSAGE:
+                    // TODO get random tip
+                    return '';
             }
         })(serverMessageType);
 

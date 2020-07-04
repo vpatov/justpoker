@@ -1,6 +1,6 @@
 import { Suit, genRandomCard } from '../game/cards';
 import { ClientActionType, UiActionType } from '../api/api';
-import { genRandomInt } from '../../util/util';
+import { genRandomInt, shuffle } from '../../util/util';
 import { SoundByte } from '../state/audioQueue';
 import { AnimationState, getCleanAnimationState } from '../state/animationState';
 import { UserPreferences } from './userPreferences';
@@ -415,16 +415,7 @@ export const testUiChatLog: UiChatLog = {
     ],
 };
 
-function shuffle(a: any) {
-    let j, x, i;
-    for (i = a.length - 1; i > 0; i--) {
-        j = Math.floor(Math.random() * (i + 1));
-        x = a[i];
-        a[i] = a[j];
-        a[j] = x;
-    }
-    return a;
-}
+
 
 const positions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 shuffle(positions);
