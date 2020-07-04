@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { usePrevious } from '../utils';
-import { flipCard } from '../game/AnimiationModule';
+import { flipCard, unflipCard } from '../game/AnimiationModule';
 import { generateStringFromRank, SUITS } from '../utils';
 import { useSelector } from 'react-redux';
 import { selectCanShowHideCards } from '../store/selectors';
@@ -101,6 +101,9 @@ const useStyles = makeStyles((theme) => ({
         color: 'black',
         fontSize: '1.6vmin',
     },
+    isBeingShown: {
+        boxShadow: `0 0 0.3vmin 0.2vmin white`,
+    },
     [SUITS.HEARTS]: {
         ...theme.custom.HEARTS,
     },
@@ -135,7 +138,11 @@ function CardSmall(props) {
 
     useEffect(() => {
         if (canShowHideCards && prevIsBeingShown !== isBeingShown) {
-            flipCard(cardId, hero);
+            if (isBeingShown) {
+                flipCard(cardId, hero);
+            } else {
+                unflipCard(cardId, hero);
+            }
         }
     }, [isBeingShown, prevIsBeingShown]);
 
@@ -165,26 +172,19 @@ function CardSmall(props) {
                 className={classnames(classes.root, classes[suit], className, {
                     ani_notWinningCard: !partOfWinningHand,
                     [classes.sideCard]: shouldFlex,
+                    [classes.isBeingShown]: isBeingShown && hero,
                 })}
                 id={cardId}
                 style={style}
                 onClick={showCard}
             >
                 {hero && canShowHideCards && !(cannotHideCards && isBeingShown) ? (
-                    <Button
-                        onClick={showCard}
-                        variant="contained"
-                        className={classes.showButton}
-                        style={isBeingShown ? { opacity: 1 } : {}}
-                    >
+                    <Button onClick={showCard} variant="contained" className={classes.showButton}>
                         {isBeingShown ? 'Hide' : 'Show'}
                     </Button>
                 ) : null}
 
-                <Typography
-                    className={shouldFlex ? classes.sideRank : classes.rank}
-                    style={rank === 'T' ? { marginLeft: '-0.5%', left: '2%' } : {}}
-                >
+                <Typography className={shouldFlex ? classes.sideRank : classes.rank}>
                     {generateStringFromRank(rank)}
                 </Typography>
                 <Suit suit={suit} className={shouldFlex ? classes.sideSuit : classes.suit} />

@@ -152,12 +152,19 @@ export function animateShowCard(id) {
 }
 
 export function flipCard(id, hero) {
-    const duration = 300;
-
     const a = anime({
         targets: [`#${id}`],
         rotateY: [-180, 0],
-        // translateY: hero ? '-2.4vmin' : '0',
+        translateY: hero ? '-1.3vmin' : '0',
+        easing: 'easeOutExpo',
+    });
+}
+
+export function unflipCard(id, hero) {
+    const b = anime({
+        targets: [`#${id}`],
+        rotateY: [-180, 0],
+        translateY: '0',
         easing: 'easeOutExpo',
     });
 }

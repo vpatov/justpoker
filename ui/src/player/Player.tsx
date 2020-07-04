@@ -130,12 +130,7 @@ function Player(props) {
                 <MoreIcon className={classes.moreIcon} />
             </IconButton>
             {canShowHideCards && hero && !(cannotHideCards && areAllCardsVisible) ? (
-                <Button
-                    onClick={flipCards}
-                    variant="contained"
-                    className={classes.showAllButton}
-                    style={areAllCardsVisible ? { opacity: 1 } : {}}
-                >
+                <Button onClick={flipCards} variant="contained" className={classes.showAllButton}>
                     {`${areAllCardsVisible ? 'Hide' : 'Show'} All Cards`}
                 </Button>
             ) : null}
