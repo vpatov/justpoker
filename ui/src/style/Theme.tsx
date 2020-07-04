@@ -42,10 +42,10 @@ export const ASPECT_RATIO_BREAK_POINT = '(max-aspect-ratio: 4/3)';
 
 export const CUSTOM_THEME = {
     custom: {
-        HEARTS:  red['A700'],
-        DIAMONDS:  indigo[900],
-        SPADES:  grey[800],
-        CLUBS:  lightGreen[900],
+        HEARTS: red['A700'],
+        DIAMONDS: indigo[900],
+        SPADES: grey[900],
+        CLUBS: lightGreen[900],
         BACKGROUND: {
             background: `linear-gradient(360deg, rgba(0,0,0,0.5) 0%,  rgba(0,0,0,0))`,
             backgroundColor: blue[600],

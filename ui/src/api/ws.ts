@@ -1,7 +1,6 @@
 import get from 'lodash/get';
 import docCookies from './cookies';
 import queryString, { ParsedQuery } from 'query-string';
-import isEmpty from 'lodash/isEmpty';
 import {
     ClientWsMessage,
     ClientChatMessage,
@@ -16,12 +15,14 @@ import {
     BuyChipsRequest,
     SeatChangeRequest,
     ChangeAvatarRequest,
+    ShowCardRequest,
 } from '../shared/models/api/api';
 import { ClientUUID, GameInstanceUUID, PlayerUUID } from '../shared/models/system/uuid';
 
 import { Config, getEnvConfig } from '../shared/models/config/config';
 import { AvatarKeys } from '../shared/models/ui/assets';
 import { getEpochTimeMs } from '../shared/util/util';
+import { Card } from '../shared/models/game/cards';
 
 const clientUUIDCookieID = 'jp-client-uuid';
 const ONE_DAY = 60 * 60 * 24;
@@ -189,6 +190,26 @@ export class WsServer {
             request: ({ playerUUID, avatarKey } as ChangeAvatarRequest) as ClientWsMessageRequest,
         };
 
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendShowCardMessage(cards: Card[]) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.SHOWCARD,
+            request: ({
+                cards: cards,
+            } as ShowCardRequest) as ClientWsMessageRequest,
+        };
+        WsServer.ws.send(JSON.stringify(clientWsMessage));
+    }
+
+    static sendHideCardMessage(cards: Card[]) {
+        const clientWsMessage: ClientWsMessage = {
+            actionType: ClientActionType.HIDECARD,
+            request: ({
+                cards: cards,
+            } as ShowCardRequest) as ClientWsMessageRequest,
+        };
         WsServer.ws.send(JSON.stringify(clientWsMessage));
     }
 

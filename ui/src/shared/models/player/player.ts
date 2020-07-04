@@ -72,6 +72,9 @@ export declare interface Player {
 
     /** The amount of chips that will be added to player's stack after hand. */
     willAddChips: number;
+
+    /** Player cannot hide their cards. */
+    cannotHideCards: boolean;
 }
 
 /* Represents the partial of Player that is cleared after every hand. */
@@ -84,6 +87,7 @@ export function getPlayerCleanHandDefaults(): Partial<Player> {
         betAmount: 0,
         chipDelta: 0,
         chipsAtStartOfHand: 0,
+        cannotHideCards: false,
     };
 }
 
@@ -122,5 +126,6 @@ export function getCleanPlayer(): Player {
         timeBanksLeft: 0,
         avatarKey: AvatarKeys.shark,
         willAddChips: 0,
+        cannotHideCards: false,
     };
 }

@@ -39,7 +39,6 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '100%',
             width: '100%',
         },
-
         sample: {
             marginLeft: 'auto',
             height: '2vmin',
@@ -53,11 +52,6 @@ const useStyles = makeStyles((theme: Theme) =>
             left: '50%',
             transform: 'translate(-50%, -50%)',
             position: 'absolute',
-        },
-        checkbox: {
-            height: '2vmin',
-            width: '2vmin',
-            margin: 'auto auto',
         },
     }),
 );
@@ -152,18 +146,18 @@ function SettingsDialog(props) {
                             </MenuItem>
                         </Select>
                     </FormControl>
-                    <FormControl>
-                        <FormLabel>
-                            Colored Card Background?
-                        </FormLabel>
-                        <Checkbox
-                            className={classes.checkbox}
-                            checked={coloredCardBackground}
-                            onChange={() => SET_coloredCardBackground(!coloredCardBackground)}
-                            name="coloredCardBackgroundCheckbox"
-                            color="primary"
-                        />
-                    </FormControl>
+                    <FormControlLabel
+                        className={classes.field}
+                        control={
+                            <Checkbox
+                                checked={coloredCardBackground}
+                                onChange={() => SET_coloredCardBackground(!coloredCardBackground)}
+                                name="coloredCardBackgroundCheckbox"
+                                color="secondary"
+                            />
+                        }
+                        label="Colored Cards"
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>

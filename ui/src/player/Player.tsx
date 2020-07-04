@@ -3,6 +3,8 @@ import classnames from 'classnames';
 
 import Hand from './Hand';
 import PlayerStack from './PlayerStack';
+import { useSelector } from 'react-redux';
+import { heroPlayerUUIDSelector, selectCanShowHideCards } from '../store/selectors';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import grey from '@material-ui/core/colors/grey';
@@ -11,7 +13,8 @@ import MoreIcon from '@material-ui/icons/MoreHoriz';
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import PlayerLabel from './PlayerLabel';
-import { IconButton } from '@material-ui/core';
+import { IconButton, Button, Hidden } from '@material-ui/core';
+import { WsServer } from '../api/ws';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,6 +25,9 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-end',
         filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
         transform: 'translateY(-50%) translateX(-50%)',
+        '&:hover $showAllButton': {
+            opacity: 1,
+        },
     },
     outOfHand: {
         opacity: 0.34,
@@ -54,13 +60,25 @@ const useStyles = makeStyles((theme) => ({
     moreIcon: {
         color: grey[900],
     },
+    showAllButton: {
+        opacity: 0,
+        padding: '0.6vmin 0.4vmin',
+        position: 'absolute',
+        fontSize: '1.4vmin',
+        bottom: '9%',
+        left: '50%',
+        width: '70%',
+        transform: 'translateX(-50%)',
+    },
 }));
 
 function Player(props) {
     const classes = useStyles();
     const { className, player, style, setHeroRotation, virtualPositon } = props;
-    const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction } = player;
+    const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction, cannotHideCards } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const canShowHideCards = useSelector(selectCanShowHideCards);
+
     const handleClick = (event: any) => {
         event.preventDefault();
         setAnchorEl(event.currentTarget as any);
@@ -69,6 +87,10 @@ function Player(props) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    function flipCards() {
+        areAllCardsVisible ? WsServer.sendHideCardMessage(hand.cards) : WsServer.sendShowCardMessage(hand.cards);
+    }
 
     function getPlayerLabelComponent() {
         if (lastAction) {
@@ -83,7 +105,7 @@ function Player(props) {
     }
 
     const playerLabelComponent = getPlayerLabelComponent();
-
+    const areAllCardsVisible = hand.cards.reduce((acc, card) => acc && card.visible, true);
     return (
         <div
             className={classnames(classes.root, className, {
@@ -101,12 +123,17 @@ function Player(props) {
                 virtualPositon={virtualPositon}
             />
 
-            <Hand hand={hand} folded={folded} hero={hero} />
+            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} />
 
             <PlayerStack player={player} onClickStack={handleClick} />
             <IconButton className={classes.moreButton} onClick={handleClick}>
                 <MoreIcon className={classes.moreIcon} />
             </IconButton>
+            {canShowHideCards && hero && !(cannotHideCards && areAllCardsVisible) ? (
+                <Button onClick={flipCards} variant="contained" className={classes.showAllButton}>
+                    {`${areAllCardsVisible ? 'Hide' : 'Show'} All Cards`}
+                </Button>
+            ) : null}
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
         </div>
     );

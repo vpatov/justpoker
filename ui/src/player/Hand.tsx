@@ -17,10 +17,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const TILT = 40;
 function Hand(props) {
     const classes = useStyles();
-    const { hand, hero, className } = props;
+    const { hand, hero, className, cannotHideCards } = props;
     const { cards } = hand;
 
     const shouldRotate = hero && cards.length === 4;
@@ -29,6 +28,7 @@ function Hand(props) {
             {cards.map((c, i) => (
                 <CardSmall
                     {...c}
+                    cannotHideCards={cannotHideCards}
                     size="small"
                     className={`ani_playerCard_${i}`}
                     shouldFlex={cards.length > 2}

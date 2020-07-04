@@ -32,3 +32,4 @@ export const isHeroAdminSelector = (gs: UiGameState): boolean => gs.global.heroI
 export const selectMenuButtons = (gs: UiGameState): MenuButton[] => gs.menu;
 export const selectGameParameters = (gs: UiGameState): GameParameters => gs.gameParameters;
 export const heroPlayerSelector = (gs: UiGameState): UiPlayer | undefined => gs.players.find((p) => p.hero);
+export const selectCanShowHideCards = (gs: UiGameState): boolean => gs.global.canShowHideCards;

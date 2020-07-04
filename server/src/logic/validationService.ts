@@ -340,7 +340,7 @@ export class ValidationService {
         }
     }
 
-    validateShowCardAction(clientUUID: ClientUUID, cards: Card[]): ValidationResponse {
+    validateShowHideCardAction(clientUUID: ClientUUID, cards: Card[]): ValidationResponse {
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) {
             return error;

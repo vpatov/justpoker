@@ -72,6 +72,7 @@ export declare interface Global {
     heroTotalChips: number;
     numberOfSpectators: number;
     willAddChips?: number;
+    canShowHideCards: boolean;
 }
 
 export declare interface Controller {
@@ -80,7 +81,6 @@ export declare interface Controller {
     timeBanks: number;
     sizingButtons: SizingButton[];
     bettingActionButtons: BettingActionButtons;
-    showCardButtons?: ShowCardButton[];
     dealInNextHand: boolean;
     toAct?: boolean;
     willStraddle: boolean;
@@ -176,6 +176,7 @@ export declare interface UiPlayer {
     };
     avatarKey: AvatarKeys;
     lastAction?: string;
+    cannotHideCards?: boolean;
 }
 
 export declare interface RatHolePlayer {
@@ -351,6 +352,7 @@ export function getCleanGlobal(): Global {
         isHeroAtTable: false,
         numberOfSpectators: 0,
         isHeroInHand: false,
+        canShowHideCards: false,
     };
 }
 
@@ -466,6 +468,7 @@ export const TestGame: UiGameState = {
         numberOfSpectators: 4,
         willAddChips: 1430,
         isHeroInHand: true,
+        canShowHideCards: true,
     },
     controller: {
         showWarningOnFold: true,
@@ -477,12 +480,6 @@ export const TestGame: UiGameState = {
         timeBanks: 11,
         dealInNextHand: false,
         playerPositionString: 'Hijack',
-        showCardButtons: [
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-            { rank: genRandomCard().rank, suit: genRandomCard().suit },
-        ],
         willStraddle: true,
         sizingButtons: [
             {

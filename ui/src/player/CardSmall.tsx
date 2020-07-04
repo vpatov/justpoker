@@ -1,17 +1,20 @@
 import React, { useEffect, useContext } from 'react';
 import { usePrevious } from '../utils';
-import { flipCard } from '../game/AnimiationModule';
+import { flipCard, unflipCard } from '../game/AnimiationModule';
+import { useSelector } from 'react-redux';
+import { selectCanShowHideCards } from '../store/selectors';
 import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import SuitComponent from '../reuseable/Suit';
-import {Suit} from '../shared/models/game/cards';
-import { Tooltip } from '@material-ui/core';
+import { Suit, Card } from '../shared/models/game/cards';
 import { grey } from '@material-ui/core/colors';
 import { ThemeSetter } from '../root/App';
 import { useColoredCardBackgroundStyles, useWhiteCardBackgroundStyles } from '../style/colors';
+import { WsServer } from '../api/ws';
+import { Button } from '@material-ui/core';
 
 const NORMAL_CARD_SIZE = '3.4vmin';
 const SIZE_CARD_SIZE = '2.5vmin';
@@ -27,6 +30,10 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
         boxShadow: '0vmin 0px 0.5vmin 0vmin rgba(0,0,0,0.5)',
+        cursor: 'pointer',
+        '&:hover $showButton': {
+            opacity: 1,
+        },
     },
     sideCard: {
         margin: '0 -1.5vmin',
@@ -79,38 +86,78 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: '20%',
         fontSize: '3vmin',
     },
+    showButton: {
+        opacity: 0,
+        padding: '0 0.3vmin',
+        position: 'absolute',
+        fontSize: '1.1vmin',
+        top: '30%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 3,
+        width: '72%',
+    },
+
+    showOverlayText: {
+        color: 'black',
+        fontSize: '1.6vmin',
+    },
+    isBeingShown: {
+        boxShadow: `0 0 0.3vmin 0.2vmin ${theme.palette.secondary.main}`,
+    },
 }));
 
 function CardSmall(props) {
     const classes = useStyles();
-    const { suit, rank, hidden, className, shouldFlex, partOfWinningHand, isBeingShown, hero, style } = props;
+    const {
+        suit,
+        rank,
+        hidden,
+        className,
+        shouldFlex,
+        partOfWinningHand,
+        isBeingShown,
+        hero,
+        style,
+        cannotHideCards,
+    } = props;
     const cardId = `${suit}-${rank}`;
     const prevIsBeingShown = usePrevious(isBeingShown);
+    const canShowHideCards = useSelector(selectCanShowHideCards);
     const coloredCardBackgroundClasses = useColoredCardBackgroundStyles();
     const whiteCardBackgroundClasses = useWhiteCardBackgroundStyles();
     const { curPrefs } = useContext(ThemeSetter);
 
-    function getCardBackGroundClasses(suit: Suit){
-        const cardClasses = curPrefs.coloredCardBackground ? 
-            coloredCardBackgroundClasses : 
-            whiteCardBackgroundClasses;
+    function getCardBackGroundClasses(suit: Suit) {
+        const cardClasses = curPrefs.coloredCardBackground ? coloredCardBackgroundClasses : whiteCardBackgroundClasses;
         return [cardClasses.base, cardClasses[suit]];
     }
 
     useEffect(() => {
-        if (!prevIsBeingShown && isBeingShown) {
-            flipCard(cardId, hero);
+        if (canShowHideCards && prevIsBeingShown !== isBeingShown) {
+            if (isBeingShown) {
+                flipCard(cardId, hero);
+            } else {
+                unflipCard(cardId, hero);
+            }
         }
     }, [isBeingShown, prevIsBeingShown]);
+
+    function showCard() {
+        if (hero && canShowHideCards) {
+            const cards: Card[] = [{ suit, rank }];
+            if (isBeingShown) {
+                if (!cannotHideCards) WsServer.sendHideCardMessage(cards);
+            } else {
+                WsServer.sendShowCardMessage(cards);
+            }
+        }
+    }
 
     if (hidden) {
         return (
             <div
-                className={classnames(
-                    classes.root, 
-                    classes.hidden, 
-                    { [classes.sideCard]: shouldFlex }, 
-                    className)}
+                className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}
                 style={style}
             >
                 <Typography className={classnames(classes.hiddenText, { [classes.sideTextHidden]: shouldFlex })}>
@@ -122,18 +169,21 @@ function CardSmall(props) {
 
     const visibleCardComponent = (
         <div
-            className={classnames(
-                    classes.root, 
-                    ...getCardBackGroundClasses(suit), 
-                    className, 
-                    {
-                        ani_notWinningCard: !partOfWinningHand,
-                        [classes.sideCard]: shouldFlex,
-                    }
-            )}
+            className={classnames(classes.root, ...getCardBackGroundClasses(suit), className, {
+                ani_notWinningCard: !partOfWinningHand,
+                [classes.sideCard]: shouldFlex,
+                [classes.isBeingShown]: isBeingShown && hero,
+            })}
             id={cardId}
             style={style}
+            onClick={showCard}
         >
+            {hero && canShowHideCards && !(cannotHideCards && isBeingShown) ? (
+                <Button onClick={showCard} variant="contained" className={classes.showButton}>
+                    {isBeingShown ? 'Hide' : 'Show'}
+                </Button>
+            ) : null}
+
             <Typography
                 className={shouldFlex ? classes.sideRank : classes.rank}
                 style={rank === 'T' ? { marginLeft: '-0.5%', left: '2%' } : {}}
@@ -148,13 +198,6 @@ function CardSmall(props) {
         </div>
     );
 
-    if (isBeingShown && hero) {
-        return (
-            <Tooltip placement="top" title="This card is flipped and is visible to all players.">
-                {visibleCardComponent}
-            </Tooltip>
-        );
-    }
     return visibleCardComponent;
 }
 

@@ -465,7 +465,10 @@ export class GamePlayService {
         // show cards
         if (!this.gsm.hasEveryoneButOnePlayerFolded()) {
             // always show winning players hands
-            winningPlayers.map((wp) => this.setPlayerCardsAllVisible(wp));
+            winningPlayers.map((wp) => {
+                this.setPlayerCardsAllVisible(wp);
+                this.gsm.setPlayerCannotHideCards(wp, true);
+            });
 
             // show banner for winning hands, any winning hand will do
             this.gsm.setWinningHand(winningHands[0]);
@@ -488,6 +491,7 @@ export class GamePlayService {
                 const [currentPlayerUUID, currentPlayerHand] = eligiblePlayers[i % eligiblePlayers.length];
                 if (this.handSolverService.compareHands(handToBeatUUID, currentPlayerHand) <= 0) {
                     this.setPlayerCardsAllVisible(currentPlayerUUID);
+                    this.gsm.setPlayerCannotHideCards(currentPlayerUUID, true);
                     [playerToBeatUUID, handToBeatUUID] = [currentPlayerUUID, currentPlayerHand];
                 }
                 this.gameInstanceLogService.addPlayerHandToPotSummary(currentPlayerUUID, currentPlayerHand.descr);
@@ -513,12 +517,17 @@ export class GamePlayService {
     }
 
     setPlayerCardsAllVisible(playerUUID: PlayerUUID) {
-        this.gsm.setPlayerCardsAllVisible(playerUUID);
+        this.gsm.setPlayerAllCardsVisibility(playerUUID, true);
         this.gameInstanceLogService.updatePlayerCards(playerUUID);
     }
 
     setPlayerCardVisible(playerUUID: PlayerUUID, card: Card) {
-        this.gsm.setPlayerCardVisible(playerUUID, card);
+        this.gsm.setPlayerCardVisibility(playerUUID, card, true);
+        this.gameInstanceLogService.updatePlayerCards(playerUUID);
+    }
+
+    setPlayerCardNotVisible(playerUUID: PlayerUUID, card: Card) {
+        this.gsm.setPlayerCardVisibility(playerUUID, card, false);
         this.gameInstanceLogService.updatePlayerCards(playerUUID);
     }
 
@@ -631,7 +640,8 @@ export class GamePlayService {
     flipCardsIfAllInRunOut() {
         if (this.gsm.isAllInRunOut()) {
             this.gsm.getPlayersInHand().forEach((playerUUID) => {
-                this.gsm.setPlayerCardsAllVisible(playerUUID);
+                this.gsm.setPlayerAllCardsVisibility(playerUUID, true);
+                this.gsm.setPlayerCannotHideCards(playerUUID, true);
             });
         }
     }
