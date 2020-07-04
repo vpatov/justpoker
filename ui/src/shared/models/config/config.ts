@@ -34,6 +34,10 @@ export const CONFIGS: Configs = {
     },
 };
 
-export function getEnvConfig(): Config {
+export function getServerEnvConfig(): Config {
     return process.env.NODE_SERVER_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
+}
+
+export function getFrontEndEnvConfig(): Config {
+    return process.env.REACT_APP_ENVIRONMENT === ENVIRONMENT.PROD ? CONFIGS.PROD : CONFIGS.DEV;
 }
