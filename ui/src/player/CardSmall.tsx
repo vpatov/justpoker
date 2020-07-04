@@ -149,7 +149,11 @@ function CardSmall(props) {
     function showCard() {
         if (hero && canShowHideCards) {
             const cards: Card[] = [{ suit, rank }];
-            isBeingShown ? WsServer.sendHideCardMessage(cards) : WsServer.sendShowCardMessage(cards);
+            if (isBeingShown) {
+                if (!cannotHideCards) WsServer.sendHideCardMessage(cards);
+            } else {
+                WsServer.sendShowCardMessage(cards);
+            }
         }
     }
 

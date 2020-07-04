@@ -155,7 +155,7 @@ export function flipCard(id, hero) {
     const a = anime({
         targets: [`#${id}`],
         rotateY: [-180, 0],
-        translateY: hero ? '-1.3vmin' : '0',
+        translateY: hero ? '-1.1vmin' : '0',
         easing: 'easeOutExpo',
     });
 }
