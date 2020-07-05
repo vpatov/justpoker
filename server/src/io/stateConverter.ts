@@ -169,7 +169,7 @@ export class StateConverter {
             adminNames: this.gameStateManager
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
-            heroTotalChips: heroPlayer?.chips,
+            heroTotalChips: heroPlayer?.chips || 0,
             willAddChips: heroPlayer?.willAddChips,
             isHeroInHand: heroPlayer?.uuid ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
             canShowHideCards: heroPlayer?.uuid ? this.gameStateManager.canPlayerShowCards(heroPlayer?.uuid) : false,

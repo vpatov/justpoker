@@ -1,51 +1,43 @@
 import React from 'react';
-import classnames from 'classnames';
+import { useSelector } from 'react-redux';
+import { controllerSelector, heroHandLabelSelector, globalGameStateSelector } from '../store/selectors';
 
+import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { Typography, Tooltip } from '@material-ui/core';
-import { Global, UiPlayer, Controller } from '../shared/models/ui/uiState';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
+
+const fontSize = '1.8vmin';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         handLabel: {
-            fontSize: '1.8vmin',
+            fontSize: fontSize,
             color: theme.palette.primary.main,
         },
         totalChips: {
-            fontSize: '1.8vmin',
+            fontSize: fontSize,
             color: theme.palette.primary.main,
         },
         handLabelSmaller: {
             fontSize: '1.5vmin',
         },
         playerPositonString: {
-            fontSize: '1.8vmin',
-            color: theme.palette.primary.main,
-        },
-        toActLabel: {
-            fontSize: '1.8vmin',
-            color: theme.palette.primary.main,
-            animation: '$blinking 1.3s linear infinite;',
+            fontSize: fontSize,
+            color: theme.palette.secondary.main,
         },
     }),
 );
 
-// define props in terms of source interfaces
-interface ControllerGameInfoProps {
-    isHeroAtTable: Global['isHeroAtTable'];
-    heroHandLabel: UiPlayer['handLabel'];
-    heroTotalChips: Global['heroTotalChips'];
-    playerPositionString: Controller['playerPositionString'];
-    rootClassName: string;
-}
-
-function ControllerGameInfo(props: ControllerGameInfoProps) {
+function ControllerGameInfo(props) {
     const classes = useStyles();
-    const { isHeroAtTable, heroTotalChips, heroHandLabel, playerPositionString, rootClassName } = props;
-
+    const { rootClassName } = props;
+    const { playerPositionString } = useSelector(controllerSelector);
+    const heroHandLabel = useSelector(heroHandLabelSelector);
+    const { isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
     return (
         <div className={rootClassName}>
-            {!isHeroAtTable ? (
+            {!isHeroAtTable && heroTotalChips ? (
                 <Tooltip title="Your current total chips." placement="right">
                     <Typography
                         className={classes.totalChips}
