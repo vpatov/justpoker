@@ -199,5 +199,6 @@ function ControllerBetSizer(props) {
         </div>
     );
 }
+ControllerBetSizer.displayName = 'ControllerBetSizer';
 
 export default ControllerBetSizer;

@@ -106,4 +106,8 @@ function ControllerTimerWrapper() {
 
     return <ControllerTimer />;
 }
+
+ControllerTimer.displayName = 'ControllerTimer';
+ControllerTimerWrapper.displayName = 'ControllerTimerWrapper';
+
 export default ControllerTimerWrapper;

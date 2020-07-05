@@ -158,4 +158,6 @@ function ControllerAdditionalGamePlay(props) {
     );
 }
 
+ControllerAdditionalGamePlay.displayName = 'ControllerAdditionalGamePlay';
+
 export default ControllerAdditionalGamePlay;

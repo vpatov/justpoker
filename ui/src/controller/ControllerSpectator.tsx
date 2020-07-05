@@ -50,4 +50,6 @@ function ControllerSpectator(props) {
     );
 }
 
+ControllerSpectator.displayName = 'ControllerSpectator';
+
 export default ControllerSpectator;

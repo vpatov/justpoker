@@ -67,4 +67,6 @@ function ControllerGameInfo(props) {
     );
 }
 
+ControllerGameInfo.displayName = 'ControllerGameInfo';
+
 export default ControllerGameInfo;

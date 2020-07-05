@@ -319,4 +319,6 @@ function ControllerBetAction(props) {
     );
 }
 
+ControllerBetAction.displayName = 'ControllerBetAction';
+
 export default ControllerBetAction;

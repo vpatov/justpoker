@@ -83,4 +83,6 @@ function ControllerRoot(props: ControllerProps) {
     );
 }
 
+ControllerRoot.displayName = 'ControllerRoot';
+
 export default ControllerRoot;

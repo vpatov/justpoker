@@ -47,4 +47,6 @@ function ControllerWarningDialog(props) {
     );
 }
 
+ControllerWarningDialog.displayName = 'ControllerWarningDialog';
+
 export default ControllerWarningDialog;
