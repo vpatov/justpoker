@@ -27,6 +27,7 @@ import BuyChipsDialog from '../game/BuyChipsDialog';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 import { grey } from '@material-ui/core/colors';
+import ControllerGameInfo from './ControllerGameInfo';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -41,7 +42,6 @@ const useStyles = makeStyles((theme: Theme) =>
             backgroundColor: grey[900],
             background: `linear-gradient(rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);`,
         },
-        rootToAct: {},
         gameInfoCont: {
             marginLeft: '2vw',
             height: '100%',
@@ -114,26 +114,7 @@ const useStyles = makeStyles((theme: Theme) =>
         adminButton: {
             fontSize: '1.4vmin',
         },
-        handLabel: {
-            fontSize: '1.8vmin',
-            color: theme.palette.primary.main,
-        },
-        totalChips: {
-            fontSize: '1.8vmin',
-            color: theme.palette.primary.main,
-        },
-        handLabelSmaller: {
-            fontSize: '1.5vmin',
-        },
-        playerPositonString: {
-            fontSize: '1.8vmin',
-            color: theme.palette.primary.main,
-        },
-        toActLabel: {
-            fontSize: '1.8vmin',
-            color: theme.palette.primary.main,
-            animation: '$blinking 1.3s linear infinite;',
-        },
+
         '@keyframes blinking': {
             '50%': {
                 opacity: 0,
@@ -171,19 +152,17 @@ function ControllerComp(props: ControllerProps) {
         amountToCall,
         playerPositionString,
     } = useSelector(controllerSelector);
-
     const heroHandLabel = useSelector(heroHandLabelSelector);
     const { allowStraddle, allowTimeBanks, bigBlind } = useSelector(selectGameParameters);
     const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
     const { isSpectator, isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
-    const [buyChipsDialogOpen, setBuyinDialogOpen] = useState(false);
 
+    const [buyChipsDialogOpen, setBuyinDialogOpen] = useState(false);
     const [betAmt, setBetAmt] = useState(0);
     const [queuedActionType, setQueuedActionType] = useState('');
-
     const [warning, setWarning] = useState(false);
-
     const [betInputRef, setBetInputFocus] = useFocus();
+
     // if there is selected betAmt and min changes rest betAmt
     useEffect(() => {
         if (betAmt !== 0 && betAmt < min) {
@@ -482,34 +461,18 @@ function ControllerComp(props: ControllerProps) {
             })}
             id={SELENIUM_TAGS.IDS.CONTROLLER_ROOT}
         >
+            {/* Dialogs */}
             <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
             <BuyChipsDialog open={buyChipsDialogOpen} handleBuy={handleBuy} handleCancel={handleClose} />
-            <div className={classes.gameInfoCont}>
-                {!isHeroAtTable ? (
-                    <Tooltip title="Your current total chips." placement="right">
-                        <Typography
-                            className={classes.totalChips}
-                        >{`Chips: ${heroTotalChips.toLocaleString()}`}</Typography>
-                    </Tooltip>
-                ) : null}
-                {heroHandLabel ? (
-                    <Tooltip title="Your current best hand." placement="right">
-                        <Typography
-                            className={classnames(classes.handLabel, {
-                                [classes.handLabelSmaller]: heroHandLabel.length > 22,
-                            })}
-                        >
-                            {heroHandLabel}
-                        </Typography>
-                    </Tooltip>
-                ) : null}
-                {playerPositionString ? (
-                    <Tooltip title="Your position at the table relative to the dealer." placement="right">
-                        <Typography className={classes.playerPositonString}>{playerPositionString}</Typography>
-                    </Tooltip>
-                ) : null}
-            </div>
-
+            {/* Left-Most Game Info */}
+            <ControllerGameInfo
+                rootClassName={classes.gameInfoCont}
+                isHeroAtTable={isHeroAtTable}
+                heroTotalChips={heroTotalChips}
+                heroHandLabel={heroHandLabel}
+                playerPositionString={playerPositionString}
+            />
+            {/* Middle Betting Console */}
             <div className={classes.sizeAndBetActionsCont}>
                 <div className={classes.betActionsCont}>{generateBetActionButtons()}</div>
                 {generatePostBustButtons()}
@@ -525,6 +488,7 @@ function ControllerComp(props: ControllerProps) {
                 />
             </div>
 
+            {/* Right-Most Game Play Buttons */}
             <div className={classes.additionalGamePlayCont}>
                 <div className={classes.additionalGamePlayTopButtons}>
                     {isHeroAtTable && allowTimeBanks ? (
