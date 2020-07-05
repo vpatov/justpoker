@@ -22,7 +22,7 @@ import { BettingRoundActionType } from '../shared/models/game/betting';
 
 import ControllerSpectator from './ControllerSpectator';
 import ControllerWarningDialog from './ControllerWarningDialog';
-import ControllerBetSizer from './ControllerBetSizer';
+import ControllerBetAction from './ControllerBetAction';
 import BuyChipsDialog from '../game/BuyChipsDialog';
 import Color from 'color';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
@@ -139,50 +139,12 @@ export interface ControllerProps {
 function ControllerComp(props: ControllerProps) {
     const classes = useStyles();
     const { className } = props;
-    const {
-        toAct,
-        min,
-        max,
-        sizingButtons,
-        bettingActionButtons,
-        dealInNextHand,
-        timeBanks,
-        willStraddle,
-        showWarningOnFold,
-        amountToCall,
-        playerPositionString,
-    } = useSelector(controllerSelector);
+    const { toAct, dealInNextHand, timeBanks, willStraddle, playerPositionString } = useSelector(controllerSelector);
     const heroHandLabel = useSelector(heroHandLabelSelector);
-    const { allowStraddle, allowTimeBanks, bigBlind } = useSelector(selectGameParameters);
-    const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
+    const { allowStraddle, allowTimeBanks } = useSelector(selectGameParameters);
     const { isSpectator, isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
 
     const [buyChipsDialogOpen, setBuyinDialogOpen] = useState(false);
-    const [betAmt, setBetAmt] = useState(0);
-    const [queuedActionType, setQueuedActionType] = useState('');
-    const [warning, setWarning] = useState(false);
-    const [betInputRef, setBetInputFocus] = useFocus();
-
-    // if there is selected betAmt and min changes rest betAmt
-    useEffect(() => {
-        if (betAmt !== 0 && betAmt < min) {
-            setBetAmt(0);
-        }
-    }, [min, setBetAmt]);
-
-    useEffect(() => {
-        for (const actionType of bettingRoundActionTypesToUnqueue) {
-            if (actionType === BettingRoundActionType.CHECK && queuedActionType === BettingRoundActionType.CHECK_FOLD) {
-                setQueuedActionType(BettingRoundActionType.FOLD);
-                setBetAmt(0);
-                break;
-            } else if (queuedActionType === actionType) {
-                setQueuedActionType('');
-                setBetAmt(0);
-                break;
-            }
-        }
-    }, [bettingRoundActionTypesToUnqueue]);
 
     const handleClose = () => {
         setBuyinDialogOpen(false);
@@ -192,59 +154,6 @@ function ControllerComp(props: ControllerProps) {
         setBuyinDialogOpen(false);
         sendSitMessage(false);
     };
-
-    const changeBetAmount = (newAmt) => {
-        // parse string into int
-        let intValue = parseInt(newAmt, 10);
-
-        // if user tries to input non interger values set to current value
-        if (Number.isNaN(intValue) || newAmt <= 0) {
-            setBetAmt(0);
-        } else {
-            setBetAmt(Math.min(Math.floor(newAmt), max));
-        }
-        return;
-    };
-
-    function closeDialog() {
-        setWarning(false);
-    }
-
-    function onConfirmDialog() {
-        setWarning(false);
-        performBettingRoundAction(BettingRoundActionType.FOLD);
-    }
-
-    function onClickActionButton(betActionType) {
-        if (betActionType === BettingRoundActionType.FOLD && showWarningOnFold) {
-            setWarning(true);
-        } else {
-            performBettingRoundAction(betActionType);
-        }
-    }
-
-    function performBettingRoundAction(betActionType) {
-        if (toAct) {
-            sendBettingRoundAction(betActionType);
-        } else {
-            if (queuedActionType === betActionType) {
-                setQueuedActionType('');
-            } else {
-                setQueuedActionType(betActionType);
-            }
-        }
-    }
-
-    function sendBettingRoundAction(betActionType) {
-        WsServer.send({
-            actionType: ClientActionType.BETACTION,
-            request: {
-                type: betActionType,
-                amount: Number(betAmt),
-            } as ClientWsMessageRequest,
-        });
-        changeBetAmount(0);
-    }
 
     function onClickTimeBank() {
         WsServer.send({
@@ -270,150 +179,6 @@ function ControllerComp(props: ControllerProps) {
             actionType: ClientActionType.SETPLAYERSTRADDLE,
             request: ({ willStraddle: !willStraddle } as ClientStraddleRequest) as ClientWsMessageRequest,
         });
-    }
-
-    if (toAct && queuedActionType !== '') {
-        if (queuedActionType === BettingRoundActionType.CHECK_FOLD) {
-            sendBettingRoundAction(BettingRoundActionType.CHECK);
-        } else {
-            sendBettingRoundAction(queuedActionType);
-        }
-
-        setQueuedActionType('');
-    }
-
-    function onClickSemiDisabledBet() {
-        setBetInputFocus();
-    }
-
-    function generateBetActionButtons() {
-        const buttons = [] as any;
-
-        // FOLD BUTTON
-        let button = bettingActionButtons[BettingRoundActionType.FOLD];
-        if (button) {
-            const { action, label, disabled } = button;
-            buttons.push(
-                <Button
-                    key={action}
-                    variant="outlined"
-                    className={classnames(classes.actionButton, classes[action], {
-                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
-                        [classes.semiDisabledFold]: showWarningOnFold,
-                    })}
-                    onClick={() => onClickActionButton(action)}
-                    disabled={disabled}
-                >
-                    {label}
-                </Button>,
-            );
-        }
-
-        // CHECK/FOLD BUTTON
-        button = bettingActionButtons[BettingRoundActionType.CHECK_FOLD];
-        if (button) {
-            const { action, label, disabled } = button;
-            buttons.push(
-                <ButtonGroup
-                    key={BettingRoundActionType.CHECK_FOLD}
-                    orientation="vertical"
-                    className={classes.actionButton}
-                    disabled={disabled}
-                >
-                    <Button
-                        id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
-                        variant="outlined"
-                        className={classnames(classes.checkFoldButton, classes[BettingRoundActionType.CHECK], {
-                            [classes[`${BettingRoundActionType.CHECK}_QUEUED`]]:
-                                BettingRoundActionType.CHECK === queuedActionType,
-                        })}
-                        onClick={() => onClickActionButton(BettingRoundActionType.CHECK)}
-                    >
-                        {label}
-                    </Button>
-                    <Button
-                        id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
-                        variant="outlined"
-                        className={classnames(classes.checkFoldButton, classes[BettingRoundActionType.CHECK], {
-                            [classes[`${BettingRoundActionType.CHECK}_QUEUED`]]:
-                                BettingRoundActionType.CHECK_FOLD === queuedActionType,
-                        })}
-                        onClick={() => onClickActionButton(BettingRoundActionType.CHECK_FOLD)}
-                    >
-                        CHECK FOLD
-                    </Button>
-                </ButtonGroup>,
-            );
-        }
-
-        // CHECK BUTTON
-        button = bettingActionButtons[BettingRoundActionType.CHECK];
-        if (button) {
-            const { action, label, disabled } = button;
-            buttons.push(
-                <Button
-                    id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
-                    key={action}
-                    variant="outlined"
-                    className={classnames(classes.actionButton, classes[action], {
-                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
-                    })}
-                    onClick={() => onClickActionButton(action)}
-                    disabled={disabled}
-                >
-                    {label}
-                </Button>,
-            );
-        }
-
-        // CALL BUTTON
-        button = bettingActionButtons[BettingRoundActionType.CALL];
-        if (button) {
-            const { action, label, disabled } = button;
-            buttons.push(
-                <Button
-                    id={SELENIUM_TAGS.IDS.CHECK_CALL_BUTTON}
-                    key={action}
-                    variant="outlined"
-                    className={classnames(classes.actionButton, classes[action], {
-                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
-                    })}
-                    onClick={() => onClickActionButton(action)}
-                    disabled={disabled}
-                >
-                    {`${label} ${amountToCall}`}
-                </Button>,
-            );
-        }
-
-        // BET BUTTON
-        button = bettingActionButtons[BettingRoundActionType.BET];
-        if (button) {
-            const { action, label, disabled } = button;
-            const betSemiDisabled = betAmt < min;
-            buttons.push(
-                <Button
-                    key={action}
-                    variant="outlined"
-                    className={classnames(classes.actionButton, classes[action], {
-                        [classes[`${action}_QUEUED`]]: action === queuedActionType,
-                        [classes.semiDisabledBet]: betSemiDisabled,
-                    })}
-                    onClick={() => {
-                        if (betSemiDisabled) {
-                            onClickSemiDisabledBet();
-                        } else {
-                            onClickActionButton(action);
-                        }
-                    }}
-                    disabled={disabled}
-                >
-                    {`${label}${betAmt ? ` ${betAmt}` : ''}`}
-                </Button>,
-            );
-        }
-
-        return buttons;
     }
 
     function generatePostBustButtons() {
@@ -462,7 +227,6 @@ function ControllerComp(props: ControllerProps) {
             id={SELENIUM_TAGS.IDS.CONTROLLER_ROOT}
         >
             {/* Dialogs */}
-            <ControllerWarningDialog open={warning} handleClose={closeDialog} onConfirm={onConfirmDialog} />
             <BuyChipsDialog open={buyChipsDialogOpen} handleBuy={handleBuy} handleCancel={handleClose} />
             {/* Left-Most Game Info */}
             <ControllerGameInfo
@@ -473,21 +237,7 @@ function ControllerComp(props: ControllerProps) {
                 playerPositionString={playerPositionString}
             />
             {/* Middle Betting Console */}
-            <div className={classes.sizeAndBetActionsCont}>
-                <div className={classes.betActionsCont}>{generateBetActionButtons()}</div>
-                {generatePostBustButtons()}
-                <ControllerBetSizer
-                    sizingButtons={sizingButtons}
-                    min={min}
-                    max={max}
-                    bigBlind={bigBlind}
-                    value={betAmt}
-                    onChange={(val) => changeBetAmount(val)}
-                    onClickActionButton={onClickActionButton}
-                    betInputRef={betInputRef}
-                />
-            </div>
-
+            <ControllerBetAction />
             {/* Right-Most Game Play Buttons */}
             <div className={classes.additionalGamePlayCont}>
                 <div className={classes.additionalGamePlayTopButtons}>
