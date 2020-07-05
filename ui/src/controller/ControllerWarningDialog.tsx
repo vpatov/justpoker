@@ -6,17 +6,17 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import { Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        root: {},
         text: {
             marginBottom: 24,
         },
     }),
 );
 
+// warning dialog to use which appears when they are making unnecessary fold
 function ControllerWarningDialog(props) {
     const classes = useStyles();
     const { open, handleClose, onConfirm } = props;

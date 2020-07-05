@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+// should be render when player is a spectator, gives option to join game
 function ControllerSpectator(props) {
     const classes = useStyles();
     const { rootClassName } = props;

@@ -47,6 +47,8 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+// provides the user with additional game play interactions:
+// time bank, sit out next hand, straddle
 function ControllerAdditionalGamePlay(props) {
     const classes = useStyles();
     const { rootClassName } = props;

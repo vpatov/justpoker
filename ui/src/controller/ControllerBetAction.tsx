@@ -66,6 +66,9 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+// the ui which allow user to bet, checkc/call, and fold
+// the presence of these buttons are driver by the server via bettingActionButtons property in controller
+// conatins logic to queue bet actions when it is not users turn to act
 function ControllerBetAction(props) {
     const classes = useStyles();
     const { rootClassName } = props;

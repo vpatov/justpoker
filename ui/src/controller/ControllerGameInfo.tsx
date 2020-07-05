@@ -29,6 +29,9 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+// left most informational section of the controller
+// contains information about the user's chips, hand and position in game
+// has no user interactable elements
 function ControllerGameInfo(props) {
     const classes = useStyles();
     const { rootClassName } = props;
