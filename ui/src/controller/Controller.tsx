@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 import classnames from 'classnames';
 import { WsServer } from '../api/ws';
 import { useSelector } from 'react-redux';
@@ -8,7 +8,6 @@ import {
     selectGameParameters,
     bettingRoundActionTypesToUnqueueSelector,
     globalGameStateSelector,
-    heroPlayerUUIDSelector,
 } from '../store/selectors';
 import { useFocus } from '../utils';
 
@@ -179,8 +178,6 @@ function ControllerComp(props: ControllerProps) {
     const { isSpectator, isHeroAtTable, heroTotalChips } = useSelector(globalGameStateSelector);
     const [buyChipsDialogOpen, setBuyinDialogOpen] = useState(false);
 
-    const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
-
     const [betAmt, setBetAmt] = useState(0);
     const [queuedActionType, setQueuedActionType] = useState('');
 
@@ -214,8 +211,6 @@ function ControllerComp(props: ControllerProps) {
 
     const handleBuy = () => {
         setBuyinDialogOpen(false);
-        // TODO make it such that user is automatically sitting in
-        // as soon as they buyin through this dialog
         sendSitMessage(false);
     };
 

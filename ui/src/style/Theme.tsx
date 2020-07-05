@@ -1,6 +1,4 @@
 import { UserPreferences } from '../shared/models/ui/userPreferences';
-import { createMuiTheme, Theme } from '@material-ui/core/styles';
-
 import { PaletteType } from '@material-ui/core';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 import green from '@material-ui/core/colors/green';
