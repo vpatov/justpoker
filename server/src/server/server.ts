@@ -31,14 +31,12 @@ import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
 import { Config, getServerEnvConfig } from '../../../ui/src/shared/models/config/config';
 import * as uWS from 'uWebSockets.js';
-
-function ab2str2json(buf: ArrayBuffer) {
-    return JSON.parse(String.fromCharCode.apply(null, new Uint8Array(buf)));
-}
+import { readJson, ab2str2json, pipeStreamOverResponse } from './uWsUtils';
+import * as fs from 'fs';
 
 @Service()
 class Server {
-    app: express.Application;
+    app: uWS.TemplatedApp;
     server: http.Server;
     wss: WebSocket.Server;
 
@@ -54,87 +52,97 @@ class Server {
         private readonly timerManager: TimerManager,
     ) {}
 
-    private initHTTPRoutes(): void {
-        const router = express.Router();
-
-        router.get('/health', (req, res) => {
-            res.send({ health: 'Great :)' });
+    private initHTTPRoutes() {
+        const router = this.app;
+        router.get('/health', (res, req) => {
+            res.send('Great :)');
         });
 
-        router.get('/metrics', (req, res) => {
-            const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
-            const clientGroups = this.connectedClientManager.getClientGroups();
+        // router.get('/metrics',(res, req) => {
+        //     const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
+        //     const clientGroups = this.connectedClientManager.getClientGroups();
 
-            const WScount = Object.values(clientGroups).reduce(
-                (count, client) => count + Object.keys(client).length,
-                0,
+        //     const WScount = Object.values(clientGroups).reduce(
+        //         (count, client) => count + Object.keys(client).length,
+        //         0,
+        //     );
+        //     res.send({ gameCount: instanceUUIDs.length, activeWS: WScount, gameInstances: instanceUUIDs });
+        // });
+
+        // router.post('/api/error',(res, req) => {
+        //     logger.error('Front-end reported error: ', req.body);
+        // });
+
+        router.post('/api/createGame', (res, req) => {
+            readJson(
+                res,
+                (obj: any) => {
+                    const body = obj;
+                    const gameParameters: GameParameters = body.gameParameters;
+                    const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
+                    this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
+                    this.timerManager.setMessageAnnouncementTimer(() => {
+                        this.eventProcessorService.processEvent(
+                            createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
+                        );
+                    }, 30 * 1000);
+
+                    logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
+                    res.end(JSON.stringify({ gameInstanceUUID: gameInstanceUUID }));
+                },
+                () => {
+                    /* Request was prematurely aborted or invalid or missing, stop reading */
+                    console.log('Invalid JSON or no data at all!');
+                },
             );
-            res.send({ gameCount: instanceUUIDs.length, activeWS: WScount, gameInstances: instanceUUIDs });
         });
 
-        router.post('/api/error', (req, res) => {
-            logger.error('Front-end reported error: ', req.body);
-        });
+        // router.get('/api/ledger',(res, req) => {
+        //     const parsedQuery = queryString.parseUrl(req.url);
+        //     const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
+        //     const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
+        //     if (!ledger) {
+        //         logger.info(`ledger not found for ${gameInstanceUUID}`);
+        //         res.send(getDefaultGame404());
+        //     } else {
+        //         res.send({ ledger: ledger });
+        //     }
+        // });
 
-        router.post('/api/createGame', (req, res) => {
-            const gameParameters: GameParameters = req.body.gameParameters;
-            const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
-            this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
-            this.timerManager.setMessageAnnouncementTimer(() => {
-                this.eventProcessorService.processEvent(
-                    createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
-                );
-            }, 30 * 1000);
-
-            logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
-            res.send({ gameInstanceUUID: gameInstanceUUID });
-        });
-
-        router.get('/api/ledger', (req, res) => {
-            const parsedQuery = queryString.parseUrl(req.url);
-            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
-            const ledger = this.gameInstanceManager.getLedgerForGameInstance(gameInstanceUUID);
-            if (!ledger) {
-                logger.info(`ledger not found for ${gameInstanceUUID}`);
-                res.send(getDefaultGame404());
-            } else {
-                res.send({ ledger: ledger });
-            }
-        });
-
-        // TODO replace with UIHandLog response when frontend and models are complete
-        router.get('/api/handlog', (req, res) => {
-            const parsedQuery = queryString.parseUrl(req.url);
-            const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
-            const clientUUID = parsedQuery.query.clientUUID as ClientUUID;
-            const handLogs = this.gameInstanceManager.getHandLogsForGameInstance(gameInstanceUUID, clientUUID);
-            if (!handLogs) {
-                logger.info(`HandLog not found for ${gameInstanceUUID}`);
-                res.send(getDefaultGame404());
-            } else {
-                res.send({ handLogs: handLogs });
-            }
-        });
+        // // TODO replace with UIHandLog response when frontend and models are complete
+        // router.get('/api/handlog',(res, req) => {
+        //     const parsedQuery = queryString.parseUrl(req.url);
+        //     const gameInstanceUUID = parsedQuery.query.gameInstanceUUID as GameInstanceUUID;
+        //     const clientUUID = parsedQuery.query.clientUUID as ClientUUID;
+        //     const handLogs = this.gameInstanceManager.getHandLogsForGameInstance(gameInstanceUUID, clientUUID);
+        //     if (!handLogs) {
+        //         logger.info(`HandLog not found for ${gameInstanceUUID}`);
+        //         res.send(getDefaultGame404());
+        //     } else {
+        //         res.send({ handLogs: handLogs });
+        //     }
+        // });
 
         // This is necessary because the server npm scripts assume the build process happens in the server,
         // and the ts sources imports are relative to the server directory (when importing from ui/src/shared)
         if (this.rootServerDir) {
             logger.info('Serving static react files.');
-
             // Important that this is last, otherwise other get endpoints won't work.
-            router.get('*', (req, res) => {
-                res.sendFile(path.join(this.rootServerDir, 'ui', 'build', 'index.html'));
+            router.get('*', (res, req) => {
+                const fileName = path.join(this.rootServerDir, 'ui', 'build', 'index.html');
+                const totalSize = fs.statSync(fileName).size;
+                const readStream = fs.createReadStream(fileName);
+                pipeStreamOverResponse(res, readStream, totalSize);
             });
-            this.app.use(express.static(path.join(this.rootServerDir, 'ui', 'build')));
         }
 
-        this.app.use(bodyParser.json());
-        this.app.use(
-            bodyParser.urlencoded({
-                extended: true,
-            }),
-        );
-        this.app.use('/', router);
+        // this.app.use(bodyParser.json());
+        // this.app.use(
+        //     bodyParser.urlencoded({
+        //         extended: true,
+        //     }),
+        // );
+        // this.app.use('/', router);
     }
 
     @debugFunc()
@@ -181,7 +189,7 @@ class Server {
         //     return;
         // });
 
-        const app = uWS
+        this.app = uWS
             .App()
             .ws('/*', {
                 /* Options */
@@ -206,7 +214,7 @@ class Server {
                 },
                 close: (ws, code, message) => {},
             })
-            .listen(8081, (token) => {
+            .listen(this.config.SERVER_PORT, (token) => {
                 if (token) {
                     console.log('Listening to port ' + this.config.SERVER_PORT);
                 } else {
@@ -262,14 +270,9 @@ class Server {
 
     init() {
         logger.info('config', this.config);
-        this.app = express();
-        this.initHTTPRoutes();
-        this.server = http.createServer(this.app);
+
         this.initGameWSS();
-        this.server.listen(this.config.SERVER_PORT, () => {
-            const addressInfo = this.server.address() as AddressInfo;
-            logger.info(`Server started on address `, addressInfo);
-        });
+        this.initHTTPRoutes();
     }
 }
 

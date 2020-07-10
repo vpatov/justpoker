@@ -40,8 +40,9 @@ export class WsServer {
         console.log('opening ws...');
         this.clientUUID = docCookies.getItem(clientUUIDCookieID) as ClientUUID | null;
         this.gameInstanceUUID = gameInstanceUUID;
-
-        const wsURL = `ws${config.SECURE_WS ? 's' : ''}://${config.SERVER_URL}:8081`;
+        const wsURL = `ws${config.SECURE_WS ? 's' : ''}://${config.SERVER_URL}${
+            config.CLIENT_NEED_PORT ? `:${config.SERVER_PORT}` : ''
+        }`;
 
         const wsURI = {
             url: wsURL,
@@ -55,7 +56,7 @@ export class WsServer {
             open: true,
         };
         WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
-        setTimeout(() => this.send(openMessage as any), 10);
+        setTimeout(() => this.send(openMessage as any), 100);
         WsServer.ws.onmessage = WsServer.onGameMessage;
         WsServer.ws.onclose = WsServer.onWSClose;
         WsServer.timeLastSentMsg = getEpochTimeMs();
