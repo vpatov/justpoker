@@ -17,7 +17,7 @@ import { getLoggableGameState, getEpochTimeMs } from '../../../ui/src/shared/uti
 import { ValidationService } from './validationService';
 import { Hand, Card } from '../../../ui/src/shared/models/game/cards';
 import { LedgerService } from '../stats/ledgerService';
-import { logger } from '../logger';
+import { logger, timeFunc } from '../logger';
 import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
@@ -147,6 +147,7 @@ export class GamePlayService {
     }
 
     /* Betting Round Actions */
+    @timeFunc()
     performBettingRoundAction(action: BettingRoundAction) {
         this.gsm.setLastBettingRoundAction(action);
         let betAmount = action.amount;
@@ -183,11 +184,13 @@ export class GamePlayService {
     // if the validation layer takes care of most things,
     // then its possible to get rid of these methods, and of
     // the CHECK_ACTION / FOLD_ACTION constants
+    @timeFunc()
     check() {
         this.audioService.playCheckSFX();
         this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerSeatToAct().playerUUID, BettingRoundActionType.CHECK);
     }
 
+    @timeFunc()
     fold() {
         this.audioService.playFoldSFX();
         this.gsm.setPlayerLastActionType(this.gsm.getCurrentPlayerSeatToAct().playerUUID, BettingRoundActionType.FOLD);
@@ -195,6 +198,7 @@ export class GamePlayService {
         // TODO only if player is facing bet
     }
 
+    @timeFunc()
     bet(betAmount: number, playerPlacingBlindBetUUID?: PlayerUUID) {
         const playerPlacingBet = playerPlacingBlindBetUUID
             ? playerPlacingBlindBetUUID
@@ -251,6 +255,7 @@ export class GamePlayService {
         return actualBetAmount;
     }
 
+    @timeFunc()
     callBet() {
         this.audioService.playCallSFX();
         const currentPlayerToActUUID = this.gsm.getCurrentPlayerSeatToAct().playerUUID;
@@ -270,6 +275,7 @@ export class GamePlayService {
         return callAmount;
     }
 
+    @timeFunc()
     initializeNewHand() {
         this.gsm.incrementHandNumber();
         this.gsm.initializeNewDeck();
@@ -281,6 +287,7 @@ export class GamePlayService {
         this.gameInstanceLogService.initNewHand();
     }
 
+    @timeFunc()
     placeBlinds() {
         const numPlayersReadyToPlay = this.gsm.getPlayersReadyToPlay().length;
         const dealerSeat = this.gsm.getDealerSeat();
@@ -327,6 +334,7 @@ export class GamePlayService {
     }
 
     /** Assumes that players have been dealt in already. */
+    @timeFunc()
     setFirstToActAtStartOfBettingRound() {
         const bigBlindSeat = this.gsm.getBigBlindSeat();
         const dealerSeat = this.gsm.getDealerSeat();
@@ -349,6 +357,7 @@ export class GamePlayService {
         this.gsm.setFirstSeatToAct(firstToAct);
     }
 
+    @timeFunc()
     dealHoleCards(playerUUID: PlayerUUID) {
         const gameType = this.gsm.getGameType();
         switch (gameType) {
@@ -366,6 +375,7 @@ export class GamePlayService {
         }
     }
 
+    @timeFunc()
     initializeBettingRound() {
         const bettingRoundStage = this.gsm.getBettingRoundStage();
         this.gameInstanceLogService.updateLastBettingRoundStage();
@@ -420,6 +430,7 @@ export class GamePlayService {
         }
     }
 
+    @timeFunc()
     showDown() {
         const playersHands: [PlayerUUID, Hand][] = this.gsm
             .getPlayersInHand()
@@ -550,6 +561,7 @@ export class GamePlayService {
         });
     }
 
+    @timeFunc()
     placeBetsInPot() {
         let playerBets: [number, PlayerUUID][] = Object.entries(this.gsm.getPlayers()).map(([uuid, player]) => [
             player.betAmount,

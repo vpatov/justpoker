@@ -25,7 +25,7 @@ import { ServerStateKey } from '../../../ui/src/shared/models/system/server';
 import { ChatService } from '../state/chatService';
 import { StateGraphManager } from '../logic/stateGraphManager';
 import { GameInstanceManager } from '../state/gameInstanceManager';
-import { logger, debugFunc } from '../logger';
+import { logger, debugFunc, timeFunc } from '../logger';
 import { ConnectedClientManager } from '../server/connectedClientManager';
 import { ClientUUID } from '../../../ui/src/shared/models/system/uuid';
 import { AnimationService } from '../state/animationService';
@@ -305,7 +305,7 @@ export class EventProcessorService {
         return undefined;
     }
 
-    @debugFunc()
+    @timeFunc()
     processEvent(event: Event) {
         const { gameInstanceUUID, actionType } = event.body;
 

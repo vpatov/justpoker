@@ -8,7 +8,7 @@ import {
     getThreeCardCombinations,
 } from '../../../ui/src/shared/models/game/cards';
 import { Hand as HandSolver } from 'pokersolver';
-import { logger } from '../logger';
+import { logger, timeFunc } from '../logger';
 
 // TODO declare types for this module and make an npm package
 
@@ -49,10 +49,12 @@ export class HandSolverService {
         throw err;
     }
 
+    @timeFunc()
     computeBestNLEHand(holeCards: Readonly<Card[]>, board: Readonly<Card[]>) {
         return this.computeBestHandFromCards([...holeCards, ...board]);
     }
 
+    @timeFunc()
     computeBestPLOHand(holeCards: Readonly<Card[]>, board: Readonly<Card[]>) {
         const holeCardCombos = getTwoCardCombinations(holeCards);
         const boardCombos = board ? getThreeCardCombinations(board) : [];

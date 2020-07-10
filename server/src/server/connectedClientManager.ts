@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { StateConverter } from '../io/stateConverter';
 import * as WebSocket from 'ws';
-import { logger, debugFunc } from '../logger';
+import { logger, debugFunc, timeFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
 import {
@@ -107,6 +107,7 @@ export class ConnectedClientManager {
     }
 
     // would be good to refactor this so there isnt a direct dependency on stateConverter
+    @timeFunc()
     sendStateToEachInGroup(gameInstanceUUID: GameInstanceUUID) {
         Object.entries(this.ClientGroups[gameInstanceUUID]).forEach(([clientUUID, client]) => {
             const newState = this.stateConverter.getUIState(clientUUID as ClientUUID, false);

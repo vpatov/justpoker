@@ -49,6 +49,7 @@ import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getHoleCardNickname } from '../../../ui/src/shared/models/game/cards';
 import { PlayerPosition } from '../../../ui/src/shared/models/player/playerPosition';
+import { timeFunc } from '../logger';
 
 declare interface CardInformation {
     hand: {
@@ -496,6 +497,7 @@ export class StateConverter {
         return undefined;
     }
 
+    @timeFunc()
     getUIState(clientUUID: ClientUUID, sendAll: boolean): UiState {
         // TODO document the usage of updatedKeys and consider a refactor/redesign if too complex
         const uiState = this.transformGameStateToUIState(clientUUID, sendAll);

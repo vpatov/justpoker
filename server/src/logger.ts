@@ -1,6 +1,6 @@
 import { inspect } from 'util'; // or directly
 const winston = require('winston');
-
+const { performance } = require('perf_hooks');
 // LOG LEVEL BEST PRACTICES
 //     error: 0     logged in production
 //     warn: 1,     logged in production
@@ -85,6 +85,29 @@ export function debugFunc(paramsArg?: DebugFuncParams) {
                 } catch (e) {
                     const err = e as Error;
                     logger.warn(`RTRN: ${String(key)} \t ERRR: ${inspect(e, false, null, true)}`);
+                    logger.warn(`Stacktrace: ${err.stack}`);
+                    throw e;
+                }
+            };
+        }
+        return descriptor;
+    };
+}
+
+export function timeFunc(paramsArg?: DebugFuncParams) {
+    return function decorator(target: Object, key: string | symbol, descriptor: PropertyDescriptor) {
+        const original = descriptor.value;
+        if (typeof original === 'function') {
+            descriptor.value = function (...args: any[]) {
+                let t0 = performance.now();
+                try {
+                    const result = original.apply(this, args);
+                    let t1 = performance.now();
+                    logger.info(`${original.name} took ${t1 - t0} ms`);
+                    return result;
+                } catch (e) {
+                    const err = e as Error;
+                    logger.warn(`err: ${inspect(e, false, null, true)}`);
                     logger.warn(`Stacktrace: ${err.stack}`);
                     throw e;
                 }
