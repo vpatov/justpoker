@@ -60,7 +60,7 @@ function openWsForGame(gameInstanceUUID) {
         gameInstanceUUID: gameInstanceUUID,
     };
     const ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
-    setTimeout(() => ws.send(JSON.stringify(openMessage)), 20);
+    setTimeout(() => ws.send(JSON.stringify(openMessage)), 100);
     function onError(err) {
         console.log('errored: ', get(err, 'error', 'unknown'));
     }
