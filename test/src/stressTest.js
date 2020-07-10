@@ -11,10 +11,10 @@ import WebSocket from 'ws';
 import { generateClientUUID } from '../../ui/src/shared/models/system/uuid';
 
 let httpUrl = 'https://justpoker.games';
-httpUrl = 'http://0.0.0.0:8080'; // uncomment for local
+// httpUrl = 'http://0.0.0.0:8080'; // uncomment for local
 
 let wsUrl = 'wss://justpoker.games';
-wsUrl = 'ws://0.0.0.0:8080'; // uncomment for local
+// wsUrl = 'ws://0.0.0.0:8080'; // uncomment for local
 
 const api = axios.create({
     baseURL: httpUrl,
