@@ -82,7 +82,6 @@ export enum UiActionType {
 }
 
 export declare interface JoinTableRequest {
-    playerUUID: PlayerUUID;
     seatNumber: number;
 }
 

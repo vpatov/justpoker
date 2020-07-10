@@ -1,16 +1,23 @@
 import axios from 'axios';
 import get from 'lodash/get';
 
-import { getDefaultGameParameters, BettingRoundActionType } from '../../ui/src/shared/models/game';
+import { BettingRoundActionType } from '../../ui/src/shared/models/game/betting';
+import { getDefaultGameParameters } from '../../ui/src/shared/models/game/game';
+
 import { ClientActionType } from '../../ui/src/shared/models/api/api';
 
 import queryString from 'query-string';
 import WebSocket from 'ws';
+import { generateClientUUID } from '../../ui/src/shared/models/system/uuid';
 
-let url = 'justpoker.games';
-// url = "0.0.0.0:8080"; // uncomment for local
+let httpUrl = 'https://justpoker.games';
+// httpUrl = 'http://0.0.0.0:8080'; // uncomment for local
+
+let wsUrl = 'wss://justpoker.games:8081';
+// wsUrl = 'ws://0.0.0.0:8081'; // uncomment for local
+
 const api = axios.create({
-    baseURL: `https://${url}`,
+    baseURL: httpUrl,
 });
 
 function sleep(ms) {
@@ -36,20 +43,25 @@ function CreateGame() {
 }
 
 function openWsForGame(gameInstanceUUID) {
+    const clientUUID = generateClientUUID();
+
     const wsURI = {
-        url: `wss://${url}`,
-        query: {
-            clientUUID: null,
-            gameInstanceUUID: gameInstanceUUID,
-        },
+        url: wsUrl,
+    };
+
+    const openMessage = {
+        open: true,
+        clientUUID: clientUUID,
+        gameInstanceUUID: gameInstanceUUID,
     };
     const ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
+    setTimeout(() => ws.send(JSON.stringify(openMessage)), 20);
     function onError(err) {
         console.log('errored: ', get(err, 'error', 'unknown'));
     }
     ws.onerror = onError;
 
-    return ws;
+    return { ws: ws, clientUUID: clientUUID, gameInstanceUUID: gameInstanceUUID };
 }
 
 function connectPlayers(numPlayers, gameInstanceUUID) {
@@ -62,11 +74,13 @@ function connectPlayers(numPlayers, gameInstanceUUID) {
 
 function sitdownPlayersAndStartGame(playerWS) {
     let admin;
-    playerWS.forEach((ws, index) => {
-        if (index === 0) admin = ws;
+    playerWS.forEach(({ ws, clientUUID, gameInstanceUUID }, index) => {
+        if (index === 0) admin = { ws, clientUUID, gameInstanceUUID };
         ws.send(
             JSON.stringify({
-                actionType: ClientActionType.JOINTABLEANDSITDOWN,
+                clientUUID,
+                gameInstanceUUID,
+                actionType: ClientActionType.JOINGAMEANDJOINTABLE,
                 request: {
                     avatarKey: 'shark',
                     name: `PLAYER ${index}`,
@@ -76,17 +90,23 @@ function sitdownPlayersAndStartGame(playerWS) {
             }),
         );
     });
-    admin.send(
+    const { ws, clientUUID, gameInstanceUUID } = admin;
+    ws.send(
         JSON.stringify({
+            clientUUID,
+            gameInstanceUUID,
             actionType: ClientActionType.STARTGAME,
             request: {},
         }),
     );
 }
 
-function playerCheck(ws) {
+function playerCheck(player) {
+    const { ws, clientUUID, gameInstanceUUID } = player;
     ws.send(
         JSON.stringify({
+            clientUUID,
+            gameInstanceUUID,
             actionType: ClientActionType.BETACTION,
             request: {
                 type: BettingRoundActionType.CHECK,
@@ -95,19 +115,19 @@ function playerCheck(ws) {
     );
 }
 
-function checkOnToAct(ws) {
+function checkOnToAct(player) {
     function onGameMessage(msg) {
         const jsonData = JSON.parse(get(msg, 'data', {}));
         const toAct = get(jsonData, 'game.controller.toAct', false);
         if (toAct) {
-            playerCheck(ws);
+            playerCheck(player);
         }
     }
 
-    ws.onmessage = onGameMessage;
+    player.ws.onmessage = onGameMessage;
 }
 
-const NUM_GAMES = 200;
+const NUM_GAMES = 10;
 const NUM_PLAYERS = 9;
 
 async function start() {

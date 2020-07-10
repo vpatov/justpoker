@@ -30,25 +30,32 @@ const ONE_DAY = 60 * 60 * 24;
 const config: Config = getFrontEndEnvConfig();
 
 export class WsServer {
-    static clientUUID: ClientUUID | null = null;
+    static clientUUID: ClientUUID | null;
     static ws: WebSocket;
     static subscriptions: { [key: string]: any } = {};
     static timeLastSentMsg: number;
+    static gameInstanceUUID: GameInstanceUUID;
 
     static openWs(gameInstanceUUID: GameInstanceUUID) {
         console.log('opening ws...');
-        const wsURL = `ws${config.SECURE_WS ? 's' : ''}://${config.SERVER_URL}${
-            config.CLIENT_NEED_PORT ? `:${config.SERVER_PORT}` : ''
-        }`;
+        this.clientUUID = docCookies.getItem(clientUUIDCookieID) as ClientUUID | null;
+        this.gameInstanceUUID = gameInstanceUUID;
+
+        const wsURL = `ws${config.SECURE_WS ? 's' : ''}://${config.SERVER_URL}:8081`;
+
         const wsURI = {
             url: wsURL,
             query: {
-                clientUUID: docCookies.getItem(clientUUIDCookieID) || null,
+                clientUUID: this.clientUUID,
                 gameInstanceUUID: gameInstanceUUID || null,
             } as ParsedQuery,
         };
 
+        const openMessage = {
+            open: true,
+        };
         WsServer.ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
+        setTimeout(() => this.send(openMessage as any), 10);
         WsServer.ws.onmessage = WsServer.onGameMessage;
         WsServer.ws.onclose = WsServer.onWSClose;
         WsServer.timeLastSentMsg = getEpochTimeMs();
@@ -78,8 +85,11 @@ export class WsServer {
 
     // TODO make this private, and expose a helper method to each component.
     static send(message: ClientWsMessage) {
+        const msgWithInfo: any = message;
+        msgWithInfo.clientUUID = this.clientUUID;
+        msgWithInfo.gameInstanceUUID = this.gameInstanceUUID;
         WsServer.timeLastSentMsg = getEpochTimeMs();
-        WsServer.ws.send(JSON.stringify(message));
+        WsServer.ws.send(JSON.stringify(msgWithInfo));
     }
 
     static ping() {
@@ -139,7 +149,7 @@ export class WsServer {
             actionType: ClientActionType.JOINGAME,
             request: ({ name, buyin, avatarKey } as JoinGameRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendJoinTableMessage(playerUUID: PlayerUUID, seatNumber: number) {
@@ -147,7 +157,7 @@ export class WsServer {
             actionType: ClientActionType.JOINTABLE,
             request: ({ playerUUID, seatNumber } as JoinTableRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendSeatChangeMessage(seatNumber: number) {
@@ -155,7 +165,7 @@ export class WsServer {
             actionType: ClientActionType.SEATCHANGE,
             request: ({ seatNumber } as SeatChangeRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendJoinGameAndJoinTableMessage(name: string, buyin: number, avatarKey: AvatarKeys) {
@@ -163,7 +173,7 @@ export class WsServer {
             actionType: ClientActionType.JOINGAMEANDJOINTABLE,
             request: ({ name, buyin, avatarKey } as JoinGameRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendSetChipsMessage(playerUUID: PlayerUUID, chipAmount: number) {
@@ -172,7 +182,7 @@ export class WsServer {
             request: ({ playerUUID, chipAmount } as SetChipsRequest) as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendBuyChipsMessage(playerUUID: PlayerUUID, chipAmount: number) {
@@ -181,7 +191,7 @@ export class WsServer {
             request: ({ playerUUID, chipAmount } as BuyChipsRequest) as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendChangeAvatarMessage(playerUUID: PlayerUUID, avatarKey: AvatarKeys) {
@@ -190,7 +200,7 @@ export class WsServer {
             request: ({ playerUUID, avatarKey } as ChangeAvatarRequest) as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendShowCardMessage(cards: Card[]) {
@@ -200,7 +210,7 @@ export class WsServer {
                 cards: cards,
             } as ShowCardRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendHideCardMessage(cards: Card[]) {
@@ -210,7 +220,7 @@ export class WsServer {
                 cards: cards,
             } as ShowCardRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendLeaveTableMessage() {
@@ -219,7 +229,7 @@ export class WsServer {
             request: {} as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static sendQuitGameMessage() {
@@ -228,7 +238,7 @@ export class WsServer {
             request: {} as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        this.send(clientWsMessage);
     }
 
     static subscribe(key: string, onMessage) {

@@ -6,12 +6,13 @@
         "playtest": "npm run build; node ./build/test/src/selenium_test.js"
     },
     "dependencies": {
-        "typescript": "^3.8.3",
         "axios": "^0.19.2",
         "chromedriver": "^83.0.0",
+        "human-readable-ids": "^1.0.4",
         "lodash": "^4.17.15",
         "query-string": "^6.13.0",
         "selenium-webdriver": "^4.0.0-alpha.7",
+        "typescript": "^3.8.3",
         "ws": "^7.3.0"
     }
 }

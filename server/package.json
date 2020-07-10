@@ -40,6 +40,7 @@
         "reflect-metadata": "^0.1.13",
         "request": "^2.88.2",
         "typedi": "^0.8.0",
+        "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.3.0",
         "winston": "^3.2.1",
         "ws": "^7.2.3"
     }

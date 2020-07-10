@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { StateConverter } from '../io/stateConverter';
-import * as WebSocket from 'ws';
+
 import { logger, debugFunc } from '../logger';
 import { ClientUUID, GameInstanceUUID } from '../../../ui/src/shared/models/system/uuid';
 import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
@@ -9,6 +9,7 @@ import {
     ATTEMPT_EXPIRE_CLIENT_INTERVAL,
     WS_NORMAL_CLOSE,
 } from '../../../ui/src/shared/util/consts';
+import * as uWS from 'uWebSockets.js';
 
 // TODO when branded types are allowed to be used as index signatures, update this definition
 export interface ClientGroups {
@@ -16,7 +17,7 @@ export interface ClientGroups {
 }
 
 export interface Client {
-    ws: WebSocket;
+    ws: uWS.WebSocket;
     lastMessaged: number;
 }
 
@@ -54,7 +55,7 @@ export class ConnectedClientManager {
         }
     }
 
-    addOrUpdateClientInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: WebSocket): boolean {
+    addOrUpdateClientInGroup(gameInstanceUUID: GameInstanceUUID, clientUUID: ClientUUID, ws: uWS.WebSocket): boolean {
         if (this.ClientGroups[gameInstanceUUID]) {
             const client = this.ClientGroups[gameInstanceUUID][clientUUID];
             if (client) {
@@ -80,7 +81,7 @@ export class ConnectedClientManager {
         const ws = this.ClientGroups[gameInstanceUUID]?.[clientUUID]?.ws;
         if (ws) {
             // remove from group if is in group
-            ws.close(WS_NORMAL_CLOSE); // close if not already closed
+            ws.close(); // close if not already closed
             delete this.ClientGroups[gameInstanceUUID][clientUUID];
             return true;
         }
@@ -92,7 +93,7 @@ export class ConnectedClientManager {
         logger.verbose(`removing group ${gameInstanceUUID}`);
         if (this.ClientGroups[gameInstanceUUID]) {
             // close all websockets
-            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((client) => client.ws.close(WS_NORMAL_CLOSE));
+            Object.values(this.ClientGroups[gameInstanceUUID]).forEach((client) => client.ws.close());
             // remove group if group exists
             delete this.ClientGroups[gameInstanceUUID];
         }
