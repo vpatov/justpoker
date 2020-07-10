@@ -55,7 +55,7 @@ class Server {
     private initHTTPRoutes() {
         const router = this.app;
         router.get('/health', (res, req) => {
-            res.send('Great :)');
+            res.end('Great :)');
         });
 
         // router.get('/metrics',(res, req) => {
