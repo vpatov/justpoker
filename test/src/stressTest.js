@@ -8,8 +8,13 @@ import { ClientActionType } from '../../ui/src/shared/models/api/api';
 
 import queryString from 'query-string';
 import WebSocket from 'ws';
-import { generateClientUUID } from '../../ui/src/shared/models/system/uuid';
 
+function generateClientUUID() {
+    return 'C_' + generateUUID();
+}
+function generateUUID() {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
 let httpUrl = 'https://justpoker.games';
 // httpUrl = 'http://0.0.0.0:8080'; // uncomment for local
 
