@@ -128,7 +128,9 @@ class Server {
         if (this.rootServerDir) {
             logger.info('Serving static react files.');
             // Important that this is last, otherwise other get endpoints won't work.
-            router.get('/*', (res, req) => {
+            router.get('*', (res, req) => {
+                logger.info('serve static react files.');
+
                 const fileName = path.join(this.rootServerDir, 'ui', 'build', 'index.html');
                 const totalSize = fs.statSync(fileName).size;
                 const readStream = fs.createReadStream(fileName);
