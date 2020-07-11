@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         sizeButton: {
             minWidth: 0,
-            fontSize: '1vmin',
+            fontSize: '1.4vmin',
             padding: '0.6vmin 0vmin',
             flexGrow: 1,
         },
