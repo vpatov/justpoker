@@ -38,11 +38,12 @@ const useStyles = makeStyles((theme) => ({
         color: 'black',
     },
 }));
-
+let test: any;
 function Home(props) {
     const classes = useStyles();
     const [openEmail, SET_openEmail] = useState(false);
     const smallHeight = useMediaQuery('(max-height:750px)');
+    const oops = test.tes.ds.sdf;
     return (
         <div className={classes.root}>
             <Typography className={classnames(classes.title, { [classes.left]: smallHeight })}>Just Poker.</Typography>

@@ -125,11 +125,15 @@ class Server {
 
         router.post('/api/sendMail', (req, res) => {
             const EmailMessage: EmailMessage = req.body;
+            // append metadata if its there
+            const text = EmailMessage.metadata
+                ? `${EmailMessage.body} \n\nMETADATA\n ${JSON.stringify(EmailMessage.metadata)}`
+                : EmailMessage.body;
             const msg = {
                 to: DEV_EMAIL_ACCOUNTS,
                 from: SERVER_EMAIL_ACCOUNT,
                 subject: `${EmailMessage.subject} (${getServerEnv()})`,
-                text: `${EmailMessage.body} \n\n\nMETADATA\n\n ${JSON.stringify(EmailMessage.metadata)}`,
+                text: text,
             };
             logger.info('sending email message');
             sgMail.send(msg).then(
