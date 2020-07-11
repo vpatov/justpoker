@@ -1,16 +1,20 @@
 import axios from 'axios';
 import get from 'lodash/get';
 
-import { getDefaultGameParameters, BettingRoundActionType } from '../../ui/src/shared/models/game';
+import { getDefaultGameParameters } from '../../ui/src/shared/models/game/game';
+import { BettingRoundActionType } from '../../ui/src/shared/models/game/betting';
 import { ClientActionType } from '../../ui/src/shared/models/api/api';
 
 import queryString from 'query-string';
 import WebSocket from 'ws';
 
-let url = 'justpoker.games';
-// url = "0.0.0.0:8080"; // uncomment for local
+let serverUrl = 'https://justpoker.games';
+// serverUrl = 'http://0.0.0.0:8080'; // uncomment for local
+
+let wsUrl = 'wss://justpoker.games';
+// wsUrl = 'ws://0.0.0.0:8080'; // uncomment for local
 const api = axios.create({
-    baseURL: `https://${url}`,
+    baseURL: serverUrl,
 });
 
 function sleep(ms) {
@@ -37,7 +41,7 @@ function CreateGame() {
 
 function openWsForGame(gameInstanceUUID) {
     const wsURI = {
-        url: `wss://${url}`,
+        url: wsUrl,
         query: {
             clientUUID: null,
             gameInstanceUUID: gameInstanceUUID,
@@ -45,7 +49,7 @@ function openWsForGame(gameInstanceUUID) {
     };
     const ws = new WebSocket(queryString.stringifyUrl(wsURI), []);
     function onError(err) {
-        console.log('errored: ', get(err, 'error', 'unknown'));
+        console.log('errored');
     }
     ws.onerror = onError;
 
@@ -66,7 +70,7 @@ function sitdownPlayersAndStartGame(playerWS) {
         if (index === 0) admin = ws;
         ws.send(
             JSON.stringify({
-                actionType: ClientActionType.JOINTABLEANDSITDOWN,
+                actionType: ClientActionType.JOINGAMEANDJOINTABLE,
                 request: {
                     avatarKey: 'shark',
                     name: `PLAYER ${index}`,
@@ -107,7 +111,7 @@ function checkOnToAct(ws) {
     ws.onmessage = onGameMessage;
 }
 
-const NUM_GAMES = 200;
+const NUM_GAMES = 10;
 const NUM_PLAYERS = 9;
 
 async function start() {
