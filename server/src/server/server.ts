@@ -7,6 +7,7 @@ import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 import queryString from 'query-string';
+import sgMail from '@sendgrid/mail';
 
 import { AddressInfo } from 'net';
 import { EventProcessorService } from '../io/eventProcessorService';
@@ -31,6 +32,8 @@ import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
 import { Config, getServerEnvConfig } from '../../../ui/src/shared/models/config/config';
 
+import { SENDGRID_API_KEY, DEV_EMAIL_ACCOUNTS, SERVER_EMAIL_ACCOUNT } from '../../../ui/src/shared/models/system/email';
+
 @Service()
 class Server {
     app: express.Application;
@@ -48,6 +51,10 @@ class Server {
         private readonly connectedClientManager: ConnectedClientManager,
         private readonly timerManager: TimerManager,
     ) {}
+
+    private initMailer(): void {
+        sgMail.setApiKey(SENDGRID_API_KEY);
+    }
 
     private initHTTPRoutes(): void {
         const router = express.Router();
@@ -109,6 +116,25 @@ class Server {
             } else {
                 res.send({ handLogs: handLogs });
             }
+        });
+
+        router.post('/api/sendMail', (req, res) => {
+            const msg = {
+                to: DEV_EMAIL_ACCOUNTS,
+                from: SERVER_EMAIL_ACCOUNT,
+                subject: 'Testing Dev Mailer',
+                text: 'hi papa ;)',
+            };
+            logger.info('sending email message');
+            sgMail.send(msg).then(
+                () => {
+                    res.send({ success: 'success!' });
+                },
+                (error) => {
+                    logger.error('error sending email message ', error);
+                    res.sendStatus(500).send({ error: error });
+                },
+            );
         });
 
         // This is necessary because the server npm scripts assume the build process happens in the server,
@@ -242,6 +268,7 @@ class Server {
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
         this.initGameWSS();
+        this.initMailer();
         this.server.listen(this.config.SERVER_PORT, () => {
             const addressInfo = this.server.address() as AddressInfo;
             logger.info(`Server started on address `, addressInfo);
