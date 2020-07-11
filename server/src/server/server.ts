@@ -123,9 +123,18 @@ class Server {
         });
 
         router.post('/setMaxWsCapacity', (req, res) => {
+            console.log(req.body);
             const maxWsCapacity = req.body.maxWsCapacity;
-            this.capacityLimiter.setMaxWsCapacity(maxWsCapacity);
-            res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+            if (maxWsCapacity) {
+                logger.info(`setting maxWsCapacity to ${maxWsCapacity}`);
+                this.capacityLimiter.setMaxWsCapacity(maxWsCapacity);
+                res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+            } else {
+                const msg = `during setting maxWsCapacity encountered falsey value: ${maxWsCapacity}`;
+                logger.error(msg);
+                res.status(400);
+                res.send(msg);
+            }
         });
 
         // This is necessary because the server npm scripts assume the build process happens in the server,
