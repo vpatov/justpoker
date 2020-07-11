@@ -12,6 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { TextField, Typography } from '@material-ui/core';
 import { sendMail } from '../api/http';
 import { EmailMessage } from '../shared/models/system/email';
+import { useClientIp } from '../utils';
 
 const useStyles = makeStyles({
     dialog: {
@@ -29,6 +30,7 @@ function EmailDialog(props) {
     const { onClose, open } = props;
     const [msgType, SET_msgType] = useState('');
     const [body, SET_body] = useState('');
+    const clientIp = useClientIp();
 
     const [mailResponse, SET_mailResponse] = useState('none');
 
@@ -52,10 +54,15 @@ function EmailDialog(props) {
         const message: EmailMessage = {
             body: body,
             subject: msgType,
+            metadata: {
+                ip: clientIp,
+                date: new Date().toUTCString(),
+            },
         };
         sendMail(message, onMailSuccess, onMailFailure);
     }
 
+    console.log(clientIp);
     function generateMailResponse() {
         switch (mailResponse) {
             case 'none':

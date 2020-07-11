@@ -129,7 +129,7 @@ class Server {
                 to: DEV_EMAIL_ACCOUNTS,
                 from: SERVER_EMAIL_ACCOUNT,
                 subject: `${EmailMessage.subject} (${getServerEnv()})`,
-                text: EmailMessage.body,
+                text: `${EmailMessage.body} \n\n\nMETADATA\n\n ${JSON.stringify(EmailMessage.metadata)}`,
             };
             logger.info('sending email message');
             sgMail.send(msg).then(

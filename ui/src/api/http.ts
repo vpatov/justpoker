@@ -34,3 +34,8 @@ export const sendMail = (message: EmailMessage, onSuccess, onError) => {
     const url = `/api/sendMail`;
     return api.post(url, message).then(onSuccess).catch(onError);
 };
+
+export const getClientIp = (onSuccess, onError) => {
+    const url = `https://ipapi.co/json/`;
+    return api.get(url).then(onSuccess).catch(onError);
+};

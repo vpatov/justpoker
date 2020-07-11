@@ -5,4 +5,5 @@ export const SERVER_EMAIL_ACCOUNT = 'server@justpoker.games';
 export declare interface EmailMessage {
     subject: string;
     body: string;
+    metadata?: any;
 }
