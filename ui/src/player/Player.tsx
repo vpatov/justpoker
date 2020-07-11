@@ -93,12 +93,11 @@ function Player(props) {
     }
 
     function getPlayerLabelComponent() {
-        if (lastAction) {
-            return <Typography className={classes.labelText}>{lastAction}</Typography>;
-        }
-
         if (playerTimer) {
             return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
+        }
+        if (lastAction) {
+            return <Typography className={classes.labelText}>{lastAction}</Typography>;
         }
 
         return null;
