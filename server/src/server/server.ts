@@ -77,6 +77,7 @@ class Server {
         router.post('/api/createGame', (req, res) => {
             if (this.capacityLimiter.areOverCapacity()) {
                 res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+                logger.error('server is over capacity, should not be able to create games');
             } else {
                 const gameParameters: GameParameters = req.body.gameParameters;
                 const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
@@ -123,7 +124,6 @@ class Server {
         });
 
         router.post('/setMaxWsCapacity', (req, res) => {
-            console.log(req.body);
             const maxWsCapacity = req.body.maxWsCapacity;
             if (maxWsCapacity) {
                 logger.info(`setting maxWsCapacity to ${maxWsCapacity}`);

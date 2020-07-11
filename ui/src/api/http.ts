@@ -14,13 +14,20 @@ export const createGame = (data, onSuccess, onError) => {
     return api.post(url, data).then(onSuccess).catch(onError);
 };
 
+export const getCapacity = (onSuccess, onError) => {
+    const url = '/api/capacity';
+    return api.get(url).then(onSuccess).catch(onError);
+};
+
 export const getLedger = (gameInstanceUUID, onSuccess, onError) => {
     const url = `/api/ledger?gameInstanceUUID=${gameInstanceUUID}`;
     return api.get(url).then(onSuccess).catch(onError);
 };
 
 export function computeHandLogGETurl(gameInstanceUUID) {
-    return `http${config.HTTPS ? 's' : ''}://${config.SERVER_URL}:${config.SERVER_PORT}/api/handlog?gameInstanceUUID=${gameInstanceUUID}`;
+    return `http${config.HTTPS ? 's' : ''}://${config.SERVER_URL}:${
+        config.SERVER_PORT
+    }/api/handlog?gameInstanceUUID=${gameInstanceUUID}`;
 }
 
 export const reportFrontEndError = (data, onSuccess, onError) => {
