@@ -30,15 +30,13 @@ function AnimiationModule(props) {
 export default AnimiationModule;
 
 function handleGamePlayAnimation(animationState: AnimationState) {
-    switch (animationState.trigger){
+    switch (animationState.trigger) {
         case GameplayTrigger.DEAL_CARDS: {
             dealCards();
             break;
         }
     }
-
 }
-
 
 export function flipTable() {
     const animations = [] as any;
@@ -70,23 +68,31 @@ export function flipTable() {
 }
 
 export function dealCards() {
-    const duration = 1800;
+    // const duration = 1800;
+    // const [x, y] = getCenterOfTable();
+    // const a = anime({
+    //     targets: ['.ani_playerCard_0', '.ani_playerCard_1', '.ani_playerCard_2', '.ani_playerCard_3'],
+    //     translateX: (target) => {
+    //         return [x - target.getBoundingClientRect().x, 0];
+    //     },
+    //     translateY: (target) => {
+    //         return [y - target.getBoundingClientRect().y, 0];
+    //     },
+    //     opacity: [0, 1],
+    //     duration: duration,
+    //     rotateZ: [-720, 0],
+    //     easing: 'easeOutExpo',
+    //     delay: anime.stagger(50),
+    // });
 
-    const [x, y] = getCenterOfTable();
-
+    const duration = 1250;
     const a = anime({
         targets: ['.ani_playerCard_0', '.ani_playerCard_1', '.ani_playerCard_2', '.ani_playerCard_3'],
-        translateX: (target) => {
-            return [x - target.getBoundingClientRect().x, 0];
-        },
-        translateY: (target) => {
-            return [y - target.getBoundingClientRect().y, 0];
-        },
-        opacity: [0, 1],
-        duration: duration,
-        rotateZ: [-720, 0],
+        rotateY: [-110, 0],
         easing: 'easeOutExpo',
-        delay: anime.stagger(50),
+        duration: duration,
+        opacity: [0.3, 1],
+        delay: anime.stagger(25),
     });
 }
 
