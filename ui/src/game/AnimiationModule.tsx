@@ -13,11 +13,11 @@ function AnimiationModule(props) {
         switch (animationState.animationType) {
             case AnimationType.GAMEPLAY:
                 handleGamePlayAnimation(animationState);
+                break;
             case AnimationType.REACTION:
                 break;
             case AnimationType.EMPTY:
                 break;
-
             default:
                 console.warn(`No animation provided for ${animationState}`);
                 break;
@@ -30,15 +30,13 @@ function AnimiationModule(props) {
 export default AnimiationModule;
 
 function handleGamePlayAnimation(animationState: AnimationState) {
-    switch (animationState.trigger){
+    switch (animationState.trigger) {
         case GameplayTrigger.DEAL_CARDS: {
             dealCards();
             break;
         }
     }
-
 }
-
 
 export function flipTable() {
     const animations = [] as any;
@@ -74,7 +72,7 @@ export function dealCards() {
 
     const [x, y] = getCenterOfTable();
 
-    const a = anime({
+    anime({
         targets: ['.ani_playerCard_0', '.ani_playerCard_1', '.ani_playerCard_2', '.ani_playerCard_3'],
         translateX: (target) => {
             return [x - target.getBoundingClientRect().x, 0];
@@ -128,7 +126,7 @@ export function animateTimeBankButton() {
     const duration = 350;
     const loops = 4;
     const angle = 10;
-    const a = anime({
+    anime({
         targets: [`.ani_timeBank`],
         rotate: [angle, 0, -1 * angle, 0],
         duration: duration,
@@ -142,7 +140,7 @@ export function animateShowCard(id) {
 
     const [x, y] = getCenterOfTable();
     const scaleTowardsTable = 2;
-    const a = anime({
+    anime({
         targets: [`#${id}`],
         translateX: (target) => {
             return (x - target.getBoundingClientRect().x) / scaleTowardsTable;
@@ -157,7 +155,7 @@ export function animateShowCard(id) {
 }
 
 export function flipCard(id, hero) {
-    const a = anime({
+    anime({
         targets: [`#${id}`],
         rotateY: [-180, 0],
         translateY: hero ? '-1.1vmin' : '0',
@@ -166,7 +164,7 @@ export function flipCard(id, hero) {
 }
 
 export function unflipCard(id, hero) {
-    const b = anime({
+    anime({
         targets: [`#${id}`],
         rotateY: [-180, 0],
         translateY: '0',
@@ -175,9 +173,7 @@ export function unflipCard(id, hero) {
 }
 
 export function animateDealCommunityCard(id) {
-    const duration = 250;
-
-    const a = anime({
+    anime({
         targets: [`#${id}`],
         rotateY: [90, 0],
         easing: 'easeOutExpo',

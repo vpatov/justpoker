@@ -37,7 +37,6 @@ function getColor(bg) {
 
 function GameToActIndicator(props) {
     const classes = useStyles();
-    const {} = props;
     const toAct = useSelector(heroPlayerToAct);
     return <div className={classnames(classes.root, { [classes.rootToAct]: toAct })} />;
 }

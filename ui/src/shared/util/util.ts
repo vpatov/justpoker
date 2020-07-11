@@ -1,4 +1,3 @@
-import util from 'util';
 import { GameState } from '../models/state/gameState';
 
 // Returns a random integer between min (inclusive) and max (inclusive)
