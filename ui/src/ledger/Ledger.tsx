@@ -46,7 +46,7 @@ function Ledger(props) {
     };
 
     const onFetchLedgerFailure = (err) => {
-        console.log(err);
+        console.error(err);
     };
 
     function render() {
@@ -98,7 +98,6 @@ function LedgerTable(props) {
         ) || getEpochTimeMs(),
     ).toLocaleDateString();
 
-    console.log(ledger, gameDate);
     return (
         <div className={classes.tableCont}>
             <MaterialTable

@@ -73,7 +73,7 @@ function MakeGame(props) {
     };
 
     const createFailure = (err) => {
-        console.log(err);
+        console.error(err);
     };
 
     function setIntoGameParameters(field, value) {
