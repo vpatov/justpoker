@@ -30,9 +30,14 @@ import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/sr
 import { GameParameters } from '../../../ui/src/shared/models/game/game';
 import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
-import { Config, getServerEnvConfig } from '../../../ui/src/shared/models/config/config';
+import { Config, getServerEnvConfig, getServerEnv } from '../../../ui/src/shared/models/config/config';
 
-import { SENDGRID_API_KEY, DEV_EMAIL_ACCOUNTS, SERVER_EMAIL_ACCOUNT } from '../../../ui/src/shared/models/system/email';
+import {
+    SENDGRID_API_KEY,
+    DEV_EMAIL_ACCOUNTS,
+    SERVER_EMAIL_ACCOUNT,
+    EmailMessage,
+} from '../../../ui/src/shared/models/system/email';
 
 @Service()
 class Server {
@@ -119,11 +124,12 @@ class Server {
         });
 
         router.post('/api/sendMail', (req, res) => {
+            const EmailMessage: EmailMessage = req.body;
             const msg = {
                 to: DEV_EMAIL_ACCOUNTS,
                 from: SERVER_EMAIL_ACCOUNT,
-                subject: 'Testing Dev Mailer',
-                text: 'hi papa ;)',
+                subject: `${EmailMessage.subject} (${getServerEnv()})`,
+                text: EmailMessage.body,
             };
             logger.info('sending email message');
             sgMail.send(msg).then(
