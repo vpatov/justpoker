@@ -111,7 +111,7 @@ function checkOnToAct(ws) {
     ws.onmessage = onGameMessage;
 }
 
-const NUM_GAMES = 200;
+const NUM_GAMES = 500;
 const NUM_PLAYERS = 9;
 
 async function start() {
