@@ -11,7 +11,7 @@ export class CapacityLimiter {
         return this.capacity;
     }
 
-    areOverCapacity(): Boolean {
+    areOverCapacity(): boolean {
         return this.connectedClientManager.getNumberOfClients() >= this.capacity.maxActiveWs;
     }
 

@@ -30,6 +30,7 @@ import { GameParameters } from '../../../ui/src/shared/models/game/game';
 import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
 import { Config, getServerEnvConfig } from '../../../ui/src/shared/models/config/config';
+import { CapacityLimiter } from './capacityLimiter';
 
 @Service()
 class Server {
@@ -47,6 +48,7 @@ class Server {
         private readonly gameInstanceManager: GameInstanceManager,
         private readonly connectedClientManager: ConnectedClientManager,
         private readonly timerManager: TimerManager,
+        private readonly capacityLimiter: CapacityLimiter,
     ) {}
 
     private initHTTPRoutes(): void {
@@ -58,13 +60,14 @@ class Server {
 
         router.get('/metrics', (req, res) => {
             const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
-            const clientGroups = this.connectedClientManager.getClientGroups();
-
-            const WScount = Object.values(clientGroups).reduce(
-                (count, client) => count + Object.keys(client).length,
-                0,
-            );
-            res.send({ gameCount: instanceUUIDs.length, activeWS: WScount, gameInstances: instanceUUIDs });
+            const WScount = this.connectedClientManager.getNumberOfClients();
+            const capacitySettings = this.capacityLimiter.getCapacity();
+            res.send({
+                gameCount: instanceUUIDs.length,
+                gameInstances: instanceUUIDs,
+                WScount,
+                capacitySettings,
+            });
         });
 
         router.post('/api/error', (req, res) => {
@@ -72,17 +75,21 @@ class Server {
         });
 
         router.post('/api/createGame', (req, res) => {
-            const gameParameters: GameParameters = req.body.gameParameters;
-            const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
-            this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
-            this.timerManager.setMessageAnnouncementTimer(() => {
-                this.eventProcessorService.processEvent(
-                    createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
-                );
-            }, 30 * 1000);
+            if (this.capacityLimiter.areOverCapacity()) {
+                res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+            } else {
+                const gameParameters: GameParameters = req.body.gameParameters;
+                const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
+                this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
+                this.timerManager.setMessageAnnouncementTimer(() => {
+                    this.eventProcessorService.processEvent(
+                        createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
+                    );
+                }, 30 * 1000);
 
-            logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
-            res.send({ gameInstanceUUID: gameInstanceUUID });
+                logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
+                res.send({ gameInstanceUUID: gameInstanceUUID });
+            }
         });
 
         router.get('/api/ledger', (req, res) => {
@@ -109,6 +116,16 @@ class Server {
             } else {
                 res.send({ handLogs: handLogs });
             }
+        });
+
+        router.get('/api/capacity', (req, res) => {
+            res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+        });
+
+        router.post('/setMaxWsCapacity', (req, res) => {
+            const maxWsCapacity = req.body.maxWsCapacity;
+            this.capacityLimiter.setMaxWsCapacity(maxWsCapacity);
+            res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
         });
 
         // This is necessary because the server npm scripts assume the build process happens in the server,
