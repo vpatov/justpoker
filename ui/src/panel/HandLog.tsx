@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactPropTypes, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -189,6 +189,11 @@ function HandLog(props: HandLogProps) {
 
                 oldHandLogEntries[handNumber] = handLogEntry;
                 return [...oldHandLogEntries];
+            }
+
+            // ensure handlog is set to latest when data first comes in
+            if (oldHandLogEntries.length === 0 && incomingHandLogEntries.length > 0) {
+                setCurrentHandNumber(incomingHandLogEntries.length - 1);
             }
 
             // If we received more than one handLogEntry, replace the entire list
