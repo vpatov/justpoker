@@ -185,6 +185,7 @@ function ControllerBetSizer(props) {
                         <ButtonGroup className={classes.sizeButtonGroupCont}>
                             {sizingButtons.map((button) => (
                                 <Button
+                                    key={button.label}
                                     variant="outlined"
                                     className={classes.sizeButton}
                                     onClick={(e) => onChange(button.value)}

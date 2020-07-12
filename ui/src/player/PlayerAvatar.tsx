@@ -56,7 +56,6 @@ function PlayerAvatar(props) {
 
     // set timeout
     useEffect(() => {
-        console.log('e1');
         if (reactionState.show) {
             const newTimer = setTimeout(() => {
                 SET_reactionState({ show: false, reaction: '' });
