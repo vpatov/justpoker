@@ -60,13 +60,12 @@ class Server {
 
         router.get('/metrics', (req, res) => {
             const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
-            const WScount = this.connectedClientManager.getNumberOfClients();
-            const capacitySettings = this.capacityLimiter.getCapacity();
+
             res.send({
                 gameCount: instanceUUIDs.length,
                 gameInstances: instanceUUIDs,
-                WScount,
-                capacitySettings,
+                wsCount: this.connectedClientManager.getNumberOfClients(),
+                capacitySettings: this.capacityLimiter.getCapacity(),
             });
         });
 
@@ -75,8 +74,8 @@ class Server {
         });
 
         router.post('/api/createGame', (req, res) => {
-            if (this.capacityLimiter.areOverCapacity()) {
-                res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+            if (this.capacityLimiter.isOverCapacity()) {
+                res.send({ areOverCapacity: this.capacityLimiter.isOverCapacity() });
                 logger.error('server is over capacity, should not be able to create games');
             } else {
                 const gameParameters: GameParameters = req.body.gameParameters;
@@ -120,7 +119,7 @@ class Server {
         });
 
         router.get('/api/capacity', (req, res) => {
-            res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+            res.send({ areOverCapacity: this.capacityLimiter.isOverCapacity() });
         });
 
         router.post('/setMaxWsCapacity', (req, res) => {
@@ -128,7 +127,7 @@ class Server {
             if (maxWsCapacity) {
                 logger.info(`setting maxWsCapacity to ${maxWsCapacity}`);
                 this.capacityLimiter.setMaxWsCapacity(maxWsCapacity);
-                res.send({ areOverCapacity: this.capacityLimiter.areOverCapacity() });
+                res.send({ areOverCapacity: this.capacityLimiter.isOverCapacity() });
             } else {
                 const msg = `during setting maxWsCapacity encountered falsey value: ${maxWsCapacity}`;
                 logger.error(msg);
