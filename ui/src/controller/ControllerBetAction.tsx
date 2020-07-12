@@ -121,7 +121,6 @@ function ControllerBetAction(props) {
             ) {
                 setQueuedActionType('');
                 // if there was a bet and user was check fold, then set fold
-                //
             } else if (queuedActionType === BettingRoundActionType.CHECK_FOLD) {
                 setQueuedActionType(BettingRoundActionType.FOLD);
             }
