@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { controllerSelector, selectGameParameters, bettingRoundActionTypesToUnqueueSelector } from '../store/selectors';
+import { controllerSelector, selectGameParameters } from '../store/selectors';
 
 import Color from 'color';
 import classnames from 'classnames';
@@ -12,7 +12,7 @@ import { BettingRoundActionType } from '../shared/models/game/betting';
 import ControllerBetSizer from './ControllerBetSizer';
 import ControllerWarningDialog from './ControllerWarningDialog';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
-import { useFocus } from '../utils';
+import { useFocus, usePrevious } from '../utils';
 import { WsServer } from '../api/ws';
 import { ClientActionType, ClientWsMessageRequest } from '../shared/models/api/api';
 
@@ -72,16 +72,25 @@ const useStyles = makeStyles((theme: Theme) =>
 function ControllerBetAction(props) {
     const classes = useStyles();
     const { rootClassName } = props;
-    const { toAct, min, max, sizingButtons, bettingActionButtons, showWarningOnFold, amountToCall } = useSelector(
-        controllerSelector,
-    );
+    const {
+        toAct,
+        min,
+        max,
+        sizingButtons,
+        bettingActionButtons,
+        showWarningOnFold,
+        amountToCall,
+        unqueueAllBettingRoundActions,
+        curBet,
+    } = useSelector(controllerSelector);
     const { bigBlind } = useSelector(selectGameParameters);
-    const bettingRoundActionTypesToUnqueue = useSelector(bettingRoundActionTypesToUnqueueSelector);
 
     const [betAmt, setBetAmt] = useState(0);
     const [queuedActionType, setQueuedActionType] = useState('');
     const [warning, setWarning] = useState(false);
     const [betInputRef, setBetInputFocus] = useFocus();
+
+    const prevBet = usePrevious(curBet);
 
     function closeDialog() {
         setWarning(false);
@@ -97,21 +106,27 @@ function ControllerBetAction(props) {
         if (betAmt !== 0 && betAmt < min) {
             setBetAmt(0);
         }
-    }, [min, setBetAmt]);
+    }, [min, betAmt, setBetAmt]);
 
     useEffect(() => {
-        for (const actionType of bettingRoundActionTypesToUnqueue) {
-            if (actionType === BettingRoundActionType.CHECK && queuedActionType === BettingRoundActionType.CHECK_FOLD) {
-                setQueuedActionType(BettingRoundActionType.FOLD);
-                setBetAmt(0);
-                break;
-            } else if (queuedActionType === actionType) {
+        if (unqueueAllBettingRoundActions) {
+            setQueuedActionType('');
+        } else if (curBet !== prevBet) {
+            // only when the action changes
+            // if there was a bet then unqueue Check, Call and Bet
+            if (
+                queuedActionType === BettingRoundActionType.CHECK ||
+                queuedActionType === BettingRoundActionType.CALL ||
+                queuedActionType === BettingRoundActionType.BET
+            ) {
                 setQueuedActionType('');
-                setBetAmt(0);
-                break;
+                // if there was a bet and user was check fold, then set fold
+                //
+            } else if (queuedActionType === BettingRoundActionType.CHECK_FOLD) {
+                setQueuedActionType(BettingRoundActionType.FOLD);
             }
         }
-    }, [bettingRoundActionTypesToUnqueue]);
+    }, [queuedActionType, unqueueAllBettingRoundActions, curBet, prevBet]);
 
     const changeBetAmount = (newAmt) => {
         // parse string into int

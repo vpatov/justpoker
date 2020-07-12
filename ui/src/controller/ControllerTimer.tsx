@@ -72,7 +72,7 @@ function ControllerTimer() {
     // clean up timer on unmount
     useEffect(() => {
         return () => clearInterval(rTimer);
-    }, []);
+    }, [rTimer]);
 
     // if time expires clear the interval
     if (timeRemaining < 0) {

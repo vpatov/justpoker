@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 import classnames from 'classnames';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

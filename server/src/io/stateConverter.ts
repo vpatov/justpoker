@@ -150,15 +150,12 @@ export class StateConverter {
 
     getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const gameStage = this.gameStateManager.getGameStage();
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
-            unqueueAllBettingRoundActions:
-                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
@@ -185,6 +182,7 @@ export class StateConverter {
     getUIController(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): Controller {
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
 
+        const gameStage = this.gameStateManager.getGameStage();
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
         const fullPot = this.gameStateManager.getFullPotValue();
@@ -228,9 +226,11 @@ export class StateConverter {
 
         const controller: Controller = {
             toAct,
-            lastBettingRoundAction: this.gameStateManager.getLastBettingRoundAction(),
+            curBet: curBet,
             min: minBet,
             max: maxBet,
+            unqueueAllBettingRoundActions:
+                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             sizingButtons: getSizingButtons(),
             bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID, toAct),
             dealInNextHand: !hero.sittingOut,
