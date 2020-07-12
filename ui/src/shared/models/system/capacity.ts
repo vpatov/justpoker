@@ -4,6 +4,6 @@ export declare interface Capacity {
 
 export function getDefaultCapacity(): Capacity {
     return {
-        maxActiveWs: 1000,
+        maxActiveWs: 2000,
     };
 }
