@@ -6,13 +6,7 @@ import { AnimationState, getCleanAnimationState } from '../state/animationState'
 import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../../util/consts';
-import {
-    BettingRoundActionType,
-    BettingRoundAction,
-    NOT_IN_HAND,
-    CHECK_ACTION,
-    BettingRoundStage,
-} from '../game/betting';
+import { BettingRoundActionType, BettingRoundStage } from '../game/betting';
 
 import { GameParameters, getCleanGameParameters, getTestGameParameters } from '../game/game';
 import { PlayerUUID, makeBlankUUID } from '../system/uuid';
