@@ -36,7 +36,6 @@ export class WsServer {
     static timeLastSentMsg: number;
 
     static openWs(gameInstanceUUID: GameInstanceUUID) {
-        console.log('opening ws...');
         const wsURL = `ws${config.SECURE_WS ? 's' : ''}://${config.SERVER_URL}${
             config.CLIENT_NEED_PORT ? `:${config.SERVER_PORT}` : ''
         }`;
@@ -64,7 +63,6 @@ export class WsServer {
     // can add types here.
     private static onGameMessage(msg: MessageEvent) {
         const jsonData = JSON.parse(get(msg, 'data', {}));
-        console.log('jsonData: ', jsonData);
         if (jsonData.clientUUID) {
             docCookies.setItem(clientUUIDCookieID, jsonData.clientUUID, ONE_DAY);
             WsServer.clientUUID = jsonData.clientUUID;

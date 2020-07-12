@@ -41,7 +41,7 @@ function Animoji(props) {
         return () => {
             abort = true;
         };
-    }, [reaction]);
+    }, [reaction, animated]);
 
     if (asset) return <img className={classnames(classes.img, className)} src={asset} alt="" />;
     return null;

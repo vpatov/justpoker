@@ -35,8 +35,12 @@ function GameContainer(props): any {
 
     const { gameInstanceUUID } = useParams();
 
-
     useEffect(() => {
+        const onReceiveNewGame = (game: any) => {
+            dispatch({ type: 'SET_GAME_STATE', game: game });
+            if (!gameLoaded) setGameLoaded(true);
+        };
+
         if (props.useTestGame) {
             dispatch({ type: 'SET_TEST_GAME' });
             if (!gameLoaded) setGameLoaded(true);
@@ -48,7 +52,7 @@ function GameContainer(props): any {
                 WsServer.subscribe('onclose', onWSClosed);
             }
         }
-    }, []);
+    }, [dispatch, gameInstanceUUID, gameLoaded, props.useTestGame]);
 
     const onWSClosed = () => {
         SET_wsConnClosed(true);
@@ -56,11 +60,6 @@ function GameContainer(props): any {
 
     const onReceiveError = (error: any) => {
         setError(error);
-    };
-
-    const onReceiveNewGame = (game: any) => {
-        dispatch({ type: 'SET_GAME_STATE', game: game });
-        if (!gameLoaded) setGameLoaded(true);
     };
 
     function renderError() {

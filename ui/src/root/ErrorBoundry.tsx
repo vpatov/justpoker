@@ -37,7 +37,7 @@ class ErrorBoundary extends React.Component {
     onReportSuccess = (response) => {};
 
     onReportFailure = (err) => {
-        console.log(err);
+        console.error(err);
     };
 
     render() {

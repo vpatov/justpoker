@@ -141,7 +141,7 @@ function CardSmall(props) {
                 unflipCard(cardId, hero);
             }
         }
-    }, [isBeingShown, prevIsBeingShown]);
+    }, [isBeingShown, prevIsBeingShown, hero, canShowHideCards, cardId]);
 
     function showCard() {
         if (hero && canShowHideCards) {

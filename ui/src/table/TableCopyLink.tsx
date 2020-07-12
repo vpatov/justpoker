@@ -37,7 +37,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function TableCopyLink(props) {
     const classes = useStyles();
-    const {} = props;
     const [copied, copiedSet] = useState(false);
     function handleClick() {
         if (!navigator.clipboard) {

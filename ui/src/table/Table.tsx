@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Player from '../player/Player';
 import OpenSeat from './OpenSeat';
 import EmptySeat from './EmptySeat';
@@ -8,7 +8,7 @@ import TableCopyLink from './TableCopyLink';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { tableSelector, playersSelector, globalGameStateSelector, selectGameParameters } from '../store/selectors';
+import { tableSelector, playersSelector, globalGameStateSelector } from '../store/selectors';
 import { ClientActionType, ClientWsMessageRequest } from '../shared/models/api/api';
 import { WsServer } from '../api/ws';
 
@@ -16,7 +16,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { Typography, Zoom } from '@material-ui/core';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
-import Color from 'color';
 
 const W_UNIT = '%';
 const H_UNIT = '%';
@@ -140,9 +139,15 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator, isHeroInHand, isGameInHandInitStage } = useSelector(
-        globalGameStateSelector,
-    );
+    const {
+        canStartGame,
+        isHeroAtTable,
+        isGameInProgress,
+        areOpenSeats,
+        isSpectator,
+        isHeroInHand,
+        isGameInHandInitStage,
+    } = useSelector(globalGameStateSelector);
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
         tableSelector,
     );
