@@ -139,7 +139,7 @@ export class WsServer {
             actionType: ClientActionType.JOINGAME,
             request: ({ name, buyin, avatarKey } as JoinGameRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendJoinTableMessage(playerUUID: PlayerUUID, seatNumber: number) {
@@ -147,7 +147,7 @@ export class WsServer {
             actionType: ClientActionType.JOINTABLE,
             request: ({ playerUUID, seatNumber } as JoinTableRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendSeatChangeMessage(seatNumber: number) {
@@ -155,7 +155,7 @@ export class WsServer {
             actionType: ClientActionType.SEATCHANGE,
             request: ({ seatNumber } as SeatChangeRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendJoinGameAndJoinTableMessage(name: string, buyin: number, avatarKey: AvatarKeys) {
@@ -163,7 +163,7 @@ export class WsServer {
             actionType: ClientActionType.JOINGAMEANDJOINTABLE,
             request: ({ name, buyin, avatarKey } as JoinGameRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendSetChipsMessage(playerUUID: PlayerUUID, chipAmount: number) {
@@ -172,7 +172,7 @@ export class WsServer {
             request: ({ playerUUID, chipAmount } as SetChipsRequest) as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendBuyChipsMessage(playerUUID: PlayerUUID, chipAmount: number) {
@@ -181,7 +181,7 @@ export class WsServer {
             request: ({ playerUUID, chipAmount } as BuyChipsRequest) as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendChangeAvatarMessage(playerUUID: PlayerUUID, avatarKey: AvatarKeys) {
@@ -190,7 +190,7 @@ export class WsServer {
             request: ({ playerUUID, avatarKey } as ChangeAvatarRequest) as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendShowCardMessage(cards: Card[]) {
@@ -200,7 +200,7 @@ export class WsServer {
                 cards: cards,
             } as ShowCardRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendHideCardMessage(cards: Card[]) {
@@ -210,7 +210,7 @@ export class WsServer {
                 cards: cards,
             } as ShowCardRequest) as ClientWsMessageRequest,
         };
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendLeaveTableMessage() {
@@ -219,7 +219,7 @@ export class WsServer {
             request: {} as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static sendQuitGameMessage() {
@@ -228,7 +228,7 @@ export class WsServer {
             request: {} as ClientWsMessageRequest,
         };
 
-        WsServer.ws.send(JSON.stringify(clientWsMessage));
+        WsServer.send(clientWsMessage);
     }
 
     static subscribe(key: string, onMessage) {
