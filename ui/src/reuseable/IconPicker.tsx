@@ -48,7 +48,7 @@ function IconPicker(props) {
 
     useEffect(() => {
         return clearTimeout(timer);
-    }, []);
+    }, [timer]);
 
     const showMenu = Boolean(anchorEl);
     return (

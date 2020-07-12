@@ -1,5 +1,4 @@
-import React, { Fragment } from 'react';
-import get from 'lodash/get';
+import React from 'react';
 import classnames from 'classnames';
 import ChipStack from './ChipStack';
 import { makeStyles } from '@material-ui/core/styles';

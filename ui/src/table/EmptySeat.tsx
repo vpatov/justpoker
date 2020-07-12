@@ -5,7 +5,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import { WsServer } from '../api/ws';
-import { grey } from '@material-ui/core/colors';
 
 const size = 5;
 
@@ -44,7 +43,15 @@ const useStyles = makeStyles((theme) => ({
 
 function EmptySeat(props) {
     const classes = useStyles();
-    const { className, style, setHeroRotation, virtualPositon, seatNumber, isHeroInHand, isGameInHandInitStage } = props;
+    const {
+        className,
+        style,
+        setHeroRotation,
+        virtualPositon,
+        seatNumber,
+        isHeroInHand,
+        isGameInHandInitStage,
+    } = props;
 
     function handleRotationButtonClick() {
         setHeroRotation(virtualPositon);
@@ -80,8 +87,8 @@ function EmptySeat(props) {
     return (
         <div className={classnames(classes.emptySeatRoot, className)} style={style}>
             <div className={classes.container}>
-                {( isHeroInHand || isGameInHandInitStage ) ? renderRotateButton(false) : renderRotateButton(true)}
-                {( isHeroInHand || isGameInHandInitStage ) ? null : renderSeatChangeButton()}
+                {isHeroInHand || isGameInHandInitStage ? renderRotateButton(false) : renderRotateButton(true)}
+                {isHeroInHand || isGameInHandInitStage ? null : renderSeatChangeButton()}
             </div>
         </div>
     );

@@ -13,7 +13,6 @@ import { AvatarKeys, getRandomAvatarKey } from '../shared/models/ui/assets';
 import Avatar from '../reuseable/Avatar';
 import { useStickyState } from '../utils';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
-import c from 'config';
 import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({

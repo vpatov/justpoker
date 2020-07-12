@@ -18,7 +18,6 @@ import { GameType, MaxBuyinType, GameParameters } from '../shared/models/game/ga
 import TextFieldWrap from '../reuseable/TextFieldWrap';
 import RadioForm from '../reuseable/RadioForm';
 import IconTooltip from '../reuseable/IconTooltip';
-import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -314,7 +313,9 @@ function GameParamatersDialog(props) {
                     <TextFieldWrap
                         className={classes.field}
                         label="Refill Interval (minutes)"
-                        onChange={(event) => setIntoGameParameters('timeBankReplenishIntervalMinutes', event.target.value)}
+                        onChange={(event) =>
+                            setIntoGameParameters('timeBankReplenishIntervalMinutes', event.target.value)
+                        }
                         value={timeBankReplenishIntervalMinutes}
                         type="number"
                         variant="standard"
