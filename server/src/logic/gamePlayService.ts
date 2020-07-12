@@ -61,8 +61,9 @@ export class GamePlayService {
     }
 
     startTimeBankReplenishTimer() {
+        const gameInstanceUUID = this.context.getGameInstanceUUID();
         this.timerManager.setTimeBankReplenishInterval(() => {
-            this.processEventCallback(createTimeBankReplenishEvent(this.context.getGameInstanceUUID()));
+            this.processEventCallback(createTimeBankReplenishEvent(gameInstanceUUID));
         }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
     }
 
