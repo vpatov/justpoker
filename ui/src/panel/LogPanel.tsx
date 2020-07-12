@@ -9,7 +9,6 @@ import { ButtonGroup } from '@material-ui/core';
 
 import ChatLog from './ChatLog';
 import HandLog from './HandLog';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

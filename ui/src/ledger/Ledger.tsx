@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import queryString from 'query-string';
 import get from 'lodash/get';
 import { getLedger } from '../api/http';
 
@@ -33,7 +32,7 @@ function Ledger(props) {
     useEffect(() => {
         document.title = 'Ledger';
         getLedger(gameInstanceUUID, onFetchLedgerSuccess, onFetchLedgerFailure);
-    }, []);
+    }, [gameInstanceUUID]);
 
     const onFetchLedgerSuccess = (response) => {
         const error = get(response, 'data.error', false);
@@ -46,7 +45,7 @@ function Ledger(props) {
     };
 
     const onFetchLedgerFailure = (err) => {
-        console.log(err);
+        console.error(err);
     };
 
     function render() {
@@ -98,7 +97,6 @@ function LedgerTable(props) {
         ) || getEpochTimeMs(),
     ).toLocaleDateString();
 
-    console.log(ledger, gameDate);
     return (
         <div className={classes.tableCont}>
             <MaterialTable

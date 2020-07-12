@@ -4,7 +4,7 @@ import { animateWinningCards, animateDealCommunityCard } from '../game/Animiatio
 import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
 import SuitComponent from '../reuseable/Suit';
-import {Suit} from '../shared/models/game/cards';
+import { Suit } from '../shared/models/game/cards';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -75,7 +75,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
 function CardLarge(props) {
     const classes = useStyles();
     const coloredCardBackgroundClasses = useColoredCardBackgroundStyles();
@@ -84,13 +83,10 @@ function CardLarge(props) {
     const smallWidth = useMediaQuery(ASPECT_RATIO_BREAK_POINT);
     const { curPrefs } = useContext(ThemeSetter);
 
-    function getCardBackGroundClasses(suit: Suit){
-        const cardClasses = curPrefs.coloredCardBackground ? 
-            coloredCardBackgroundClasses : 
-            whiteCardBackgroundClasses;
+    function getCardBackGroundClasses(suit: Suit) {
+        const cardClasses = curPrefs.coloredCardBackground ? coloredCardBackgroundClasses : whiteCardBackgroundClasses;
         return [cardClasses.base, cardClasses[suit]];
     }
-
 
     const id = `${suit}${rank}`;
     // this function could be located in many different componets
@@ -105,7 +101,7 @@ function CardLarge(props) {
 
     useEffect(() => {
         animateDealCommunityCard(id);
-    }, []);
+    }, [id]);
 
     if (placeHolder) {
         return (
@@ -122,16 +118,11 @@ function CardLarge(props) {
     return (
         <div id={id}>
             <div
-                className={classnames(
-                    classes.root, 
-                    className, 
-                    ...getCardBackGroundClasses(suit), 
-                    {
-                        [classes.partOfWinningHand]: partOfWinningHand,
-                        ani_notWinningCard: !partOfWinningHand,
-                        [classes.smallWidth]: smallWidth,
-                    }
-                )}
+                className={classnames(classes.root, className, ...getCardBackGroundClasses(suit), {
+                    [classes.partOfWinningHand]: partOfWinningHand,
+                    ani_notWinningCard: !partOfWinningHand,
+                    [classes.smallWidth]: smallWidth,
+                })}
             >
                 <Typography
                     className={classnames(classes.text, classes.rank)}
@@ -139,11 +130,7 @@ function CardLarge(props) {
                 >
                     {generateStringFromRank(rank)}
                 </Typography>
-                <SuitComponent
-                    suit={suit}
-                    className={classes.suit}
-                    color={!curPrefs.coloredCardBackground}
-                />
+                <SuitComponent suit={suit} className={classes.suit} color={!curPrefs.coloredCardBackground} />
             </div>
         </div>
     );

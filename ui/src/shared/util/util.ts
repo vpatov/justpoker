@@ -1,9 +1,4 @@
-import util from 'util';
 import { GameState } from '../models/state/gameState';
-
-export function printObj(obj: any) {
-    console.log(util.inspect(obj, false, null, true));
-}
 
 // Returns a random integer between min (inclusive) and max (inclusive)
 export function genRandomInt(min: number, max: number) {

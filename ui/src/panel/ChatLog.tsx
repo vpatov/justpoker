@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
-import get from 'lodash/get';
 
 import TextFieldWrap from '../reuseable/TextFieldWrap';
 
@@ -134,14 +133,13 @@ function ChatLog(props: ChatLogProps) {
     const [draftChatMessage, setDraftChatMessage] = useState('');
 
     useEffect(() => {
+        function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
+            setUnreadChats(true);
+            setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
+        }
         WsServer.subscribe('chat', onReceiveNewChatMessage);
         WsServer.ping(); // first game state update comes before subscriptions, so need to ping.
-    }, []);
-
-    function onReceiveNewChatMessage(chatMessage: UiChatMessage) {
-        setUnreadChats(true);
-        setChatMessages((oldMessages) => [...oldMessages, chatMessage]);
-    }
+    }, [setUnreadChats]);
 
     const messagesRef = useRef(null);
     useEffect(() => {

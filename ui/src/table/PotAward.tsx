@@ -20,7 +20,7 @@ function PotAward(props) {
     const potId = `ani_awardPot_${index}`;
     useEffect(() => {
         animateAwardPot(winnerUUID, potId);
-    }, []);
+    }, [winnerUUID, potId]);
 
     return <Bet className={classnames(classes.root)} amount={value} id={potId} />;
 }
