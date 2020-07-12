@@ -63,6 +63,7 @@ export class WsServer {
     // can add types here.
     private static onGameMessage(msg: MessageEvent) {
         const jsonData = JSON.parse(get(msg, 'data', {}));
+        console.log('recieved', jsonData);
         if (jsonData.clientUUID) {
             docCookies.setItem(clientUUIDCookieID, jsonData.clientUUID, ONE_DAY);
             WsServer.clientUUID = jsonData.clientUUID;

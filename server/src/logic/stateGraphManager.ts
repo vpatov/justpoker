@@ -44,13 +44,13 @@ export class StateGraphManager {
     isAllInRunOutCondition: Condition = {
         fn: () => this.gameStateManager.isAllInRunOut(),
         TRUE: GameStage.FINISH_BETTING_ROUND,
-        FALSE: GameStage.SET_CURRENT_PLAYER_TO_ACT,
+        FALSE: GameStage.WAITING_FOR_BET_ACTION,
     };
 
     isBettingRoundOverCondition: Condition = {
         fn: () => this.gameStateManager.isBettingRoundOver() || this.gameStateManager.hasEveryoneButOnePlayerFolded(),
         TRUE: GameStage.FINISH_BETTING_ROUND,
-        FALSE: GameStage.SET_CURRENT_PLAYER_TO_ACT,
+        FALSE: GameStage.WAITING_FOR_BET_ACTION,
     };
 
     sidePotsRemainingCondition: Condition = {
@@ -73,9 +73,6 @@ export class StateGraphManager {
         [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([
             [ServerActionType.GAMEPLAY_TIMEOUT, this.isAllInRunOutCondition],
         ]),
-        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([
-            [ServerActionType.GAMEPLAY_TIMEOUT, GameStage.WAITING_FOR_BET_ACTION],
-        ]),
         [GameStage.WAITING_FOR_BET_ACTION]: new Map([
             [ClientActionType.BETACTION, GameStage.SHOW_BET_ACTION],
             [ClientActionType.USETIMEBANK, GameStage.WAITING_FOR_BET_ACTION],
@@ -94,7 +91,6 @@ export class StateGraphManager {
         [GameStage.INITIALIZE_NEW_HAND]: 250,
         [GameStage.SHOW_START_OF_HAND]: 400,
         [GameStage.SHOW_START_OF_BETTING_ROUND]: 750,
-        [GameStage.SET_CURRENT_PLAYER_TO_ACT]: 50, // TODO there does not need to be a delay here.
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
         [GameStage.SHOW_BET_ACTION]: 200,
         [GameStage.FINISH_BETTING_ROUND]: 1200,
@@ -213,12 +209,8 @@ export class StateGraphManager {
                 break;
             }
 
-            case GameStage.SET_CURRENT_PLAYER_TO_ACT: {
-                this.gamePlayService.computeAndSetCurrentPlayerToAct();
-                break;
-            }
-
             case GameStage.WAITING_FOR_BET_ACTION: {
+                this.gamePlayService.computeAndSetCurrentPlayerToAct();
                 this.gamePlayService.setTimeCurrentPlayerTurnStarted();
                 break;
             }
