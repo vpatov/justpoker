@@ -2,7 +2,7 @@ import React from 'react';
 import classnames from 'classnames';
 
 import Table from '../table/Table';
-import Controller from '../controller/Controller';
+import Controller from '../controller/ControllerRoot';
 import AudioModule from './AudioModule';
 import AnimiationModule from './AnimiationModule';
 import LogPanel from '../panel/LogPanel';

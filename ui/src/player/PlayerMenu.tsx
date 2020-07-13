@@ -77,8 +77,8 @@ function PlayerMenu(props) {
         return (
             <>
                 {Object.keys(AvatarKeys).map((key, index) => (
-                    <IconButton onClick={handleSelectNewAvatar(key)} className={classes.avatarButton}>
-                        <Avatar key={`${key}${index}`} avatarKey={key} className={classes.avatarIcon} />
+                    <IconButton key={key} onClick={handleSelectNewAvatar(key)} className={classes.avatarButton}>
+                        <Avatar avatarKey={key} className={classes.avatarIcon} />
                     </IconButton>
                 ))}
             </>
