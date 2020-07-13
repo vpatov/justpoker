@@ -63,8 +63,10 @@ function SettingsDialog(props) {
     const [background, SET_background] = useState(curfPrefs.backgroundColor);
     const [twoColor, SET_twoColor] = React.useState(curfPrefs.twoColor);
 
+    const isBackgroundADefault = Object.values(Background).some((bg) => bg === background);
+
     const [showColorPicker, SET_showColorPicker] = React.useState(false);
-    const [customColor, SET_customColor] = React.useState('#FFFFFF');
+    const [customColor, SET_customColor] = React.useState(isBackgroundADefault ? '#FFFFFF' : background);
 
     const [coloredCardBackground, SET_coloredCardBackground] = React.useState(curfPrefs.coloredCardBackground);
 
