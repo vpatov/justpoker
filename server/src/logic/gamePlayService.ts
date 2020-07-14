@@ -134,7 +134,7 @@ export class GamePlayService {
 
     resetBettingRoundActions() {
         this.gsm.forEveryPlayerUUID((playerUUID) => {
-            if (this.gsm.isPlayerInHand(playerUUID) && !this.gsm.isPlayerAllIn(playerUUID)) {
+            if (this.gsm.isPlayerInHand(playerUUID) && !this.gsm.hasPlayerPutAllChipsInThePot(playerUUID)) {
                 this.gsm.setPlayerLastActionType(playerUUID, BettingRoundActionType.WAITING_TO_ACT);
                 this.gsm.setPlayerBetAmount(playerUUID, 0);
             }
@@ -264,10 +264,9 @@ export class GamePlayService {
         this.gsm.setPlayerBetAmount(currentPlayerToActUUID, callAmount);
 
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToActUUID);
-        const isPlayerCallingAllInRunOut = this.gsm.getPlayersAllIn().length === this.gsm.getPlayersInHand().length - 1;
         this.gsm.setPlayerLastActionType(
             currentPlayerToActUUID,
-            isPlayerAllIn || isPlayerCallingAllInRunOut ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
+            isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
         );
 
         return callAmount;
@@ -348,7 +347,7 @@ export class GamePlayService {
         } else {
             firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(0);
         }
-        if (this.gsm.isPlayerAllIn(firstToAct.playerUUID)) {
+        if (this.gsm.hasPlayerPutAllChipsInThePot(firstToAct.playerUUID)) {
             firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(firstToAct.positionIndex);
         }
 
