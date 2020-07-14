@@ -271,21 +271,12 @@ export class GameStateManager {
      */
     updateCurrentPlayerSeatToAct(): void {
         const previousPlayerSeat = this.getCurrentPlayerSeatToAct();
-        const firstSeatToAct = this.getFirstSeatToAct();
+        const currentPlayerSeat = previousPlayerSeat
+            ? this.getNextPlayerSeatEligibleToAct(previousPlayerSeat.positionIndex)
+            : this.getFirstSeatToAct();
 
-        // if this isnt start of betting round
-        if (previousPlayerSeat) {
-            this.setCurrentPlayerSeatToAct(this.getNextPlayerSeatEligibleToAct(previousPlayerSeat.positionIndex));
-        } else {
-            // if this is start of betting round
-            // check if first to act is all in via the blinds, if so find next eligible to act
-            if (this.isPlayerAllIn(firstSeatToAct.playerUUID)) {
-                this.setCurrentPlayerSeatToAct(this.getNextPlayerSeatEligibleToAct(firstSeatToAct.positionIndex));
-            } else {
-                // if first to act is not all in, set first to act to act!
-                this.setCurrentPlayerSeatToAct(firstSeatToAct);
-            }
-        }
+        assert(previousPlayerSeat !== currentPlayerSeat);
+        this.setCurrentPlayerSeatToAct(currentPlayerSeat);
     }
 
     getDealerSeat(): PlayerSeat {
