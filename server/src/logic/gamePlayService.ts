@@ -339,12 +339,12 @@ export class GamePlayService {
             if (headsUp) {
                 firstToAct = dealerSeat;
             } else if (straddleSeat) {
-                firstToAct = this.gsm.getNextPlayerSeatInHand(3);
+                firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(3);
             } else {
-                firstToAct = this.gsm.getNextPlayerSeatInHand(2);
+                firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(2);
             }
         } else {
-            firstToAct = this.gsm.getNextPlayerSeatInHand(0);
+            firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(0);
         }
 
         this.gsm.setFirstSeatToAct(firstToAct);

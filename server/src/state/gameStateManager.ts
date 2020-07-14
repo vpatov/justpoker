@@ -272,7 +272,7 @@ export class GameStateManager {
     updateCurrentPlayerSeatToAct(): void {
         const previousPlayerSeat = this.getCurrentPlayerSeatToAct();
         const currentPlayerSeat = previousPlayerSeat
-            ? this.getNextPlayerSeatInHand(previousPlayerSeat.positionIndex)
+            ? this.getNextPlayerSeatEligibleToAct(previousPlayerSeat.positionIndex)
             : this.getFirstSeatToAct();
 
         assert(previousPlayerSeat !== currentPlayerSeat);
@@ -824,12 +824,15 @@ export class GameStateManager {
     }
 
     /** Given the positionNumber, find the next player that is in the hand. */
-    getNextPlayerSeatInHand(positionNumber: number): PlayerSeat {
+    getNextPlayerSeatEligibleToAct(positionNumber: number): PlayerSeat {
         const seatsDealtIn = this.getSeatsDealtIn();
         for (let i = 1; i < seatsDealtIn.length; i++) {
             const nextIndex = (positionNumber + i) % seatsDealtIn.length;
             const seat = seatsDealtIn[nextIndex];
-            if (this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber && this.isPlayerInHand(seat.playerUUID)) {
+            if (
+                this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber &&
+                this.isPlayerEligibleToActNext(seat.playerUUID)
+            ) {
                 return seat;
             }
         }
