@@ -723,6 +723,13 @@ export class ValidationService {
             };
         }
 
+        if (bigBlind < smallBlind) {
+            return {
+                errorType: ErrorType.ILLEGAL_VALUE,
+                errorString: `smallBlind must be less than or equal to bigBlind`,
+            };
+        }
+
         const minMaxErrors: ValidationResponse[] = [
             this.validateMinMaxValues(smallBlind, MIN_VALUES.SMALL_BLIND, MAX_VALUES.SMALL_BLIND, 'smallBlind'),
             this.validateMinMaxValues(bigBlind, MIN_VALUES.BIG_BLIND, MAX_VALUES.BIG_BLIND, 'bigBlind'),
