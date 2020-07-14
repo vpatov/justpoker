@@ -126,16 +126,16 @@ function PlayerStack(props) {
 
     function getPlayerOverlay() {
         const comps = [] as any;
-        if (disconnected) {
+        if (quitting) {
             comps.push(
                 <Typography key={'disconnected'} className={classes.labelText}>
-                    Disconnected
+                    Quitting
                 </Typography>,
             );
-        } else if (quitting) {
+        } else if (disconnected) {
             comps.push(
                 <Typography key={'quitting'} className={classes.labelText}>
-                    Quitting
+                    Disconnected
                 </Typography>,
             );
         } else if (leaving) {
