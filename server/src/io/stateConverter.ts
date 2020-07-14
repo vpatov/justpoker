@@ -195,7 +195,10 @@ export class StateConverter {
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
 
         const getSizingButtons = () => {
-            if (!this.gameStateManager.isGameInProgress()) {
+            if (
+                !this.gameStateManager.isGameInProgress() ||
+                !this.gameStateManager.isPlayerReadyToPlay(heroPlayerUUID)
+            ) {
                 return [];
             }
 
