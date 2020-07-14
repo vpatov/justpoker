@@ -191,6 +191,11 @@ function HandLog(props: HandLogProps) {
                 return [...oldHandLogEntries];
             }
 
+            // ensure handlog is set to latest when data first comes in
+            if (oldHandLogEntries.length === 0 && incomingHandLogEntries.length > 0) {
+                setCurrentHandNumber(incomingHandLogEntries.length - 1);
+            }
+
             // If we received more than one handLogEntry, replace the entire list
             return incomingHandLogEntries;
         });
