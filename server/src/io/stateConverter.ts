@@ -264,7 +264,7 @@ export class StateConverter {
         heroPlayerUUID: PlayerUUID,
         toAct: boolean,
     ): BettingActionButtons {
-        if (!this.gameStateManager.isGameInProgress()) {
+        if (!this.gameStateManager.isGameInProgress() || !this.gameStateManager.isPlayerReadyToPlay(heroPlayerUUID)) {
             return {};
         }
 
