@@ -96,7 +96,9 @@ function PlayerMenu(props) {
             {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
             {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
             {isHeroAdmin && isPlayerHero ? <MenuItem onClick={handleRemoveAdmin}>Remove as Admin</MenuItem> : null}
-            {isHeroAdmin && !isPlayerHero ? <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem> : null}
+            {isHeroAdmin && !isPlayerHero && !quitting ? (
+                <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
+            ) : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
             {isPlayerHero ? <MenuItem onClick={handleChangeAvatarMenu}>Change Avatar</MenuItem> : null}
             <ConfirmationDialog
