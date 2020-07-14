@@ -836,7 +836,6 @@ export class GameStateManager {
                 return seat;
             }
         }
-
         throw Error(`Went through all players and didnt find the next player ready to play.`);
     }
 
@@ -1309,6 +1308,12 @@ export class GameStateManager {
 
     getPlayersAllIn(): PlayerUUID[] {
         return this.filterPlayerUUIDs((playerUUID) => this.isPlayerAllIn(playerUUID));
+    }
+
+    getPlayersPutAllChipsInPot(): PlayerUUID[] {
+        return this.filterPlayerUUIDs(
+            (playerUUID) => this.isPlayerInHand(playerUUID) && this.hasPlayerPutAllChipsInThePot(playerUUID),
+        );
     }
 
     isAllInRunOut(): boolean {

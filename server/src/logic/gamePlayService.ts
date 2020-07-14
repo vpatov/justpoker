@@ -26,6 +26,7 @@ import { ChatService } from '../state/chatService';
 import { TimerManager } from '../state/timerManager';
 import { Context } from '../state/context';
 import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
+import { assert } from 'console';
 
 @Service()
 export class GamePlayService {
@@ -240,6 +241,7 @@ export class GamePlayService {
             // you cant call less then the BB, you must put in at least a BB
             this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
             this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
+            this.gsm.setPartialAllInLeftOver(0); // unset partial all in left over if a full bet was made
         }
 
         // record last aggressor
@@ -345,6 +347,9 @@ export class GamePlayService {
             }
         } else {
             firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(0);
+        }
+        if (this.gsm.isPlayerAllIn(firstToAct.playerUUID)) {
+            firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(firstToAct.positionIndex);
         }
 
         this.gsm.setFirstSeatToAct(firstToAct);
@@ -625,16 +630,31 @@ export class GamePlayService {
         if (this.gsm.isAllInRunOut()) {
             return;
         }
-        const [playersAllIn, playersInHand] = [this.gsm.getPlayersAllIn(), this.gsm.getPlayersInHand()];
+        const [playersAllIn, playersInHand] = [this.gsm.getPlayersPutAllChipsInPot(), this.gsm.getPlayersInHand()];
 
         // there must be a least two player in the hand and at least one player all in at the minimum
         if (playersAllIn.length < 1 || playersInHand.length < 2) {
             return;
         }
 
-        // If everyone is all in, or everyone but one player is all in, isAllInRunOut === true
-        if (playersAllIn.length >= playersInHand.length - 1) {
+        // if all players are all in then its all in runout
+        if (playersAllIn.length === playersInHand.length) {
             this.gsm.setIsAllInRunOut(true);
+            return;
+        }
+
+        // if one player is not all in
+        if (playersAllIn.length >= playersInHand.length - 1) {
+            const playersNotAllIn = playersInHand.filter(
+                (playerInHandUUID) => !playersAllIn.includes(playerInHandUUID),
+            );
+            assert(playersNotAllIn.length === 1); // should only every be one player not all in if playersAllIn.length >= playersInHand.length - 1
+            const playerNotAllIn = playersNotAllIn[0];
+            const isPlayerNotAllInFacingBet = this.gsm.isPlayerFacingBet(playerNotAllIn);
+            // if you are not facing a bet and you are the last player not all in then it is a runout
+            if (!isPlayerNotAllInFacingBet) {
+                this.gsm.setIsAllInRunOut(true);
+            }
         }
     }
 
