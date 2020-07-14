@@ -583,6 +583,13 @@ export class ValidationService {
             };
         }
 
+        if (bootPlayer.quitting) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player ${req.playerUUID} is already quitting.`,
+            };
+        }
+
         const requestingPlayer = this.gsm.getPlayerByClientUUID(clientUUID);
         if (requestingPlayer && requestingPlayer.uuid === bootPlayer.uuid) {
             return {

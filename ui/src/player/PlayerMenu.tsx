@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function PlayerMenu(props) {
     const classes = useStyles();
     const { anchorEl, handleClose, setHeroRotation, virtualPositon, player } = props;
-    const { stack, name, uuid, admin } = player;
+    const { stack, name, uuid, admin, quitting } = player;
     const [chipsDialog, setChipsDialog] = useState(false);
     const [avatarDialog, SET_avatarDialog] = useState(false);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
