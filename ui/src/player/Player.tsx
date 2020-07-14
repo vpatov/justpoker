@@ -123,7 +123,7 @@ function Player(props) {
                 virtualPositon={virtualPositon}
             />
 
-            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} />
+            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} playerUUID={uuid} />
 
             <PlayerStack player={player} onClickStack={handleClick} />
             <IconButton className={classes.moreButton} onClick={handleClick}>

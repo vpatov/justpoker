@@ -6,13 +6,7 @@ import { AnimationState, getCleanAnimationState } from '../state/animationState'
 import { UserPreferences } from './userPreferences';
 
 import { MAX_VALUES } from '../../util/consts';
-import {
-    BettingRoundActionType,
-    BettingRoundAction,
-    NOT_IN_HAND,
-    CHECK_ACTION,
-    BettingRoundStage,
-} from '../game/betting';
+import { BettingRoundActionType, BettingRoundStage } from '../game/betting';
 
 import { GameParameters, getCleanGameParameters, getTestGameParameters } from '../game/game';
 import { PlayerUUID, makeBlankUUID } from '../system/uuid';
@@ -61,7 +55,6 @@ export declare interface Global {
     isGameInProgress: boolean;
     canStartGame: boolean;
     gameWillStopAfterHand: boolean;
-    unqueueAllBettingRoundActions: boolean;
     areOpenSeats: boolean;
     gameParametersWillChangeAfterHand: boolean;
     isGameInHandInitStage: boolean;
@@ -84,10 +77,11 @@ export declare interface Controller {
     dealInNextHand: boolean;
     toAct?: boolean;
     willStraddle: boolean;
-    lastBettingRoundAction: BettingRoundAction;
+    curBet: number;
     showWarningOnFold: boolean;
     amountToCall: number;
     playerPositionString?: string;
+    unqueueAllBettingRoundActions: boolean;
 }
 
 export declare interface BettingActionButtons {
@@ -322,9 +316,9 @@ export function getCleanUiChatLog(): UiChatLog {
 export function getCleanController(): Controller {
     return {
         toAct: false,
-        lastBettingRoundAction: NOT_IN_HAND,
         min: 0,
         max: 0,
+        curBet: 0,
         willStraddle: false,
         dealInNextHand: true,
         sizingButtons: [],
@@ -332,6 +326,7 @@ export function getCleanController(): Controller {
         timeBanks: 0,
         showWarningOnFold: false,
         amountToCall: 0,
+        unqueueAllBettingRoundActions: false,
     };
 }
 
@@ -343,7 +338,6 @@ export function getCleanGlobal(): Global {
         canStartGame: false,
         gameWillStopAfterHand: false,
         gameParametersWillChangeAfterHand: false,
-        unqueueAllBettingRoundActions: true,
         isGameInHandInitStage: false,
         areOpenSeats: true,
         computedMaxBuyin: 1,
@@ -456,7 +450,6 @@ export const TestGame: UiGameState = {
         isGameInProgress: true,
         canStartGame: false,
         gameWillStopAfterHand: true,
-        unqueueAllBettingRoundActions: true,
         areOpenSeats: true,
         gameParametersWillChangeAfterHand: true,
         computedMaxBuyin: 1000,
@@ -471,9 +464,10 @@ export const TestGame: UiGameState = {
         canShowHideCards: true,
     },
     controller: {
+        unqueueAllBettingRoundActions: false,
         showWarningOnFold: true,
         toAct: false,
-        lastBettingRoundAction: CHECK_ACTION,
+        curBet: 25,
         min: 25,
         max: 43000,
         amountToCall: 54323,

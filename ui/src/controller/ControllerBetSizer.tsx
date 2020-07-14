@@ -1,15 +1,16 @@
-import React, { Fragment } from 'react';
-import classnames from 'classnames';
+import React from 'react';
 
+import classnames from 'classnames';
 import { createStyles, makeStyles, Theme, withStyles, useTheme } from '@material-ui/core/styles';
-import TextFieldWrap from '../reuseable/TextFieldWrap';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import Slider from '@material-ui/core/Slider';
-import { BettingRoundActionType } from '../shared/models/game/betting';
-var Color = require('color');
+import Color from 'color';
 
-const ThiccSlider = withStyles({
+import TextFieldWrap from '../reuseable/TextFieldWrap';
+import { BettingRoundActionType } from '../shared/models/game/betting';
+
+const ThickSlider = withStyles({
     root: {
         height: 8,
     },
@@ -17,7 +18,6 @@ const ThiccSlider = withStyles({
         height: '1.6vmin',
         width: '1.6vmin',
         marginTop: '-0.4vmin',
-        // marginLeft: '1vmin',
     },
     track: {
         height: '0.8vmin',
@@ -101,13 +101,16 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         sizeButton: {
             minWidth: 0,
-            fontSize: '1vmin',
+            fontSize: '1.4vmin',
             padding: '0.6vmin 0vmin',
             flexGrow: 1,
         },
     }),
 );
 
+// right most part of the bet action sections of the controller
+// allows user to set the size of their bet within valid bet options
+// is vertically structred with three main components, a free numeric textfield, a slider, and fixed betsizing buttons
 function ControllerBetSizer(props) {
     const classes = useStyles();
     const theme = useTheme();
@@ -133,7 +136,7 @@ function ControllerBetSizer(props) {
     return (
         <div className={classes.bettingCont}>
             {sizingButtons.length > 0 ? (
-                <Fragment>
+                <>
                     <div className={classes.plusMinusButtonAndTextfieldCont}>
                         <Button
                             variant="outlined"
@@ -169,7 +172,7 @@ function ControllerBetSizer(props) {
                             +
                         </Button>
                     </div>
-                    <ThiccSlider
+                    <ThickSlider
                         className={classes.slider}
                         onChange={(e, val) => onChange(val as number)}
                         value={value}
@@ -182,6 +185,7 @@ function ControllerBetSizer(props) {
                         <ButtonGroup className={classes.sizeButtonGroupCont}>
                             {sizingButtons.map((button) => (
                                 <Button
+                                    key={button.label}
                                     variant="outlined"
                                     className={classes.sizeButton}
                                     onClick={(e) => onChange(button.value)}
@@ -191,10 +195,11 @@ function ControllerBetSizer(props) {
                             ))}
                         </ButtonGroup>
                     </div>
-                </Fragment>
+                </>
             ) : null}
         </div>
     );
 }
+ControllerBetSizer.displayName = 'ControllerBetSizer';
 
 export default ControllerBetSizer;

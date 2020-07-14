@@ -1,5 +1,4 @@
 import { UiGameState, Table, Controller, UiPlayer, Global, PlayerTimer, MenuButton } from '../shared/models/ui/uiState';
-import { BettingRoundActionType, ALL_BETTING_ROUND_ACTION_TYPES } from '../shared/models/game/betting';
 import { GameParameters } from '../shared/models/game/game';
 import { PlayerUUID } from '../shared/models/system/uuid';
 
@@ -9,17 +8,6 @@ export const playersSelector = (gs: UiGameState): UiPlayer[] => gs.players;
 export const heroHandLabelSelector = (gs: UiGameState): string =>
     (gs.players.find((p) => p.hero) || {}).handLabel || '';
 
-export const bettingRoundActionTypesToUnqueueSelector: (UiGameState) => BettingRoundActionType[] = (
-    gs: UiGameState,
-) => {
-    if (gs.global.unqueueAllBettingRoundActions) {
-        return ALL_BETTING_ROUND_ACTION_TYPES;
-    } else if (gs.controller.lastBettingRoundAction.type === BettingRoundActionType.BET) {
-        return [BettingRoundActionType.CHECK, BettingRoundActionType.CALL, BettingRoundActionType.BET];
-    } else {
-        return [];
-    }
-};
 export const canStartGameSelector = (gs: UiGameState): boolean => gs.global.canStartGame;
 export const globalGameStateSelector = (gs: UiGameState): Global => gs.global;
 export const heroPlayerTimerSelector = (gs: UiGameState): PlayerTimer =>
