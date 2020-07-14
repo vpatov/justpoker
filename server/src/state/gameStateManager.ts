@@ -953,7 +953,7 @@ export class GameStateManager {
     }
 
     removePlayerFromGame(playerUUID: PlayerUUID) {
-        if (this.isPlayerInHand(playerUUID)) {
+        if (this.wasPlayerDealtIn(playerUUID)) {
             this.queueAction({
                 actionType: ClientActionType.BOOTPLAYER,
                 args: [playerUUID],
