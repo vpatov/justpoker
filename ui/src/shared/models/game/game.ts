@@ -79,7 +79,7 @@ export function getDefaultGameParameters(): GameParameters {
         timeBankTime: 30,
         numberTimeBanks: 5,
         allowTimeBanks: true,
-        timeBankReplenishIntervalMinutes: 15,
+        timeBankReplenishIntervalMinutes: 30,
         allowStraddle: false,
         canShowHeadsUp: false,
     };
