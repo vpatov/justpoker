@@ -696,7 +696,7 @@ export class ValidationService {
         if (value < min) {
             return {
                 errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `Value ${value}${field ? ` for field ${field}` : ''} is below min value ${max}`,
+                errorString: `Value ${value}${field ? ` for field ${field}` : ''} is below min value ${min}`,
             };
         }
         return undefined;
@@ -760,7 +760,7 @@ export class ValidationService {
             };
         }
 
-        error = this.validateMinMaxValues(req.chipAmount, MIN_VALUES.BUY_IN, MAX_VALUES.BUY_IN, 'buyIn');
+        error = this.validateMinMaxValues(req.chipAmount, 0, MAX_VALUES.BUY_IN, 'buyIn');
         if (error) {
             return error;
         }

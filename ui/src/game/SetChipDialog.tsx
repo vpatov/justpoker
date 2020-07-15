@@ -52,6 +52,10 @@ function SetChipDialog(props) {
         handleClose();
     }
 
+    function canSubmit() {
+        return resultingChips >= 0;
+    }
+
     function computeResultingChips() {
         switch (mode) {
             case 'Add':
@@ -108,7 +112,7 @@ function SetChipDialog(props) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={onSubmit} color="primary" autoFocus>
+                <Button onClick={onSubmit} disabled={!canSubmit()} color="primary" autoFocus>
                     {mode} Chips
                 </Button>
             </DialogActions>
