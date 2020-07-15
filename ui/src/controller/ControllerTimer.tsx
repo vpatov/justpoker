@@ -86,16 +86,13 @@ function ControllerTimer() {
     }
 
     const transformBy = computePercentageTransform();
+
     return (
         <div
             className={classnames(classes.root)}
-            style={
-                transformBy !== 0
-                    ? {
-                          transform: `translateX(${transformBy * -1}%)`,
-                      }
-                    : {}
-            }
+            style={{
+                transform: `translateX(${transformBy * -1}%)`,
+            }}
         />
     );
 }
