@@ -712,21 +712,7 @@ export class ValidationService {
         if (maxBuyin < minBuyin) {
             return {
                 errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `maxBuyin cannot bet less than minBuyin`,
-            };
-        }
-
-        if (minBuyin < smallBlind) {
-            return {
-                errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `minBuyin must be at least smallBlind amount`,
-            };
-        }
-
-        if (minBuyin < bigBlind) {
-            return {
-                errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `minBuyin must be at least bigBlind amount`,
+                errorString: `maxBuyin cannot be less than minBuyin`,
             };
         }
 
