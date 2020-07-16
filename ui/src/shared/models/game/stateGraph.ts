@@ -34,5 +34,4 @@ export const INIT_HAND_STAGES = [
     GameStage.INITIALIZE_NEW_HAND,
     GameStage.SHOW_START_OF_HAND,
     GameStage.SHOW_START_OF_BETTING_ROUND,
-    GameStage.POST_HAND_CLEANUP,
 ];

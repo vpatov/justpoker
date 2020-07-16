@@ -955,8 +955,12 @@ export class GameStateManager {
         return connectedClient;
     }
 
+    isGameInInitStage(): boolean {
+        return INIT_HAND_STAGES.includes(this.getGameStage());
+    }
+
     removePlayerFromGame(playerUUID: PlayerUUID) {
-        if (this.wasPlayerDealtIn(playerUUID)) {
+        if (this.wasPlayerDealtIn(playerUUID) || this.isGameInInitStage()) {
             this.queueAction({
                 actionType: ClientActionType.BOOTPLAYER,
                 args: [playerUUID],
@@ -1053,7 +1057,7 @@ export class GameStateManager {
     }
 
     playerLeaveTable(playerUUID: PlayerUUID) {
-        if (this.isPlayerInHand(playerUUID)) {
+        if (this.isPlayerInHand(playerUUID) || this.isGameInInitStage()) {
             this.queueAction({
                 actionType: ClientActionType.LEAVETABLE,
                 args: [playerUUID],
