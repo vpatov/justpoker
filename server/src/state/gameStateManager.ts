@@ -332,7 +332,7 @@ export class GameStateManager {
             return 0;
         }
         const chips = this.getPlayerChips(playerUUID);
-        const callAmount = this.getPreviousRaise() > chips ? chips : this.getPreviousRaise();
+        const callAmount = Math.min(this.getPreviousRaise() + this.getPartialAllInLeftOver(), chips);
         return callAmount;
     }
 
@@ -694,6 +694,7 @@ export class GameStateManager {
         return INIT_HAND_STAGES.indexOf(this.getGameStage()) > -1;
     }
 
+    // is this still correct??
     getMinimumBetSize(): number {
         const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise();
         return minimumBet;
@@ -1267,6 +1268,9 @@ export class GameStateManager {
             smallBlindSeat: undefined,
             bigBlindSeat: undefined,
             straddleSeat: undefined,
+            minRaiseDiff: 0,
+            previousRaise: 0,
+            partialAllInLeftOver: 0,
         });
     }
 

@@ -124,12 +124,12 @@ export class GamePlayService {
 
     startOfBettingRound() {
         this.gsm.setMinRaiseDiff(this.gsm.getBB());
-        this.gsm.setPartialAllInLeftOver(0);
         this.updatePlayersBestHands();
     }
 
     endOfBettingRound() {
         this.gsm.setPreviousRaise(0);
+        this.gsm.setPartialAllInLeftOver(0);
     }
 
     resetBettingRoundActions() {
@@ -221,7 +221,11 @@ export class GamePlayService {
         );
 
         const previousRaise = this.gsm.getPreviousRaise();
-        const minRaiseDiff = betAmount - previousRaise;
+        const minRaiseDiff = this.gsm.getMinRaiseDiff();
+
+        console.log('actualBetAmount: ', actualBetAmount);
+        console.log('previousRaise: ', previousRaise);
+        console.log('minRaiseDiff: ', minRaiseDiff);
 
         this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
         this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
