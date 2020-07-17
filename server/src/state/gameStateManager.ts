@@ -245,10 +245,6 @@ export class GameStateManager {
         this.gameState.previousRaise = previousRaise;
     }
 
-    setPartialAllInLeftOver(partialAllInLeftOver: number) {
-        this.gameState.partialAllInLeftOver = partialAllInLeftOver;
-    }
-
     getMinRaiseDiff(): number {
         return this.gameState.minRaiseDiff;
     }

@@ -129,7 +129,6 @@ export class GamePlayService {
 
     endOfBettingRound() {
         this.gsm.setPreviousRaise(0);
-        this.gsm.setPartialAllInLeftOver(0);
     }
 
     resetBettingRoundActions() {
@@ -221,11 +220,9 @@ export class GamePlayService {
         );
 
         const previousRaise = this.gsm.getPreviousRaise();
-        const minRaiseDiff = this.gsm.getMinRaiseDiff();
 
         console.log('actualBetAmount: ', actualBetAmount);
         console.log('previousRaise: ', previousRaise);
-        console.log('minRaiseDiff: ', minRaiseDiff);
 
         this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
         this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
