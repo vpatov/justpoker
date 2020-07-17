@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
         height: '50px',
     },
     pickerMenu: {
-        width: '30vmin',
+        width: '38vmin',
     },
     minMaxButtonCont: {
         display: 'flex',
