@@ -223,26 +223,8 @@ export class GamePlayService {
         const previousRaise = this.gsm.getPreviousRaise();
         const minRaiseDiff = betAmount - previousRaise;
 
-        // If player is all in, and is not reraising, it is considered a call. However, since
-        // they are putting more chips in the pot, it will still go through this code path.
-        // In thise case, we do not update the minRaiseDiff or previousRaise, but only the
-        // partialAllInLeftOver.
-        if (actualBetAmount > previousRaise && actualBetAmount < previousRaise + minRaiseDiff) {
-            if (!isPlayerAllIn) {
-                throw Error(
-                    `Player is not all in, but is raising less than the minimum raise.` +
-                        ` GameState: ${getLoggableGameState(this.gsm.getGameState())}`,
-                );
-            }
-            const partialAllInLeftOver = actualBetAmount - previousRaise;
-            this.gsm.setPartialAllInLeftOver(partialAllInLeftOver);
-        } else {
-            // If SB/BB are going all in with less than a blind preflop, if you have more than one BB
-            // you cant call less then the BB, you must put in at least a BB
-            this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
-            this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
-            this.gsm.setPartialAllInLeftOver(0); // unset partial all in left over if a full bet was made
-        }
+        this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
+        this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
 
         // record last aggressor
         this.gsm.updateGameState({

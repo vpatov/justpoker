@@ -245,10 +245,6 @@ export class GameStateManager {
         this.gameState.previousRaise = previousRaise;
     }
 
-    getPartialAllInLeftOver() {
-        return this.gameState.partialAllInLeftOver;
-    }
-
     setPartialAllInLeftOver(partialAllInLeftOver: number) {
         this.gameState.partialAllInLeftOver = partialAllInLeftOver;
     }
@@ -699,7 +695,7 @@ export class GameStateManager {
     }
 
     getMinimumBetSize(): number {
-        const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise() + this.getPartialAllInLeftOver();
+        const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise();
         return minimumBet;
     }
 
@@ -740,7 +736,7 @@ export class GameStateManager {
     }
 
     isPlayerFacingBet(playerUUID: PlayerUUID): boolean {
-        return this.getPreviousRaise() + this.getPartialAllInLeftOver() > this.getPlayerBetAmount(playerUUID);
+        return this.getPreviousRaise() > this.getPlayerBetAmount(playerUUID);
     }
 
     // TODO
