@@ -123,11 +123,11 @@ export class GamePlayService {
     }
 
     startOfBettingRound() {
-        this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.updatePlayersBestHands();
     }
 
     endOfBettingRound() {
+        this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPreviousRaise(0);
     }
 
@@ -220,11 +220,12 @@ export class GamePlayService {
         );
 
         const previousRaise = this.gsm.getPreviousRaise();
+        const minRaiseDiff = this.gsm.getMinRaiseDiff();
+        const raisingBy = actualBetAmount - previousRaise;
 
-        console.log('actualBetAmount: ', actualBetAmount);
-        console.log('previousRaise: ', previousRaise);
-
-        this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
+        if (raisingBy >= minRaiseDiff) {
+            this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
+        }
         this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
 
         // record last aggressor

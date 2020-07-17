@@ -110,11 +110,8 @@ export declare interface GameState {
     /** The minimum amount by which the next player can raise. */
     minRaiseDiff: number;
 
-    /** The size of the bet of the last aggressor. It will not include callers and partial all-ins. */
+    /** The size of the bet of the last aggressor. It will not include callers but will include partial all-ins. */
     previousRaise: number;
-
-    /** The extra amount put into the pot by an all-in that was below the min-raise. */
-    partialAllInLeftOver: number;
 
     /** The number of the current hand. Starts at 0. */
     handNumber: number;
@@ -158,7 +155,6 @@ export function getCleanGameState(): GameState {
         serverTime: 0,
         minRaiseDiff: 0,
         previousRaise: 0,
-        partialAllInLeftOver: 0,
         handNumber: -1,
         timeGameStarted: 0,
     };

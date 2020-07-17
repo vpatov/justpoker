@@ -1266,7 +1266,6 @@ export class GameStateManager {
             straddleSeat: undefined,
             minRaiseDiff: 0,
             previousRaise: 0,
-            partialAllInLeftOver: 0,
         });
     }
 
