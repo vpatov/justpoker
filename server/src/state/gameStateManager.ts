@@ -332,7 +332,7 @@ export class GameStateManager {
             return 0;
         }
         const chips = this.getPlayerChips(playerUUID);
-        const callAmount = Math.min(this.getPreviousRaise() + this.getPartialAllInLeftOver(), chips);
+        const callAmount = Math.min(this.getPreviousRaise(), chips);
         return callAmount;
     }
 
