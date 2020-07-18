@@ -197,7 +197,8 @@ export class StateConverter {
         const getSizingButtons = () => {
             if (
                 !this.gameStateManager.isGameInProgress() ||
-                !this.gameStateManager.isPlayerReadyToPlay(heroPlayerUUID)
+                (this.gameStateManager.getPlayer(heroPlayerUUID).sittingOut &&
+                    !this.gameStateManager.isPlayerInHand(heroPlayerUUID))
             ) {
                 return [];
             }
@@ -267,7 +268,11 @@ export class StateConverter {
         heroPlayerUUID: PlayerUUID,
         toAct: boolean,
     ): BettingActionButtons {
-        if (!this.gameStateManager.isGameInProgress() || !this.gameStateManager.isPlayerReadyToPlay(heroPlayerUUID)) {
+        if (
+            !this.gameStateManager.isGameInProgress() ||
+            (this.gameStateManager.getPlayer(heroPlayerUUID).sittingOut &&
+                !this.gameStateManager.isPlayerInHand(heroPlayerUUID))
+        ) {
             return {};
         }
 
