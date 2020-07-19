@@ -216,7 +216,7 @@ function MakeGame(props) {
                     variant="contained"
                     color="primary"
                     size="large"
-                    disabled={!createButtonEnabled}
+                    disabled={!createButtonEnabled()}
                     onClick={handleCreateGame}
                 >
                     Create Game
