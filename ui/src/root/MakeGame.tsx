@@ -63,8 +63,29 @@ function MakeGame(props) {
     const [gameParameters, SET_gameParameters] = useState(getDefaultGameParameters());
     const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType } = gameParameters;
 
+    function errorSB() {
+        if (smallBlind > bigBlind) return true;
+        if (smallBlind < MIN_VALUES.SMALL_BLIND) return true;
+        return false;
+    }
+
+    function errorBB() {
+        if (bigBlind < MIN_VALUES.SMALL_BLIND) return true;
+        return false;
+    }
+
+    function errorMaxBuy() {
+        if (maxBuyin < MIN_VALUES.BUY_IN) return true;
+        return false;
+    }
+
+    function errorTimeToAct() {
+        if (timeToAct < MIN_VALUES.TIME_TO_ACT) return true;
+        return false;
+    }
+
     function canCreate() {
-        return true;
+        return !errorSB() && !errorBB() && !errorMaxBuy() && !errorTimeToAct();
     }
 
     const createSuccess = (response) => {
@@ -101,9 +122,9 @@ function MakeGame(props) {
                     variant="standard"
                     onChange={(event) => setIntoGameParameters('smallBlind', event.target.value)}
                     value={smallBlind}
-                    min={MIN_VALUES.SMALL_BLIND}
                     max={MAX_VALUES.SMALL_BLIND}
                     type="number"
+                    error={errorSB()}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -111,9 +132,9 @@ function MakeGame(props) {
                     variant="standard"
                     onChange={(event) => setIntoGameParameters('bigBlind', event.target.value)}
                     value={bigBlind}
-                    min={MIN_VALUES.BIG_BLIND}
                     max={MAX_VALUES.BIG_BLIND}
                     type="number"
+                    error={errorBB()}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -121,9 +142,9 @@ function MakeGame(props) {
                     variant="standard"
                     onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
                     value={maxBuyin}
-                    min={MIN_VALUES.BUY_IN}
                     max={MAX_VALUES.BUY_IN}
                     type="number"
+                    error={errorMaxBuy()}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -131,10 +152,10 @@ function MakeGame(props) {
                     variant="standard"
                     onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
                     value={timeToAct}
-                    min={MIN_VALUES.TIME_TO_ACT}
                     max={MAX_VALUES.TIME_TO_ACT}
                     type="number"
-                />{' '}
+                    error={errorTimeToAct()}
+                />
                 <FormControl className={classes.field}>
                     <InputLabel>Game Type</InputLabel>
                     <Select
