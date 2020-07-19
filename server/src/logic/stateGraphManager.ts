@@ -209,6 +209,7 @@ export class StateGraphManager {
                 this.gameStateManager.incrementBettingRoundStage();
                 this.gamePlayService.resetBettingRoundActions();
                 this.gamePlayService.initializeBettingRound();
+                this.gamePlayService.updateIsAllInRunOut();
                 if (!this.gameStateManager.isAllInRunOut()) {
                     this.gamePlayService.setFirstToActAtStartOfBettingRound();
                 }
@@ -233,10 +234,10 @@ export class StateGraphManager {
 
             case GameStage.FINISH_BETTING_ROUND: {
                 this.gamePlayService.placeBetsInPot();
-                this.gamePlayService.updateIsAllInRunOut();
-                this.gamePlayService.flipCardsIfAllInRunOut();
                 this.gameStateManager.clearCurrentPlayerToAct();
                 this.gamePlayService.endOfBettingRound();
+                this.gamePlayService.updateIsAllInRunOut();
+                this.gamePlayService.flipCardsIfAllInRunOut();
                 break;
             }
 

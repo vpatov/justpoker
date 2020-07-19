@@ -750,7 +750,9 @@ export class GameStateManager {
 
     isPlayerEligibleToActNext(playerUUID: PlayerUUID): boolean {
         return (
-            !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID) && !this.isPlayerAllIn(playerUUID)
+            !this.hasPlayerFolded(playerUUID) &&
+            this.wasPlayerDealtIn(playerUUID) &&
+            !this.hasPlayerPutAllChipsInThePot(playerUUID)
         );
     }
 
@@ -836,7 +838,6 @@ export class GameStateManager {
                 return seat;
             }
         }
-
         throw Error(`Went through all players and didnt find the next player ready to play.`);
     }
 
@@ -1306,13 +1307,10 @@ export class GameStateManager {
         }, 0);
     }
 
-    isPlayerAllIn(playerUUID: PlayerUUID): boolean {
-        const player = this.getPlayer(playerUUID);
-        return player.lastActionType === BettingRoundActionType.ALL_IN;
-    }
-
-    getPlayersAllIn(): PlayerUUID[] {
-        return this.filterPlayerUUIDs((playerUUID) => this.isPlayerAllIn(playerUUID));
+    getPlayersPutAllChipsInPot(): PlayerUUID[] {
+        return this.filterPlayerUUIDs(
+            (playerUUID) => this.isPlayerInHand(playerUUID) && this.hasPlayerPutAllChipsInThePot(playerUUID),
+        );
     }
 
     isAllInRunOut(): boolean {
@@ -1334,7 +1332,7 @@ export class GameStateManager {
                 player.lastActionType !== BettingRoundActionType.PLACE_BLIND &&
                 (this.hasPlayerFolded(player.uuid) ||
                     player.betAmount === this.getHighestBet() ||
-                    this.isPlayerAllIn(player.uuid)),
+                    this.hasPlayerPutAllChipsInThePot(player.uuid)),
         );
     }
 

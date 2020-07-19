@@ -277,7 +277,7 @@ export class StateConverter {
         }
 
         if (
-            this.gameStateManager.isPlayerAllIn(heroPlayerUUID) ||
+            this.gameStateManager.hasPlayerPutAllChipsInThePot(heroPlayerUUID) ||
             this.gameStateManager.isAllInRunOut() ||
             !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
             this.gameStateManager.isGameStageInBetweenHands()
