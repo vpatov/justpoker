@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactPropTypes, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import classnames from 'classnames';
@@ -191,6 +191,11 @@ function HandLog(props: HandLogProps) {
                 return [...oldHandLogEntries];
             }
 
+            // ensure handlog is set to latest when data first comes in
+            if (oldHandLogEntries.length === 0 && incomingHandLogEntries.length > 0) {
+                setCurrentHandNumber(incomingHandLogEntries.length - 1);
+            }
+
             // If we received more than one handLogEntry, replace the entire list
             return incomingHandLogEntries;
         });
@@ -289,11 +294,11 @@ function HandLog(props: HandLogProps) {
     function renderCardsInline(cards: UiCard[]) {
         return (
             <Typography className={classes.handLogInlineCards}>
-                {cards.map((card) => (
-                    <>
+                {cards.map((card, index) => (
+                    <React.Fragment key={index}>
                         {generateStringFromRank(card.rank)}
                         <Suit className={classes.suit} suit={card.suit} color lightened />
-                    </>
+                    </React.Fragment>
                 ))}
             </Typography>
         );
@@ -348,22 +353,18 @@ function HandLog(props: HandLogProps) {
 
     function renderBettingRoundActions(actions: BetActionRecord[]) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
-        return (
-            <>
-                {actions.map((action, index) => {
-                    const playerSummary = playerSummaries[action.playerUUID];
-                    return (
-                        <Typography className={classnames(classes.handLogBettingRoundAction)} key={index}>
-                            <span>
-                                {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
-                                {renderBettingRoundAction(action)}
-                            </span>
-                            <span>{renderTimeTookToAct(action.timeTookToAct)}</span>
-                        </Typography>
-                    );
-                })}
-            </>
-        );
+        return actions.map((action, index) => {
+            const playerSummary = playerSummaries[action.playerUUID];
+            return (
+                <Typography className={classnames(classes.handLogBettingRoundAction)} key={index}>
+                    <span>
+                        {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                        {renderBettingRoundAction(action)}
+                    </span>
+                    <span>{renderTimeTookToAct(action.timeTookToAct)}</span>
+                </Typography>
+            );
+        });
     }
 
     // A 3 5 4 7,    A 3 5    ->    A 3 5
@@ -394,7 +395,7 @@ function HandLog(props: HandLogProps) {
     }
 
     function renderBettingRoundLogs(bettingRounds: BettingRoundLog[], board: UiCard[]) {
-        return <>{bettingRounds.map((bettingRound, index) => renderBettingRoundLog(bettingRound, index, board))}</>;
+        return bettingRounds.map((bettingRound, index) => renderBettingRoundLog(bettingRound, index, board));
     }
 
     function renderTimeHandStarted(timeHandStarted: number) {
@@ -407,36 +408,28 @@ function HandLog(props: HandLogProps) {
 
     function renderPlayerHands(playerHands: ShowdownHand[]) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
-        return (
-            <>
-                {playerHands.map((playerHand, index) => {
-                    const playerSummary = playerSummaries[playerHand.playerUUID];
-                    return (
-                        <Typography className={classnames(classes.handLogContentLabel)} key={index}>
-                            {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
-                            {playerHand.handDescription ? ` shows ${playerHand.handDescription}.` : ` doesn't show.`}
-                        </Typography>
-                    );
-                })}
-            </>
-        );
+        return playerHands.map((playerHand, index) => {
+            const playerSummary = playerSummaries[playerHand.playerUUID];
+            return (
+                <Typography className={classnames(classes.handLogContentLabel)} key={index}>
+                    {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                    {playerHand.handDescription ? ` shows ${playerHand.handDescription}.` : ` doesn't show.`}
+                </Typography>
+            );
+        });
     }
 
     function renderPotWinners(winners: PotWinner[]) {
         const playerSummaries = handLogEntries[currentHandNumber].playerSummaries;
-        return (
-            <>
-                {winners.map((winner, index) => {
-                    const playerSummary = playerSummaries[winner.playerUUID];
-                    return (
-                        <Typography className={classnames(classes.handLogContentLabel)} key={index}>
-                            {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
-                            {` wins ${winner.amount}`}
-                        </Typography>
-                    );
-                })}
-            </>
-        );
+        return winners.map((winner, index) => {
+            const playerSummary = playerSummaries[winner.playerUUID];
+            return (
+                <Typography className={classnames(classes.handLogContentLabel)} key={index}>
+                    {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
+                    {` wins ${winner.amount}`}
+                </Typography>
+            );
+        });
     }
 
     function renderPotSummaries(potSummaries: PotSummary[]) {
@@ -450,10 +443,8 @@ function HandLog(props: HandLogProps) {
                             <Typography className={classnames(classes.handLogContentLabel)}>
                                 Pot: {potSummary.amount}
                             </Typography>
-                            <>
-                                {renderPlayerHands(potSummary.playerHands)}
-                                {renderPotWinners(potSummary.winners)}
-                            </>
+                            {renderPlayerHands(potSummary.playerHands)}
+                            {renderPotWinners(potSummary.winners)}
                         </React.Fragment>
                     );
                 })}
@@ -486,15 +477,13 @@ function HandLog(props: HandLogProps) {
         }
 
         return (
-            <>
-                <div className={classnames(classes.handLogContents)}>
-                    {renderHandLogEntryButtonPanel(handLogEntry)}
-                    {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
-                    {renderBoard(handLogEntry.board)}
-                    {renderBettingRoundLogs(handLogEntry.bettingRounds, handLogEntry.board)}
-                    {handLogEntry.potSummaries.length ? renderPotSummaries(handLogEntry.potSummaries) : null}
-                </div>
-            </>
+            <div className={classnames(classes.handLogContents)}>
+                {renderHandLogEntryButtonPanel(handLogEntry)}
+                {renderPlayerPositions(handLogEntry.playersSortedByPosition)}
+                {renderBoard(handLogEntry.board)}
+                {renderBettingRoundLogs(handLogEntry.bettingRounds, handLogEntry.board)}
+                {handLogEntry.potSummaries.length ? renderPotSummaries(handLogEntry.potSummaries) : null}
+            </div>
         );
     }
 

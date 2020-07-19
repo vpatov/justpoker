@@ -30,10 +30,12 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
         boxShadow: '0vmin 0px 0.5vmin 0vmin rgba(0,0,0,0.5)',
-        cursor: 'pointer',
         '&:hover $showButton': {
             opacity: 1,
         },
+    },
+    flippable: {
+        cursor: 'pointer',
     },
     sideCard: {
         margin: '0 -1.5vmin',
@@ -127,12 +129,14 @@ function CardSmall(props) {
     const coloredCardBackgroundClasses = useColoredCardBackgroundStyles();
     const whiteCardBackgroundClasses = useWhiteCardBackgroundStyles();
     const { curPrefs } = useContext(ThemeSetter);
+    const isFlipable = hero && canShowHideCards && !(cannotHideCards && isBeingShown);
 
     function getCardBackGroundClasses(suit: Suit) {
         const cardClasses = curPrefs.coloredCardBackground ? coloredCardBackgroundClasses : whiteCardBackgroundClasses;
         return [cardClasses.base, cardClasses[suit]];
     }
 
+    // animation
     useEffect(() => {
         if (canShowHideCards && prevIsBeingShown !== isBeingShown) {
             if (isBeingShown) {
@@ -141,7 +145,7 @@ function CardSmall(props) {
                 unflipCard(cardId, hero);
             }
         }
-    }, [isBeingShown, prevIsBeingShown]);
+    }, [isBeingShown, prevIsBeingShown, hero, canShowHideCards, cardId]);
 
     function showCard() {
         if (hero && canShowHideCards) {
@@ -173,12 +177,13 @@ function CardSmall(props) {
                 ani_notWinningCard: !partOfWinningHand,
                 [classes.sideCard]: shouldFlex,
                 [classes.isBeingShown]: isBeingShown && hero,
+                [classes.flippable]: isFlipable,
             })}
             id={cardId}
             style={style}
             onClick={showCard}
         >
-            {hero && canShowHideCards && !(cannotHideCards && isBeingShown) ? (
+            {isFlipable ? (
                 <Button onClick={showCard} variant="contained" className={classes.showButton}>
                     {isBeingShown ? 'Hide' : 'Show'}
                 </Button>

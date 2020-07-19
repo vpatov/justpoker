@@ -245,14 +245,6 @@ export class GameStateManager {
         this.gameState.previousRaise = previousRaise;
     }
 
-    getPartialAllInLeftOver() {
-        return this.gameState.partialAllInLeftOver;
-    }
-
-    setPartialAllInLeftOver(partialAllInLeftOver: number) {
-        this.gameState.partialAllInLeftOver = partialAllInLeftOver;
-    }
-
     getMinRaiseDiff(): number {
         return this.gameState.minRaiseDiff;
     }
@@ -272,7 +264,7 @@ export class GameStateManager {
     updateCurrentPlayerSeatToAct(): void {
         const previousPlayerSeat = this.getCurrentPlayerSeatToAct();
         const currentPlayerSeat = previousPlayerSeat
-            ? this.getNextPlayerSeatInHand(previousPlayerSeat.positionIndex)
+            ? this.getNextPlayerSeatEligibleToAct(previousPlayerSeat.positionIndex)
             : this.getFirstSeatToAct();
 
         assert(previousPlayerSeat !== currentPlayerSeat);
@@ -336,7 +328,7 @@ export class GameStateManager {
             return 0;
         }
         const chips = this.getPlayerChips(playerUUID);
-        const callAmount = this.getPreviousRaise() > chips ? chips : this.getPreviousRaise();
+        const callAmount = Math.min(this.getPreviousRaise(), chips);
         return callAmount;
     }
 
@@ -371,6 +363,12 @@ export class GameStateManager {
 
     getPlayerSeatNumber(playerUUID: PlayerUUID): number {
         return this.getPlayer(playerUUID).seatNumber;
+    }
+
+    canPlayerRaise(playerUUID: PlayerUUID): boolean {
+        const callAmount = this.computeCallAmount(playerUUID);
+        const heroPlayerStack = this.getPlayer(playerUUID).chips;
+        return heroPlayerStack > callAmount && playerUUID !== this.gameState.lastFullRaiserUUID;
     }
 
     // returns time in milliseconds
@@ -698,8 +696,9 @@ export class GameStateManager {
         return INIT_HAND_STAGES.indexOf(this.getGameStage()) > -1;
     }
 
+    // is this still correct??
     getMinimumBetSize(): number {
-        const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise() + this.getPartialAllInLeftOver();
+        const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise();
         return minimumBet;
     }
 
@@ -740,7 +739,7 @@ export class GameStateManager {
     }
 
     isPlayerFacingBet(playerUUID: PlayerUUID): boolean {
-        return this.getPreviousRaise() + this.getPartialAllInLeftOver() > this.getPlayerBetAmount(playerUUID);
+        return this.getPreviousRaise() > this.getPlayerBetAmount(playerUUID);
     }
 
     // TODO
@@ -750,7 +749,9 @@ export class GameStateManager {
 
     isPlayerEligibleToActNext(playerUUID: PlayerUUID): boolean {
         return (
-            !this.hasPlayerFolded(playerUUID) && this.wasPlayerDealtIn(playerUUID) && !this.isPlayerAllIn(playerUUID)
+            !this.hasPlayerFolded(playerUUID) &&
+            this.wasPlayerDealtIn(playerUUID) &&
+            !this.hasPlayerPutAllChipsInThePot(playerUUID)
         );
     }
 
@@ -824,16 +825,18 @@ export class GameStateManager {
     }
 
     /** Given the positionNumber, find the next player that is in the hand. */
-    getNextPlayerSeatInHand(positionNumber: number): PlayerSeat {
+    getNextPlayerSeatEligibleToAct(positionNumber: number): PlayerSeat {
         const seatsDealtIn = this.getSeatsDealtIn();
         for (let i = 1; i < seatsDealtIn.length; i++) {
             const nextIndex = (positionNumber + i) % seatsDealtIn.length;
             const seat = seatsDealtIn[nextIndex];
-            if (this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber && this.isPlayerInHand(seat.playerUUID)) {
+            if (
+                this.getPlayerSeatNumber(seat.playerUUID) === seat.seatNumber &&
+                this.isPlayerEligibleToActNext(seat.playerUUID)
+            ) {
                 return seat;
             }
         }
-
         throw Error(`Went through all players and didnt find the next player ready to play.`);
     }
 
@@ -952,8 +955,12 @@ export class GameStateManager {
         return connectedClient;
     }
 
+    isGameInInitStage(): boolean {
+        return INIT_HAND_STAGES.includes(this.getGameStage());
+    }
+
     removePlayerFromGame(playerUUID: PlayerUUID) {
-        if (this.isPlayerInHand(playerUUID)) {
+        if (this.wasPlayerDealtIn(playerUUID) || this.isGameInInitStage()) {
             this.queueAction({
                 actionType: ClientActionType.BOOTPLAYER,
                 args: [playerUUID],
@@ -1050,7 +1057,7 @@ export class GameStateManager {
     }
 
     playerLeaveTable(playerUUID: PlayerUUID) {
-        if (this.isPlayerInHand(playerUUID)) {
+        if (this.isPlayerInHand(playerUUID) || this.isGameInInitStage()) {
             this.queueAction({
                 actionType: ClientActionType.LEAVETABLE,
                 args: [playerUUID],
@@ -1267,6 +1274,8 @@ export class GameStateManager {
             smallBlindSeat: undefined,
             bigBlindSeat: undefined,
             straddleSeat: undefined,
+            minRaiseDiff: 0,
+            previousRaise: 0,
         });
     }
 
@@ -1299,13 +1308,10 @@ export class GameStateManager {
         }, 0);
     }
 
-    isPlayerAllIn(playerUUID: PlayerUUID): boolean {
-        const player = this.getPlayer(playerUUID);
-        return player.lastActionType === BettingRoundActionType.ALL_IN;
-    }
-
-    getPlayersAllIn(): PlayerUUID[] {
-        return this.filterPlayerUUIDs((playerUUID) => this.isPlayerAllIn(playerUUID));
+    getPlayersPutAllChipsInPot(): PlayerUUID[] {
+        return this.filterPlayerUUIDs(
+            (playerUUID) => this.isPlayerInHand(playerUUID) && this.hasPlayerPutAllChipsInThePot(playerUUID),
+        );
     }
 
     isAllInRunOut(): boolean {
@@ -1327,7 +1333,7 @@ export class GameStateManager {
                 player.lastActionType !== BettingRoundActionType.PLACE_BLIND &&
                 (this.hasPlayerFolded(player.uuid) ||
                     player.betAmount === this.getHighestBet() ||
-                    this.isPlayerAllIn(player.uuid)),
+                    this.hasPlayerPutAllChipsInThePot(player.uuid)),
         );
     }
 

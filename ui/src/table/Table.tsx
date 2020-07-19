@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Player from '../player/Player';
 import OpenSeat from './OpenSeat';
 import EmptySeat from './EmptySeat';
@@ -8,7 +8,7 @@ import TableCopyLink from './TableCopyLink';
 import CommunityCards from './CommunityCards';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { tableSelector, playersSelector, globalGameStateSelector, selectGameParameters } from '../store/selectors';
+import { tableSelector, playersSelector, globalGameStateSelector } from '../store/selectors';
 import { ClientActionType, ClientWsMessageRequest } from '../shared/models/api/api';
 import { WsServer } from '../api/ws';
 
@@ -16,7 +16,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { Typography, Zoom } from '@material-ui/core';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
-import Color from 'color';
 
 const W_UNIT = '%';
 const H_UNIT = '%';
@@ -29,6 +28,8 @@ const BET_WIDTH = 40;
 
 const HERO_DEFAULT_ROTATION = 5;
 
+const PLAYER_TABLE_MARGIN_WIDTH = 5.6;
+const PLAYER_TABLE_MARGIN_HEIGHT = 8.8;
 function positionToPlacement(virtualPositon) {
     const xInc = 100 / 8;
     const yInc = 100 / 6;
@@ -55,8 +56,8 @@ const useStyles = makeStyles((theme) => ({
     },
     playersCont: {
         position: 'absolute',
-        height: `calc(calc(${TABLE_HEIGHT}${H_UNIT} + ${theme.custom.PLAYER_HEIGHT}vmin ) + 8.8vmin)`,
-        width: `calc(calc(${TABLE_WIDTH}${W_UNIT} + ${theme.custom.PLAYER_WIDTH}vmin ) + 5.6vmin)`,
+        height: `calc(${TABLE_HEIGHT}${H_UNIT} + ${theme.custom.PLAYER_HEIGHT + PLAYER_TABLE_MARGIN_HEIGHT}vmin )`,
+        width: `calc(${TABLE_WIDTH}${W_UNIT} + ${theme.custom.PLAYER_WIDTH + PLAYER_TABLE_MARGIN_WIDTH}vmin )`,
         border: '6vmin solid transparent', // inscrease size for better hover radius
         '&:hover $emptySeat': {
             visibility: 'visible',
@@ -69,7 +70,6 @@ const useStyles = makeStyles((theme) => ({
         '-webkit-transform': 'translate3d(0, 0, 0)',
         '-moz-transform': 'translate3d(0, 0, 0)',
     },
-
     table: {
         position: 'absolute',
         height: `${TABLE_HEIGHT}${H_UNIT}`,
@@ -133,6 +133,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+//  define mod function, built in % is remainder
 function mod(n, m) {
     return ((n % m) + m) % m;
 }
@@ -140,9 +141,15 @@ function mod(n, m) {
 function Table(props) {
     const classes = useStyles();
     const { className } = props;
-    const { canStartGame, isHeroAtTable, isGameInProgress, areOpenSeats, isSpectator, isHeroInHand, isGameInHandInitStage } = useSelector(
-        globalGameStateSelector,
-    );
+    const {
+        canStartGame,
+        isHeroAtTable,
+        isGameInProgress,
+        areOpenSeats,
+        isSpectator,
+        isHeroInHand,
+        isGameInHandInitStage,
+    } = useSelector(globalGameStateSelector);
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
         tableSelector,
     );
@@ -256,6 +263,7 @@ function Table(props) {
         }
         return ans;
     }
+
     return (
         <div className={classnames(classes.root, className)}>
             <div className={classnames(classes.table, 'ani_table')}>
@@ -288,7 +296,6 @@ function Table(props) {
                     </Zoom>
                 ) : null}
             </div>
-
             <div className={classes.playersCont}>{createSpotsAtTable()}</div>
             <div className={classes.betCont}>{createBetsAtTable()}</div>
         </div>

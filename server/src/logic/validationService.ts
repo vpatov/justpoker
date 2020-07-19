@@ -456,9 +456,7 @@ export class ValidationService {
                 errorString:
                     `${errorPrefix} Player cannot bet ${betAmount}\nminimum bet is ${minimumBet},` +
                     ` previousRaise is ${this.gsm.getPreviousRaise()}, minRaiseDiff is ${this.gsm.getMinRaiseDiff()}, ` +
-                    `partialAllInLeftOver is ${this.gsm.getPartialAllInLeftOver()}. Player has ${
-                        player.chips
-                    } chips, ` +
+                    `Player has ${player.chips} chips, ` +
                     `so they are ${player.chips === betAmount ? '' : 'NOT'} all in.`,
             };
         }
@@ -538,14 +536,11 @@ export class ValidationService {
                 errorString: `Player already has quitting action queued.`,
             };
         }
-        return this.validateNotInGameStages(INIT_HAND_STAGES, 'quit game');
+        return undefined;
     }
 
     validateLeaveTableRequest(clientUUID: ClientUUID): ValidationResponse {
         let error = this.ensureClientIsInGame(clientUUID);
-        if (error) return error;
-
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'leave table');
         if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
@@ -580,6 +575,13 @@ export class ValidationService {
             return {
                 errorType: ErrorType.PLAYER_DOES_NOT_EXIST,
                 errorString: `Player ${req.playerUUID} does not exist.`,
+            };
+        }
+
+        if (bootPlayer.quitting) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player ${req.playerUUID} is already quitting.`,
             };
         }
 
@@ -689,7 +691,7 @@ export class ValidationService {
         if (value < min) {
             return {
                 errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `Value ${value}${field ? ` for field ${field}` : ''} is below min value ${max}`,
+                errorString: `Value ${value}${field ? ` for field ${field}` : ''} is below min value ${min}`,
             };
         }
         return undefined;
@@ -705,21 +707,14 @@ export class ValidationService {
         if (maxBuyin < minBuyin) {
             return {
                 errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `maxBuyin cannot bet less than minBuyin`,
+                errorString: `maxBuyin cannot be less than minBuyin`,
             };
         }
 
-        if (minBuyin < smallBlind) {
+        if (bigBlind < smallBlind) {
             return {
                 errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `minBuyin must be at least smallBlind amount`,
-            };
-        }
-
-        if (minBuyin < bigBlind) {
-            return {
-                errorType: ErrorType.ILLEGAL_VALUE,
-                errorString: `minBuyin must be at least bigBlind amount`,
+                errorString: `smallBlind must be less than or equal to bigBlind`,
             };
         }
 
@@ -760,7 +755,7 @@ export class ValidationService {
             };
         }
 
-        error = this.validateMinMaxValues(req.chipAmount, MIN_VALUES.BUY_IN, MAX_VALUES.BUY_IN, 'buyIn');
+        error = this.validateMinMaxValues(req.chipAmount, 0, MAX_VALUES.BUY_IN, 'buyIn');
         if (error) {
             return error;
         }

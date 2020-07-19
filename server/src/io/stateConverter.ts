@@ -150,15 +150,12 @@ export class StateConverter {
 
     getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const gameStage = this.gameStateManager.getGameStage();
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
-            unqueueAllBettingRoundActions:
-                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
@@ -169,7 +166,7 @@ export class StateConverter {
             adminNames: this.gameStateManager
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
-            heroTotalChips: heroPlayer?.chips,
+            heroTotalChips: heroPlayer?.chips || 0,
             willAddChips: heroPlayer?.willAddChips,
             isHeroInHand: heroPlayer?.uuid ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
             canShowHideCards: heroPlayer?.uuid ? this.gameStateManager.canPlayerShowCards(heroPlayer?.uuid) : false,
@@ -185,6 +182,7 @@ export class StateConverter {
     getUIController(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): Controller {
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
 
+        const gameStage = this.gameStateManager.getGameStage();
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
         const fullPot = this.gameStateManager.getFullPotValue();
@@ -197,7 +195,11 @@ export class StateConverter {
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
 
         const getSizingButtons = () => {
-            if (!this.gameStateManager.isGameInProgress()) {
+            if (
+                !this.gameStateManager.isGameInProgress() ||
+                (this.gameStateManager.getPlayer(heroPlayerUUID).sittingOut &&
+                    !this.gameStateManager.isPlayerInHand(heroPlayerUUID))
+            ) {
                 return [];
             }
 
@@ -228,9 +230,11 @@ export class StateConverter {
 
         const controller: Controller = {
             toAct,
-            lastBettingRoundAction: this.gameStateManager.getLastBettingRoundAction(),
+            curBet: curBet,
             min: minBet,
             max: maxBet,
+            unqueueAllBettingRoundActions:
+                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             sizingButtons: getSizingButtons(),
             bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID, toAct),
             dealInNextHand: !hero.sittingOut,
@@ -264,12 +268,16 @@ export class StateConverter {
         heroPlayerUUID: PlayerUUID,
         toAct: boolean,
     ): BettingActionButtons {
-        if (!this.gameStateManager.isGameInProgress()) {
+        if (
+            !this.gameStateManager.isGameInProgress() ||
+            (this.gameStateManager.getPlayer(heroPlayerUUID).sittingOut &&
+                !this.gameStateManager.isPlayerInHand(heroPlayerUUID))
+        ) {
             return {};
         }
 
         if (
-            this.gameStateManager.isPlayerAllIn(heroPlayerUUID) ||
+            this.gameStateManager.hasPlayerPutAllChipsInThePot(heroPlayerUUID) ||
             this.gameStateManager.isAllInRunOut() ||
             !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
             this.gameStateManager.isGameStageInBetweenHands()
@@ -298,10 +306,7 @@ export class StateConverter {
             }
         }
 
-        const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
-        const heroPlayerStack = this.gameStateManager.getPlayerByClientUUID(clientUUID).chips;
-
-        if (heroPlayerStack <= callAmount) {
+        if (!this.gameStateManager.canPlayerRaise(heroPlayerUUID)) {
             buttons[BettingRoundActionType.BET] = this.disableButton(BET_BUTTON);
         } else {
             buttons[BettingRoundActionType.BET] = BET_BUTTON;

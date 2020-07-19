@@ -16,10 +16,10 @@ function TextFieldWrap(props) {
             if (Number.isNaN(intValue) || current <= 0) {
                 return 0;
             } else {
-                if (max && maxStrict) {
+                if (!Number.isNaN(max) && maxStrict) {
                     intValue = Math.min(intValue, max);
                 }
-                if (min && minStrict) {
+                if (!Number.isNaN(min) && minStrict) {
                     intValue = Math.max(intValue, min);
                 }
                 return intValue;

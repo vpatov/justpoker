@@ -18,7 +18,7 @@ import { ValidationService } from './validationService';
 import { Hand, Card } from '../../../ui/src/shared/models/game/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
-import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
+import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 import { ClientActionType } from '../../../ui/src/shared/models/api/api';
@@ -26,6 +26,7 @@ import { ChatService } from '../state/chatService';
 import { TimerManager } from '../state/timerManager';
 import { Context } from '../state/context';
 import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
+import { assert } from 'console';
 
 @Service()
 export class GamePlayService {
@@ -61,8 +62,9 @@ export class GamePlayService {
     }
 
     startTimeBankReplenishTimer() {
+        const gameInstanceUUID = this.context.getGameInstanceUUID();
         this.timerManager.setTimeBankReplenishInterval(() => {
-            this.processEventCallback(createTimeBankReplenishEvent(this.context.getGameInstanceUUID()));
+            this.processEventCallback(createTimeBankReplenishEvent(gameInstanceUUID));
         }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
     }
 
@@ -121,18 +123,20 @@ export class GamePlayService {
     }
 
     startOfBettingRound() {
-        this.gsm.setMinRaiseDiff(this.gsm.getBB());
-        this.gsm.setPartialAllInLeftOver(0);
         this.updatePlayersBestHands();
     }
 
     endOfBettingRound() {
+        this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPreviousRaise(0);
+        this.gsm.updateGameState({
+            lastFullRaiserUUID: makeBlankUUID(),
+        });
     }
 
     resetBettingRoundActions() {
         this.gsm.forEveryPlayerUUID((playerUUID) => {
-            if (this.gsm.isPlayerInHand(playerUUID) && !this.gsm.isPlayerAllIn(playerUUID)) {
+            if (this.gsm.isPlayerInHand(playerUUID) && !this.gsm.hasPlayerPutAllChipsInThePot(playerUUID)) {
                 this.gsm.setPlayerLastActionType(playerUUID, BettingRoundActionType.WAITING_TO_ACT);
                 this.gsm.setPlayerBetAmount(playerUUID, 0);
             }
@@ -219,27 +223,20 @@ export class GamePlayService {
         );
 
         const previousRaise = this.gsm.getPreviousRaise();
-        const minRaiseDiff = betAmount - previousRaise;
+        const minRaiseDiff = this.gsm.getMinRaiseDiff();
+        const raisingBy = actualBetAmount - previousRaise;
 
-        // If player is all in, and is not reraising, it is considered a call. However, since
-        // they are putting more chips in the pot, it will still go through this code path.
-        // In thise case, we do not update the minRaiseDiff or previousRaise, but only the
-        // partialAllInLeftOver.
-        if (actualBetAmount > previousRaise && actualBetAmount < previousRaise + minRaiseDiff) {
-            if (!isPlayerAllIn) {
-                throw Error(
-                    `Player is not all in, but is raising less than the minimum raise.` +
-                        ` GameState: ${getLoggableGameState(this.gsm.getGameState())}`,
-                );
-            }
-            const partialAllInLeftOver = actualBetAmount - previousRaise;
-            this.gsm.setPartialAllInLeftOver(partialAllInLeftOver);
-        } else {
-            // If SB/BB are going all in with less than a blind preflop, if you have more than one BB
-            // you cant call less then the BB, you must put in at least a BB
+        // this is a full raise
+        if (raisingBy >= minRaiseDiff) {
             this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
-            this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
+            // record last full raiser if it is not a blind bet
+            if (!playerPlacingBlindBetUUID) {
+                this.gsm.updateGameState({
+                    lastFullRaiserUUID: playerPlacingBet,
+                });
+            }
         }
+        this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
 
         // record last aggressor
         this.gsm.updateGameState({
@@ -261,10 +258,9 @@ export class GamePlayService {
         this.gsm.setPlayerBetAmount(currentPlayerToActUUID, callAmount);
 
         const isPlayerAllIn = this.gsm.hasPlayerPutAllChipsInThePot(currentPlayerToActUUID);
-        const isPlayerCallingAllInRunOut = this.gsm.getPlayersAllIn().length === this.gsm.getPlayersInHand().length - 1;
         this.gsm.setPlayerLastActionType(
             currentPlayerToActUUID,
-            isPlayerAllIn || isPlayerCallingAllInRunOut ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
+            isPlayerAllIn ? BettingRoundActionType.ALL_IN : BettingRoundActionType.CALL,
         );
 
         return callAmount;
@@ -338,12 +334,15 @@ export class GamePlayService {
             if (headsUp) {
                 firstToAct = dealerSeat;
             } else if (straddleSeat) {
-                firstToAct = this.gsm.getNextPlayerSeatInHand(3);
+                firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(3);
             } else {
-                firstToAct = this.gsm.getNextPlayerSeatInHand(2);
+                firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(2);
             }
         } else {
-            firstToAct = this.gsm.getNextPlayerSeatInHand(0);
+            firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(0);
+        }
+        if (this.gsm.hasPlayerPutAllChipsInThePot(firstToAct.playerUUID)) {
+            firstToAct = this.gsm.getNextPlayerSeatEligibleToAct(firstToAct.positionIndex);
         }
 
         this.gsm.setFirstSeatToAct(firstToAct);
@@ -624,16 +623,31 @@ export class GamePlayService {
         if (this.gsm.isAllInRunOut()) {
             return;
         }
-        const [playersAllIn, playersInHand] = [this.gsm.getPlayersAllIn(), this.gsm.getPlayersInHand()];
+        const [playersAllIn, playersInHand] = [this.gsm.getPlayersPutAllChipsInPot(), this.gsm.getPlayersInHand()];
 
         // there must be a least two player in the hand and at least one player all in at the minimum
         if (playersAllIn.length < 1 || playersInHand.length < 2) {
             return;
         }
 
-        // If everyone is all in, or everyone but one player is all in, isAllInRunOut === true
-        if (playersAllIn.length >= playersInHand.length - 1) {
+        // if all players are all in then its all in runout
+        if (playersAllIn.length === playersInHand.length) {
             this.gsm.setIsAllInRunOut(true);
+            return;
+        }
+
+        // if one player is not all in
+        if (playersAllIn.length >= playersInHand.length - 1) {
+            const playersNotAllIn = playersInHand.filter(
+                (playerInHandUUID) => !playersAllIn.includes(playerInHandUUID),
+            );
+            assert(playersNotAllIn.length === 1); // should only every be one player not all in if playersAllIn.length >= playersInHand.length - 1
+            const playerNotAllIn = playersNotAllIn[0];
+            const isPlayerNotAllInFacingBet = this.gsm.isPlayerFacingBet(playerNotAllIn);
+            // if you are not facing a bet and you are the last player not all in then it is a runout
+            if (!isPlayerNotAllInFacingBet) {
+                this.gsm.setIsAllInRunOut(true);
+            }
         }
     }
 

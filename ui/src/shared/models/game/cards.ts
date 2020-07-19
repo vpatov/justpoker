@@ -170,19 +170,20 @@ export function getHoleCardNickname(cardA: Card, cardB: Card): string | undefine
         '44': 'Sail Boats',
         '33': 'Crabs',
         '22': 'Deuces',
-        // A-X
-        AK: 'Big Slick',
-        AQ: 'Ms. Slick',
-        AJ: 'Apple Jacks',
-        AT: 'Bookends',
-        A9: 'Rounders',
-        A8: "Dead Man's Hand",
-        A7: 'Slapshot',
-        A6: "Devil's Ace",
-        A5: 'High Five',
-        A4: 'Fake Aces',
-        A3: 'Thraces',
-        A2: 'Little Slick',
+
+        // // A-X
+        // AK: 'Big Slick',
+        // AQ: 'Ms. Slick',
+        // AJ: 'Apple Jacks',
+        // AT: 'Bookends',
+        // A9: 'Rounders',
+        // A8: "Dead Man's Hand",
+        // A7: 'Slapshot',
+        // A6: "Devil's Ace",
+        // A5: 'High Five',
+        // A4: 'Fake Aces',
+        // A3: 'Thraces',
+        // A2: 'Little Slick',
 
         // These sorta get stupid, prob dont need
         // // K-X

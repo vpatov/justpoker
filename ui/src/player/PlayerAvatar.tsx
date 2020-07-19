@@ -41,20 +41,22 @@ function PlayerAvatar(props) {
     const [timer, timerSet] = useState(0);
 
     useEffect(() => {
+        const onReceiveNewAnimationState = (animationState: AnimationState) => {
+            if (animationState.animationType === AnimationType.REACTION && animationState.target === playerUUID) {
+                SET_reactionState({ show: true, reaction: animationState.trigger as any });
+            }
+        };
         WsServer.subscribe('animation', onReceiveNewAnimationState);
+    }, [playerUUID]);
+
+    // clear timeouts
+    useEffect(() => {
         return () => clearTimeout(timer);
-    }, []);
+    }, [timer]);
 
-    const onReceiveNewAnimationState = (animationState: AnimationState) => {
-        if (animationState.animationType === AnimationType.REACTION && animationState.target === playerUUID) {
-            SET_reactionState({ show: true, reaction: animationState.trigger as any });
-        }
-    };
-
-    // set and clear timeouts
+    // set timeout
     useEffect(() => {
         if (reactionState.show) {
-            clearTimeout(timer);
             const newTimer = setTimeout(() => {
                 SET_reactionState({ show: false, reaction: '' });
             }, REACTION_TIME);

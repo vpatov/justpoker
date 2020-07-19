@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import Hand from './Hand';
 import PlayerStack from './PlayerStack';
 import { useSelector } from 'react-redux';
-import { heroPlayerUUIDSelector, selectCanShowHideCards } from '../store/selectors';
+import { selectCanShowHideCards } from '../store/selectors';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import grey from '@material-ui/core/colors/grey';
@@ -13,7 +13,7 @@ import MoreIcon from '@material-ui/icons/MoreHoriz';
 import PlayerTimer from './PlayerTimer';
 import PlayerMenu from './PlayerMenu';
 import PlayerLabel from './PlayerLabel';
-import { IconButton, Button, Hidden } from '@material-ui/core';
+import { IconButton, Button } from '@material-ui/core';
 import { WsServer } from '../api/ws';
 
 const useStyles = makeStyles((theme) => ({
@@ -93,12 +93,11 @@ function Player(props) {
     }
 
     function getPlayerLabelComponent() {
-        if (lastAction) {
-            return <Typography className={classes.labelText}>{lastAction}</Typography>;
-        }
-
         if (playerTimer) {
             return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
+        }
+        if (lastAction) {
+            return <Typography className={classes.labelText}>{lastAction}</Typography>;
         }
 
         return null;
@@ -123,7 +122,7 @@ function Player(props) {
                 virtualPositon={virtualPositon}
             />
 
-            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} />
+            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} playerUUID={uuid} />
 
             <PlayerStack player={player} onClickStack={handleClick} />
             <IconButton className={classes.moreButton} onClick={handleClick}>

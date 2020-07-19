@@ -41,6 +41,8 @@ declare type ClientActionProcessor = {
     [key in ClientActionType]: ActionProcessor;
 };
 
+// EventProcessorServicee serves as the single API entry point for mutations to the state of a game instance
+// can consume actions from both the server and client
 @Service()
 export class EventProcessorService {
     constructor(
@@ -56,6 +58,10 @@ export class EventProcessorService {
         gamePlayService.setProcessEventCallback((event: Event) => this.processEvent(event));
     }
 
+    // consume events from server and client
+    // first validate event request
+    // then perform action
+    // lastly mark what need to be sent back to client
     clientActionProcessor: ClientActionProcessor = {
         [ClientActionType.STARTGAME]: {
             validation: (uuid, req) => this.validationService.validateStartGameRequest(uuid),
@@ -249,6 +255,7 @@ export class EventProcessorService {
         },
     };
 
+    // process actions originating from the server
     processServerAction(serverAction: ServerAction) {
         switch (serverAction.actionType) {
             case ServerActionType.GAMEPLAY_TIMEOUT: {
@@ -281,6 +288,7 @@ export class EventProcessorService {
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }
 
+    // process actions originating from the client
     processClientAction(clientAction: ClientAction): ValidationResponse {
         const { clientUUID, actionType, request } = clientAction;
 

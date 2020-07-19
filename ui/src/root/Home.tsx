@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Home(props) {
     const classes = useStyles();
-    const {} = props;
     const smallHeight = useMediaQuery('(max-height:750px)');
     return (
         <div className={classes.root}>

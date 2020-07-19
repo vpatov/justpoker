@@ -15,7 +15,6 @@ import { MAX_VALUES } from '../shared/util/consts';
 import { Typography } from '@material-ui/core';
 
 import { WsServer } from '../api/ws';
-import { ClientActionType, ClientWsMessageRequest } from '../shared/models/api/api';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -51,6 +50,10 @@ function SetChipDialog(props) {
     function onSubmit() {
         WsServer.sendSetChipsMessage(uuid, resultingChips);
         handleClose();
+    }
+
+    function canSubmit() {
+        return resultingChips >= 0;
     }
 
     function computeResultingChips() {
@@ -109,7 +112,7 @@ function SetChipDialog(props) {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={onSubmit} color="primary" autoFocus>
+                <Button onClick={onSubmit} disabled={!canSubmit()} color="primary" autoFocus>
                     {mode} Chips
                 </Button>
             </DialogActions>
