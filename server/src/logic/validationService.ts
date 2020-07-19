@@ -536,14 +536,11 @@ export class ValidationService {
                 errorString: `Player already has quitting action queued.`,
             };
         }
-        return this.validateNotInGameStages(INIT_HAND_STAGES, 'quit game');
+        return undefined;
     }
 
     validateLeaveTableRequest(clientUUID: ClientUUID): ValidationResponse {
         let error = this.ensureClientIsInGame(clientUUID);
-        if (error) return error;
-
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'leave table');
         if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
