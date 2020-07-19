@@ -30,15 +30,9 @@ function IconPicker(props) {
     const { options, paperClass, placement, initIcon, onSelect, size, hoverOpen, buttonClass, open } = props;
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [renderOptions, SET_renderOptions] = useState(false);
-    const [timer, SET_timer] = useState(0);
 
     const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(anchorEl ? null : event.currentTarget);
-        // this is to ensure paper renders first, then we try to render large set of images
-        // I can't tell if this is really hacky and bad or sorta clever...
-        clearTimeout(timer);
-        SET_timer(window.setTimeout(() => SET_renderOptions(true), 50));
     };
 
     function handleClickButton(option) {
@@ -46,11 +40,8 @@ function IconPicker(props) {
         setAnchorEl(null);
     }
 
-    useEffect(() => {
-        return clearTimeout(timer);
-    }, [timer]);
-
     const showMenu = Boolean(anchorEl);
+
     return (
         <>
             <IconButton
@@ -66,14 +57,12 @@ function IconPicker(props) {
                     {({ TransitionProps }) => (
                         <Grow {...TransitionProps} timeout={350}>
                             <Paper className={classnames(classes.root, paperClass)} elevation={24}>
-                                {renderOptions ? (
-                                    <Options
-                                        options={options}
-                                        handleClickButton={handleClickButton}
-                                        style={{ width: size, height: size }}
-                                        className={classes.iconButton}
-                                    />
-                                ) : null}
+                                <Options
+                                    options={options}
+                                    handleClickButton={handleClickButton}
+                                    style={{ width: size, height: size }}
+                                    className={classes.iconButton}
+                                />
                             </Paper>
                         </Grow>
                     )}
