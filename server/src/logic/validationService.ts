@@ -456,9 +456,7 @@ export class ValidationService {
                 errorString:
                     `${errorPrefix} Player cannot bet ${betAmount}\nminimum bet is ${minimumBet},` +
                     ` previousRaise is ${this.gsm.getPreviousRaise()}, minRaiseDiff is ${this.gsm.getMinRaiseDiff()}, ` +
-                    `partialAllInLeftOver is ${this.gsm.getPartialAllInLeftOver()}. Player has ${
-                        player.chips
-                    } chips, ` +
+                    `Player has ${player.chips} chips, ` +
                     `so they are ${player.chips === betAmount ? '' : 'NOT'} all in.`,
             };
         }

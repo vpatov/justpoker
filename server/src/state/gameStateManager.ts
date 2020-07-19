@@ -245,14 +245,6 @@ export class GameStateManager {
         this.gameState.previousRaise = previousRaise;
     }
 
-    getPartialAllInLeftOver() {
-        return this.gameState.partialAllInLeftOver;
-    }
-
-    setPartialAllInLeftOver(partialAllInLeftOver: number) {
-        this.gameState.partialAllInLeftOver = partialAllInLeftOver;
-    }
-
     getMinRaiseDiff(): number {
         return this.gameState.minRaiseDiff;
     }
@@ -336,7 +328,7 @@ export class GameStateManager {
             return 0;
         }
         const chips = this.getPlayerChips(playerUUID);
-        const callAmount = this.getPreviousRaise() > chips ? chips : this.getPreviousRaise();
+        const callAmount = Math.min(this.getPreviousRaise(), chips);
         return callAmount;
     }
 
@@ -371,6 +363,12 @@ export class GameStateManager {
 
     getPlayerSeatNumber(playerUUID: PlayerUUID): number {
         return this.getPlayer(playerUUID).seatNumber;
+    }
+
+    canPlayerRaise(playerUUID: PlayerUUID): boolean {
+        const callAmount = this.computeCallAmount(playerUUID);
+        const heroPlayerStack = this.getPlayer(playerUUID).chips;
+        return heroPlayerStack > callAmount && playerUUID !== this.gameState.lastFullRaiserUUID;
     }
 
     // returns time in milliseconds
@@ -698,8 +696,9 @@ export class GameStateManager {
         return INIT_HAND_STAGES.indexOf(this.getGameStage()) > -1;
     }
 
+    // is this still correct??
     getMinimumBetSize(): number {
-        const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise() + this.getPartialAllInLeftOver();
+        const minimumBet = this.getMinRaiseDiff() + this.getPreviousRaise();
         return minimumBet;
     }
 
@@ -740,7 +739,7 @@ export class GameStateManager {
     }
 
     isPlayerFacingBet(playerUUID: PlayerUUID): boolean {
-        return this.getPreviousRaise() + this.getPartialAllInLeftOver() > this.getPlayerBetAmount(playerUUID);
+        return this.getPreviousRaise() > this.getPlayerBetAmount(playerUUID);
     }
 
     // TODO
@@ -1275,6 +1274,8 @@ export class GameStateManager {
             smallBlindSeat: undefined,
             bigBlindSeat: undefined,
             straddleSeat: undefined,
+            minRaiseDiff: 0,
+            previousRaise: 0,
         });
     }
 

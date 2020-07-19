@@ -18,7 +18,7 @@ import { ValidationService } from './validationService';
 import { Hand, Card } from '../../../ui/src/shared/models/game/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
-import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
+import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 import { ClientActionType } from '../../../ui/src/shared/models/api/api';
@@ -123,13 +123,15 @@ export class GamePlayService {
     }
 
     startOfBettingRound() {
-        this.gsm.setMinRaiseDiff(this.gsm.getBB());
-        this.gsm.setPartialAllInLeftOver(0);
         this.updatePlayersBestHands();
     }
 
     endOfBettingRound() {
+        this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPreviousRaise(0);
+        this.gsm.updateGameState({
+            lastFullRaiserUUID: makeBlankUUID(),
+        });
     }
 
     resetBettingRoundActions() {
@@ -221,28 +223,20 @@ export class GamePlayService {
         );
 
         const previousRaise = this.gsm.getPreviousRaise();
-        const minRaiseDiff = betAmount - previousRaise;
+        const minRaiseDiff = this.gsm.getMinRaiseDiff();
+        const raisingBy = actualBetAmount - previousRaise;
 
-        // If player is all in, and is not reraising, it is considered a call. However, since
-        // they are putting more chips in the pot, it will still go through this code path.
-        // In thise case, we do not update the minRaiseDiff or previousRaise, but only the
-        // partialAllInLeftOver.
-        if (actualBetAmount > previousRaise && actualBetAmount < previousRaise + minRaiseDiff) {
-            if (!isPlayerAllIn) {
-                throw Error(
-                    `Player is not all in, but is raising less than the minimum raise.` +
-                        ` GameState: ${getLoggableGameState(this.gsm.getGameState())}`,
-                );
-            }
-            const partialAllInLeftOver = actualBetAmount - previousRaise;
-            this.gsm.setPartialAllInLeftOver(partialAllInLeftOver);
-        } else {
-            // If SB/BB are going all in with less than a blind preflop, if you have more than one BB
-            // you cant call less then the BB, you must put in at least a BB
+        // this is a full raise
+        if (raisingBy >= minRaiseDiff) {
             this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
-            this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
-            this.gsm.setPartialAllInLeftOver(0); // unset partial all in left over if a full bet was made
+            // record last full raiser if it is not a blind bet
+            if (!playerPlacingBlindBetUUID) {
+                this.gsm.updateGameState({
+                    lastFullRaiserUUID: playerPlacingBet,
+                });
+            }
         }
+        this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
 
         // record last aggressor
         this.gsm.updateGameState({
