@@ -306,10 +306,7 @@ export class StateConverter {
             }
         }
 
-        const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
-        const heroPlayerStack = this.gameStateManager.getPlayerByClientUUID(clientUUID).chips;
-
-        if (heroPlayerStack <= callAmount) {
+        if (!this.gameStateManager.canPlayerRaise(heroPlayerUUID)) {
             buttons[BettingRoundActionType.BET] = this.disableButton(BET_BUTTON);
         } else {
             buttons[BettingRoundActionType.BET] = BET_BUTTON;

@@ -67,6 +67,10 @@ export declare interface GameState {
     // playerUUID of last player to bet or raise
     lastAggressorUUID: PlayerUUID | undefined;
 
+    // playerUUID of last player to bet greater than or equal to the current min raise
+    // that is, it was not a partial all in raise
+    lastFullRaiserUUID: PlayerUUID | undefined;
+
     bettingRoundStage: BettingRoundStage;
 
     firstToActSeat: PlayerSeat | undefined;
@@ -138,6 +142,7 @@ export function getCleanGameState(): GameState {
         straddleSeat: undefined,
         prevBigBlindSeat: undefined,
         lastAggressorUUID: makeBlankUUID(),
+        lastFullRaiserUUID: makeBlankUUID(),
         bettingRoundStage: BettingRoundStage.WAITING,
         firstToActSeat: undefined,
         admins: [],

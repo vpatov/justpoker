@@ -365,6 +365,12 @@ export class GameStateManager {
         return this.getPlayer(playerUUID).seatNumber;
     }
 
+    canPlayerRaise(playerUUID: PlayerUUID): boolean {
+        const callAmount = this.computeCallAmount(playerUUID);
+        const heroPlayerStack = this.getPlayer(playerUUID).chips;
+        return heroPlayerStack > callAmount && playerUUID !== this.gameState.lastFullRaiserUUID;
+    }
+
     // returns time in milliseconds
     getTimeCurrentPlayerTurnStarted(): number {
         return this.gameState.timeCurrentPlayerTurnStarted;

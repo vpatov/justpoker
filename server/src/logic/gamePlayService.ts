@@ -18,7 +18,7 @@ import { ValidationService } from './validationService';
 import { Hand, Card } from '../../../ui/src/shared/models/game/cards';
 import { LedgerService } from '../stats/ledgerService';
 import { logger } from '../logger';
-import { PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
+import { PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 import { PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 import { ClientActionType } from '../../../ui/src/shared/models/api/api';
@@ -129,6 +129,9 @@ export class GamePlayService {
     endOfBettingRound() {
         this.gsm.setMinRaiseDiff(this.gsm.getBB());
         this.gsm.setPreviousRaise(0);
+        this.gsm.updateGameState({
+            lastFullRaiserUUID: makeBlankUUID(),
+        });
     }
 
     resetBettingRoundActions() {
@@ -223,8 +226,15 @@ export class GamePlayService {
         const minRaiseDiff = this.gsm.getMinRaiseDiff();
         const raisingBy = actualBetAmount - previousRaise;
 
+        // this is a full raise
         if (raisingBy >= minRaiseDiff) {
             this.gsm.setMinRaiseDiff(Math.max(this.gsm.getBB(), actualBetAmount - previousRaise));
+            // record last full raiser if it is not a blind bet
+            if (!playerPlacingBlindBetUUID) {
+                this.gsm.updateGameState({
+                    lastFullRaiserUUID: playerPlacingBet,
+                });
+            }
         }
         this.gsm.setPreviousRaise(Math.max(this.gsm.getBB(), actualBetAmount));
 
