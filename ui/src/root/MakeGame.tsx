@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
-import { createGame } from '../api/http';
+import { createGame, getCapacity } from '../api/http';
 import { MIN_VALUES, MAX_VALUES } from '../shared/util/consts';
 
 import { makeStyles } from '@material-ui/core/styles';
 import TextFieldWrap from '../reuseable/TextFieldWrap';
 
 import Button from '@material-ui/core/Button';
-import { Select, MenuItem } from '@material-ui/core';
+import { Select, MenuItem, Typography } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { GameType, getDefaultGameParameters, GameParameters } from '../shared/models/game/game';
 import GameParamatersDialog from '../game/GameParamatersDialog';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
+import Animoji from '../reuseable/Animoji';
+import { AnimojiKeys } from '../shared/models/ui/assets';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,7 +44,15 @@ const useStyles = makeStyles((theme) => ({
         margin: '12px auto',
         color: 'white',
     },
-
+    animoji: {
+        width: 100,
+        height: 100,
+    },
+    capacityMessage: {
+        fontSize: 26,
+        textAlign: 'center',
+        color: theme.palette.error.light,
+    },
     button: {
         width: '100%',
         margin: '12px 0',
@@ -59,10 +69,22 @@ function MakeGame(props) {
     const classes = useStyles();
     const { history } = props;
 
+    const [areOverCapacity, SET_areOverCapacity] = useState();
+    const [canCreate, SET_canCreate] = useState(false);
     const [showAdvanced, SET_showAdvanced] = useState(false);
     const [gameParameters, SET_gameParameters] = useState(getDefaultGameParameters());
     const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType } = gameParameters;
 
+    function generateCapacityMessage() {
+        return (
+            <div className={classes.root}>
+                <Typography className={classes.capacityMessage}>
+                    {`Our servers are currently over capacity.\nNo new games can be created. Please check back shortly!.`}{' '}
+                </Typography>
+                <Animoji reaction={AnimojiKeys.broken_heart} animated className={classes.animoji} />
+            </div>
+        );
+    }
     function errorSB() {
         if (smallBlind > bigBlind) return true;
         if (smallBlind < MIN_VALUES.SMALL_BLIND) return true;
@@ -84,9 +106,23 @@ function MakeGame(props) {
         return false;
     }
 
-    function canCreate() {
-        return !errorSB() && !errorBB() && !errorMaxBuy() && !errorTimeToAct();
+    function createButtonEnabled() {
+        return !errorSB() && !errorBB() && !errorMaxBuy() && !errorTimeToAct() && canCreate;
     }
+
+    useEffect(() => {
+        getCapacity(capacitySuccess, capacityFailure);
+    }, []);
+
+    const capacitySuccess = (response) => {
+        const areOverCapacity = get(response, 'data.areOverCapacity', true);
+        if (!areOverCapacity) SET_canCreate(true);
+        SET_areOverCapacity(areOverCapacity);
+    };
+
+    const capacityFailure = (err) => {
+        console.log(err);
+    };
 
     const createSuccess = (response) => {
         const gameInstanceUUID = get(response, 'data.gameInstanceUUID');
@@ -112,6 +148,9 @@ function MakeGame(props) {
         };
         createGame(createReq, createSuccess, createFailure);
     }
+
+    if (areOverCapacity === true) return generateCapacityMessage();
+    if (canCreate === false) return <div className={classes.root} />; // prevents flash of normal screen
 
     return (
         <div className={classes.root}>
@@ -170,13 +209,14 @@ function MakeGame(props) {
                 <Button className={classes.advButton} onClick={() => SET_showAdvanced(!showAdvanced)}>
                     Advanced Settings
                 </Button>
+
                 <Button
                     id={SELENIUM_TAGS.IDS.CREATE_GAME_BUTTON}
                     className={classes.button}
                     variant="contained"
                     color="primary"
                     size="large"
-                    disabled={!canCreate()}
+                    disabled={!createButtonEnabled()}
                     onClick={handleCreateGame}
                 >
                     Create Game

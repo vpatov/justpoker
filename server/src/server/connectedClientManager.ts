@@ -116,4 +116,8 @@ export class ConnectedClientManager {
             client.ws.send(jsonRes);
         });
     }
+
+    getNumberOfClients(): number {
+        return Object.values(this.ClientGroups).reduce((count, group) => count + Object.values(group).length, 0);
+    }
 }

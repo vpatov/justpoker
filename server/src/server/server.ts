@@ -30,6 +30,7 @@ import { GameParameters } from '../../../ui/src/shared/models/game/game';
 import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
 import { Config, getServerEnvConfig } from '../../../ui/src/shared/models/config/config';
+import { CapacityLimiter } from './capacityLimiter';
 
 @Service()
 class Server {
@@ -47,6 +48,7 @@ class Server {
         private readonly gameInstanceManager: GameInstanceManager,
         private readonly connectedClientManager: ConnectedClientManager,
         private readonly timerManager: TimerManager,
+        private readonly capacityLimiter: CapacityLimiter,
     ) {}
 
     private initHTTPRoutes(): void {
@@ -58,13 +60,13 @@ class Server {
 
         router.get('/metrics', (req, res) => {
             const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
-            const clientGroups = this.connectedClientManager.getClientGroups();
 
-            const WScount = Object.values(clientGroups).reduce(
-                (count, client) => count + Object.keys(client).length,
-                0,
-            );
-            res.send({ gameCount: instanceUUIDs.length, activeWS: WScount, gameInstances: instanceUUIDs });
+            res.send({
+                gameCount: instanceUUIDs.length,
+                gameInstances: instanceUUIDs,
+                wsCount: this.connectedClientManager.getNumberOfClients(),
+                capacitySettings: this.capacityLimiter.getCapacity(),
+            });
         });
 
         router.post('/api/error', (req, res) => {
@@ -72,17 +74,22 @@ class Server {
         });
 
         router.post('/api/createGame', (req, res) => {
-            const gameParameters: GameParameters = req.body.gameParameters;
-            const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
-            this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
-            this.timerManager.setMessageAnnouncementTimer(() => {
-                this.eventProcessorService.processEvent(
-                    createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
-                );
-            }, 30 * 1000);
+            if (this.capacityLimiter.isOverCapacity()) {
+                res.send({ areOverCapacity: this.capacityLimiter.isOverCapacity() });
+                logger.error('server is over capacity, should not be able to create games');
+            } else {
+                const gameParameters: GameParameters = req.body.gameParameters;
+                const gameInstanceUUID = this.gameInstanceManager.createNewGameInstance(gameParameters);
+                this.connectedClientManager.createNewClientGroup(gameInstanceUUID);
+                this.timerManager.setMessageAnnouncementTimer(() => {
+                    this.eventProcessorService.processEvent(
+                        createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
+                    );
+                }, 30 * 1000);
 
-            logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
-            res.send({ gameInstanceUUID: gameInstanceUUID });
+                logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
+                res.send({ gameInstanceUUID: gameInstanceUUID });
+            }
         });
 
         router.get('/api/ledger', (req, res) => {
@@ -108,6 +115,24 @@ class Server {
                 res.send(getDefaultGame404());
             } else {
                 res.send({ handLogs: handLogs });
+            }
+        });
+
+        router.get('/api/capacity', (req, res) => {
+            res.send({ areOverCapacity: this.capacityLimiter.isOverCapacity() });
+        });
+
+        router.post('/setMaxWsCapacity', (req, res) => {
+            const maxWsCapacity = req.body.maxWsCapacity;
+            if (maxWsCapacity) {
+                logger.info(`setting maxWsCapacity to ${maxWsCapacity}`);
+                this.capacityLimiter.setMaxWsCapacity(maxWsCapacity);
+                res.send({ areOverCapacity: this.capacityLimiter.isOverCapacity() });
+            } else {
+                const msg = `during setting maxWsCapacity encountered falsey value: ${maxWsCapacity}`;
+                logger.error(msg);
+                res.status(400);
+                res.send(msg);
             }
         });
 
