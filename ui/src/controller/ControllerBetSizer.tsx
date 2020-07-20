@@ -133,6 +133,7 @@ function ControllerBetSizer(props) {
             onClickActionButton(BettingRoundActionType.BET);
         }
     }
+    console.log(min, max);
     return (
         <div className={classes.bettingCont}>
             {sizingButtons.length > 0 ? (
@@ -140,7 +141,7 @@ function ControllerBetSizer(props) {
                     <div className={classes.plusMinusButtonAndTextfieldCont}>
                         <Button
                             variant="outlined"
-                            onClick={() => onChange(value - min)}
+                            onClick={() => onChange(value - bigBlind)}
                             className={classnames(classes.minusButton)}
                         >
                             -
@@ -166,7 +167,7 @@ function ControllerBetSizer(props) {
                         />
                         <Button
                             variant="outlined"
-                            onClick={() => onChange(value + bigBlind)}
+                            onClick={() => onChange(value === 0 ? min : value + bigBlind)}
                             className={classnames(classes.plusButton)}
                         >
                             +
@@ -175,7 +176,7 @@ function ControllerBetSizer(props) {
                     <ThickSlider
                         className={classes.slider}
                         onChange={(e, val) => onChange(val as number)}
-                        value={value}
+                        value={value + 0.1}
                         min={min}
                         max={max}
                         valueLabelDisplay="off"
