@@ -134,7 +134,7 @@ function ControllerBetSizer(props) {
             onClickActionButton(BettingRoundActionType.BET);
         }
     }
-    console.log(min, max);
+
     return (
         <div className={classes.bettingCont}>
             {sizingButtons.length > 0 ? (
