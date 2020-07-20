@@ -15,8 +15,9 @@ const ThickSlider = withStyles({
         height: 8,
     },
     thumb: {
-        height: '1.6vmin',
-        width: '1.6vmin',
+        // !important needed to override disabled styles
+        height: '1.6vmin !important',
+        width: '1.6vmin !important',
         marginTop: '-0.4vmin',
     },
     track: {
@@ -114,7 +115,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function ControllerBetSizer(props) {
     const classes = useStyles();
     const theme = useTheme();
-    const { sizingButtons, min, max, value, onChange, onClickActionButton, betInputRef, bigBlind } = props;
+    const { sizingButtons, min, max, value, onChange, onClickActionButton, betInputRef, bigBlind, disabled } = props;
 
     function isBetValid() {
         if (0 < value && value < min) return true;
@@ -143,6 +144,7 @@ function ControllerBetSizer(props) {
                             variant="outlined"
                             onClick={() => onChange(value - bigBlind)}
                             className={classnames(classes.minusButton)}
+                            disabled={disabled}
                         >
                             -
                         </Button>
@@ -164,11 +166,13 @@ function ControllerBetSizer(props) {
                             helperText={isBetValid() ? `Min Bet is ${min}` : ''}
                             onKeyPress={(event) => onPressEnter(event)}
                             inputRef={betInputRef}
+                            disabled={disabled}
                         />
                         <Button
                             variant="outlined"
                             onClick={() => onChange(value === 0 ? min : value + bigBlind)}
                             className={classnames(classes.plusButton)}
+                            disabled={disabled}
                         >
                             +
                         </Button>
@@ -181,6 +185,7 @@ function ControllerBetSizer(props) {
                             max={1}
                             valueLabelDisplay="off"
                             style={{ color: computeColor() }}
+                            disabled={disabled}
                         />
                     ) : (
                         <ThickSlider
@@ -191,16 +196,18 @@ function ControllerBetSizer(props) {
                             max={max}
                             valueLabelDisplay="off"
                             style={{ color: computeColor() }}
+                            disabled={disabled}
                         />
                     )}
                     <div className={classes.sizingButtonsCont}>
-                        <ButtonGroup className={classes.sizeButtonGroupCont}>
+                        <ButtonGroup className={classes.sizeButtonGroupCont} disabled={disabled}>
                             {sizingButtons.map((button) => (
                                 <Button
                                     key={button.label}
                                     variant="outlined"
                                     className={classes.sizeButton}
                                     onClick={(e) => onChange(button.value)}
+                                    disabled={disabled}
                                 >
                                     {button.label}
                                 </Button>

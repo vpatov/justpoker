@@ -330,6 +330,7 @@ function ControllerBetAction(props) {
                 onChange={(val) => changeBetAmount(val)}
                 onClickActionButton={onClickActionButton}
                 betInputRef={betInputRef}
+                disabled={bettingActionButtons[BettingRoundActionType.BET]?.disabled}
             />
         </div>
     );
