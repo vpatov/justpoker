@@ -47,7 +47,7 @@ import { ChatService } from '../state/chatService';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
-import { getHoleCardNickname } from '../../../ui/src/shared/models/game/cards';
+import { getHoleCardNickname, Card } from '../../../ui/src/shared/models/game/cards';
 import { PlayerPosition } from '../../../ui/src/shared/models/player/playerPosition';
 
 declare interface CardInformation {
@@ -377,20 +377,28 @@ export class StateConverter {
         return uiChatMessage;
     }
 
-    transformPlayerCards(player: Player, heroPlayerUUID: PlayerUUID): CardInformation {
-        const isHero = heroPlayerUUID === player.uuid;
+    getPartOfWinningHand(player: Player, holeCard: Card): boolean | undefined {
         const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
         const isWinner = player.winner;
+        if (this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER) {
+            return (
+                isWinner &&
+                shouldHighlightWinningCards &&
+                this.gameStateManager.isCardInPlayerBestHand(player.uuid, holeCard)
+            );
+        }
+        return undefined;
+    }
+
+    transformPlayerCards(player: Player, heroPlayerUUID: PlayerUUID): CardInformation {
+        const isHero = heroPlayerUUID === player.uuid;
 
         const cards: UiCard[] = player.holeCards.map((holeCard) => {
             return holeCard.visible || isHero
                 ? {
                       ...holeCard,
                       isBeingShown: holeCard.visible,
-                      partOfWinningHand:
-                          isWinner &&
-                          shouldHighlightWinningCards &&
-                          this.gameStateManager.isCardInPlayerBestHand(player.uuid, holeCard),
+                      partOfWinningHand: this.getPartOfWinningHand(player, holeCard),
                   }
                 : { hidden: true };
         });

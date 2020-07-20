@@ -182,4 +182,4 @@ async function click(numTables, players) {
     }
 }
 
-sit(1, 4);
+sit(1, 6);

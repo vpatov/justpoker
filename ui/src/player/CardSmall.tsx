@@ -107,6 +107,14 @@ const useStyles = makeStyles((theme) => ({
     isBeingShown: {
         boxShadow: `0 0 0.3vmin 0.2vmin ${theme.palette.secondary.main}`,
     },
+    partOfWinningHand: {
+        transform: 'translateY(33%)',
+        filter: 'brightness(1)',
+    },
+    notPartOfWinningHand: {
+        transform: 'translateY(0%)',
+        filter: 'brightness(0.2)',
+    },
 }));
 
 function CardSmall(props) {
@@ -174,7 +182,8 @@ function CardSmall(props) {
     const visibleCardComponent = (
         <div
             className={classnames(classes.root, ...getCardBackGroundClasses(suit), className, {
-                ani_notWinningCard: !partOfWinningHand,
+                [classes.partOfWinningHand]: partOfWinningHand,
+                [classes.notPartOfWinningHand]: partOfWinningHand === false,
                 [classes.sideCard]: shouldFlex,
                 [classes.isBeingShown]: isBeingShown && hero,
                 [classes.flippable]: isFlipable,
