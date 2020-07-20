@@ -54,6 +54,7 @@ export declare interface Global {
     isHeroInHand: boolean;
     isGameInProgress: boolean;
     canStartGame: boolean;
+    isGamePaused: boolean;
     gameWillStopAfterHand: boolean;
     areOpenSeats: boolean;
     gameParametersWillChangeAfterHand: boolean;
@@ -336,6 +337,7 @@ export function getCleanGlobal(): Global {
         heroIsAdmin: false,
         isGameInProgress: false,
         canStartGame: false,
+        isGamePaused: true,
         gameWillStopAfterHand: false,
         gameParametersWillChangeAfterHand: false,
         isGameInHandInitStage: false,
@@ -449,6 +451,7 @@ export const TestGame: UiGameState = {
         heroIsAdmin: true,
         isGameInProgress: true,
         canStartGame: false,
+        isGamePaused: false,
         gameWillStopAfterHand: true,
         areOpenSeats: true,
         gameParametersWillChangeAfterHand: true,

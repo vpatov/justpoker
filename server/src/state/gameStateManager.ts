@@ -782,7 +782,14 @@ export class GameStateManager {
      * if the game is not currently in progress, and if there are enough players to play.
      */
     canPlayerStartGame(playerUUID: PlayerUUID) {
-        return this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress() && this.isPlayerAdmin(playerUUID);
+        return this.isGamePaused() && this.isPlayerAdmin(playerUUID);
+    }
+
+    /**
+     * Used to toggle the appearance of the game is paused UI
+     */
+    isGamePaused() {
+        return this.getPlayersReadyToPlay().length >= 2 && !this.isGameInProgress();
     }
 
     /**

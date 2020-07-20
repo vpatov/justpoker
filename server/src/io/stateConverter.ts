@@ -155,6 +155,7 @@ export class StateConverter {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
+            isGamePaused: this.gameStateManager.isGamePaused(),
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),

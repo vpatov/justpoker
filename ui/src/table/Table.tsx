@@ -119,6 +119,12 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 5,
         fontSize: '4vmin',
     },
+    pauseGame: {
+        zIndex: 5,
+        fontSize: '4vmin',
+        pointerEvents: 'none',
+        boxShadow: 'none',
+    },
     winningHandDescription: {
         width: '85vw',
         zIndex: 5,
@@ -149,6 +155,7 @@ function Table(props) {
         isSpectator,
         isHeroInHand,
         isGameInHandInitStage,
+        isGamePaused,
     } = useSelector(globalGameStateSelector);
     const { communityCards, spots, activePot, fullPot, inactivePots, awardPots, winningHandDescription } = useSelector(
         tableSelector,
@@ -276,6 +283,11 @@ function Table(props) {
                         onClick={onClickStartGame}
                     >
                         Start Game
+                    </Button>
+                ) : null}
+                {isGamePaused && !canStartGame ? (
+                    <Button className={classes.pauseGame} color="secondary" variant="contained">
+                        Paused
                     </Button>
                 ) : null}
                 {isGameInProgress ? (
