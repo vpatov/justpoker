@@ -173,15 +173,26 @@ function ControllerBetSizer(props) {
                             +
                         </Button>
                     </div>
-                    <ThickSlider
-                        className={classes.slider}
-                        onChange={(e, val) => onChange(val as number)}
-                        value={value + 0.1}
-                        min={min}
-                        max={max}
-                        valueLabelDisplay="off"
-                        style={{ color: computeColor() }}
-                    />
+                    {min === max && value !== 0 ? (
+                        <ThickSlider
+                            className={classes.slider}
+                            value={1}
+                            min={0}
+                            max={1}
+                            valueLabelDisplay="off"
+                            style={{ color: computeColor() }}
+                        />
+                    ) : (
+                        <ThickSlider
+                            className={classes.slider}
+                            onChange={(e, val) => onChange(val as number)}
+                            value={value}
+                            min={min}
+                            max={max}
+                            valueLabelDisplay="off"
+                            style={{ color: computeColor() }}
+                        />
+                    )}
                     <div className={classes.sizingButtonsCont}>
                         <ButtonGroup className={classes.sizeButtonGroupCont}>
                             {sizingButtons.map((button) => (
