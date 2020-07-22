@@ -184,4 +184,4 @@ async function click(numTables, players) {
     }
 }
 
-click(1, 7);
+click(1, 3);
