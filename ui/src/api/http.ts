@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Config, getFrontEndEnvConfig } from '../shared/models/config/config';
+import { EmailMessage } from '../shared/models/system/email';
 
 const api = axios.create({
     baseURL: '', // for local dev currenly handled by proxy in package.json
@@ -33,4 +34,13 @@ export function computeHandLogGETurl(gameInstanceUUID) {
 export const reportFrontEndError = (data, onSuccess, onError) => {
     const url = `/api/error`;
     return api.post(url, data).then(onSuccess).catch(onError);
+};
+export const sendMail = (message: EmailMessage, onSuccess, onError) => {
+    const url = `/api/sendMail`;
+    return api.post(url, message).then(onSuccess).catch(onError);
+};
+
+export const getClientIp = (onSuccess, onError) => {
+    const url = `https://ipapi.co/json/`;
+    return api.get(url).then(onSuccess).catch(onError);
 };

@@ -1,14 +1,15 @@
 import React from 'react';
-import { reportFrontEndError } from '../api/http';
+import { reportFrontEndError, sendMail } from '../api/http';
 import { store } from '../index';
+import { EmailMessage } from '../shared/models/system/email';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { error: null, errorInfo: null };
+        this.state = { error: null, errorInfo: null, userText: '', mailResponse: '' };
     }
 
-    state = { error: null, errorInfo: null };
+    state = { error: null, errorInfo: null, userText: '', mailResponse: '' };
     componentDidCatch(error, errorInfo) {
         // Catch errors in any components below and re-render with error message
         this.setState({
@@ -40,12 +41,58 @@ class ErrorBoundary extends React.Component {
         console.error(err);
     };
 
+    handleChange = (event) => {
+        this.setState({ userText: event.target.value });
+    };
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        const message: EmailMessage = {
+            body: `USER_MESSAGE\n\n${this.state.userText}`,
+            subject: 'UI Error',
+        };
+        sendMail(
+            message,
+            () => this.setState({ mailResponse: 'Thank you. Our team is on the case!' }),
+            () => this.setState({ mailResponse: 'Uh Oh... We could not send the message 🤦‍♂️.' }),
+        );
+    };
+
     render() {
         if (this.state.errorInfo) {
             // Error path
             return (
-                <div>
-                    <h2 style={{ fontFamily: 'Futura, san-serif', margin: 24 }}>Something went wrong.</h2>
+                <div style={{ margin: 12 }}>
+                    <h1 style={{ fontFamily: 'Futura, san-serif', margin: 12 }}>Something went wrong.</h1>
+                    <h3 style={{ fontFamily: 'Futura, san-serif', margin: 12 }}>
+                        Please describe what happened leading up to the error.
+                    </h3>
+                    <h3 style={{ fontFamily: 'Futura, san-serif', margin: 12 }}>
+                        This will help our developent team fix the bug as quickly as possible.
+                    </h3>
+
+                    <form onSubmit={this.handleSubmit}>
+                        <textarea
+                            value={this.state.userText}
+                            onChange={this.handleChange}
+                            style={{
+                                fontFamily: 'Futura, san-serif',
+                                margin: 12,
+                                fontSize: 18,
+                                width: 600,
+                                height: 300,
+                            }}
+                        />
+                        {this.state.mailResponse ? (
+                            <h2 style={{ fontFamily: 'Futura, san-serif', margin: 12 }}>{this.state.mailResponse}</h2>
+                        ) : (
+                            <input
+                                type="submit"
+                                value="Submit"
+                                style={{ fontFamily: 'Futura, san-serif', margin: 24, fontSize: 24, cursor: 'pointer' }}
+                            />
+                        )}
+                    </form>
                 </div>
             );
         }

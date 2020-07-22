@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import get from 'lodash/get';
+import { getClientIp } from './api/http';
 
 export function generateStringFromRank(rank) {
     if (rank === 'T') return '10';
@@ -80,4 +81,17 @@ export class ScrollFixer {
         }
         return false;
     }
+}
+
+export function useClientIp(): any {
+    const [ip, SET_ip] = useState('');
+
+    useEffect(() => {
+        getClientIp(
+            (res) => SET_ip(res.data),
+            () => SET_ip('**COULD NOT FETCH IP INFO**'),
+        );
+    }, []);
+
+    return ip;
 }

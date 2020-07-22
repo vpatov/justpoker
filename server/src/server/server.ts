@@ -7,6 +7,7 @@ import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 import queryString from 'query-string';
+import sgMail from '@sendgrid/mail';
 
 import { AddressInfo } from 'net';
 import { EventProcessorService } from '../io/eventProcessorService';
@@ -29,7 +30,14 @@ import { GameInstanceUUID, ClientUUID, generateClientUUID } from '../../../ui/sr
 import { GameParameters } from '../../../ui/src/shared/models/game/game';
 import { ServerMessageType } from '../../../ui/src/shared/models/state/chat';
 import { TimerManager } from '../state/timerManager';
-import { Config, getServerEnvConfig } from '../../../ui/src/shared/models/config/config';
+import { Config, getServerEnvConfig, getServerEnv } from '../../../ui/src/shared/models/config/config';
+
+import {
+    SENDGRID_API_KEY,
+    DEV_EMAIL_ACCOUNTS,
+    SERVER_EMAIL_ACCOUNT,
+    EmailMessage,
+} from '../../../ui/src/shared/models/system/email';
 import { CapacityLimiter } from './capacityLimiter';
 
 @Service()
@@ -50,6 +58,10 @@ class Server {
         private readonly timerManager: TimerManager,
         private readonly capacityLimiter: CapacityLimiter,
     ) {}
+
+    private initMailer(): void {
+        sgMail.setApiKey(SENDGRID_API_KEY);
+    }
 
     private initHTTPRoutes(): void {
         const router = express.Router();
@@ -116,6 +128,30 @@ class Server {
             } else {
                 res.send({ handLogs: handLogs });
             }
+        });
+
+        router.post('/api/sendMail', (req, res) => {
+            const EmailMessage: EmailMessage = req.body;
+            // append metadata if its there
+            const text = EmailMessage.metadata
+                ? `${EmailMessage.body} \n\nMETADATA\n ${JSON.stringify(EmailMessage.metadata)}`
+                : EmailMessage.body;
+            const msg = {
+                to: DEV_EMAIL_ACCOUNTS,
+                from: SERVER_EMAIL_ACCOUNT,
+                subject: `${EmailMessage.subject} (${getServerEnv()})`,
+                text: text,
+            };
+            logger.info('sending email message');
+            sgMail.send(msg).then(
+                () => {
+                    res.send({ success: 'success!' });
+                },
+                (error) => {
+                    logger.error('error sending email message ', error);
+                    res.sendStatus(500).send({ error: error });
+                },
+            );
         });
 
         router.get('/api/capacity', (req, res) => {
@@ -267,6 +303,7 @@ class Server {
         this.initHTTPRoutes();
         this.server = http.createServer(this.app);
         this.initGameWSS();
+        this.initMailer();
         this.server.listen(this.config.SERVER_PORT, () => {
             const addressInfo = this.server.address() as AddressInfo;
             logger.info(`Server started on address `, addressInfo);
