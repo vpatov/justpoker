@@ -32,12 +32,17 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '2vmin',
             color: theme.palette.success.light,
         },
+        copiedErr: {
+            fontSize: '2vmin',
+            color: theme.palette.error.light,
+        },
     }),
 );
 
 function TableCopyLink(props) {
     const classes = useStyles();
     const [copied, copiedSet] = useState(false);
+    const [copiedFailed, SET_copiedFailed] = useState(false);
     function handleClick() {
         if (!navigator.clipboard) {
             console.warn('Clipboard api not avaliable. Not copied.');
@@ -50,10 +55,16 @@ function TableCopyLink(props) {
             setTimeout(() => copiedSet(false), 1000);
         } catch (err) {
             console.error('Failed to copy!', err);
+            SET_copiedFailed(true);
         }
     }
     return (
         <ButtonBase className={classes.root} onClick={handleClick}>
+            {copiedFailed ? (
+                <Typography className={classes.copiedErr}>
+                    Could not copy to clipboard, please copy url manually.
+                </Typography>
+            ) : null}
             {copied ? (
                 <Typography className={classes.copied}>Copied to clipboard!</Typography>
             ) : (

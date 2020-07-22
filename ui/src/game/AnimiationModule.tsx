@@ -99,15 +99,16 @@ export function animateAwardPot(winnerUUID, potId) {
     return a;
 }
 
-export function animateWinningCards() {
+export function animateWinningCard(cardId, partOfWinningHand) {
     const duration = 800;
-    const a = anime({
-        targets: [`.ani_notWinningCard`],
-        filter: ['brightness(1)', 'brightness(0.2)'],
+    const fliter = partOfWinningHand ? 'brightness(1)' : ['brightness(1)', 'brightness(0.2)'];
+    console.log(cardId, partOfWinningHand);
+    anime({
+        targets: [`#${cardId}`],
+        filter: fliter,
         duration: duration,
         easing: 'easeInOutExpo',
     });
-    return a;
 }
 
 export function animateTimeBankButton() {

@@ -91,6 +91,7 @@ function ControllerBetAction(props) {
     const [betInputRef, setBetInputFocus] = useFocus();
 
     const prevBet = usePrevious(curBet);
+    const prevBetAmt = usePrevious(betAmt);
 
     function closeDialog() {
         setWarning(false);
@@ -101,12 +102,13 @@ function ControllerBetAction(props) {
         performBettingRoundAction(BettingRoundActionType.FOLD);
     }
 
-    // if there is selected betAmt and min changes rest betAmt
+    // if there is selected betAmt and min changes reset betAmt
     useEffect(() => {
-        if (betAmt !== 0 && betAmt < min) {
+        // only fire on min change
+        if (betAmt < min && prevBetAmt === betAmt) {
             setBetAmt(0);
         }
-    }, [min, betAmt, setBetAmt]);
+    }, [min, prevBetAmt, betAmt]);
 
     useEffect(() => {
         if (unqueueAllBettingRoundActions) {
@@ -328,6 +330,7 @@ function ControllerBetAction(props) {
                 onChange={(val) => changeBetAmount(val)}
                 onClickActionButton={onClickActionButton}
                 betInputRef={betInputRef}
+                disabled={bettingActionButtons[BettingRoundActionType.BET]?.disabled}
             />
         </div>
     );
