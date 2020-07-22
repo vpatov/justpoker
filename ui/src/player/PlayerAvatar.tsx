@@ -47,19 +47,22 @@ function PlayerAvatar(props) {
             }
         };
         WsServer.subscribe('animation', onReceiveNewAnimationState);
-        return () => clearTimeout(timer);
-    }, [timer, playerUUID]);
+    }, [playerUUID]);
 
-    // set and clear timeouts
+    // clear timeouts
+    useEffect(() => {
+        return () => clearTimeout(timer);
+    }, [timer]);
+
+    // set timeout
     useEffect(() => {
         if (reactionState.show) {
-            clearTimeout(timer);
             const newTimer = setTimeout(() => {
                 SET_reactionState({ show: false, reaction: '' });
             }, REACTION_TIME);
             timerSet(newTimer as any);
         }
-    }, [reactionState, timer]);
+    }, [reactionState]);
 
     return (
         <div className={classnames(classes.root, className)}>

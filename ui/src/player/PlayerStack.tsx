@@ -126,14 +126,30 @@ function PlayerStack(props) {
 
     function getPlayerOverlay() {
         const comps = [] as any;
-        if (disconnected) {
-            comps.push(<Typography className={classes.labelText}>Disconnected</Typography>);
-        } else if (quitting) {
-            comps.push(<Typography className={classes.labelText}>Quitting</Typography>);
+        if (quitting) {
+            comps.push(
+                <Typography key={'disconnected'} className={classes.labelText}>
+                    Quitting
+                </Typography>,
+            );
+        } else if (disconnected) {
+            comps.push(
+                <Typography key={'quitting'} className={classes.labelText}>
+                    Disconnected
+                </Typography>,
+            );
         } else if (leaving) {
-            comps.push(<Typography className={classes.labelText}>Leaving</Typography>);
+            comps.push(
+                <Typography key={'leaving'} className={classes.labelText}>
+                    Leaving
+                </Typography>,
+            );
         } else if (sittingOut) {
-            comps.push(<Typography className={classes.labelText}>Sitting Out</Typography>);
+            comps.push(
+                <Typography key={'sittingOut'} className={classes.labelText}>
+                    Sitting Out
+                </Typography>,
+            );
         }
 
         if (comps.length) {

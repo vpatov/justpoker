@@ -1,6 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { usePrevious } from '../utils';
-import { animateWinningCards, animateDealCommunityCard } from '../game/AnimiationModule';
+import { animateDealCommunityCard } from '../game/AnimiationModule';
 import { generateStringFromRank } from '../utils';
 import classnames from 'classnames';
 import SuitComponent from '../reuseable/Suit';
@@ -70,8 +69,11 @@ const useStyles = makeStyles((theme) => ({
     },
     partOfWinningHand: {
         transform: 'translateY(33%)',
-        zIndex: 1,
-        ...theme.custom.WINNING_CARD,
+        filter: 'brightness(1)',
+    },
+    notPartOfWinningHand: {
+        transform: 'translateY(0%)',
+        filter: 'brightness(0.2)',
     },
 }));
 
@@ -88,20 +90,11 @@ function CardLarge(props) {
         return [cardClasses.base, cardClasses[suit]];
     }
 
-    const id = `${suit}${rank}`;
-    // this function could be located in many different componets
-    // we could also do it at a global level, maybe the animation module is peforming these diff?
-    // or we could do it explictly as part of the backend animation flow
-    const prevWinner = usePrevious(partOfWinningHand);
-    useEffect(() => {
-        if (!prevWinner && partOfWinningHand) {
-            animateWinningCards();
-        }
-    }, [prevWinner, partOfWinningHand]);
+    const cardId = `${suit}${rank}`;
 
     useEffect(() => {
-        animateDealCommunityCard(id);
-    }, [id]);
+        animateDealCommunityCard(cardId);
+    }, [cardId]);
 
     if (placeHolder) {
         return (
@@ -116,11 +109,11 @@ function CardLarge(props) {
     }
 
     return (
-        <div id={id}>
+        <div id={cardId}>
             <div
                 className={classnames(classes.root, className, ...getCardBackGroundClasses(suit), {
                     [classes.partOfWinningHand]: partOfWinningHand,
-                    ani_notWinningCard: !partOfWinningHand,
+                    [classes.notPartOfWinningHand]: partOfWinningHand === false,
                     [classes.smallWidth]: smallWidth,
                 })}
             >

@@ -14,14 +14,14 @@ export const MIN_VALUES = {
 
 export const MAX_VALUES = {
     TIME_TO_ACT: 60 * 10, // 10 minutes
-    BIG_BLIND: Math.pow(10, 8),
-    SMALL_BLIND: Math.pow(10, 8),
-    BUY_IN: Math.pow(10, 9),
-    PLAYER_STACK: Math.pow(10, 9),
+    BIG_BLIND: Math.pow(10, 8) - 1,
+    SMALL_BLIND: Math.pow(10, 8) - 1,
+    BUY_IN: Math.pow(10, 9) - 1,
+    PLAYER_STACK: Math.pow(10, 9) - 1,
     MAX_PLAYERS: 9,
     NUMBER_TIME_BANKS: 100,
     TIME_BANK_TIME: 60 * 10, // 10 minutes
-    TIME_BANK_REPLENISH_INTERVAL: Math.pow(10,5),
+    TIME_BANK_REPLENISH_INTERVAL: Math.pow(10, 5) - 1,
 };
 
 export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes

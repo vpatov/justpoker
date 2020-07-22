@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import classnames from 'classnames';
+import { useSelector } from 'react-redux';
+import { globalGameStateSelector } from '../store/selectors';
+
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+
 import JoinGameDialog from '../game/JoinGameDialog';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        spectatorRoot: {
-            display: 'flex',
-            justifyContent: 'center !important',
-            alignItems: 'center',
-        },
         joinGameButton: {
             height: '60%',
             width: '12vw',
@@ -21,16 +19,22 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+// should be render when player is a spectator, gives option to join game
 function ControllerSpectator(props) {
     const classes = useStyles();
-    const { className } = props;
+    const { rootClassName } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
+
     const handleClose = () => {
         setDialogOpen(false);
     };
 
+    const { isSpectator } = useSelector(globalGameStateSelector);
+
+    if (!isSpectator) return null;
+
     return (
-        <div className={classnames(classes.spectatorRoot, className)}>
+        <div className={rootClassName}>
             <Button
                 className={classes.joinGameButton}
                 onClick={() => setDialogOpen(true)}
@@ -45,5 +49,7 @@ function ControllerSpectator(props) {
         </div>
     );
 }
+
+ControllerSpectator.displayName = 'ControllerSpectator';
 
 export default ControllerSpectator;

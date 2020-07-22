@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
         mainPotCont: {
             width: '100%',
             textAlign: 'center',
-            marginBottom: '1vmin',
+            marginBottom: '2vmin',
         },
         sidePotsCont: {
             display: 'flex',

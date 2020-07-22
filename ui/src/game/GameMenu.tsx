@@ -219,7 +219,7 @@ function GameMenu(props) {
                     className={classnames(classes.root, {
                         [classes.rootExpanded]: open,
                     })}
-                    style={open ? {} : { maxHeight: `${6 * alwaysShowMenuButtons.length}vmin` }}
+                    style={open ? {} : { maxHeight: `${5 * (alwaysShowMenuButtons.length + 1)}vmin` }}
                 >
                     {open ? (
                         <>

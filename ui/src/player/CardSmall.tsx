@@ -30,10 +30,12 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-evenly',
         margin: '0 0.5vmin',
         boxShadow: '0vmin 0px 0.5vmin 0vmin rgba(0,0,0,0.5)',
-        cursor: 'pointer',
         '&:hover $showButton': {
             opacity: 1,
         },
+    },
+    flippable: {
+        cursor: 'pointer',
     },
     sideCard: {
         margin: '0 -1.5vmin',
@@ -105,6 +107,12 @@ const useStyles = makeStyles((theme) => ({
     isBeingShown: {
         boxShadow: `0 0 0.3vmin 0.2vmin ${theme.palette.secondary.main}`,
     },
+    partOfWinningHand: {
+        filter: 'brightness(1)',
+    },
+    notPartOfWinningHand: {
+        filter: 'brightness(0.2)',
+    },
 }));
 
 function CardSmall(props) {
@@ -127,12 +135,14 @@ function CardSmall(props) {
     const coloredCardBackgroundClasses = useColoredCardBackgroundStyles();
     const whiteCardBackgroundClasses = useWhiteCardBackgroundStyles();
     const { curPrefs } = useContext(ThemeSetter);
+    const isFlipable = hero && canShowHideCards && !(cannotHideCards && isBeingShown);
 
     function getCardBackGroundClasses(suit: Suit) {
         const cardClasses = curPrefs.coloredCardBackground ? coloredCardBackgroundClasses : whiteCardBackgroundClasses;
         return [cardClasses.base, cardClasses[suit]];
     }
 
+    // animation
     useEffect(() => {
         if (canShowHideCards && prevIsBeingShown !== isBeingShown) {
             if (isBeingShown) {
@@ -170,15 +180,17 @@ function CardSmall(props) {
     const visibleCardComponent = (
         <div
             className={classnames(classes.root, ...getCardBackGroundClasses(suit), className, {
-                ani_notWinningCard: !partOfWinningHand,
+                [classes.partOfWinningHand]: partOfWinningHand,
+                [classes.notPartOfWinningHand]: partOfWinningHand === false,
                 [classes.sideCard]: shouldFlex,
                 [classes.isBeingShown]: isBeingShown && hero,
+                [classes.flippable]: isFlipable,
             })}
             id={cardId}
             style={style}
             onClick={showCard}
         >
-            {hero && canShowHideCards && !(cannotHideCards && isBeingShown) ? (
+            {isFlipable ? (
                 <Button onClick={showCard} variant="contained" className={classes.showButton}>
                     {isBeingShown ? 'Hide' : 'Show'}
                 </Button>

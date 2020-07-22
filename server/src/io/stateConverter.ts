@@ -47,7 +47,7 @@ import { ChatService } from '../state/chatService';
 import { GameInstanceLogService } from '../stats/gameInstanceLogService';
 
 import { ClientUUID, PlayerUUID, makeBlankUUID } from '../../../ui/src/shared/models/system/uuid';
-import { getHoleCardNickname } from '../../../ui/src/shared/models/game/cards';
+import { getHoleCardNickname, Card } from '../../../ui/src/shared/models/game/cards';
 import { PlayerPosition } from '../../../ui/src/shared/models/player/playerPosition';
 
 declare interface CardInformation {
@@ -150,15 +150,13 @@ export class StateConverter {
 
     getUIGlobal(clientUUID: ClientUUID): Global {
         const heroPlayer = this.gameStateManager.getPlayerByClientUUID(clientUUID);
-        const gameStage = this.gameStateManager.getGameStage();
 
         const global: Global = {
             isGameInProgress: this.gameStateManager.isGameInProgress(),
             heroIsAdmin: this.gameStateManager.isClientAdmin(clientUUID),
             canStartGame: heroPlayer ? this.gameStateManager.canPlayerStartGame(heroPlayer?.uuid) : false,
+            isGamePaused: this.gameStateManager.isGamePaused(),
             gameWillStopAfterHand: this.gameStateManager.gameWillStopAfterHand(),
-            unqueueAllBettingRoundActions:
-                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
@@ -169,7 +167,7 @@ export class StateConverter {
             adminNames: this.gameStateManager
                 .getAdminClientUUIDs()
                 .map((clientUUID) => this.gameStateManager.getPlayerByClientUUID(clientUUID)?.name || 'Anonymous'),
-            heroTotalChips: heroPlayer?.chips,
+            heroTotalChips: heroPlayer?.chips || 0,
             willAddChips: heroPlayer?.willAddChips,
             isHeroInHand: heroPlayer?.uuid ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
             canShowHideCards: heroPlayer?.uuid ? this.gameStateManager.canPlayerShowCards(heroPlayer?.uuid) : false,
@@ -185,6 +183,7 @@ export class StateConverter {
     getUIController(clientUUID: ClientUUID, heroPlayerUUID: PlayerUUID): Controller {
         const hero = this.gameStateManager.getPlayer(heroPlayerUUID);
 
+        const gameStage = this.gameStateManager.getGameStage();
         const bettingRoundStage = this.gameStateManager.getBettingRoundStage();
         const bbValue = this.gameStateManager.getBB();
         const fullPot = this.gameStateManager.getFullPotValue();
@@ -197,7 +196,11 @@ export class StateConverter {
         const maxBet = this.getMaxBetSizeForPlayer(heroPlayerUUID);
 
         const getSizingButtons = () => {
-            if (!this.gameStateManager.isGameInProgress()) {
+            if (
+                !this.gameStateManager.isGameInProgress() ||
+                (this.gameStateManager.getPlayer(heroPlayerUUID).sittingOut &&
+                    !this.gameStateManager.isPlayerInHand(heroPlayerUUID))
+            ) {
                 return [];
             }
 
@@ -228,9 +231,11 @@ export class StateConverter {
 
         const controller: Controller = {
             toAct,
-            lastBettingRoundAction: this.gameStateManager.getLastBettingRoundAction(),
+            curBet: curBet,
             min: minBet,
             max: maxBet,
+            unqueueAllBettingRoundActions:
+                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             sizingButtons: getSizingButtons(),
             bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID, toAct),
             dealInNextHand: !hero.sittingOut,
@@ -264,12 +269,16 @@ export class StateConverter {
         heroPlayerUUID: PlayerUUID,
         toAct: boolean,
     ): BettingActionButtons {
-        if (!this.gameStateManager.isGameInProgress()) {
+        if (
+            !this.gameStateManager.isGameInProgress() ||
+            (this.gameStateManager.getPlayer(heroPlayerUUID).sittingOut &&
+                !this.gameStateManager.isPlayerInHand(heroPlayerUUID))
+        ) {
             return {};
         }
 
         if (
-            this.gameStateManager.isPlayerAllIn(heroPlayerUUID) ||
+            this.gameStateManager.hasPlayerPutAllChipsInThePot(heroPlayerUUID) ||
             this.gameStateManager.isAllInRunOut() ||
             !this.gameStateManager.isPlayerInHand(heroPlayerUUID) ||
             this.gameStateManager.isGameStageInBetweenHands()
@@ -298,10 +307,7 @@ export class StateConverter {
             }
         }
 
-        const callAmount = this.gameStateManager.computeCallAmount(heroPlayerUUID);
-        const heroPlayerStack = this.gameStateManager.getPlayerByClientUUID(clientUUID).chips;
-
-        if (heroPlayerStack <= callAmount) {
+        if (!this.gameStateManager.canPlayerRaise(heroPlayerUUID)) {
             buttons[BettingRoundActionType.BET] = this.disableButton(BET_BUTTON);
         } else {
             buttons[BettingRoundActionType.BET] = BET_BUTTON;
@@ -371,20 +377,28 @@ export class StateConverter {
         return uiChatMessage;
     }
 
-    transformPlayerCards(player: Player, heroPlayerUUID: PlayerUUID): CardInformation {
-        const isHero = heroPlayerUUID === player.uuid;
+    getPartOfWinningHand(player: Player, holeCard: Card): boolean | undefined {
         const shouldHighlightWinningCards = !this.gameStateManager.hasEveryoneButOnePlayerFolded();
         const isWinner = player.winner;
+        if (this.gameStateManager.getGameStage() === GameStage.SHOW_WINNER) {
+            return (
+                isWinner &&
+                shouldHighlightWinningCards &&
+                this.gameStateManager.isCardInPlayerBestHand(player.uuid, holeCard)
+            );
+        }
+        return undefined;
+    }
+
+    transformPlayerCards(player: Player, heroPlayerUUID: PlayerUUID): CardInformation {
+        const isHero = heroPlayerUUID === player.uuid;
 
         const cards: UiCard[] = player.holeCards.map((holeCard) => {
             return holeCard.visible || isHero
                 ? {
                       ...holeCard,
                       isBeingShown: holeCard.visible,
-                      partOfWinningHand:
-                          isWinner &&
-                          shouldHighlightWinningCards &&
-                          this.gameStateManager.isCardInPlayerBestHand(player.uuid, holeCard),
+                      partOfWinningHand: this.getPartOfWinningHand(player, holeCard),
                   }
                 : { hidden: true };
         });

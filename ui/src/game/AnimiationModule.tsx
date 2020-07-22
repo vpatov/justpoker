@@ -68,23 +68,14 @@ export function flipTable() {
 }
 
 export function dealCards() {
-    const duration = 1800;
-
-    const [x, y] = getCenterOfTable();
-
+    const duration = 1250;
     anime({
         targets: ['.ani_playerCard_0', '.ani_playerCard_1', '.ani_playerCard_2', '.ani_playerCard_3'],
-        translateX: (target) => {
-            return [x - target.getBoundingClientRect().x, 0];
-        },
-        translateY: (target) => {
-            return [y - target.getBoundingClientRect().y, 0];
-        },
-        opacity: [0, 1],
-        duration: duration,
-        rotateZ: [-720, 0],
+        rotateY: [-110, 0],
         easing: 'easeOutExpo',
-        delay: anime.stagger(50),
+        duration: duration,
+        opacity: [0.3, 1],
+        delay: anime.stagger(25),
     });
 }
 
@@ -105,21 +96,19 @@ export function animateAwardPot(winnerUUID, potId) {
         duration: duration,
         easing: 'easeInOutExpo',
     });
-    // setTimeout(() => a.reset(), duration);
     return a;
 }
 
-export function animateWinningCards() {
+export function animateWinningCard(cardId, partOfWinningHand) {
     const duration = 800;
-
-    const a = anime({
-        targets: [`.ani_notWinningCard`],
-        filter: ['brightness(1)', 'brightness(0.2)'],
+    const fliter = partOfWinningHand ? 'brightness(1)' : ['brightness(1)', 'brightness(0.2)'];
+    console.log(cardId, partOfWinningHand);
+    anime({
+        targets: [`#${cardId}`],
+        filter: fliter,
         duration: duration,
         easing: 'easeInOutExpo',
     });
-    // setTimeout(() => a.reset(), resetDuration);
-    return a;
 }
 
 export function animateTimeBankButton() {
@@ -179,8 +168,8 @@ export function animateDealCommunityCard(id) {
         easing: 'easeOutExpo',
     });
 }
-// utility functions
 
+// utility functions
 function getCenterOfRef(ref) {
     const { bottom, left, right, top } = ref.getBoundingClientRect();
     const x = (right - left) / 2 + left;

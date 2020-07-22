@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function PlayerMenu(props) {
     const classes = useStyles();
     const { anchorEl, handleClose, setHeroRotation, virtualPositon, player } = props;
-    const { stack, name, uuid, admin } = player;
+    const { stack, name, uuid, admin, quitting } = player;
     const [chipsDialog, setChipsDialog] = useState(false);
     const [avatarDialog, SET_avatarDialog] = useState(false);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
@@ -77,8 +77,8 @@ function PlayerMenu(props) {
         return (
             <>
                 {Object.keys(AvatarKeys).map((key, index) => (
-                    <IconButton onClick={handleSelectNewAvatar(key)} className={classes.avatarButton}>
-                        <Avatar key={`${key}${index}`} avatarKey={key} className={classes.avatarIcon} />
+                    <IconButton key={key} onClick={handleSelectNewAvatar(key)} className={classes.avatarButton}>
+                        <Avatar avatarKey={key} className={classes.avatarIcon} />
                     </IconButton>
                 ))}
             </>
@@ -96,7 +96,9 @@ function PlayerMenu(props) {
             {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
             {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
             {isHeroAdmin && isPlayerHero ? <MenuItem onClick={handleRemoveAdmin}>Remove as Admin</MenuItem> : null}
-            {isHeroAdmin && !isPlayerHero ? <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem> : null}
+            {isHeroAdmin && !isPlayerHero && !quitting ? (
+                <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
+            ) : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>
             {isPlayerHero ? <MenuItem onClick={handleChangeAvatarMenu}>Change Avatar</MenuItem> : null}
             <ConfirmationDialog

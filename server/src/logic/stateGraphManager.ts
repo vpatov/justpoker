@@ -18,6 +18,9 @@ import { LedgerService } from '../stats/ledgerService';
 
 const MAX_CONDITION_DEPTH = 3;
 
+// StateGraphManager defines and manages the allowed GameStages and valid transitions between them
+// each GameStage has a set of action which take place and conditions upon which it can transitoin into other GameStages
+// these transitons are triggered through event originating from the client or server which are consumed by EventProcessorService
 @Service()
 export class StateGraphManager {
     constructor(
@@ -206,6 +209,7 @@ export class StateGraphManager {
                 this.gameStateManager.incrementBettingRoundStage();
                 this.gamePlayService.resetBettingRoundActions();
                 this.gamePlayService.initializeBettingRound();
+                this.gamePlayService.updateIsAllInRunOut();
                 if (!this.gameStateManager.isAllInRunOut()) {
                     this.gamePlayService.setFirstToActAtStartOfBettingRound();
                 }
@@ -230,10 +234,10 @@ export class StateGraphManager {
 
             case GameStage.FINISH_BETTING_ROUND: {
                 this.gamePlayService.placeBetsInPot();
-                this.gamePlayService.updateIsAllInRunOut();
-                this.gamePlayService.flipCardsIfAllInRunOut();
                 this.gameStateManager.clearCurrentPlayerToAct();
                 this.gamePlayService.endOfBettingRound();
+                this.gamePlayService.updateIsAllInRunOut();
+                this.gamePlayService.flipCardsIfAllInRunOut();
                 break;
             }
 
@@ -271,6 +275,8 @@ export class StateGraphManager {
         });
     }
 
+    // some actions can only be executed inbetween hands
+    // these are queued up and then executed here during correct gamestage
     executeQueuedServerAction(action: QueuedServerAction) {
         switch (action.actionType) {
             case ClientActionType.BOOTPLAYER: {

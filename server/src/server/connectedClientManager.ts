@@ -20,6 +20,8 @@ export interface Client {
     lastMessaged: number;
 }
 
+// ConnectedClientManager manages WS connections for the sever. WS are grouped together depending on which need to be sent updates upon the same state mutations
+// it is also responsible for automatically triming stale WS over ATTEMPT_EXPIRE_CLIENT_INTERVAL
 @Service()
 export class ConnectedClientManager {
     private ClientGroups: ClientGroups = {};
@@ -113,5 +115,9 @@ export class ConnectedClientManager {
             const jsonRes = JSON.stringify(newState);
             client.ws.send(jsonRes);
         });
+    }
+
+    getNumberOfClients(): number {
+        return Object.values(this.ClientGroups).reduce((count, group) => count + Object.values(group).length, 0);
     }
 }

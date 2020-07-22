@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Hand(props) {
     const classes = useStyles();
-    const { hand, hero, className, cannotHideCards } = props;
+    const { hand, hero, className, cannotHideCards, playerUUID } = props;
     const { cards } = hand;
 
     const shouldRotate = hero && cards.length === 4;
@@ -28,6 +28,7 @@ function Hand(props) {
             {cards.map((c, i) => (
                 <CardSmall
                     {...c}
+                    key={`${JSON.stringify(c)}-${playerUUID}-${i}`}
                     cannotHideCards={cannotHideCards}
                     size="small"
                     className={`ani_playerCard_${i}`}

@@ -93,12 +93,11 @@ function Player(props) {
     }
 
     function getPlayerLabelComponent() {
-        if (lastAction) {
-            return <Typography className={classes.labelText}>{lastAction}</Typography>;
-        }
-
         if (playerTimer) {
             return <PlayerTimer className={classes.labelText} playerTimer={playerTimer} hero={hero} />;
+        }
+        if (lastAction) {
+            return <Typography className={classes.labelText}>{lastAction}</Typography>;
         }
 
         return null;
@@ -123,7 +122,7 @@ function Player(props) {
                 virtualPositon={virtualPositon}
             />
 
-            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} />
+            <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} playerUUID={uuid} />
 
             <PlayerStack player={player} onClickStack={handleClick} />
             <IconButton className={classes.moreButton} onClick={handleClick}>
