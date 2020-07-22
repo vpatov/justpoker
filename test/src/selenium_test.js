@@ -129,6 +129,7 @@ async function playGameWithPlayers(numPlayers) {
     const adminWindow = await createGameSitDownAdmin();
     const gameUrl = adminWindow.getCurrentUrl();
     const playerDrivers = await sitDownPlayers(numPlayers, gameUrl);
+    await adminWindow.wait(until.elementLocated(By.id(SELENIUM_TAGS.IDS.START_GAME_BUTTON)));
     await adminWindow.findElement(By.id(SELENIUM_TAGS.IDS.START_GAME_BUTTON)).click();
     checkItDown([adminWindow, ...playerDrivers]);
 }
@@ -137,6 +138,7 @@ async function clickButtonsWithPlayers(numPlayers) {
     const adminWindow = await createGameSitDownAdmin();
     const gameUrl = adminWindow.getCurrentUrl();
     const playerDrivers = await sitDownPlayers(numPlayers, gameUrl);
+    await adminWindow.wait(until.elementLocated(By.id(SELENIUM_TAGS.IDS.START_GAME_BUTTON)));
     await adminWindow.findElement(By.id(SELENIUM_TAGS.IDS.START_GAME_BUTTON)).click();
 
     clickRandomButtons([adminWindow, ...playerDrivers], 40, `#${SELENIUM_TAGS.IDS.CONTROLLER_ROOT}`);
@@ -182,4 +184,4 @@ async function click(numTables, players) {
     }
 }
 
-sit(1, 6);
+click(1, 7);
