@@ -108,11 +108,9 @@ const useStyles = makeStyles((theme) => ({
         boxShadow: `0 0 0.3vmin 0.2vmin ${theme.palette.secondary.main}`,
     },
     partOfWinningHand: {
-        transform: 'translateY(33%)',
         filter: 'brightness(1)',
     },
     notPartOfWinningHand: {
-        transform: 'translateY(0%)',
         filter: 'brightness(0.2)',
     },
 }));
