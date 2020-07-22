@@ -130,7 +130,6 @@ class Server {
             }
         });
 
-<<<<<<< HEAD
         router.post('/api/sendMail', (req, res) => {
             const EmailMessage: EmailMessage = req.body;
             // append metadata if its there
@@ -153,7 +152,8 @@ class Server {
                     res.sendStatus(500).send({ error: error });
                 },
             );
-=======
+        });
+
         router.get('/api/capacity', (req, res) => {
             res.send({ areOverCapacity: this.capacityLimiter.isOverCapacity() });
         });
@@ -170,7 +170,6 @@ class Server {
                 res.status(400);
                 res.send(msg);
             }
->>>>>>> 2e486a00bc50b9c3bc31b316a4e9e4a9e89324e1
         });
 
         // This is necessary because the server npm scripts assume the build process happens in the server,
