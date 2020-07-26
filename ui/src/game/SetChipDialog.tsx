@@ -106,7 +106,7 @@ function SetChipDialog(props) {
                 <Typography>{`Resulting Chips: ${resultingChips.toLocaleString()}`}</Typography>
                 <Typography className={classes.warning}>
                     {
-                        'Warning: this action will take effect immediately and may impact the gameplay of the current hand. The change will be recorded in the ledger.'
+                        'Warning: this action will take effect immediately and may impact the gameplay of the current hand. You cannot remove chips from a player which are currently a live bet. The change will be recorded in the ledger.'
                     }
                 </Typography>
             </DialogContent>
