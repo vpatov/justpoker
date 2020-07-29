@@ -674,7 +674,7 @@ export class GamePlayService {
         } else {
             const maxBuyin = this.gsm.getMaxBuyin();
             const currentStack = this.gsm.getPlayerChips(playerUUID);
-            const resultingChips = currentStack + numChips > maxBuyin ? currentStack : currentStack + numChips;
+            const resultingChips = currentStack + numChips > maxBuyin ? maxBuyin : currentStack + numChips;
             const amountAdded = resultingChips - currentStack;
             this.gsm.setPlayerChips(playerUUID, resultingChips);
             if (amountAdded > 0) {

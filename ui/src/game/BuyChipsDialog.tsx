@@ -41,8 +41,8 @@ function BuyChipsDialog(props) {
     const classes = useStyles();
     const { open, handleBuy, handleCancel } = props;
 
-    const { heroTotalChips, isHeroInHand } = useSelector(globalGameStateSelector);
-    const { minBuyin, maxBuyin } = useSelector(selectGameParameters);
+    const { heroTotalChips, isHeroInHand, computedMaxBuyin } = useSelector(globalGameStateSelector);
+    const { minBuyin } = useSelector(selectGameParameters);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
     const [chipAmt, SET_ChipAmt] = useState(computeMax());
 
@@ -52,7 +52,7 @@ function BuyChipsDialog(props) {
     }
 
     function computeMax() {
-        return Math.max(maxBuyin - heroTotalChips, 0);
+        return Math.max(computedMaxBuyin - heroTotalChips, 0);
     }
 
     function computeMin() {
@@ -69,6 +69,9 @@ function BuyChipsDialog(props) {
             if (validBuy()) onSubmit();
         }
     }
+
+    if (!open) return null;
+
     return (
         <Dialog open={open} maxWidth="sm" fullWidth onKeyPress={(event) => onPressEnter(event)}>
             <DialogTitle>{`Buy Chips`}</DialogTitle>

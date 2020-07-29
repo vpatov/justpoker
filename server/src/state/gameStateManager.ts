@@ -92,6 +92,7 @@ export class GameStateManager {
             Object.values(this.gameState.players),
             (player: Player) => player.chips * -1,
         );
+
         switch (maxBuyinType) {
             case MaxBuyinType.TopStack:
                 return Math.max(maxBuyin, sortedPlayer[0]?.chips || 0);
@@ -100,7 +101,7 @@ export class GameStateManager {
             case MaxBuyinType.SecondStack:
                 return Math.max(maxBuyin, sortedPlayer[1]?.chips || 0);
             case MaxBuyinType.AverageStack:
-                const playerArr = Object.values(this.gameState.players);
+                const playerArr = this.getPlayersReadyToPlay();
                 const avgStackSize = Math.floor(
                     playerArr.reduce((sum, player) => sum + player.chips, 0) / playerArr.length,
                 );
