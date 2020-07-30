@@ -3,9 +3,10 @@ import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 import MakeGame from './MakeGame';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { Button } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import EmailDialog from '../reuseable/EmailDialog';
 import LandingLogo from './LandingLogo';
+import { indigo } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,6 +39,17 @@ const useStyles = makeStyles((theme) => ({
         bottom: '0',
         color: 'black',
     },
+    beta: {
+        position: 'absolute',
+        color: indigo[900],
+        fontStyle: 'bold',
+        top: 18,
+        right: 36,
+        fontSize: '4.5vmin',
+        padding: '0.5vmin 1.5vmin',
+        backgroundColor: 'rgba(0,0,0,0.35)',
+        borderRadius: '1vmin',
+    },
 }));
 
 function Home(props) {
@@ -48,6 +60,7 @@ function Home(props) {
     return (
         <div className={classes.root}>
             <LandingLogo className={classnames(classes.title, { [classes.left]: smallHeight })} />
+            <Typography className={classes.beta}>BETA!</Typography>
             <MakeGame />
             <Button className={classes.contactUs} onClick={() => SET_openEmail(true)}>
                 Contact Us
