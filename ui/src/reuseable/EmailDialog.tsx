@@ -62,7 +62,6 @@ function EmailDialog(props) {
         sendMail(message, onMailSuccess, onMailFailure);
     }
 
-    console.log(clientIp);
     function generateMailResponse() {
         switch (mailResponse) {
             case 'none':

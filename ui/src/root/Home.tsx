@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 import MakeGame from './MakeGame';
-import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { Button } from '@material-ui/core';
 import EmailDialog from '../reuseable/EmailDialog';
+import LandingLogo from './LandingLogo';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         height: '100vh',
@@ -17,17 +18,17 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'auto',
     },
     title: {
-        marginTop: 72,
-        marginBottom: 12,
-        fontSize: 'min(90px, 9vmin)',
+        marginTop: 24,
+        marginBottom: 0,
+        height: '28vmin',
         color: 'black',
     },
     left: {
         position: 'absolute',
-        left: '0',
+        left: 0,
         width: '25%',
-        top: '0',
-        margin: 24,
+        top: -12,
+        margin: 6,
         lineHeight: '100%',
     },
     contactUs: {
@@ -46,7 +47,7 @@ function Home(props) {
 
     return (
         <div className={classes.root}>
-            <Typography className={classnames(classes.title, { [classes.left]: smallHeight })}>Just Poker.</Typography>
+            <LandingLogo className={classnames(classes.title, { [classes.left]: smallHeight })} />
             <MakeGame />
             <Button className={classes.contactUs} onClick={() => SET_openEmail(true)}>
                 Contact Us

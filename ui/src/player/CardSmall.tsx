@@ -16,6 +16,8 @@ import { useColoredCardBackgroundStyles, useWhiteCardBackgroundStyles } from '..
 import { WsServer } from '../api/ws';
 import { Button } from '@material-ui/core';
 
+import { ReactComponent as Koi } from '../assets/logo/koi.svg';
+
 const NORMAL_CARD_SIZE = '3.4vmin';
 const SIZE_CARD_SIZE = '2.5vmin';
 
@@ -77,13 +79,21 @@ const useStyles = makeStyles((theme) => ({
     },
     hidden: {
         backgroundColor: grey[900],
+        border: `0.2vmin solid black`,
+        boxSizing: 'border-box',
+        position: 'relative',
     },
-    hiddenText: {
-        marginTop: '20%',
-        fontWeight: 'bold',
-        fontSize: '3vmin',
-        color: theme.palette.primary.light,
+    backIcon: {
+        position: 'absolute',
+        width: '4vmin',
+        height: '4vmin',
+        filter: 'brightness(10)',
+        opacity: 0.1,
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
     },
+
     sideTextHidden: {
         marginLeft: '20%',
         fontSize: '3vmin',
@@ -170,9 +180,7 @@ function CardSmall(props) {
                 className={classnames(classes.root, classes.hidden, { [classes.sideCard]: shouldFlex }, className)}
                 style={style}
             >
-                <Typography className={classnames(classes.hiddenText, { [classes.sideTextHidden]: shouldFlex })}>
-                    JP
-                </Typography>
+                <Koi className={classes.backIcon} />
             </div>
         );
     }
