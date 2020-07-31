@@ -1,8 +1,9 @@
 import { selectUseCents } from '../store/selectors';
 import { useSelector } from 'react-redux';
 
-export function useChipFormatter(): (number) => string {
-    const useCents = useSelector(selectUseCents);
+export function useChipFormatter(usePassCents?: boolean): (number) => string {
+    const stateUseCents = useSelector(selectUseCents);
+    const useCents = usePassCents || stateUseCents;
 
     if (useCents) {
         return formatCents;

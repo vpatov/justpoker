@@ -95,16 +95,3 @@ export function useClientIp(): any {
 
     return ip;
 }
-
-export function deepApplyToKeys(object, keys, func) {
-    console.log(func);
-    Object.keys(object).some(function (k) {
-        if (keys.includes(k)) {
-            console.log(k, object[k], func(object[k]));
-            object[k] = func(object[k]);
-        }
-        if (object[k] && typeof object[k] === 'object') {
-            deepApplyToKeys(object[k], keys, func);
-        }
-    });
-}
