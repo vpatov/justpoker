@@ -75,6 +75,10 @@ function TextFieldWrap(props) {
                     ? {
                           inputComponent: DivideBy100Formatter as any,
                           ...InputProps,
+                          inputProps: {
+                              max: max,
+                              maxStrict: maxStrict,
+                          },
                       }
                     : { ...InputProps }
             }
@@ -83,7 +87,7 @@ function TextFieldWrap(props) {
 }
 
 function DivideBy100Formatter(props) {
-    const { inputRef, onChange, ...other } = props;
+    const { inputRef, onChange, max, maxStrict, ...other } = props;
 
     return (
         <NumberFormat
@@ -98,9 +102,12 @@ function DivideBy100Formatter(props) {
             }}
             isNumericString
             format={(val) => {
-                const num = parseInt(val) / 100;
+                let num = parseInt(val);
+                if (maxStrict && !Number.isNaN(max)) num = Math.min(num, max);
+                num = num / 100;
                 return num.toFixed(2);
             }}
+            type="tel"
         />
     );
 }

@@ -9,8 +9,5 @@
     },
     "devDependencies": {
         "concurrently": "^5.2.0"
-    },
-    "dependencies": {
-        "react-number-format": "^4.4.1"
     }
 }

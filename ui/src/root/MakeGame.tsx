@@ -44,6 +44,9 @@ const useStyles = makeStyles((theme) => ({
         margin: '12px auto',
         color: 'white',
     },
+    checkLabel: {
+        color: 'white',
+    },
     animoji: {
         width: 100,
         height: 100,
@@ -155,17 +158,6 @@ function MakeGame(props) {
     return (
         <div className={classes.root}>
             <div className={classes.fieldCont}>
-                <FormControlLabel
-                    className={classes.field}
-                    control={
-                        <Checkbox
-                            checked={useCents}
-                            onChange={() => setIntoGameParameters('useCents', !useCents)}
-                            color="primary"
-                        />
-                    }
-                    label="Use Cent Denominations"
-                />
                 <TextFieldWrap
                     className={classes.field}
                     label="Small Blind"
@@ -199,6 +191,7 @@ function MakeGame(props) {
                     error={errorMaxBuy()}
                     divideBy100={useCents}
                 />
+
                 <TextFieldWrap
                     className={classes.field}
                     label="Time To Act (seconds)"
@@ -220,6 +213,17 @@ function MakeGame(props) {
                         <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
                     </Select>
                 </FormControl>
+                <FormControlLabel
+                    className={classes.checkLabel}
+                    control={
+                        <Checkbox
+                            checked={useCents}
+                            onChange={() => setIntoGameParameters('useCents', !useCents)}
+                            color="primary"
+                        />
+                    }
+                    label="Use Cent Denominations"
+                />
                 <Button className={classes.advButton} onClick={() => SET_showAdvanced(!showAdvanced)}>
                     Advanced Settings
                 </Button>
