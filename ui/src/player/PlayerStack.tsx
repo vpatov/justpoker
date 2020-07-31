@@ -10,6 +10,7 @@ import TablePositionIndicator from '../table/TablePositionIndicator';
 import PlayerAvatar from './PlayerAvatar';
 import Animoji from '../reuseable/Animoji';
 import { Tooltip } from '@material-ui/core';
+import { useChipFormatter } from '../game/ChipFormatter';
 
 const useStyles = makeStyles((theme) => ({
     stackCont: {
@@ -123,6 +124,7 @@ function PlayerStack(props) {
     } = player;
     const outOfHand = sittingOut || folded;
     const prevStack = usePrevious(stack);
+    const formattedStack = useChipFormatter(stack);
 
     function getPlayerOverlay() {
         const comps = [] as any;
@@ -176,7 +178,7 @@ function PlayerStack(props) {
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <div className={classes.nameStackCont}>
                 <Typography variant="h4" className={classes.stack}>
-                    {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
+                    {winner ? <CountUp start={prevStack} end={stack} separator="," /> : formattedStack}
                 </Typography>
                 <Typography variant="body1" className={classes.name}>
                     {admin ? (

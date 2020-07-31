@@ -8,7 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextFieldWrap from '../reuseable/TextFieldWrap';
 
 import Button from '@material-ui/core/Button';
-import { Select, MenuItem, Typography } from '@material-ui/core';
+import { Select, MenuItem, Typography, Checkbox, FormControlLabel } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { GameType, getDefaultGameParameters, GameParameters } from '../shared/models/game/game';
@@ -73,7 +73,7 @@ function MakeGame(props) {
     const [canCreate, SET_canCreate] = useState(false);
     const [showAdvanced, SET_showAdvanced] = useState(false);
     const [gameParameters, SET_gameParameters] = useState(getDefaultGameParameters());
-    const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType } = gameParameters;
+    const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType, useCents } = gameParameters;
 
     function generateCapacityMessage() {
         return (
@@ -155,6 +155,17 @@ function MakeGame(props) {
     return (
         <div className={classes.root}>
             <div className={classes.fieldCont}>
+                <FormControlLabel
+                    className={classes.field}
+                    control={
+                        <Checkbox
+                            checked={useCents}
+                            onChange={() => setIntoGameParameters('useCents', !useCents)}
+                            color="primary"
+                        />
+                    }
+                    label="Use Cent Amounts"
+                />
                 <TextFieldWrap
                     className={classes.field}
                     label="Small Blind"
@@ -164,7 +175,7 @@ function MakeGame(props) {
                     max={MAX_VALUES.SMALL_BLIND}
                     type="number"
                     error={errorSB()}
-                    divideBy100
+                    divideBy100={useCents}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -175,7 +186,7 @@ function MakeGame(props) {
                     max={MAX_VALUES.BIG_BLIND}
                     type="number"
                     error={errorBB()}
-                    divideBy100
+                    divideBy100={useCents}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -186,7 +197,7 @@ function MakeGame(props) {
                     max={MAX_VALUES.BUY_IN}
                     type="number"
                     error={errorMaxBuy()}
-                    divideBy100
+                    divideBy100={useCents}
                 />
                 <TextFieldWrap
                     className={classes.field}

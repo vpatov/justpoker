@@ -589,7 +589,7 @@ export const TestGame: UiGameState = {
             positionIndicator: PositionIndicator.BUTTON,
             name: 'Marvinminwhich Lorgrikiski',
             position: positions[4],
-            stack: 323,
+            stack: 2,
             bet: genRandomInt(0, 100000),
             handLabel: 'Top Two',
             hand: {

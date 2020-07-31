@@ -9,7 +9,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Button from '@material-ui/core/Button';
-import { Select, MenuItem, Typography } from '@material-ui/core';
+import { Select, MenuItem, Typography, Checkbox, FormControlLabel } from '@material-ui/core';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
@@ -76,6 +76,7 @@ function GameParamatersDialog(props) {
         timeBankReplenishIntervalMinutes,
         dynamicMaxBuyin,
         maxBuyinType,
+        useCents,
     } = curGameParameters;
 
     function onPressEnter(event: any) {
@@ -96,6 +97,17 @@ function GameParamatersDialog(props) {
     function generateChipsContent() {
         return (
             <div className={classes.tabCont}>
+                <FormControlLabel
+                    className={classes.field}
+                    control={
+                        <Checkbox
+                            checked={useCents}
+                            onChange={() => setIntoGameParameters('useCents', !useCents)}
+                            color="primary"
+                        />
+                    }
+                    label="Use Cent Amounts"
+                />
                 <TextFieldWrap
                     className={classes.field}
                     label="Small Blind"
@@ -105,6 +117,7 @@ function GameParamatersDialog(props) {
                     min={MIN_VALUES.SMALL_BLIND}
                     max={MAX_VALUES.SMALL_BLIND}
                     type="number"
+                    divideBy100={useCents}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -115,6 +128,7 @@ function GameParamatersDialog(props) {
                     min={MIN_VALUES.BIG_BLIND}
                     max={MAX_VALUES.BIG_BLIND}
                     type="number"
+                    divideBy100={useCents}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -125,6 +139,7 @@ function GameParamatersDialog(props) {
                     min={MIN_VALUES.BUY_IN}
                     max={MAX_VALUES.BUY_IN}
                     type="number"
+                    divideBy100={useCents}
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -135,6 +150,7 @@ function GameParamatersDialog(props) {
                     variant="standard"
                     min={MIN_VALUES.BUY_IN}
                     max={MAX_VALUES.BUY_IN}
+                    divideBy100={useCents}
                 />
                 <div className={classes.field}>
                     <IconTooltip

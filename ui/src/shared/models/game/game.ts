@@ -6,7 +6,7 @@ export declare interface GameParameters {
     gameType: GameType;
     maxBuyin: number;
     timeToAct: number;
-
+    useCents: boolean;
     // advanced params
 
     maxPlayers: number;
@@ -62,6 +62,7 @@ export function getCleanGameParameters(): GameParameters {
         timeBankReplenishIntervalMinutes: 0,
         allowStraddle: false,
         canShowHeadsUp: false,
+        useCents: false,
     };
 }
 
@@ -82,6 +83,7 @@ export function getDefaultGameParameters(): GameParameters {
         timeBankReplenishIntervalMinutes: 30,
         allowStraddle: false,
         canShowHeadsUp: false,
+        useCents: false,
     };
 }
 
@@ -102,5 +104,6 @@ export function getTestGameParameters(): GameParameters {
         timeBankReplenishIntervalMinutes: 15,
         allowStraddle: true,
         canShowHeadsUp: true,
+        useCents: true,
     };
 }
