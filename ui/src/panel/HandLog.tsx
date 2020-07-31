@@ -29,6 +29,7 @@ import { grey } from '@material-ui/core/colors';
 import { ASPECT_RATIO_BREAK_POINT } from '../style/Theme';
 import { computeHandLogGETurl } from '../api/http';
 import { useParams } from 'react-router';
+import { useChipFormatter } from '../game/ChipFormatter';
 
 const handLogTextContentSize = '1.5vmin';
 const handLogCardSize = '1.8vmin';
@@ -172,6 +173,8 @@ function HandLog(props: HandLogProps) {
         }
     }, [handLogEntries]);
 
+    const ChipFormatter = useChipFormatter();
+
     function onReceiveNewHandLogEntries(incomingHandLogEntries: UiHandLogEntry[]) {
         if (!incomingHandLogEntries || !incomingHandLogEntries.length || !incomingHandLogEntries[0]) {
             return;
@@ -276,7 +279,7 @@ function HandLog(props: HandLogProps) {
                     {`${AbbreviatedPlayerPositionString[playerSummary.position]}: `}
                 </span>
                 {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
-                <span>{` (${playerSummary.startingChips})`}</span>
+                <span>{` (${ChipFormatter(playerSummary.startingChips)})`}</span>
             </Typography>
         ) : null;
     }
@@ -323,10 +326,10 @@ function HandLog(props: HandLogProps) {
                 return 'folds.';
             }
             case BettingRoundActionType.BET: {
-                return `bets ${amount !== undefined ? amount : 'unknown value'}.`;
+                return `bets ${amount !== undefined ? ChipFormatter(amount) : 'unknown value'}.`;
             }
             case BettingRoundActionType.CALL: {
-                return `calls ${amount !== undefined ? amount : 'unknown value'}.`;
+                return `calls ${amount !== undefined ? ChipFormatter(amount) : 'unknown value'}.`;
             }
             default: {
                 return '';
@@ -426,7 +429,7 @@ function HandLog(props: HandLogProps) {
             return (
                 <Typography className={classnames(classes.handLogContentLabel)} key={index}>
                     {renderPlayerName(playerSummary.seatNumber, playerSummary.playerName)}
-                    {` wins ${winner.amount}`}
+                    {` wins ${ChipFormatter(winner.amount)}`}
                 </Typography>
             );
         });
@@ -441,7 +444,7 @@ function HandLog(props: HandLogProps) {
                     return (
                         <React.Fragment key={index}>
                             <Typography className={classnames(classes.handLogContentLabel)}>
-                                Pot: {potSummary.amount}
+                                Pot: {ChipFormatter(potSummary.amount)}
                             </Typography>
                             {renderPlayerHands(potSummary.playerHands)}
                             {renderPotWinners(potSummary.winners)}
