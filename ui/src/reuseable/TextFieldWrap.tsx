@@ -1,8 +1,9 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
+import NumberFormat from 'react-number-format';
 
 function TextFieldWrap(props) {
-    const { onChange, type, min, max, minStrict, maxStrict = true, maxChars = 250, ...rest } = props;
+    const { onChange, type, min, max, minStrict, maxStrict = true, maxChars = 250, divideBy100, ...rest } = props;
 
     function getReturnValue(current) {
         if (current.length > maxChars) {
@@ -30,6 +31,7 @@ function TextFieldWrap(props) {
     const onChangeWrap = (event) => {
         const current = event.target.value;
         const returnVal = getReturnValue(current);
+
         if (typeof onChange === 'function') {
             onChange({ target: { value: returnVal } });
         }
@@ -45,7 +47,45 @@ function TextFieldWrap(props) {
         return value;
     }
 
-    return <TextField variant="outlined" {...rest} onChange={onChangeWrap} value={getRenderValue()} type="text" />;
+    return (
+        <TextField
+            variant="outlined"
+            {...rest}
+            onChange={onChangeWrap}
+            value={getRenderValue()}
+            type="text"
+            InputProps={
+                divideBy100
+                    ? {
+                          inputComponent: DivideBy100Formatter as any,
+                      }
+                    : {}
+            }
+        />
+    );
+}
+
+function DivideBy100Formatter(props) {
+    const { inputRef, onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={inputRef}
+            onValueChange={(values) => {
+                onChange({
+                    target: {
+                        value: values.value,
+                    },
+                });
+            }}
+            isNumericString
+            format={(val) => {
+                const num = parseInt(val) / 100;
+                return num.toFixed(2);
+            }}
+        />
+    );
 }
 
 export default TextFieldWrap;

@@ -164,6 +164,7 @@ function MakeGame(props) {
                     max={MAX_VALUES.SMALL_BLIND}
                     type="number"
                     error={errorSB()}
+                    divideBy100
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -174,6 +175,7 @@ function MakeGame(props) {
                     max={MAX_VALUES.BIG_BLIND}
                     type="number"
                     error={errorBB()}
+                    divideBy100
                 />
                 <TextFieldWrap
                     className={classes.field}
@@ -184,6 +186,7 @@ function MakeGame(props) {
                     max={MAX_VALUES.BUY_IN}
                     type="number"
                     error={errorMaxBuy()}
+                    divideBy100
                 />
                 <TextFieldWrap
                     className={classes.field}
