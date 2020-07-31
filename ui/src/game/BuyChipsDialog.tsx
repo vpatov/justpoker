@@ -13,6 +13,7 @@ import Button from '@material-ui/core/Button';
 import { Typography } from '@material-ui/core';
 
 import { WsServer } from '../api/ws';
+import { useChipFormatter } from './ChipFormatter';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -45,6 +46,7 @@ function BuyChipsDialog(props) {
     const { minBuyin } = useSelector(selectGameParameters);
     const heroPlayerUUID = useSelector(heroPlayerUUIDSelector);
     const [chipAmt, SET_ChipAmt] = useState(computeMax());
+    const ChipFormatter = useChipFormatter();
 
     function onSubmit() {
         WsServer.sendBuyChipsMessage(heroPlayerUUID, chipAmt);
@@ -86,7 +88,7 @@ function BuyChipsDialog(props) {
                     type="number"
                     autoFocus
                 />
-                <Typography>{`Current Chips: ${heroTotalChips?.toLocaleString()}`}</Typography>
+                <Typography>{`Current Chips: ${ChipFormatter(heroTotalChips)}`}</Typography>
                 {isHeroInHand ? (
                     <Typography className={classes.note}>
                         You are currently particpating in a hand. The chips will be added to your stack upon completion.

@@ -1,9 +1,25 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import NumberFormat from 'react-number-format';
+import { useSelector } from 'react-redux';
+import { selectUseCents } from '../store/selectors';
 
 function TextFieldWrap(props) {
-    const { onChange, type, min, max, minStrict, maxStrict = true, maxChars = 250, divideBy100, ...rest } = props;
+    const {
+        onChange,
+        type,
+        min,
+        max,
+        minStrict,
+        maxStrict = true,
+        maxChars = 250,
+        chipsField,
+        divideBy100,
+        InputProps,
+        ...rest
+    } = props;
+
+    const useCents = useSelector(selectUseCents);
 
     function getReturnValue(current) {
         if (current.length > maxChars) {
@@ -55,11 +71,12 @@ function TextFieldWrap(props) {
             value={getRenderValue()}
             type="text"
             InputProps={
-                divideBy100
+                (chipsField && useCents) || divideBy100
                     ? {
                           inputComponent: DivideBy100Formatter as any,
+                          ...InputProps,
                       }
-                    : {}
+                    : { ...InputProps }
             }
         />
     );

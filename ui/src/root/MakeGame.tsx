@@ -164,7 +164,7 @@ function MakeGame(props) {
                             color="primary"
                         />
                     }
-                    label="Use Cent Amounts"
+                    label="Use Cent Denominations"
                 />
                 <TextFieldWrap
                     className={classes.field}

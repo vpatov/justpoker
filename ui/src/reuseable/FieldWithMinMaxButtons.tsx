@@ -5,6 +5,7 @@ import TextFieldWrap from './TextFieldWrap';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import { useChipFormatter } from '../game/ChipFormatter';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -33,6 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function FieldWithMinMaxButtons(props) {
     const classes = useStyles();
     const { onChange, className, min, max, ...rest } = props;
+    const ChipFormatter = useChipFormatter();
 
     const onClickMin = (event) => {
         if (typeof onChange === 'function') {
@@ -53,14 +55,16 @@ function FieldWithMinMaxButtons(props) {
                 onChange={onChange}
                 min={min}
                 max={max}
+                type="number"
+                chipsField
                 {...rest}
                 InputProps={{
                     className: classes.field,
                 }}
             />
             <ButtonGroup orientation="vertical" variant="contained" className={classes.minMaxButtonCont}>
-                <Button className={classes.minMaxButton} onClick={onClickMax}>{`Max ${max}`}</Button>
-                <Button className={classes.minMaxButton} onClick={onClickMin}>{`Min ${min}`}</Button>
+                <Button className={classes.minMaxButton} onClick={onClickMax}>{`Max ${ChipFormatter(max)}`}</Button>
+                <Button className={classes.minMaxButton} onClick={onClickMin}>{`Min ${ChipFormatter(min)}`}</Button>
             </ButtonGroup>
         </div>
     );

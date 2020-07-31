@@ -15,6 +15,7 @@ import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 import { useFocus, usePrevious } from '../utils';
 import { WsServer } from '../api/ws';
 import { ClientActionType, ClientWsMessageRequest } from '../shared/models/api/api';
+import { useChipFormatter } from '../game/ChipFormatter';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -92,6 +93,8 @@ function ControllerBetAction(props) {
 
     const prevBet = usePrevious(curBet);
     const prevBetAmt = usePrevious(betAmt);
+
+    const ChipFormatter = useChipFormatter();
 
     function closeDialog() {
         setWarning(false);
@@ -282,7 +285,7 @@ function ControllerBetAction(props) {
                     onClick={() => onClickActionButton(action)}
                     disabled={disabled}
                 >
-                    {`${label} ${amountToCall}`}
+                    {`${label} ${ChipFormatter(amountToCall)}`}
                 </Button>,
             );
         }
@@ -309,7 +312,7 @@ function ControllerBetAction(props) {
                     }}
                     disabled={disabled}
                 >
-                    {`${label}${betAmt ? ` ${betAmt}` : ''}`}
+                    {`${label}${betAmt ? ` ${ChipFormatter(betAmt)}` : ''}`}
                 </Button>,
             );
         }
