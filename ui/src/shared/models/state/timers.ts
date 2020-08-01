@@ -2,6 +2,7 @@ export declare interface TimerGroup {
     stateTimer: NodeJS.Timer | null;
     messageAnnouncementTimer: NodeJS.Timer | null;
     timeBankReplenishTimer: NodeJS.Timer | null;
+    incrementBlindsScheduleTimer: NodeJS.Timer | null;
 }
 
 export function getCleanTimerGroup(): TimerGroup {
@@ -9,5 +10,6 @@ export function getCleanTimerGroup(): TimerGroup {
         stateTimer: null,
         messageAnnouncementTimer: null,
         timeBankReplenishTimer: null,
+        incrementBlindsScheduleTimer: null,
     };
 }

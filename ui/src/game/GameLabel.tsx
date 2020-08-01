@@ -9,6 +9,8 @@ import IconTooltip from '../reuseable/IconTooltip';
 import AdminIcon from '@material-ui/icons/AccountBox';
 import SpectatorsIcon from '@material-ui/icons/Visibility';
 import { useChipFormatter } from './ChipFormatter';
+import { startCase } from 'lodash';
+import { stringArrayToSentence } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'flex-end',
         },
         pause: {
-            fontSize: '1.3vmin',
+            fontSize: '1.5vmin',
         },
         spectating: {
             fontSize: '1.8vmin',
@@ -62,8 +64,10 @@ function GameLabel(props) {
                     willAddChips,
                 )} chips will be added to your total after this hand.`}</Typography>
             ) : null}
-            {gameParametersWillChangeAfterHand ? (
-                <Typography className={classes.pause}>{`Game settings will change after this hand.`}</Typography>
+            {gameParametersWillChangeAfterHand.length ? (
+                <Typography className={classes.pause}>{`${stringArrayToSentence(
+                    gameParametersWillChangeAfterHand.map((s) => startCase(s)),
+                )} will change after this hand.`}</Typography>
             ) : null}
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>

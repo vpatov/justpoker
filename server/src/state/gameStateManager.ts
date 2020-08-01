@@ -2,7 +2,13 @@ import { Service } from 'typedi';
 
 import { GameState, getCleanGameState, PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 import { ServerStateKey, ALL_STATE_KEYS, QueuedServerAction } from '../../../ui/src/shared/models/system/server';
-import { GameType, GameParameters, MaxBuyinType, ConnectedClient } from '../../../ui/src/shared/models/game/game';
+import {
+    GameType,
+    GameParameters,
+    MaxBuyinType,
+    ConnectedClient,
+    BlindsLevel,
+} from '../../../ui/src/shared/models/game/game';
 import {
     BETTING_ROUND_STAGES,
     BettingRoundStage,
@@ -396,6 +402,15 @@ export class GameStateManager {
 
     getTimeBankReplenishIntervalMinutes() {
         return this.gameState.gameParameters.timeBankReplenishIntervalMinutes;
+    }
+
+    // currently based on if there is blindsIntervalMinutes set to greater than zero
+    isThereABlindsSchedule(): boolean {
+        return this.getBlindsIntervalMinutes() > 0;
+    }
+
+    getBlindsIntervalMinutes(): number {
+        return this.gameState.gameParameters.blindsIntervalMinutes;
     }
 
     replenishTimeBanks() {
@@ -802,8 +817,20 @@ export class GameStateManager {
     }
 
     // Used to display message to users that game will change
-    gameParametersWillChangeAfterHand(): boolean {
-        return this.getQueuedServerActions().some((action) => action.actionType === ClientActionType.SETGAMEPARAMETERS);
+    gameParametersWillChangeAfterHand(): string[] {
+        const changedKeys = new Set<string>();
+        const curGameParameters = this.getGameParameters();
+        this.getQueuedServerActions().forEach((action) => {
+            if (action.actionType === ClientActionType.SETGAMEPARAMETERS) {
+                const newGameParameters: GameParameters = action.args[0] || {};
+                Object.entries(newGameParameters).forEach(([key, val]) => {
+                    if (((curGameParameters as any)[key] as any) !== val) {
+                        changedKeys.add(key);
+                    }
+                });
+            }
+        });
+        return Array.from(changedKeys);
     }
 
     isGameInProgress() {
@@ -1073,6 +1100,31 @@ export class GameStateManager {
             this.getPlayer(playerUUID).leaving = true;
         } else {
             this.updatePlayer(playerUUID, getPlayerCleanTableDefaults());
+        }
+    }
+
+    getNextBlindsLevel(): BlindsLevel | undefined {
+        const curLevel = this.gameState.currentBlindsLevel;
+        return this.getGameParameters().blindsSchedule[curLevel + 1];
+    }
+
+    incrementBlindsSchedule() {
+        const nextBlindsLevel = this.getNextBlindsLevel();
+        if (nextBlindsLevel) {
+            const newGameParameters = {
+                ...this.getGameParameters(),
+                bigBlind: nextBlindsLevel.bigBlind,
+                smallBlind: nextBlindsLevel.smallBlind,
+            };
+            if (this.isGameInProgress()) {
+                this.queueAction({
+                    actionType: ClientActionType.SETGAMEPARAMETERS,
+                    args: [newGameParameters],
+                });
+                this.gameState.currentBlindsLevel += 1;
+            } else {
+                this.setGameParameters(newGameParameters);
+            }
         }
     }
 

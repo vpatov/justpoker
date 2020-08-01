@@ -25,7 +25,11 @@ import { ClientActionType } from '../../../ui/src/shared/models/api/api';
 import { ChatService } from '../state/chatService';
 import { TimerManager } from '../state/timerManager';
 import { Context } from '../state/context';
-import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
+import {
+    createTimeBankReplenishEvent,
+    createIncrementBlindsScheduleEvent,
+    Event,
+} from '../../../ui/src/shared/models/api/api';
 import { assert } from 'console';
 
 @Service()
@@ -54,6 +58,7 @@ export class GamePlayService {
         if (this.gsm.getTimeGameStarted() === 0) {
             this.gsm.setTimeGameStarted(getEpochTimeMs());
             this.startTimeBankReplenishTimer();
+            if (this.gsm.isThereABlindsSchedule()) this.startBlindScheduleTimer();
         }
     }
 
@@ -66,6 +71,13 @@ export class GamePlayService {
         this.timerManager.setTimeBankReplenishInterval(() => {
             this.processEventCallback(createTimeBankReplenishEvent(gameInstanceUUID));
         }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
+    }
+
+    startBlindScheduleTimer() {
+        const gameInstanceUUID = this.context.getGameInstanceUUID();
+        this.timerManager.setIncrementBlindsScheduleInterval(() => {
+            this.processEventCallback(createIncrementBlindsScheduleEvent(gameInstanceUUID));
+        }, this.gsm.getBlindsIntervalMinutes() * 1000);
     }
 
     setGameParameters(gameParameters: GameParameters) {
