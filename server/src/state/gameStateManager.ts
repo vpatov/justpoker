@@ -1117,6 +1117,10 @@ export class GameStateManager {
         return this.getGameParameters().blindsSchedule[curLevel + 1];
     }
 
+    getCurrentBlindsLevel() {
+        return this.gameState.currentBlindsLevel;
+    }
+
     incrementBlindsSchedule() {
         const nextBlindsLevel = this.getNextBlindsLevel();
         if (nextBlindsLevel) {

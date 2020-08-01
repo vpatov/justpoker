@@ -171,6 +171,7 @@ export class StateConverter {
             willAddChips: heroPlayer?.willAddChips,
             isHeroInHand: heroPlayer?.uuid ? this.gameStateManager.isPlayerInHand(heroPlayer.uuid) : false,
             canShowHideCards: heroPlayer?.uuid ? this.gameStateManager.canPlayerShowCards(heroPlayer?.uuid) : false,
+            currentBlindsLevel: this.gameStateManager.getCurrentBlindsLevel(),
         };
 
         return global;

@@ -116,7 +116,7 @@ export function getTestGameParameters(): GameParameters {
         allowStraddle: true,
         canShowHeadsUp: true,
         useCents: true,
-        blindsIntervalMinutes: 0,
+        blindsIntervalMinutes: 12,
         blindsSchedule: [],
     };
 }
