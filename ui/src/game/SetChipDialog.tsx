@@ -15,6 +15,7 @@ import { MAX_VALUES } from '../shared/util/consts';
 import { Typography } from '@material-ui/core';
 
 import { WsServer } from '../api/ws';
+import { useChipFormatter } from './ChipFormatter';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -41,6 +42,7 @@ function SetChipDialog(props) {
     const [mode, setMode] = React.useState('Add');
 
     const resultingChips = computeResultingChips();
+    const ChipFormatter = useChipFormatter();
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChipAmt(0);
@@ -101,9 +103,10 @@ function SetChipDialog(props) {
                     type="number"
                     variant="standard"
                     autoFocus
+                    chipsField
                 />
-                <Typography>{`Current Chips: ${stack.toLocaleString()}`}</Typography>
-                <Typography>{`Resulting Chips: ${resultingChips.toLocaleString()}`}</Typography>
+                <Typography>{`Current Chips: ${ChipFormatter(stack)}`}</Typography>
+                <Typography>{`Resulting Chips: ${ChipFormatter(resultingChips)}`}</Typography>
                 <Typography className={classes.warning}>
                     {
                         'Warning: this action will take effect immediately and may impact the gameplay of the current hand. You cannot remove chips from a player which are currently a live bet. The change will be recorded in the ledger.'

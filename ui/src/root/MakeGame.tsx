@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { createGame, getCapacity } from '../api/http';
 import { MIN_VALUES, MAX_VALUES } from '../shared/util/consts';
@@ -8,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextFieldWrap from '../reuseable/TextFieldWrap';
 
 import Button from '@material-ui/core/Button';
-import { Select, MenuItem, Typography } from '@material-ui/core';
+import { Select, MenuItem, Typography, Checkbox, FormControlLabel } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { GameType, getDefaultGameParameters, GameParameters } from '../shared/models/game/game';
@@ -16,6 +15,10 @@ import GameParamatersDialog from '../game/GameParamatersDialog';
 import { SELENIUM_TAGS } from '../shared/models/test/seleniumTags';
 import Animoji from '../reuseable/Animoji';
 import { AnimojiKeys } from '../shared/models/ui/assets';
+import { NOT_RELATIVE_THEME } from '../style/Theme';
+import { ThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { withRouter } from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +45,9 @@ const useStyles = makeStyles((theme) => ({
     field: {
         width: '100%',
         margin: '12px auto',
+        color: 'white',
+    },
+    checkLabel: {
         color: 'white',
     },
     animoji: {
@@ -73,7 +79,7 @@ function MakeGame(props) {
     const [canCreate, SET_canCreate] = useState(false);
     const [showAdvanced, SET_showAdvanced] = useState(false);
     const [gameParameters, SET_gameParameters] = useState(getDefaultGameParameters());
-    const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType } = gameParameters;
+    const { smallBlind, bigBlind, maxBuyin, timeToAct, gameType, useCents } = gameParameters;
 
     function generateCapacityMessage() {
         return (
@@ -153,84 +159,100 @@ function MakeGame(props) {
     if (canCreate === false) return <div className={classes.root} />; // prevents flash of normal screen
 
     return (
-        <div className={classes.root}>
-            <div className={classes.fieldCont}>
-                <TextFieldWrap
-                    className={classes.field}
-                    label="Small Blind"
-                    variant="standard"
-                    onChange={(event) => setIntoGameParameters('smallBlind', event.target.value)}
-                    value={smallBlind}
-                    max={MAX_VALUES.SMALL_BLIND}
-                    type="number"
-                    error={errorSB()}
-                />
-                <TextFieldWrap
-                    className={classes.field}
-                    label="Big Blind"
-                    variant="standard"
-                    onChange={(event) => setIntoGameParameters('bigBlind', event.target.value)}
-                    value={bigBlind}
-                    max={MAX_VALUES.BIG_BLIND}
-                    type="number"
-                    error={errorBB()}
-                />
-                <TextFieldWrap
-                    className={classes.field}
-                    label="Max Buyin"
-                    variant="standard"
-                    onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
-                    value={maxBuyin}
-                    max={MAX_VALUES.BUY_IN}
-                    type="number"
-                    error={errorMaxBuy()}
-                />
-                <TextFieldWrap
-                    className={classes.field}
-                    label="Time To Act (seconds)"
-                    variant="standard"
-                    onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
-                    value={timeToAct}
-                    max={MAX_VALUES.TIME_TO_ACT}
-                    type="number"
-                    error={errorTimeToAct()}
-                />
-                <FormControl className={classes.field}>
-                    <InputLabel>Game Type</InputLabel>
-                    <Select
+        <ThemeProvider theme={createMuiTheme(NOT_RELATIVE_THEME)}>
+            <div className={classes.root}>
+                <div className={classes.fieldCont}>
+                    <TextFieldWrap
                         className={classes.field}
-                        value={gameType}
-                        onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
-                    >
-                        <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
-                        <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
-                    </Select>
-                </FormControl>
-                <Button className={classes.advButton} onClick={() => SET_showAdvanced(!showAdvanced)}>
-                    Advanced Settings
-                </Button>
-
-                <Button
-                    id={SELENIUM_TAGS.IDS.CREATE_GAME_BUTTON}
-                    className={classes.button}
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    disabled={!createButtonEnabled()}
-                    onClick={handleCreateGame}
-                >
-                    Create Game
-                </Button>
-                {showAdvanced ? (
-                    <GameParamatersDialog
-                        open={showAdvanced}
-                        gameParameters={gameParameters}
-                        onCancel={() => SET_showAdvanced(false)}
-                        onSave={onGameParamatersDialogSave}
+                        label="Small Blind"
+                        variant="standard"
+                        onChange={(event) => setIntoGameParameters('smallBlind', event.target.value)}
+                        value={smallBlind}
+                        max={MAX_VALUES.SMALL_BLIND}
+                        type="number"
+                        error={errorSB()}
+                        divideBy100={useCents}
                     />
-                ) : null}
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Big Blind"
+                        variant="standard"
+                        onChange={(event) => setIntoGameParameters('bigBlind', event.target.value)}
+                        value={bigBlind}
+                        max={MAX_VALUES.BIG_BLIND}
+                        type="number"
+                        error={errorBB()}
+                        divideBy100={useCents}
+                    />
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Max Buyin"
+                        variant="standard"
+                        onChange={(event) => setIntoGameParameters('maxBuyin', event.target.value)}
+                        value={maxBuyin}
+                        max={MAX_VALUES.BUY_IN}
+                        type="number"
+                        error={errorMaxBuy()}
+                        divideBy100={useCents}
+                    />
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Time To Act (seconds)"
+                        variant="standard"
+                        onChange={(event) => setIntoGameParameters('timeToAct', event.target.value)}
+                        value={timeToAct}
+                        max={MAX_VALUES.TIME_TO_ACT}
+                        type="number"
+                        error={errorTimeToAct()}
+                    />
+                    <FormControl className={classes.field}>
+                        <InputLabel>Game Type</InputLabel>
+                        <Select
+                            className={classes.field}
+                            value={gameType}
+                            onChange={(event) => setIntoGameParameters('gameType', event.target.value as GameType)}
+                        >
+                            <MenuItem value={GameType.NLHOLDEM}>No Limit Hold'em</MenuItem>
+                            <MenuItem value={GameType.PLOMAHA}>Pot Limit Omaha</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControlLabel
+                        className={classes.checkLabel}
+                        control={
+                            <Checkbox
+                                checked={useCents}
+                                onChange={() => setIntoGameParameters('useCents', !useCents)}
+                                color="primary"
+                            />
+                        }
+                        label="Use Cent Denominations"
+                    />
+                    <Button className={classes.advButton} onClick={() => SET_showAdvanced(!showAdvanced)}>
+                        Advanced Settings
+                    </Button>
+
+                    <Button
+                        id={SELENIUM_TAGS.IDS.CREATE_GAME_BUTTON}
+                        className={classes.button}
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        disabled={!createButtonEnabled()}
+                        onClick={handleCreateGame}
+                    >
+                        Create Game
+                    </Button>
+                    {showAdvanced ? (
+                        <GameParamatersDialog
+                            open={showAdvanced}
+                            gameParameters={gameParameters}
+                            onCancel={() => SET_showAdvanced(false)}
+                            onSave={onGameParamatersDialogSave}
+                        />
+                    ) : null}
+                </div>
             </div>
-        </div>
+        </ThemeProvider>
     );
 }
 

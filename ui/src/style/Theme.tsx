@@ -10,6 +10,7 @@ import indigo from '@material-ui/core/colors/indigo';
 import orange from '@material-ui/core/colors/orange';
 import red from '@material-ui/core/colors/red';
 import { Background } from './colors';
+import cloneDeep from 'lodash/cloneDeep';
 
 declare module '@material-ui/core/styles/createMuiTheme' {
     interface Theme {
@@ -194,6 +195,15 @@ export const CUSTOM_THEME = {
                 top: '10%',
                 right: 0,
             },
+        },
+    },
+};
+
+export const NOT_RELATIVE_THEME: any = cloneDeep(CUSTOM_THEME);
+NOT_RELATIVE_THEME.overrides = {
+    MuiPaper: {
+        root: {
+            backgroundColor: grey[900],
         },
     },
 };

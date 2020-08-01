@@ -167,6 +167,7 @@ function ControllerBetSizer(props) {
                             onKeyPress={(event) => onPressEnter(event)}
                             inputRef={betInputRef}
                             disabled={disabled}
+                            chipsField
                         />
                         <Button
                             variant="outlined"

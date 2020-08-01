@@ -10,6 +10,9 @@ import TablePositionIndicator from '../table/TablePositionIndicator';
 import PlayerAvatar from './PlayerAvatar';
 import Animoji from '../reuseable/Animoji';
 import { Tooltip } from '@material-ui/core';
+import { useChipFormatter } from '../game/ChipFormatter';
+import { useSelector } from 'react-redux';
+import { selectUseCents } from '../store/selectors';
 
 const useStyles = makeStyles((theme) => ({
     stackCont: {
@@ -123,6 +126,8 @@ function PlayerStack(props) {
     } = player;
     const outOfHand = sittingOut || folded;
     const prevStack = usePrevious(stack);
+    const ChipFormatter = useChipFormatter();
+    const useCents = useSelector(selectUseCents);
 
     function getPlayerOverlay() {
         const comps = [] as any;
@@ -176,7 +181,11 @@ function PlayerStack(props) {
             {positionIndicator ? <TablePositionIndicator type="button" positionIndicator={positionIndicator} /> : null}
             <div className={classes.nameStackCont}>
                 <Typography variant="h4" className={classes.stack}>
-                    {winner ? <CountUp start={prevStack} end={stack} separator="," /> : stack.toLocaleString()}
+                    {winner && !useCents ? (
+                        <CountUp start={prevStack} end={stack} separator="," />
+                    ) : (
+                        ChipFormatter(stack)
+                    )}
                 </Typography>
                 <Typography variant="body1" className={classes.name}>
                     {admin ? (

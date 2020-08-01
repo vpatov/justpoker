@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'auto',
     },
     title: {
-        marginTop: 24,
+        marginTop: 12,
         marginBottom: 0,
         height: '28vmin',
         color: 'black',
@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 function Home(props) {
     const classes = useStyles();
     const [openEmail, SET_openEmail] = useState(false);
-    const smallHeight = useMediaQuery('(max-height:750px)');
+    const smallHeight = useMediaQuery('(max-height:820px)');
 
     return (
         <div className={classes.root}>

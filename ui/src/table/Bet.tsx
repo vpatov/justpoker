@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import ChipStack from './ChipStack';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { useChipFormatter } from '../game/ChipFormatter';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
 function Bet(props) {
     const classes = useStyles();
     const { className, style, amount, id } = props;
+    const ChipFormatter = useChipFormatter();
 
     return (
         <div
@@ -35,7 +37,7 @@ function Bet(props) {
         >
             <ChipStack amount={amount} />
             <Typography variant={'h6'} className={classnames(classes.amount, 'ani_betLabel')}>
-                {amount.toLocaleString()}
+                {ChipFormatter(amount)}
             </Typography>
         </div>
     );

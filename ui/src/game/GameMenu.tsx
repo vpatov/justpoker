@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 import queryString from 'query-string';
 import classnames from 'classnames';
 import { useSelector } from 'react-redux';
-import { selectMenuButtons, selectGameParameters, isHeroAdminSelector } from '../store/selectors';
+import { selectMenuButtons, selectGameParameters, isHeroAdminSelector, selectUseCents } from '../store/selectors';
 import { WsServer } from '../api/ws';
 import SettingsDialog from './SettingsDialog';
 import { ClientActionType, UiActionType, ClientWsMessageRequest } from '../shared/models/api/api';
@@ -85,6 +85,8 @@ function GameMenu(props) {
     const menuButtons = useSelector(selectMenuButtons);
     const gameParameters = useSelector(selectGameParameters);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
+    const useCents = useSelector(selectUseCents);
+
     const { gameInstanceUUID } = useParams();
 
     const [settingsOpen, setSettingsOpen] = React.useState(false);
@@ -110,7 +112,8 @@ function GameMenu(props) {
 
     const handleOpenLedger = () => {
         const stringifiedUrl = queryString.stringifyUrl({ url: `/ledger/${gameInstanceUUID}`, query: {} });
-        window.open(stringifiedUrl, 'JustPoker Ledger', `width=${window.innerWidth},height=600`);
+        const newWindow: any = window.open(stringifiedUrl, 'JustPoker Ledger', `width=${window.innerWidth},height=600`);
+        newWindow.useCents = useCents;
     };
 
     function handleClickButton(action) {

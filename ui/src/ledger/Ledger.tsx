@@ -9,6 +9,7 @@ import { getEpochTimeMs } from '../shared/util/util';
 import ErrorMessage from '../root/ErrorMessage';
 import MaterialTable from 'material-table';
 import { useParams } from 'react-router';
+import { useChipFormatter } from '../game/ChipFormatter';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -76,26 +77,36 @@ const columns = [
     { field: 'timeMostRecentHand', title: 'Last Played' },
 ] as any;
 
-function transformLedgerData(data: UILedgerRow[]) {
-    return data.map((row) => {
-        const newRow: any = { ...row };
-        newRow.buyins = row.buyins.replace(/,/g, ', ');
-        newRow.flopsSeen = `${row.flopsSeen} (${row.vpip}%)`;
-        newRow.timeStartedPlaying = new Date(row.timeStartedPlaying).toLocaleTimeString();
-        newRow.timeMostRecentHand = new Date(row.timeMostRecentHand).toLocaleTimeString();
-        return newRow;
-    });
-}
 function LedgerTable(props) {
     const classes = useStyles();
     const ledger: UILedgerRow[] = props.ledger;
+
+    const ChipFormatter = useChipFormatter(get(window, 'useCents', false));
     const transformed = transformLedgerData(ledger);
+
     const gameDate = new Date(
         ledger.reduce(
             (min, row) => (row.timeStartedPlaying < min ? row.timeStartedPlaying : min),
             Number.POSITIVE_INFINITY,
         ) || getEpochTimeMs(),
     ).toLocaleDateString();
+
+    function transformLedgerData(data: UILedgerRow[]) {
+        return data.map((row) => {
+            const newRow: any = { ...row };
+            newRow.totalBuyin = ChipFormatter(row.totalBuyin);
+            newRow.walkaway = ChipFormatter(row.walkaway);
+            newRow.net = ChipFormatter(row.net);
+            newRow.buyins = row.buyins
+                .split(',')
+                .map((buy) => ChipFormatter(parseInt(buy)))
+                .join(', ');
+            newRow.flopsSeen = `${row.flopsSeen} (${row.vpip}%)`;
+            newRow.timeStartedPlaying = new Date(row.timeStartedPlaying).toLocaleTimeString();
+            newRow.timeMostRecentHand = new Date(row.timeMostRecentHand).toLocaleTimeString();
+            return newRow;
+        });
+    }
 
     return (
         <div className={classes.tableCont}>

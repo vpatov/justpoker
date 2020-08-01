@@ -5,6 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import PotAward from './PotAward';
+import { useChipFormatter } from '../game/ChipFormatter';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -66,11 +67,12 @@ function PotTable(props) {
     const { activePot, fullPot, inactivePots, awardPots } = props;
     const showInactivePots = inactivePots.length >= 1;
     const showActivePot = activePot !== 0;
+    const ChipFormatter = useChipFormatter();
 
     return (
         <>
             <Tooltip placement="top" title="Current main pot plus all commited bets by every player.">
-                <Typography className={classes.fullPot}>{`Full Pot: ${fullPot.toLocaleString()}`}</Typography>
+                <Typography className={classes.fullPot}>{`Full Pot: ${ChipFormatter(fullPot)}`}</Typography>
             </Tooltip>
             {awardPots ? (
                 <div className={classes.awardPotCont}>
@@ -82,15 +84,13 @@ function PotTable(props) {
             <div className={classnames(classes.root)}>
                 {showActivePot ? (
                     <div className={classes.mainPotCont}>
-                        <Typography
-                            className={classnames(classes.mainPot)}
-                        >{`${activePot.toLocaleString()}`}</Typography>
+                        <Typography className={classnames(classes.mainPot)}>{`${ChipFormatter(activePot)}`}</Typography>
                     </div>
                 ) : null}
                 {showInactivePots ? (
                     <div className={classes.sidePotsCont}>
                         {inactivePots.map((sp) => (
-                            <Typography className={classnames(classes.sidePot)}>{`${sp.toLocaleString()}`}</Typography>
+                            <Typography className={classnames(classes.sidePot)}>{ChipFormatter(sp)}</Typography>
                         ))}
                     </div>
                 ) : null}

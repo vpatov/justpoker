@@ -8,6 +8,7 @@ import { Typography } from '@material-ui/core';
 import IconTooltip from '../reuseable/IconTooltip';
 import AdminIcon from '@material-ui/icons/AccountBox';
 import SpectatorsIcon from '@material-ui/icons/Visibility';
+import { useChipFormatter } from './ChipFormatter';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -52,13 +53,14 @@ function GameLabel(props) {
         willAddChips,
     } = useSelector(globalGameStateSelector);
     const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
+    const ChipFormatter = useChipFormatter();
 
     return (
         <div className={classes.root}>
             {willAddChips ? (
-                <Typography
-                    className={classes.pause}
-                >{`Up to ${willAddChips.toLocaleString()} chips will be added to your total after this hand.`}</Typography>
+                <Typography className={classes.pause}>{`Up to ${ChipFormatter(
+                    willAddChips,
+                )} chips will be added to your total after this hand.`}</Typography>
             ) : null}
             {gameParametersWillChangeAfterHand ? (
                 <Typography className={classes.pause}>{`Game settings will change after this hand.`}</Typography>
@@ -67,7 +69,9 @@ function GameLabel(props) {
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
 
-            <Typography className={classes.gameText}>{`${gameType}  ${smallBlind}/${bigBlind}`}</Typography>
+            <Typography className={classes.gameText}>{`${gameType}  ${ChipFormatter(smallBlind)}/${ChipFormatter(
+                bigBlind,
+            )}`}</Typography>
             {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
             {numberOfSpectators > 0 ? (
                 <IconTooltip
