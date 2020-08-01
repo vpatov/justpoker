@@ -57,7 +57,7 @@ export declare interface Global {
     isGamePaused: boolean;
     gameWillStopAfterHand: boolean;
     areOpenSeats: boolean;
-    gameParametersWillChangeAfterHand: boolean;
+    gameParametersWillChangeAfterHand: string[];
     isGameInHandInitStage: boolean;
     computedMaxBuyin: number;
     adminNames: string[];
@@ -339,7 +339,7 @@ export function getCleanGlobal(): Global {
         canStartGame: false,
         isGamePaused: true,
         gameWillStopAfterHand: false,
-        gameParametersWillChangeAfterHand: false,
+        gameParametersWillChangeAfterHand: [],
         isGameInHandInitStage: false,
         areOpenSeats: true,
         computedMaxBuyin: 1,
@@ -454,7 +454,7 @@ export const TestGame: UiGameState = {
         isGamePaused: false,
         gameWillStopAfterHand: true,
         areOpenSeats: true,
-        gameParametersWillChangeAfterHand: true,
+        gameParametersWillChangeAfterHand: ['bigBlind', 'smallBlind'],
         computedMaxBuyin: 1000,
         isGameInHandInitStage: false,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],

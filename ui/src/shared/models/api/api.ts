@@ -71,6 +71,7 @@ export enum ServerActionType {
     SEND_MESSAGE = 'SEND_MESSAGE',
     WS_CLOSE = 'WS_CLOSE',
     REPLENISH_TIMEBANK = 'REPLENISH_TIMEBANK',
+    INCREMENT_BLINDS_SCHEDULE = 'INCREMENT_BLINDS_SCHEDULE',
 }
 
 export enum UiActionType {
@@ -211,6 +212,17 @@ export function createWSCloseEvent(gameInstanceUUID: GameInstanceUUID, clientUUI
         actionType: ServerActionType.WS_CLOSE,
         gameInstanceUUID,
         clientUUID,
+    };
+    return {
+        eventType: EventType.SERVER_ACTION,
+        body,
+    };
+}
+
+export function createIncrementBlindsScheduleEvent(gameInstanceUUID: GameInstanceUUID): Event {
+    const body: ServerAction = {
+        actionType: ServerActionType.INCREMENT_BLINDS_SCHEDULE,
+        gameInstanceUUID,
     };
     return {
         eventType: EventType.SERVER_ACTION,

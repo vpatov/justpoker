@@ -33,6 +33,15 @@ export class TimerManager {
         this.timerGroup.timeBankReplenishTimer = global.setInterval(() => fn(), timeout);
     }
 
+    setIncrementBlindsScheduleInterval(fn: Function, timeout: number) {
+        this.cancelIncrementBlindsScheduleInterval();
+        this.timerGroup.incrementBlindsScheduleTimer = global.setInterval(() => fn(), timeout);
+    }
+
+    cancelIncrementBlindsScheduleInterval() {
+        global.clearTimeout(this.timerGroup.incrementBlindsScheduleTimer);
+    }
+
     cancelTimeBankReplenishTimer() {
         global.clearTimeout(this.timerGroup.timeBankReplenishTimer);
     }

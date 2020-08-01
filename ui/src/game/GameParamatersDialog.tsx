@@ -94,7 +94,7 @@ function GameParamatersDialog(props) {
         dynamicMaxBuyin,
         maxBuyinType,
         useCents,
-        blindsInterval,
+        blindsIntervalMinutes,
         blindsSchedule,
     } = curGameParameters;
 
@@ -250,8 +250,8 @@ function GameParamatersDialog(props) {
                         className={classes.field}
                         label="Blinds Interval (minutes)"
                         variant="standard"
-                        onChange={(event) => setIntoGameParameters('blindsInterval', event.target.value)}
-                        value={blindsInterval}
+                        onChange={(event) => setIntoGameParameters('blindsIntervalMinutes', event.target.value)}
+                        value={blindsIntervalMinutes}
                         min={MIN_VALUES.BLINDS_INTERVAL}
                         max={MAX_VALUES.BLINDS_INTERVAL}
                         type="number"
@@ -303,13 +303,13 @@ function GameParamatersDialog(props) {
                                 </IconButton>
                             </div>
                         ))}
-                        <Tooltip title={blindsInterval < 1 ? 'Must set valid Blind Interval.' : ''}>
+                        <Tooltip title={blindsIntervalMinutes < 1 ? 'Must set valid Blind Interval.' : ''}>
                             <span>
                                 <Button
                                     variant="contained"
                                     onClick={addBlindsLevel}
                                     className={classes.button}
-                                    disabled={blindsInterval < 1}
+                                    disabled={blindsIntervalMinutes < 1}
                                 >
                                     Add Level
                                 </Button>

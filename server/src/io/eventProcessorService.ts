@@ -284,6 +284,12 @@ export class EventProcessorService {
                 this.gameStateManager.addUpdatedKeys(ServerStateKey.CHAT);
                 break;
             }
+
+            case ServerActionType.INCREMENT_BLINDS_SCHEDULE: {
+                this.gameStateManager.incrementBlindsSchedule();
+
+                break;
+            }
         }
         this.gameStateManager.addUpdatedKeys(ServerStateKey.GAMESTATE);
     }

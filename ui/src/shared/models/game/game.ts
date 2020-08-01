@@ -19,7 +19,7 @@ export declare interface GameParameters {
     numberTimeBanks: number;
     allowStraddle: boolean;
     canShowHeadsUp: boolean;
-    blindsInterval: number; // minutes
+    blindsIntervalMinutes: number; // minutes
     blindsSchedule: BlindsLevel[];
 }
 
@@ -70,7 +70,7 @@ export function getCleanGameParameters(): GameParameters {
         allowStraddle: false,
         canShowHeadsUp: false,
         useCents: false,
-        blindsInterval: 0,
+        blindsIntervalMinutes: 0,
         blindsSchedule: [],
     };
 }
@@ -93,7 +93,7 @@ export function getDefaultGameParameters(): GameParameters {
         allowStraddle: false,
         canShowHeadsUp: false,
         useCents: false,
-        blindsInterval: 0,
+        blindsIntervalMinutes: 0,
         blindsSchedule: [],
     };
 }
@@ -116,7 +116,7 @@ export function getTestGameParameters(): GameParameters {
         allowStraddle: true,
         canShowHeadsUp: true,
         useCents: true,
-        blindsInterval: 0,
+        blindsIntervalMinutes: 0,
         blindsSchedule: [],
     };
 }
