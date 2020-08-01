@@ -25,7 +25,7 @@ import {
 } from '../../../ui/src/shared/models/player/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api/api';
+import { ClientActionType, JoinGameRequest, ServerActionType } from '../../../ui/src/shared/models/api/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/game/cards';
@@ -40,6 +40,7 @@ import {
 import { AvatarKeys } from '../../../ui/src/shared/models/ui/assets';
 import sortBy from 'lodash/sortBy';
 import { assert } from 'console';
+import { isEqual } from 'lodash';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -824,10 +825,14 @@ export class GameStateManager {
             if (action.actionType === ClientActionType.SETGAMEPARAMETERS) {
                 const newGameParameters: GameParameters = action.args[0] || {};
                 Object.entries(newGameParameters).forEach(([key, val]) => {
-                    if (((curGameParameters as any)[key] as any) !== val) {
+                    if (!isEqual((curGameParameters as any)[key], val)) {
                         changedKeys.add(key);
                     }
                 });
+            }
+            if (action.actionType === ServerActionType.INCREMENT_BLINDS_SCHEDULE) {
+                changedKeys.add('smallBlind');
+                changedKeys.add('bigBlind');
             }
         });
         return Array.from(changedKeys);
@@ -835,6 +840,10 @@ export class GameStateManager {
 
     isGameInProgress() {
         return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
+    }
+
+    isGameNotInProgressOrInPostHandCleanUp() {
+        return this.getGameStage() === GameStage.NOT_IN_PROGRESS || this.getGameStage() === GameStage.POST_HAND_CLEANUP;
     }
 
     willPlayerStraddle(playerUUID: PlayerUUID): boolean {
@@ -1111,19 +1120,19 @@ export class GameStateManager {
     incrementBlindsSchedule() {
         const nextBlindsLevel = this.getNextBlindsLevel();
         if (nextBlindsLevel) {
-            const newGameParameters = {
-                ...this.getGameParameters(),
-                bigBlind: nextBlindsLevel.bigBlind,
-                smallBlind: nextBlindsLevel.smallBlind,
-            };
-            if (this.isGameInProgress()) {
+            if (!this.isGameNotInProgressOrInPostHandCleanUp()) {
                 this.queueAction({
-                    actionType: ClientActionType.SETGAMEPARAMETERS,
-                    args: [newGameParameters],
+                    actionType: ServerActionType.INCREMENT_BLINDS_SCHEDULE,
+                    args: [],
                 });
-                this.gameState.currentBlindsLevel += 1;
             } else {
+                const newGameParameters = {
+                    ...this.getGameParameters(),
+                    bigBlind: nextBlindsLevel.bigBlind,
+                    smallBlind: nextBlindsLevel.smallBlind,
+                };
                 this.setGameParameters(newGameParameters);
+                this.gameState.currentBlindsLevel += 1;
             }
         }
     }

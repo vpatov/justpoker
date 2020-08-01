@@ -72,7 +72,6 @@ function GameLabel(props) {
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
-
             <Typography className={classes.gameText}>{`${gameType}  ${ChipFormatter(smallBlind)}/${ChipFormatter(
                 bigBlind,
             )}`}</Typography>

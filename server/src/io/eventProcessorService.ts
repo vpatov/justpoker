@@ -228,14 +228,7 @@ export class EventProcessorService {
         [ClientActionType.SETGAMEPARAMETERS]: {
             validation: (uuid, req) => this.validationService.validateSetGameParameters(uuid, req.gameParameters),
             perform: (uuid, req: SetGameParametersRequest) => {
-                if (this.gameStateManager.isGameInProgress()) {
-                    this.gameStateManager.queueAction({
-                        actionType: ClientActionType.SETGAMEPARAMETERS,
-                        args: [req.gameParameters],
-                    });
-                } else {
-                    this.gamePlayService.setGameParameters(req.gameParameters);
-                }
+                this.gamePlayService.setGameParameters(req.gameParameters);
             },
             updates: [ServerStateKey.GAMESTATE],
         },
@@ -250,7 +243,7 @@ export class EventProcessorService {
         },
         [ClientActionType.KEEPALIVE]: {
             validation: (uuid, req) => undefined,
-            perform: (uuid, req: PlayerReactionRequest) => {},
+            perform: (uuid, req) => {},
             updates: [],
         },
     };
