@@ -9,7 +9,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Button from '@material-ui/core/Button';
-import { Select, MenuItem, Typography, Checkbox, FormControlLabel } from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { Select, MenuItem, Typography, Checkbox, FormControlLabel, IconButton, Tooltip } from '@material-ui/core';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
@@ -18,6 +19,7 @@ import { GameType, MaxBuyinType, GameParameters } from '../shared/models/game/ga
 import TextFieldWrap from '../reuseable/TextFieldWrap';
 import RadioForm from '../reuseable/RadioForm';
 import IconTooltip from '../reuseable/IconTooltip';
+import { remove } from 'lodash';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,20 +29,35 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'flex-start',
             flexWrap: 'wrap',
             flexDirection: 'column',
-            height: '50vh',
+            height: '70vh',
         },
 
         field: {
-            margin: '12px',
-            color: 'white',
+            margin: 12,
             width: 240,
             display: 'flex',
+        },
+        blindsScheduleCont: {
+            margin: 12,
+            display: 'flex',
+        },
+        blindsScheduleField: {
+            margin: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            width: 240,
+        },
+
+        halfField: {
+            color: 'white',
+            width: 90,
         },
         iconTip: {
             margin: '0px 12px',
             alignSelf: 'center',
         },
         button: {
+            marginTop: 12,
             width: '100%',
         },
         tabs: {
@@ -58,7 +75,7 @@ function GameParamatersDialog(props) {
     const { open, onSave, onCancel, gameParameters, disabled } = props;
 
     const [curGameParameters, SET_curGameParameters] = useState(gameParameters);
-    const [tabValue, SET_tabValue] = React.useState('chips');
+    const [tabValue, SET_tabValue] = useState('chips');
 
     const {
         smallBlind,
@@ -77,7 +94,38 @@ function GameParamatersDialog(props) {
         dynamicMaxBuyin,
         maxBuyinType,
         useCents,
+        blindsInterval,
+        blindsSchedule,
     } = curGameParameters;
+
+    function addBlindsLevel(event: any) {
+        const prevLevel = blindsSchedule[blindsSchedule.length - 1];
+        const defaultLevel = prevLevel
+            ? { smallBlind: prevLevel.smallBlind * 2, bigBlind: prevLevel.bigBlind * 2 }
+            : { smallBlind, bigBlind };
+        SET_curGameParameters({
+            ...curGameParameters,
+            blindsSchedule: [...blindsSchedule, defaultLevel],
+        });
+    }
+    const setBlindSchedule = (index, field) => (event: any) => {
+        const newValue = event.target.value;
+        const newSchedule = blindsSchedule.map((blindLevel, i) => {
+            if (index === i) return { ...blindLevel, [field]: newValue };
+            return blindLevel;
+        });
+        SET_curGameParameters({
+            ...curGameParameters,
+            blindsSchedule: newSchedule,
+        });
+    };
+    const removeBlindsLevel = (index) => (event: any) => {
+        const newBlindsSchedule = remove(blindsSchedule, (_, i) => i !== index);
+        SET_curGameParameters({
+            ...curGameParameters,
+            blindsSchedule: [...newBlindsSchedule],
+        });
+    };
 
     function onPressEnter(event: any) {
         if (event.key === 'Enter') {
@@ -97,17 +145,6 @@ function GameParamatersDialog(props) {
     function generateChipsContent() {
         return (
             <div className={classes.tabCont}>
-                <FormControlLabel
-                    className={classes.field}
-                    control={
-                        <Checkbox
-                            checked={useCents}
-                            onChange={() => setIntoGameParameters('useCents', !useCents)}
-                            color="primary"
-                        />
-                    }
-                    label="Use Cent Denominations"
-                />
                 <TextFieldWrap
                     className={classes.field}
                     label="Small Blind"
@@ -152,6 +189,17 @@ function GameParamatersDialog(props) {
                     max={MAX_VALUES.BUY_IN}
                     divideBy100={useCents}
                 />
+                <FormControlLabel
+                    className={classes.field}
+                    control={
+                        <Checkbox
+                            checked={useCents}
+                            onChange={() => setIntoGameParameters('useCents', !useCents)}
+                            color="primary"
+                        />
+                    }
+                    label="Use Cent Denominations"
+                />
                 <div className={classes.field}>
                     <IconTooltip
                         className={classes.iconTip}
@@ -191,6 +239,83 @@ function GameParamatersDialog(props) {
                             <MenuItem value={MaxBuyinType.AverageStack}>Average of All Stacks</MenuItem>
                         </Select>
                     </FormControl>
+                </div>
+                <div className={classes.field}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="The blinds will increase after this many minutes according to the blinds schedule. If Blind Interval is set to 0, the blinds will not increase."
+                        placement="left"
+                    />
+                    <TextFieldWrap
+                        className={classes.field}
+                        label="Blinds Interval (minutes)"
+                        variant="standard"
+                        onChange={(event) => setIntoGameParameters('blindsInterval', event.target.value)}
+                        value={blindsInterval}
+                        min={MIN_VALUES.BLINDS_INTERVAL}
+                        max={MAX_VALUES.BLINDS_INTERVAL}
+                        type="number"
+                        InputLabelProps={{
+                            style: { width: '120%' },
+                        }}
+                    />
+                </div>
+                <div className={classes.blindsScheduleCont}>
+                    <IconTooltip
+                        className={classes.iconTip}
+                        title="The blinds will increase every blind inverval. The blind begin at Level 1 and move up the schedule from there. If Blind Interval is set to 0, this schedule is ignored."
+                        placement="left"
+                    />
+                    <div className={classes.blindsScheduleField}>
+                        <InputLabel>Blinds Schedule</InputLabel>
+                        {blindsSchedule.map((blindsLevel, index) => (
+                            <div className={classes.field} key={index}>
+                                <TextFieldWrap
+                                    className={classes.halfField}
+                                    label={`SB - Level ${index + 1}`}
+                                    variant="standard"
+                                    value={blindsLevel.smallBlind}
+                                    type="number"
+                                    divideBy100={useCents}
+                                    onChange={setBlindSchedule(index, 'smallBlind')}
+                                    min={MIN_VALUES.SMALL_BLIND}
+                                    max={MAX_VALUES.SMALL_BLIND}
+                                    InputLabelProps={{
+                                        style: { width: '120%' },
+                                    }}
+                                />
+                                <TextFieldWrap
+                                    className={classes.halfField}
+                                    label={`BB - Level ${index + 1}`}
+                                    variant="standard"
+                                    value={blindsLevel.bigBlind}
+                                    type="number"
+                                    divideBy100={useCents}
+                                    onChange={setBlindSchedule(index, 'bigBlind')}
+                                    min={MIN_VALUES.SMALL_BLIND}
+                                    max={MAX_VALUES.SMALL_BLIND}
+                                    InputLabelProps={{
+                                        style: { width: '120%' },
+                                    }}
+                                />
+                                <IconButton className={classes.iconTip} onClick={removeBlindsLevel(index)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </div>
+                        ))}
+                        <Tooltip title={blindsInterval < 1 ? 'Must set valid Blind Interval.' : ''}>
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    onClick={addBlindsLevel}
+                                    className={classes.button}
+                                    disabled={blindsInterval < 1}
+                                >
+                                    Add Level
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    </div>
                 </div>
             </div>
         );
@@ -372,7 +497,7 @@ function GameParamatersDialog(props) {
                         <Button onClick={onCancel}>Cancel</Button>
                         <Button onClick={() => onSave(curGameParameters)} color="primary">
                             Save
-                        </Button>{' '}
+                        </Button>
                     </>
                 )}
             </DialogActions>

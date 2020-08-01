@@ -10,6 +10,7 @@ export const MIN_VALUES = {
     NUMBER_TIME_BANKS: 1,
     TIME_BANK_TIME: 1,
     TIME_BANK_REPLENISH_INTERVAL: 1,
+    BLINDS_INTERVAL: 0,
 };
 
 export const MAX_VALUES = {
@@ -22,6 +23,7 @@ export const MAX_VALUES = {
     NUMBER_TIME_BANKS: 100,
     TIME_BANK_TIME: 60 * 10, // 10 minutes
     TIME_BANK_REPLENISH_INTERVAL: Math.pow(10, 5) - 1,
+    BLINDS_INTERVAL: 999,
 };
 
 export const EXPIRE_CLIENT_INTERVAL = 1000 * 60 * 10; // 10 minutes

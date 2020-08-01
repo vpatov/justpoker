@@ -19,6 +19,13 @@ export declare interface GameParameters {
     numberTimeBanks: number;
     allowStraddle: boolean;
     canShowHeadsUp: boolean;
+    blindsInterval: number; // minutes
+    blindsSchedule: BlindsLevel[];
+}
+
+export declare interface BlindsLevel {
+    bigBlind: number;
+    smallBlind: number;
 }
 
 export enum MaxBuyinType {
@@ -63,6 +70,8 @@ export function getCleanGameParameters(): GameParameters {
         allowStraddle: false,
         canShowHeadsUp: false,
         useCents: false,
+        blindsInterval: 0,
+        blindsSchedule: [],
     };
 }
 
@@ -84,6 +93,8 @@ export function getDefaultGameParameters(): GameParameters {
         allowStraddle: false,
         canShowHeadsUp: false,
         useCents: false,
+        blindsInterval: 0,
+        blindsSchedule: [],
     };
 }
 
@@ -105,5 +116,7 @@ export function getTestGameParameters(): GameParameters {
         allowStraddle: true,
         canShowHeadsUp: true,
         useCents: true,
+        blindsInterval: 0,
+        blindsSchedule: [],
     };
 }
