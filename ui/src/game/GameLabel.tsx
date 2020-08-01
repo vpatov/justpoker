@@ -77,7 +77,7 @@ function GameLabel(props) {
                 bigBlind,
             )}`}</Typography>
             {isThereABlindsSchedule ? (
-                <Typography className={classes.gameText}>{`Blind Level ${currentBlindsLevel}`}</Typography>
+                <Typography className={classes.gameText}>{`Blind Level ${currentBlindsLevel + 1}`}</Typography>
             ) : null}
             {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
             {numberOfSpectators > 0 ? (
