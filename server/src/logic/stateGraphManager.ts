@@ -300,6 +300,10 @@ export class StateGraphManager {
                 this.gamePlayService.buyChipsPlayerAction(playerUUID, chipAmt);
                 break;
             }
+            case ServerActionType.INCREMENT_BLINDS_SCHEDULE: {
+                this.gameStateManager.incrementBlindsSchedule();
+                break;
+            }
         }
     }
 

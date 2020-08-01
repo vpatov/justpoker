@@ -31,6 +31,7 @@ import {
     Event,
 } from '../../../ui/src/shared/models/api/api';
 import { assert } from 'console';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 
 @Service()
 export class GamePlayService {
@@ -81,10 +82,21 @@ export class GamePlayService {
     }
 
     setGameParameters(gameParameters: GameParameters) {
-        const currentTimeBankReplenishInterval = this.gsm.getTimeBankReplenishIntervalMinutes();
-        this.gsm.setGameParameters(gameParameters);
-        if (gameParameters.timeBankReplenishIntervalMinutes !== currentTimeBankReplenishInterval) {
-            this.startTimeBankReplenishTimer();
+        if (!this.gsm.isGameNotInProgressOrInPostHandCleanUp()) {
+            this.gsm.queueAction({
+                actionType: ClientActionType.SETGAMEPARAMETERS,
+                args: [gameParameters],
+            });
+        } else {
+            const curTimeBankReplenishIntervalMinutes = this.gsm.getTimeBankReplenishIntervalMinutes();
+            const curBlindsIntervalMinutes = this.gsm.getBlindsIntervalMinutes();
+            this.gsm.setGameParameters(gameParameters);
+            if (gameParameters.timeBankReplenishIntervalMinutes !== curTimeBankReplenishIntervalMinutes) {
+                this.startTimeBankReplenishTimer();
+            }
+            if (gameParameters.blindsIntervalMinutes !== curBlindsIntervalMinutes) {
+                this.startBlindScheduleTimer();
+            }
         }
     }
 

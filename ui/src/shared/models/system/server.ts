@@ -1,8 +1,8 @@
-import { ClientActionType } from '../api/api';
+import { ClientActionType, ServerActionType } from '../api/api';
 
 // TODO consider doing something similar to messageService for queuedActionsProcessor ?
 export declare interface QueuedServerAction {
-    actionType: ClientActionType;
+    actionType: ClientActionType | ServerActionType;
     args: any[];
 }
 

@@ -292,8 +292,8 @@ function GameParamatersDialog(props) {
                                     type="number"
                                     divideBy100={useCents}
                                     onChange={setBlindSchedule(index, 'bigBlind')}
-                                    min={MIN_VALUES.SMALL_BLIND}
-                                    max={MAX_VALUES.SMALL_BLIND}
+                                    min={MIN_VALUES.BIG_BLIND}
+                                    max={MAX_VALUES.BIG_BLIND}
                                     InputLabelProps={{
                                         style: { width: '120%' },
                                     }}
