@@ -831,8 +831,7 @@ export class GameStateManager {
                 });
             }
             if (action.actionType === ServerActionType.INCREMENT_BLINDS_SCHEDULE) {
-                changedKeys.add('smallBlind');
-                changedKeys.add('bigBlind');
+                changedKeys.add('blindLevel');
             }
         });
         return Array.from(changedKeys);
