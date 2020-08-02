@@ -1112,12 +1112,25 @@ export class GameStateManager {
     }
 
     getNextBlindsLevel(): BlindsLevel | undefined {
-        const curLevel = this.gameState.currentBlindsLevel;
+        const curLevel = this.gameState.currentBlindsLevelIndex;
         return this.getGameParameters().blindsSchedule[curLevel + 1];
     }
 
-    getCurrentBlindsLevel() {
-        return this.gameState.currentBlindsLevel;
+    getCurrentBlindsLevel(): BlindsLevel | undefined {
+        const curLevel = this.gameState.currentBlindsLevelIndex;
+        return this.getGameParameters().blindsSchedule[curLevel];
+    }
+
+    getCurrentBlindsLevelIndex(): number {
+        return this.gameState.currentBlindsLevelIndex;
+    }
+
+    setSmallBlind(smallBlind: number) {
+        this.gameState.gameParameters.smallBlind = smallBlind;
+    }
+
+    setBigBlind(bigBlind: number) {
+        this.gameState.gameParameters.bigBlind = bigBlind;
     }
 
     incrementBlindsSchedule() {
@@ -1129,13 +1142,9 @@ export class GameStateManager {
                     args: [],
                 });
             } else {
-                const newGameParameters = {
-                    ...this.getGameParameters(),
-                    bigBlind: nextBlindsLevel.bigBlind,
-                    smallBlind: nextBlindsLevel.smallBlind,
-                };
-                this.setGameParameters(newGameParameters);
-                this.gameState.currentBlindsLevel += 1;
+                this.setSmallBlind(nextBlindsLevel.smallBlind);
+                this.setBigBlind(nextBlindsLevel.bigBlind);
+                this.gameState.currentBlindsLevelIndex += 1;
             }
         }
     }

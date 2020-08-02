@@ -67,7 +67,7 @@ export declare interface Global {
     numberOfSpectators: number;
     willAddChips?: number;
     canShowHideCards: boolean;
-    currentBlindsLevel: number;
+    currentBlindsLevelIndex: number;
 }
 
 export declare interface Controller {
@@ -350,7 +350,7 @@ export function getCleanGlobal(): Global {
         numberOfSpectators: 0,
         isHeroInHand: false,
         canShowHideCards: false,
-        currentBlindsLevel: 0,
+        currentBlindsLevelIndex: 0,
     };
 }
 
@@ -467,7 +467,7 @@ export const TestGame: UiGameState = {
         willAddChips: 1430,
         isHeroInHand: true,
         canShowHideCards: true,
-        currentBlindsLevel: 12,
+        currentBlindsLevelIndex: 12,
     },
     controller: {
         unqueueAllBettingRoundActions: false,

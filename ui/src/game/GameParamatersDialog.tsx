@@ -263,7 +263,7 @@ function GameParamatersDialog(props) {
                 <div className={classes.blindsScheduleCont}>
                     <IconTooltip
                         className={classes.iconTip}
-                        title="The blinds will increase every blind inverval. The blind begin at Level 1 and move up the schedule from there. If Blind Interval is set to 0, this schedule is ignored."
+                        title="The blinds will increase every blind inverval. The blinds will begin at Level 1 and move up the schedule from there. If Blind Interval is set to 0, this schedule is ignored."
                         placement="left"
                     />
                     <div className={classes.blindsScheduleField}>

@@ -124,7 +124,7 @@ export declare interface GameState {
     timeGameStarted: number;
 
     /** The index of the currently active blinds level in the blinds schedule . */
-    currentBlindsLevel: number;
+    currentBlindsLevelIndex: number;
 }
 
 // TODO create partially clean game that can be used to clear state of round info.
@@ -165,6 +165,6 @@ export function getCleanGameState(): GameState {
         previousRaise: 0,
         handNumber: -1,
         timeGameStarted: 0,
-        currentBlindsLevel: 0,
+        currentBlindsLevelIndex: 0,
     };
 }

@@ -59,7 +59,14 @@ export class GamePlayService {
         if (this.gsm.getTimeGameStarted() === 0) {
             this.gsm.setTimeGameStarted(getEpochTimeMs());
             this.startTimeBankReplenishTimer();
-            if (this.gsm.isThereABlindsSchedule()) this.startBlindScheduleTimer();
+            if (this.gsm.isThereABlindsSchedule()) {
+                this.startBlindScheduleTimer();
+                const currentLevel = this.gsm.getCurrentBlindsLevel();
+                if (currentLevel) {
+                    this.gsm.setSmallBlind(currentLevel.smallBlind);
+                    this.gsm.setBigBlind(currentLevel.bigBlind);
+                }
+            }
         }
     }
 
