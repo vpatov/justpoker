@@ -6,10 +6,10 @@ import { EmailMessage } from '../shared/models/system/email';
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { error: null, errorInfo: null, userText: '', mailResponse: '' };
+        this.state = { error: null, errorInfo: null, email: '', userText: '', mailResponse: '' };
     }
 
-    state = { error: null, errorInfo: null, userText: '', mailResponse: '' };
+    state = { error: null, errorInfo: null, userText: '', mailResponse: '', email: '' };
     componentDidCatch(error, errorInfo) {
         // Catch errors in any components below and re-render with error message
         this.setState({
@@ -48,7 +48,8 @@ class ErrorBoundary extends React.Component {
     handleSubmit = (event) => {
         event.preventDefault();
         const message: EmailMessage = {
-            body: `USER_MESSAGE\n\n${this.state.userText}`,
+            email: this.state.email,
+            body: `***USER_MESSAGE***\n${this.state.userText}`,
             subject: 'UI Error',
         };
         sendMail(
@@ -71,10 +72,24 @@ class ErrorBoundary extends React.Component {
                         This will help our developent team fix the bug as quickly as possible.
                     </h3>
 
-                    <form onSubmit={this.handleSubmit}>
+                    <form onSubmit={this.handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+                        <input
+                            type="text"
+                            placeholder="Your Contact (if you want to help us debug)"
+                            value={this.state.email}
+                            onChange={(event) => this.setState({ email: event.target.value })}
+                            style={{
+                                fontFamily: 'Futura, san-serif',
+                                margin: 12,
+                                fontSize: 16,
+                                width: 600,
+                                height: 50,
+                            }}
+                        />
                         <textarea
                             value={this.state.userText}
                             onChange={this.handleChange}
+                            placeholder="What Happened?"
                             style={{
                                 fontFamily: 'Futura, san-serif',
                                 margin: 12,
@@ -89,7 +104,13 @@ class ErrorBoundary extends React.Component {
                             <input
                                 type="submit"
                                 value="Submit"
-                                style={{ fontFamily: 'Futura, san-serif', margin: 24, fontSize: 24, cursor: 'pointer' }}
+                                style={{
+                                    fontFamily: 'Futura, san-serif',
+                                    margin: 24,
+                                    fontSize: 24,
+                                    cursor: 'pointer',
+                                    width: 600,
+                                }}
                             />
                         )}
                     </form>

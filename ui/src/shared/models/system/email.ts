@@ -3,6 +3,7 @@ export const DEV_EMAIL_ACCOUNTS = ['hankjamesnickel@gmail.com', 'justpokerdev@gm
 export const SERVER_EMAIL_ACCOUNT = 'server@justpoker.games';
 
 export declare interface EmailMessage {
+    email: string;
     subject: string;
     body: string;
     metadata?: any;

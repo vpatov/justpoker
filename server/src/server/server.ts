@@ -132,10 +132,11 @@ class Server {
 
         router.post('/api/sendMail', (req, res) => {
             const EmailMessage: EmailMessage = req.body;
-            // append metadata if its there
-            const text = EmailMessage.metadata
-                ? `${EmailMessage.body} \n\nMETADATA\n ${JSON.stringify(EmailMessage.metadata)}`
-                : EmailMessage.body;
+
+            let text = EmailMessage.body;
+            text += `\n\n***EMAIL***\n ${EmailMessage.email}`; // append email
+            text += `\n\n***METADATA***\n ${JSON.stringify(EmailMessage.metadata, null, 2)}`; // append metadata
+
             const msg = {
                 to: DEV_EMAIL_ACCOUNTS,
                 from: SERVER_EMAIL_ACCOUNT,

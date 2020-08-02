@@ -17,7 +17,7 @@ import { useClientIp } from '../utils';
 const useStyles = makeStyles({
     dialog: {
         width: '60vw',
-        height: '40vh',
+        height: '60vh',
     },
     field: {
         width: '100%',
@@ -30,6 +30,7 @@ function EmailDialog(props) {
     const { onClose, open } = props;
     const [msgType, SET_msgType] = useState('');
     const [body, SET_body] = useState('');
+    const [email, SET_email] = useState('');
     const clientIp = useClientIp();
 
     const [mailResponse, SET_mailResponse] = useState('none');
@@ -52,6 +53,7 @@ function EmailDialog(props) {
 
     function onConfirm() {
         const message: EmailMessage = {
+            email: email,
             body: body,
             subject: msgType,
             metadata: {
@@ -87,6 +89,14 @@ function EmailDialog(props) {
                         <MenuItem value={'Friendly Message'}>Friendly Message :)</MenuItem>
                     </Select>
                 </FormControl>
+                <TextField
+                    label="Your Email"
+                    className={classes.field}
+                    value={email}
+                    onChange={(event) => SET_email(event.target.value)}
+                    placeholder="If you want a response..."
+                    variant="filled"
+                />
                 <TextField
                     label="Body"
                     className={classes.field}
