@@ -9,10 +9,10 @@ import queryString from 'query-string';
 import WebSocket from 'ws';
 
 let serverUrl = 'https://justpoker.games';
-// serverUrl = 'http://0.0.0.0:8080'; // uncomment for local
+serverUrl = 'http://0.0.0.0:8080'; // uncomment for local
 
 let wsUrl = 'wss://justpoker.games';
-// wsUrl = 'ws://0.0.0.0:8080'; // uncomment for local
+wsUrl = 'ws://0.0.0.0:8080'; // uncomment for local
 const api = axios.create({
     baseURL: serverUrl,
 });
@@ -111,7 +111,7 @@ function checkOnToAct(ws) {
     ws.onmessage = onGameMessage;
 }
 
-const NUM_GAMES = 500;
+const NUM_GAMES = 14;
 const NUM_PLAYERS = 9;
 
 async function start() {

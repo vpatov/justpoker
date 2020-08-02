@@ -71,13 +71,24 @@ class Server {
         });
 
         router.get('/metrics', (req, res) => {
-            const instanceUUIDs = this.gameInstanceManager.getAllGameInstanceUUIDs();
-
+            const clientGroups = this.connectedClientManager.getClientGroups();
+            let gameInstancesCount = 0;
+            const gameInstances: any = {};
+            Object.entries(clientGroups).forEach(([gameInstanceUUIDStr, group]) => {
+                const gameInstanceUUID = gameInstanceUUIDStr as GameInstanceUUID;
+                gameInstancesCount++;
+                const lastActive = this.gameInstanceManager.getGameInstance(gameInstanceUUID)?.lastActive;
+                gameInstances[gameInstanceUUID] = {
+                    WSCount: Object.values(group).length,
+                    link: `https://justpoker.games/table/${gameInstanceUUID}`,
+                    lastActive: new Date(lastActive).toLocaleString(),
+                };
+            });
             res.send({
-                gameCount: instanceUUIDs.length,
-                gameInstances: instanceUUIDs,
-                wsCount: this.connectedClientManager.getNumberOfClients(),
+                gameInstancesCount: gameInstancesCount,
+                totalWSCount: this.connectedClientManager.getNumberOfClients(),
                 capacitySettings: this.capacityLimiter.getCapacity(),
+                gameInstances: gameInstances,
             });
         });
 
