@@ -2,7 +2,13 @@ import { Service } from 'typedi';
 
 import { GameState, getCleanGameState, PlayerSeat } from '../../../ui/src/shared/models/state/gameState';
 import { ServerStateKey, ALL_STATE_KEYS, QueuedServerAction } from '../../../ui/src/shared/models/system/server';
-import { GameType, GameParameters, MaxBuyinType, ConnectedClient } from '../../../ui/src/shared/models/game/game';
+import {
+    GameType,
+    GameParameters,
+    MaxBuyinType,
+    ConnectedClient,
+    BlindsLevel,
+} from '../../../ui/src/shared/models/game/game';
 import {
     BETTING_ROUND_STAGES,
     BettingRoundStage,
@@ -19,7 +25,7 @@ import {
 } from '../../../ui/src/shared/models/player/player';
 import { DeckService } from '../cards/deckService';
 import { getLoggableGameState } from '../../../ui/src/shared/util/util';
-import { ClientActionType, JoinGameRequest } from '../../../ui/src/shared/models/api/api';
+import { ClientActionType, JoinGameRequest, ServerActionType } from '../../../ui/src/shared/models/api/api';
 import { HandSolverService } from '../cards/handSolverService';
 import { LedgerService } from '../stats/ledgerService';
 import { Hand, Card, cardsAreEqual, convertHandToCardArray } from '../../../ui/src/shared/models/game/cards';
@@ -34,6 +40,7 @@ import {
 import { AvatarKeys } from '../../../ui/src/shared/models/ui/assets';
 import sortBy from 'lodash/sortBy';
 import { assert } from 'console';
+import { isEqual } from 'lodash';
 
 // TODO Re-organize methods in some meaningful way
 
@@ -396,6 +403,15 @@ export class GameStateManager {
 
     getTimeBankReplenishIntervalMinutes() {
         return this.gameState.gameParameters.timeBankReplenishIntervalMinutes;
+    }
+
+    // currently based on if there is blindsIntervalMinutes set to greater than zero
+    isThereABlindsSchedule(): boolean {
+        return this.getBlindsIntervalMinutes() > 0;
+    }
+
+    getBlindsIntervalMinutes(): number {
+        return this.gameState.gameParameters.blindsIntervalMinutes;
     }
 
     replenishTimeBanks() {
@@ -802,12 +818,31 @@ export class GameStateManager {
     }
 
     // Used to display message to users that game will change
-    gameParametersWillChangeAfterHand(): boolean {
-        return this.getQueuedServerActions().some((action) => action.actionType === ClientActionType.SETGAMEPARAMETERS);
+    gameParametersWillChangeAfterHand(): string[] {
+        const changedKeys = new Set<string>();
+        const curGameParameters = this.getGameParameters();
+        this.getQueuedServerActions().forEach((action) => {
+            if (action.actionType === ClientActionType.SETGAMEPARAMETERS) {
+                const newGameParameters: GameParameters = action.args[0] || {};
+                Object.entries(newGameParameters).forEach(([key, val]) => {
+                    if (!isEqual((curGameParameters as any)[key], val)) {
+                        changedKeys.add(key);
+                    }
+                });
+            }
+            if (action.actionType === ServerActionType.INCREMENT_BLINDS_SCHEDULE) {
+                changedKeys.add('blindLevel');
+            }
+        });
+        return Array.from(changedKeys);
     }
 
     isGameInProgress() {
         return this.getGameStage() !== GameStage.NOT_IN_PROGRESS;
+    }
+
+    isGameNotInProgressOrInPostHandCleanUp() {
+        return this.getGameStage() === GameStage.NOT_IN_PROGRESS || this.getGameStage() === GameStage.POST_HAND_CLEANUP;
     }
 
     willPlayerStraddle(playerUUID: PlayerUUID): boolean {
@@ -1073,6 +1108,44 @@ export class GameStateManager {
             this.getPlayer(playerUUID).leaving = true;
         } else {
             this.updatePlayer(playerUUID, getPlayerCleanTableDefaults());
+        }
+    }
+
+    getNextBlindsLevel(): BlindsLevel | undefined {
+        const curLevel = this.gameState.currentBlindsLevelIndex;
+        return this.getGameParameters().blindsSchedule[curLevel + 1];
+    }
+
+    getCurrentBlindsLevel(): BlindsLevel | undefined {
+        const curLevel = this.gameState.currentBlindsLevelIndex;
+        return this.getGameParameters().blindsSchedule[curLevel];
+    }
+
+    getCurrentBlindsLevelIndex(): number {
+        return this.gameState.currentBlindsLevelIndex;
+    }
+
+    setSmallBlind(smallBlind: number) {
+        this.gameState.gameParameters.smallBlind = smallBlind;
+    }
+
+    setBigBlind(bigBlind: number) {
+        this.gameState.gameParameters.bigBlind = bigBlind;
+    }
+
+    incrementBlindsSchedule() {
+        const nextBlindsLevel = this.getNextBlindsLevel();
+        if (nextBlindsLevel) {
+            if (!this.isGameNotInProgressOrInPostHandCleanUp()) {
+                this.queueAction({
+                    actionType: ServerActionType.INCREMENT_BLINDS_SCHEDULE,
+                    args: [],
+                });
+            } else {
+                this.setSmallBlind(nextBlindsLevel.smallBlind);
+                this.setBigBlind(nextBlindsLevel.bigBlind);
+                this.gameState.currentBlindsLevelIndex += 1;
+            }
         }
     }
 

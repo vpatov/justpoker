@@ -25,8 +25,13 @@ import { ClientActionType } from '../../../ui/src/shared/models/api/api';
 import { ChatService } from '../state/chatService';
 import { TimerManager } from '../state/timerManager';
 import { Context } from '../state/context';
-import { createTimeBankReplenishEvent, Event } from '../../../ui/src/shared/models/api/api';
+import {
+    createTimeBankReplenishEvent,
+    createIncrementBlindsScheduleEvent,
+    Event,
+} from '../../../ui/src/shared/models/api/api';
 import { assert } from 'console';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 
 @Service()
 export class GamePlayService {
@@ -53,26 +58,70 @@ export class GamePlayService {
         this.gsm.setShouldDealNextHand(true);
         if (this.gsm.getTimeGameStarted() === 0) {
             this.gsm.setTimeGameStarted(getEpochTimeMs());
-            this.startTimeBankReplenishTimer();
+            this.createTimeBankReplenishTimer();
+            if (this.gsm.isThereABlindsSchedule()) {
+                this.createBlindScheduleTimer();
+                const currentLevel = this.gsm.getCurrentBlindsLevel();
+                if (currentLevel) {
+                    this.gsm.setSmallBlind(currentLevel.smallBlind);
+                    this.gsm.setBigBlind(currentLevel.bigBlind);
+                }
+            }
+        } else {
+            this.startGameTimers();
         }
     }
 
-    stopGame() {
-        this.gsm.setShouldDealNextHand(false);
+    pauseGameIfNeeded() {
+        if (!this.gsm.canDealNextHand()) {
+            this.pauseGameTimers();
+            this.gsm.setShouldDealNextHand(false);
+        }
     }
 
-    startTimeBankReplenishTimer() {
+    createTimeBankReplenishTimer() {
         const gameInstanceUUID = this.context.getGameInstanceUUID();
         this.timerManager.setTimeBankReplenishInterval(() => {
             this.processEventCallback(createTimeBankReplenishEvent(gameInstanceUUID));
         }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
     }
 
+    createBlindScheduleTimer() {
+        const gameInstanceUUID = this.context.getGameInstanceUUID();
+        this.timerManager.setIncrementBlindsScheduleInterval(() => {
+            this.processEventCallback(createIncrementBlindsScheduleEvent(gameInstanceUUID));
+        }, this.gsm.getBlindsIntervalMinutes() * 60 * 1000);
+    }
+
+    pauseGameTimers() {
+        this.timerManager.pauseIncrementBlindsScheduleInterval();
+        this.timerManager.pauseTimeBankReplenishTimer();
+    }
+
+    startGameTimers() {
+        this.timerManager.startIncrementBlindsScheduleInterval();
+        this.timerManager.startTimeBankReplenishTimer();
+    }
+
     setGameParameters(gameParameters: GameParameters) {
-        const currentTimeBankReplenishInterval = this.gsm.getTimeBankReplenishIntervalMinutes();
-        this.gsm.setGameParameters(gameParameters);
-        if (gameParameters.timeBankReplenishIntervalMinutes !== currentTimeBankReplenishInterval) {
-            this.startTimeBankReplenishTimer();
+        if (!this.gsm.isGameNotInProgressOrInPostHandCleanUp()) {
+            this.gsm.queueAction({
+                actionType: ClientActionType.SETGAMEPARAMETERS,
+                args: [gameParameters],
+            });
+        } else {
+            const curTimeBankReplenishIntervalMinutes = this.gsm.getTimeBankReplenishIntervalMinutes();
+            const curBlindsIntervalMinutes = this.gsm.getBlindsIntervalMinutes();
+            this.gsm.setGameParameters(gameParameters);
+
+            if (gameParameters.timeBankReplenishIntervalMinutes !== curTimeBankReplenishIntervalMinutes) {
+                this.createTimeBankReplenishTimer();
+                if (!this.gsm.isGameInProgress()) this.timerManager.pauseTimeBankReplenishTimer();
+            }
+            if (gameParameters.blindsIntervalMinutes !== curBlindsIntervalMinutes) {
+                this.createBlindScheduleTimer();
+                if (!this.gsm.isGameInProgress()) this.timerManager.pauseIncrementBlindsScheduleInterval();
+            }
         }
     }
 

@@ -57,7 +57,7 @@ export declare interface Global {
     isGamePaused: boolean;
     gameWillStopAfterHand: boolean;
     areOpenSeats: boolean;
-    gameParametersWillChangeAfterHand: boolean;
+    gameParametersWillChangeAfterHand: string[];
     isGameInHandInitStage: boolean;
     computedMaxBuyin: number;
     adminNames: string[];
@@ -67,6 +67,7 @@ export declare interface Global {
     numberOfSpectators: number;
     willAddChips?: number;
     canShowHideCards: boolean;
+    currentBlindsLevelIndex: number;
 }
 
 export declare interface Controller {
@@ -339,7 +340,7 @@ export function getCleanGlobal(): Global {
         canStartGame: false,
         isGamePaused: true,
         gameWillStopAfterHand: false,
-        gameParametersWillChangeAfterHand: false,
+        gameParametersWillChangeAfterHand: [],
         isGameInHandInitStage: false,
         areOpenSeats: true,
         computedMaxBuyin: 1,
@@ -349,6 +350,7 @@ export function getCleanGlobal(): Global {
         numberOfSpectators: 0,
         isHeroInHand: false,
         canShowHideCards: false,
+        currentBlindsLevelIndex: 0,
     };
 }
 
@@ -454,7 +456,7 @@ export const TestGame: UiGameState = {
         isGamePaused: false,
         gameWillStopAfterHand: true,
         areOpenSeats: true,
-        gameParametersWillChangeAfterHand: true,
+        gameParametersWillChangeAfterHand: ['bigBlind', 'smallBlind'],
         computedMaxBuyin: 1000,
         isGameInHandInitStage: false,
         adminNames: ['Hank James Nickel', 'Rick Dolo', 'Lenny'],
@@ -465,6 +467,7 @@ export const TestGame: UiGameState = {
         willAddChips: 1430,
         isHeroInHand: true,
         canShowHideCards: true,
+        currentBlindsLevelIndex: 12,
     },
     controller: {
         unqueueAllBettingRoundActions: false,

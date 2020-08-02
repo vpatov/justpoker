@@ -95,3 +95,11 @@ export function useClientIp(): any {
 
     return ip;
 }
+
+export function stringArrayToSentence(arr: string[]): string {
+    if (arr.length === 0) return '';
+    if (arr.length === 1) return arr[0];
+    if (arr.length === 2) return arr.join(' and ');
+    const lastElement = arr.pop();
+    return `${arr.join(', ')} and ${lastElement}`;
+}

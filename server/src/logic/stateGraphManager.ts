@@ -260,6 +260,8 @@ export class StateGraphManager {
                 this.gamePlayService.ejectStackedPlayers();
 
                 this.executeQueuedServerActions();
+                this.gamePlayService.pauseGameIfNeeded();
+
                 break;
             }
         }
@@ -298,6 +300,10 @@ export class StateGraphManager {
                 const playerUUID = action.args[0];
                 const chipAmt = action.args[1];
                 this.gamePlayService.buyChipsPlayerAction(playerUUID, chipAmt);
+                break;
+            }
+            case ServerActionType.INCREMENT_BLINDS_SCHEDULE: {
+                this.gameStateManager.incrementBlindsSchedule();
                 break;
             }
         }

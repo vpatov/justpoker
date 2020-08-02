@@ -9,6 +9,8 @@ import IconTooltip from '../reuseable/IconTooltip';
 import AdminIcon from '@material-ui/icons/AccountBox';
 import SpectatorsIcon from '@material-ui/icons/Visibility';
 import { useChipFormatter } from './ChipFormatter';
+import { startCase } from 'lodash';
+import { stringArrayToSentence } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
             justifyContent: 'flex-end',
         },
         pause: {
-            fontSize: '1.3vmin',
+            fontSize: '1.5vmin',
         },
         spectating: {
             fontSize: '1.8vmin',
@@ -51,10 +53,11 @@ function GameLabel(props) {
         isSpectator,
         numberOfSpectators,
         willAddChips,
+        currentBlindsLevelIndex,
     } = useSelector(globalGameStateSelector);
-    const { gameType, smallBlind, bigBlind } = useSelector(selectGameParameters);
+    const { gameType, smallBlind, bigBlind, blindsIntervalMinutes } = useSelector(selectGameParameters);
     const ChipFormatter = useChipFormatter();
-
+    const isThereABlindsSchedule = blindsIntervalMinutes > 0;
     return (
         <div className={classes.root}>
             {willAddChips ? (
@@ -62,16 +65,20 @@ function GameLabel(props) {
                     willAddChips,
                 )} chips will be added to your total after this hand.`}</Typography>
             ) : null}
-            {gameParametersWillChangeAfterHand ? (
-                <Typography className={classes.pause}>{`Game settings will change after this hand.`}</Typography>
+            {gameParametersWillChangeAfterHand.length ? (
+                <Typography className={classes.pause}>{`${stringArrayToSentence(
+                    gameParametersWillChangeAfterHand.map((s) => startCase(s)),
+                )} will change after this hand.`}</Typography>
             ) : null}
             {gameWillStopAfterHand ? (
                 <Typography className={classes.pause}>{`Game will pause after this hand.`}</Typography>
             ) : null}
-
             <Typography className={classes.gameText}>{`${gameType}  ${ChipFormatter(smallBlind)}/${ChipFormatter(
                 bigBlind,
             )}`}</Typography>
+            {isThereABlindsSchedule ? (
+                <Typography className={classes.gameText}>{`Blind Level ${currentBlindsLevelIndex + 1}`}</Typography>
+            ) : null}
             {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
             {numberOfSpectators > 0 ? (
                 <IconTooltip
