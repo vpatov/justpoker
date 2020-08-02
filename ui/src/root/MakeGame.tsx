@@ -127,7 +127,7 @@ function MakeGame(props) {
     };
 
     const capacityFailure = (err) => {
-        console.log(err);
+        console.error(err);
     };
 
     const createSuccess = (response) => {

@@ -260,6 +260,8 @@ export class StateGraphManager {
                 this.gamePlayService.ejectStackedPlayers();
 
                 this.executeQueuedServerActions();
+                this.gamePlayService.pauseGameIfNeeded();
+
                 break;
             }
         }

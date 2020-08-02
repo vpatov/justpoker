@@ -58,34 +58,49 @@ export class GamePlayService {
         this.gsm.setShouldDealNextHand(true);
         if (this.gsm.getTimeGameStarted() === 0) {
             this.gsm.setTimeGameStarted(getEpochTimeMs());
-            this.startTimeBankReplenishTimer();
+            this.createTimeBankReplenishTimer();
             if (this.gsm.isThereABlindsSchedule()) {
-                this.startBlindScheduleTimer();
+                this.createBlindScheduleTimer();
                 const currentLevel = this.gsm.getCurrentBlindsLevel();
                 if (currentLevel) {
                     this.gsm.setSmallBlind(currentLevel.smallBlind);
                     this.gsm.setBigBlind(currentLevel.bigBlind);
                 }
             }
+        } else {
+            this.startGameTimers();
         }
     }
 
-    stopGame() {
-        this.gsm.setShouldDealNextHand(false);
+    pauseGameIfNeeded() {
+        if (!this.gsm.canDealNextHand()) {
+            this.pauseGameTimers();
+            this.gsm.setShouldDealNextHand(false);
+        }
     }
 
-    startTimeBankReplenishTimer() {
+    createTimeBankReplenishTimer() {
         const gameInstanceUUID = this.context.getGameInstanceUUID();
         this.timerManager.setTimeBankReplenishInterval(() => {
             this.processEventCallback(createTimeBankReplenishEvent(gameInstanceUUID));
         }, this.gsm.getTimeBankReplenishIntervalMinutes() * 60 * 1000);
     }
 
-    startBlindScheduleTimer() {
+    createBlindScheduleTimer() {
         const gameInstanceUUID = this.context.getGameInstanceUUID();
         this.timerManager.setIncrementBlindsScheduleInterval(() => {
             this.processEventCallback(createIncrementBlindsScheduleEvent(gameInstanceUUID));
-        }, this.gsm.getBlindsIntervalMinutes() * 1000);
+        }, this.gsm.getBlindsIntervalMinutes() * 60 * 1000);
+    }
+
+    pauseGameTimers() {
+        this.timerManager.pauseIncrementBlindsScheduleInterval();
+        this.timerManager.pauseTimeBankReplenishTimer();
+    }
+
+    startGameTimers() {
+        this.timerManager.startIncrementBlindsScheduleInterval();
+        this.timerManager.startTimeBankReplenishTimer();
     }
 
     setGameParameters(gameParameters: GameParameters) {
@@ -98,11 +113,14 @@ export class GamePlayService {
             const curTimeBankReplenishIntervalMinutes = this.gsm.getTimeBankReplenishIntervalMinutes();
             const curBlindsIntervalMinutes = this.gsm.getBlindsIntervalMinutes();
             this.gsm.setGameParameters(gameParameters);
+
             if (gameParameters.timeBankReplenishIntervalMinutes !== curTimeBankReplenishIntervalMinutes) {
-                this.startTimeBankReplenishTimer();
+                this.createTimeBankReplenishTimer();
+                if (!this.gsm.isGameInProgress()) this.timerManager.pauseTimeBankReplenishTimer();
             }
             if (gameParameters.blindsIntervalMinutes !== curBlindsIntervalMinutes) {
-                this.startBlindScheduleTimer();
+                this.createBlindScheduleTimer();
+                if (!this.gsm.isGameInProgress()) this.timerManager.pauseIncrementBlindsScheduleInterval();
             }
         }
     }

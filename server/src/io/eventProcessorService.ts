@@ -70,7 +70,7 @@ export class EventProcessorService {
         },
         [ClientActionType.STOPGAME]: {
             validation: (uuid, req) => this.validationService.validateStopGameRequest(uuid),
-            perform: (uuid, req) => this.gamePlayService.stopGame(),
+            perform: (uuid, req) => this.gameStateManager.setShouldDealNextHand(false),
             updates: [ServerStateKey.GAMESTATE],
         },
         [ClientActionType.SITOUT]: {
