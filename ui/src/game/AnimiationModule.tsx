@@ -102,7 +102,7 @@ export function animateAwardPot(winnerUUID, potId) {
 export function animateWinningCard(cardId, partOfWinningHand) {
     const duration = 800;
     const fliter = partOfWinningHand ? 'brightness(1)' : ['brightness(1)', 'brightness(0.2)'];
-    console.log(cardId, partOfWinningHand);
+
     anime({
         targets: [`#${cardId}`],
         filter: fliter,
