@@ -1,4 +1,4 @@
-export const JP_VERSION = '0.1.0';
+export const JP_VERSION = '0.2.0';
 
 export const MIN_VALUES = {
     TIME_TO_ACT: 1,

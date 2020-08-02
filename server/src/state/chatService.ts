@@ -15,9 +15,7 @@ import { JP_VERSION } from '../../../ui/src/shared/util/consts';
 
 const changeNameCommandRegEx = /\/name\s(.+)$/;
 
-const welcomeMessage =
-    `Welcome to JustPoker ${JP_VERSION}! Check out the menu in the ` +
-    `top left to change the app's appearance, and (for admins) to set game parameters. May the suits be with you.`;
+const welcomeMessage = `Welcome to JustPoker ${JP_VERSION}! Check out the menu in the top left to change the app's appearance, and game parameters. May the suits be with you.`;
 
 const replenishTimeBankMessage = 'Replenishing one time bank for all players.';
 
