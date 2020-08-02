@@ -53,7 +53,7 @@ function GameLabel(props) {
         isSpectator,
         numberOfSpectators,
         willAddChips,
-        currentBlindsLevel,
+        currentBlindsLevelIndex,
     } = useSelector(globalGameStateSelector);
     const { gameType, smallBlind, bigBlind, blindsIntervalMinutes } = useSelector(selectGameParameters);
     const ChipFormatter = useChipFormatter();
@@ -77,7 +77,7 @@ function GameLabel(props) {
                 bigBlind,
             )}`}</Typography>
             {isThereABlindsSchedule ? (
-                <Typography className={classes.gameText}>{`Blind Level ${currentBlindsLevel + 1}`}</Typography>
+                <Typography className={classes.gameText}>{`Blind Level ${currentBlindsLevelIndex + 1}`}</Typography>
             ) : null}
             {isSpectator ? <Typography className={classes.spectating}>{`You are spectating.`}</Typography> : null}
             {numberOfSpectators > 0 ? (
