@@ -316,12 +316,10 @@ export class EventProcessorService {
     @debugFunc()
     processEvent(event: Event) {
         const { gameInstanceUUID, actionType } = event.body;
-
-        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
-        logger.debug(
-            `EventProcessorService.processEvent. gameInstanceUUID: ${gameInstanceUUID} ` +
-                `eventType: ${event.eventType}`,
+        logger.info(
+            `EventProcessorService.processEvent. gameInstanceUUID: ${gameInstanceUUID} eventType: ${event.eventType} actionType ${actionType}`,
         );
+        this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
 
         switch (event.eventType) {
             case EventType.SERVER_ACTION: {

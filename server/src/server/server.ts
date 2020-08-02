@@ -285,10 +285,11 @@ class Server {
     }
 
     onWSClose(data: WebSocket.Data, clientUUID: ClientUUID, gameInstanceUUID: GameInstanceUUID) {
-        logger.verbose(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
-        const closeEvent = createWSCloseEvent(gameInstanceUUID, clientUUID);
-        this.eventProcessorService.processEvent(closeEvent);
-
+        if (this.gameInstanceManager.doesGameInstanceExist(gameInstanceUUID)) {
+            logger.info(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
+            const closeEvent = createWSCloseEvent(gameInstanceUUID, clientUUID);
+            this.eventProcessorService.processEvent(closeEvent);
+        }
         const succ = this.connectedClientManager.removeClientFromGroup(gameInstanceUUID, clientUUID);
         if (!succ) {
             logger.verbose(
