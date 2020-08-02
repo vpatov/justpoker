@@ -1,5 +1,4 @@
 import get from 'lodash/get';
-import docCookies from './cookies';
 import queryString, { ParsedQuery } from 'query-string';
 import {
     ClientWsMessage,
@@ -25,7 +24,6 @@ import { getEpochTimeMs } from '../shared/util/util';
 import { Card } from '../shared/models/game/cards';
 
 const clientUUIDCookieID = 'jp-client-uuid';
-const ONE_DAY = 60 * 60 * 24;
 
 const config: Config = getFrontEndEnvConfig();
 
@@ -42,7 +40,7 @@ export class WsServer {
         const wsURI = {
             url: wsURL,
             query: {
-                clientUUID: docCookies.getItem(clientUUIDCookieID) || null,
+                clientUUID: window.localStorage.getItem(clientUUIDCookieID) || null,
                 gameInstanceUUID: gameInstanceUUID || null,
             } as ParsedQuery,
         };
@@ -64,7 +62,7 @@ export class WsServer {
     private static onGameMessage(msg: MessageEvent) {
         const jsonData = JSON.parse(get(msg, 'data', {}));
         if (jsonData.clientUUID) {
-            docCookies.setItem(clientUUIDCookieID, jsonData.clientUUID, ONE_DAY);
+            window.localStorage.setItem(clientUUIDCookieID, jsonData.clientUUID);
             WsServer.clientUUID = jsonData.clientUUID;
         }
         Object.keys(WsServer.subscriptions).forEach((key) => {
