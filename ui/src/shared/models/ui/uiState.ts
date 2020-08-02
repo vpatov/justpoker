@@ -9,7 +9,7 @@ import { MAX_VALUES } from '../../util/consts';
 import { BettingRoundActionType, BettingRoundStage } from '../game/betting';
 
 import { GameParameters, getCleanGameParameters, getTestGameParameters } from '../game/game';
-import { PlayerUUID, makeBlankUUID } from '../system/uuid';
+import { PlayerUUID, makeBlankUUID, generatePlayerUUID } from '../system/uuid';
 import { getRandomAvatarKey, AvatarKeys } from './assets';
 import { PlayerSummary, BettingRoundLog, PotSummary } from '../state/handLog';
 
@@ -153,7 +153,7 @@ export declare interface UiPlayer {
     name: string;
     position: number;
     stack: number;
-    uuid?: string;
+    uuid: PlayerUUID;
     hero?: boolean;
     sittingOut?: boolean;
     quitting?: boolean;
@@ -530,6 +530,7 @@ export const TestGame: UiGameState = {
             stack: 5500,
             hero: true,
             toAct: true,
+            uuid: generatePlayerUUID(),
             playerTimer: {
                 timeElapsed: 11.5,
                 timeLimit: 30,
@@ -551,7 +552,7 @@ export const TestGame: UiGameState = {
             name: 'Marty Shakus',
             position: positions[1],
             stack: 425320,
-            uuid: 'TEST_UUID_1',
+            uuid: generatePlayerUUID(),
             quitting: true,
             bet: genRandomInt(0, 100),
             hand: {
@@ -575,6 +576,7 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            uuid: generatePlayerUUID(),
         },
         // {
         //     name: "Johnny Bones",
@@ -601,6 +603,7 @@ export const TestGame: UiGameState = {
             avatarKey: getRandomAvatarKey(),
             admin: false,
             lastAction: 'All In',
+            uuid: generatePlayerUUID(),
         },
         {
             name: 'Lenny',
@@ -612,12 +615,13 @@ export const TestGame: UiGameState = {
             avatarKey: getRandomAvatarKey(),
             disconnected: true,
             admin: true,
+            uuid: generatePlayerUUID(),
         },
         {
             name: 'Jimmy Dean',
             position: positions[6],
             stack: 43020,
-            uuid: 'TEST_UUID_2',
+            uuid: generatePlayerUUID(),
             bet: genRandomInt(0, 1000000),
             positionIndicator: PositionIndicator.BIG_BLIND,
             hand: {
@@ -638,13 +642,14 @@ export const TestGame: UiGameState = {
             },
             avatarKey: getRandomAvatarKey(),
             admin: false,
+            uuid: generatePlayerUUID(),
         },
         {
             name: 'Tommy Bones',
             position: positions[8],
             stack: 323,
             folded: true,
-
+            uuid: generatePlayerUUID(),
             hand: {
                 cards: [{ hidden: true }, { hidden: true }],
             },

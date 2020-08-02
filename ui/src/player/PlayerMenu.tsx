@@ -12,6 +12,7 @@ import { IconButton } from '@material-ui/core';
 import Avatar from '../reuseable/Avatar';
 import ConfirmationDialog from '../reuseable/ConfirmationDialog';
 import { AVATAR_LOCAL_STORAGE_KEY } from '../game/JoinGameDialog';
+import { UiPlayer } from '../shared/models/ui/uiState';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -32,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function PlayerMenu(props) {
     const classes = useStyles();
     const { anchorEl, handleClose, setHeroRotation, virtualPositon, player } = props;
-    const { stack, name, uuid, admin, quitting } = player;
+    const { stack, name, uuid, admin, quitting, disconnected } = player as UiPlayer;
     const [chipsDialog, setChipsDialog] = useState(false);
     const [avatarDialog, SET_avatarDialog] = useState(false);
     const isHeroAdmin = useSelector(isHeroAdminSelector);
@@ -96,7 +97,7 @@ function PlayerMenu(props) {
             {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
             {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
             {isHeroAdmin && isPlayerHero ? <MenuItem onClick={handleRemoveAdmin}>Remove as Admin</MenuItem> : null}
-            {isHeroAdmin && !isPlayerHero && !quitting ? (
+            {(isHeroAdmin && !isPlayerHero && !quitting) || disconnected ? (
                 <MenuItem onClick={handleBootPlayer}>Boot Player</MenuItem>
             ) : null}
             <MenuItem onClick={handleSetRotation}>Rotate Here</MenuItem>

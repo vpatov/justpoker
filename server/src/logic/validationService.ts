@@ -565,11 +565,6 @@ export class ValidationService {
     }
 
     validateBootPlayerAction(clientUUID: ClientUUID, req: BootPlayerRequest): ValidationResponse {
-        const error = this.ensureClientIsAdmin(clientUUID);
-        if (error) {
-            return error;
-        }
-
         const bootPlayer = this.gsm.getPlayer(req.playerUUID);
         if (!bootPlayer) {
             return {
@@ -593,6 +588,13 @@ export class ValidationService {
             };
         }
 
+        // non admins can boot disconnected players
+        if (!this.gsm.isClientAdmin(clientUUID) && !bootPlayer.disconnected) {
+            return {
+                errorType: ErrorType.NOT_ADMIN,
+                errorString: `Only admins can boot non disconnected player.`,
+            };
+        }
         return undefined;
     }
 
