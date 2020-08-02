@@ -286,7 +286,7 @@ class Server {
 
     onWSClose(data: WebSocket.Data, clientUUID: ClientUUID, gameInstanceUUID: GameInstanceUUID) {
         if (this.gameInstanceManager.doesGameInstanceExist(gameInstanceUUID)) {
-            logger.info(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
+            logger.verbose(`WS closed for client ${clientUUID} in game ${gameInstanceUUID}`);
             const closeEvent = createWSCloseEvent(gameInstanceUUID, clientUUID);
             this.eventProcessorService.processEvent(closeEvent);
         }

@@ -24,7 +24,7 @@ import { Context } from './context';
 export interface GameInstances {
     [gameInstanceUUID: string]: GameInstance;
 }
-const EXPIRE_GAME_INSTANCE_TIME = 1000 * 12; // expire games after 2 hours of inactivity
+const EXPIRE_GAME_INSTANCE_TIME = 1000 * 60 * 60 * 2; // expire games after 2 hours of inactivity
 const MAX_GEN_ID_RETRIES = 1000;
 
 @Service()
@@ -44,7 +44,7 @@ export class GameInstanceManager {
         private readonly connectedClientManager: ConnectedClientManager,
         private readonly context: Context,
     ) {
-        setInterval(() => this.clearStaleGames(), 5000); // attempt to expire games every hour
+        setInterval(() => this.clearStaleGames(), 1000 * 60 * 60); // attempt to expire games every hour
     }
 
     makeGameInstanceUUID(): GameInstanceUUID {
@@ -104,15 +104,16 @@ export class GameInstanceManager {
     }
 
     clearStaleGames() {
-        logger.info(`Clearing expired game instances...`);
+        logger.verbose(`attempt to expire game instances...`);
         if (this.gameInstances) {
             // TODO implement warning game will be cleared do to inactivity
             const now = getEpochTimeMs();
             Object.entries(this.gameInstances).forEach(([gameInstanceUUID, gameInstance]) => {
                 const timeInactive = now - gameInstance.lastActive;
-                logger.info(`${gameInstanceUUID} has been inactive for ${timeInactive}`);
+                logger.verbose(`${gameInstanceUUID} has been inactive for ${timeInactive}`);
                 if (timeInactive > EXPIRE_GAME_INSTANCE_TIME) {
-                    logger.info(`expiring game instance ${gameInstanceUUID}`);
+                    logger.verbose(`expiring game instance ${gameInstanceUUID}`);
+                    this.timerManager.cancelAllTimers(this.gameInstances[gameInstanceUUID].timerGroup);
                     this.connectedClientManager.removeGroupFromManager(gameInstanceUUID as GameInstanceUUID);
                     delete this.gameInstances[gameInstanceUUID];
                     logger.info(`expired game instance ${gameInstanceUUID}`);

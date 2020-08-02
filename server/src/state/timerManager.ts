@@ -56,4 +56,11 @@ export class TimerManager {
     cancelIncrementBlindsScheduleInterval() {
         if (this.timerGroup.incrementBlindsScheduleTimer !== null) this.timerGroup.incrementBlindsScheduleTimer.clear();
     }
+
+    // pass arg to avoid loading
+    cancelAllTimers(timerGroup: TimerGroup) {
+        Object.values(timerGroup).forEach((timer) => {
+            if (timer) timer.clear();
+        });
+    }
 }

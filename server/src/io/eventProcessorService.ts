@@ -315,7 +315,7 @@ export class EventProcessorService {
     @debugFunc()
     processEvent(event: Event) {
         const { gameInstanceUUID, actionType } = event.body;
-        logger.info(
+        logger.verbose(
             `EventProcessorService.processEvent. gameInstanceUUID: ${gameInstanceUUID} eventType: ${event.eventType} actionType ${actionType}`,
         );
         this.gameInstanceManager.loadGameInstance(gameInstanceUUID);
