@@ -713,6 +713,18 @@ export class GamePlayService {
         this.gsm.setPrevBigBlindSeat(this.gsm.getBigBlindSeat());
     }
 
+    updateLedgerAfterHand() {
+        this.ledgerService.incrementHandsWonForPlayers(
+            [...this.gsm.getHandWinners()].map((playerUUID) => this.gsm.getClientByPlayerUUID(playerUUID)),
+        );
+        this.gsm.forEveryClient((client) => {
+            const player = this.gsm.getPlayerByClientUUID(client.uuid);
+            if (player) {
+                this.ledgerService.setCurrentChips(client.uuid, this.gsm.getPlayerChips(player.uuid));
+            }
+        });
+    }
+
     buyChipsPlayerAction(playerUUID: PlayerUUID, numChips: number): void {
         if (this.gsm.isPlayerInHand(playerUUID)) {
             this.gsm.queueAction({
@@ -727,7 +739,9 @@ export class GamePlayService {
             const amountAdded = resultingChips - currentStack;
             this.gsm.setPlayerChips(playerUUID, resultingChips);
             if (amountAdded > 0) {
-                this.ledgerService.addBuyin(this.gsm.getClientByPlayerUUID(playerUUID), amountAdded);
+                const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
+                this.ledgerService.addBuyin(clientUUID, amountAdded);
+                this.ledgerService.setCurrentChips(clientUUID, resultingChips);
                 this.chatService.announcePlayerBuyin(playerUUID, amountAdded);
             }
             this.gsm.setPlayerWillAddChips(playerUUID, 0);
@@ -740,8 +754,11 @@ export class GamePlayService {
         const newChips = chipAmt + player.betAmount; // cannot remove live bet
         const chipDifference = newChips - originalChips;
         if (chipDifference !== 0) {
-            this.ledgerService.addBuyin(this.gsm.getClientByPlayerUUID(playerUUID), chipDifference);
             this.chatService.announceAdminAdjustChips(playerUUID, newChips, originalChips);
+            // ledger
+            const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
+            this.ledgerService.addBuyin(clientUUID, chipDifference);
+            this.ledgerService.setCurrentChips(clientUUID, newChips);
         }
         this.gsm.setPlayerChips(playerUUID, newChips);
     }

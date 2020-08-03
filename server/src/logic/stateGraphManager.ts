@@ -14,7 +14,6 @@ import { GameStateManager } from '../state/gameStateManager';
 import { GamePlayService } from './gamePlayService';
 import { TimerManager } from '../state/timerManager';
 import { BettingRoundStage } from '../../../ui/src/shared/models/game/betting';
-import { LedgerService } from '../stats/ledgerService';
 
 const MAX_CONDITION_DEPTH = 3;
 
@@ -27,7 +26,6 @@ export class StateGraphManager {
         private readonly gameStateManager: GameStateManager,
         private readonly gamePlayService: GamePlayService,
         private readonly timerManager: TimerManager,
-        private readonly ledgerService: LedgerService,
     ) {}
 
     canContinueGameCondition: Condition = {
@@ -250,11 +248,7 @@ export class StateGraphManager {
 
             case GameStage.POST_HAND_CLEANUP: {
                 this.gamePlayService.updatePostHandChipDeltas();
-                this.ledgerService.incrementHandsWonForPlayers(
-                    [...this.gameStateManager.getHandWinners()].map((playerUUID) =>
-                        this.gameStateManager.getClientByPlayerUUID(playerUUID),
-                    ),
-                );
+                this.gamePlayService.updateLedgerAfterHand();
                 this.gamePlayService.savePreviousHandInfo();
                 this.gameStateManager.clearStateOfHandInfo();
                 this.gamePlayService.ejectStackedPlayers();
@@ -265,16 +259,6 @@ export class StateGraphManager {
                 break;
             }
         }
-        this.updateLedger();
-    }
-
-    updateLedger() {
-        this.gameStateManager.forEveryClient((client) => {
-            const player = this.gameStateManager.getPlayerByClientUUID(client.uuid);
-            if (player) {
-                this.ledgerService.setCurrentChips(client.uuid, this.gameStateManager.getPlayerChips(player.uuid));
-            }
-        });
     }
 
     // some actions can only be executed inbetween hands

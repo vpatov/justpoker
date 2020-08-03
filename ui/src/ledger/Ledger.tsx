@@ -10,6 +10,8 @@ import ErrorMessage from '../root/ErrorMessage';
 import MaterialTable from 'material-table';
 import { useParams } from 'react-router';
 import { useChipFormatter } from '../game/ChipFormatter';
+import { IconButton, Tooltip } from '@material-ui/core';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -18,9 +20,18 @@ const useStyles = makeStyles((theme) => ({
         color: 'white',
         ...theme.custom.BACKGROUND,
     },
-
     tableCont: {
         padding: 24,
+    },
+    refresh: {
+        top: 39,
+        right: 72,
+        zIndex: 2,
+        position: 'absolute',
+    },
+    refreshIcon: {
+        width: 24,
+        height: 24,
     },
 }));
 
@@ -53,7 +64,13 @@ function Ledger(props) {
         if (error !== undefined) {
             return <ErrorMessage errorDisplay={error} />;
         }
-        return <LedgerTable ledger={ledger} gameInstanceUUID={gameInstanceUUID} />;
+        return (
+            <LedgerTable
+                ledger={ledger}
+                gameInstanceUUID={gameInstanceUUID}
+                fetchLedger={() => getLedger(gameInstanceUUID, onFetchLedgerSuccess, onFetchLedgerFailure)}
+            />
+        );
     }
 
     return (
@@ -110,6 +127,11 @@ function LedgerTable(props) {
 
     return (
         <div className={classes.tableCont}>
+            <Tooltip title="Refresh">
+                <IconButton onClick={props.fetchLedger} className={classes.refresh}>
+                    <RefreshIcon className={classes.refreshIcon} />
+                </IconButton>
+            </Tooltip>
             <MaterialTable
                 title={`Ledger for ${props.gameInstanceUUID} (${gameDate})`}
                 columns={columns}

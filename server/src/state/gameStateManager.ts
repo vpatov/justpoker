@@ -1064,6 +1064,8 @@ export class GameStateManager {
 
         this.ledgerService.addAlias(clientUUID, name);
         this.ledgerService.addBuyin(clientUUID, buyin);
+        this.ledgerService.setCurrentChips(clientUUID, player.chips);
+        this.ledgerService.setCurrentChips(clientUUID, player.chips);
         if (this.isGameInProgress()) {
             this.setPlayerWillPostBlind(player.uuid, true);
         }
