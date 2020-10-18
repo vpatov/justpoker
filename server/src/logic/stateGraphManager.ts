@@ -116,18 +116,6 @@ export class StateGraphManager {
     getEdge(actionType: ActionType): GraphEdge {
         const gameStage = this.gameStateManager.getGameStage();
         const edge = this.stateGraph[gameStage].get(actionType);
-
-        if (!!edge) {
-            /* 
-                TODO
-                If the edge is not defined in the map, one of the following conditions is true:
-                    - A timeout event has occurred during the NOT_IN_PROGRESS stage, during which
-                    timeout processing is undefined. This is a bug if it happens.
-                    - An action that cannot be currently processed has been sent by the user. It will
-                    either be queued or discarded. For now, they will be discarded (TODO).
-                    - An action that can be processed at any time assuming it is valid (add chips, chat, etc.)
-            */
-        }
         return edge;
     }
 
@@ -162,11 +150,8 @@ export class StateGraphManager {
         return condition.fn() ? condition.TRUE : condition.FALSE;
     }
 
-    // - MessageService receives the message, validates the action
-    //     (validation service will use stages to simplify validation)
-    // - MessageService executes the action if valid.
-    // - After executing the action, messageService calls this processEvent method.
-    // - If the event is a defined state transition path, a state transition is executed.
+    // Called after the EventProcessorService processes an incoming event.
+    // If the event is a defined state transition path, a state transition is executed.
     processStateTransitions(event: ActionType, timeoutCallback: () => void) {
         const nextStage = this.getNextStage(event);
         if (nextStage) {
@@ -261,7 +246,7 @@ export class StateGraphManager {
         }
     }
 
-    // some actions can only be executed inbetween hands
+    // some actions can only be executed in between hands
     // these are queued up and then executed here during correct gamestage
     executeQueuedServerAction(action: QueuedServerAction) {
         switch (action.actionType) {

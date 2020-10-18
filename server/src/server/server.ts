@@ -74,10 +74,9 @@ class Server {
             const clientGroups = this.connectedClientManager.getClientGroups();
             let gameInstancesCount = 0;
             const gameInstances: any = {};
-            Object.entries(clientGroups).forEach(([gameInstanceUUIDStr, group]) => {
-                const gameInstanceUUID = gameInstanceUUIDStr as GameInstanceUUID;
+            Object.entries(clientGroups).forEach(([gameInstanceUUID, group]) => {
                 gameInstancesCount++;
-                const lastActive = this.gameInstanceManager.getGameInstance(gameInstanceUUID)?.lastActive;
+                const lastActive = this.gameInstanceManager.getGameInstance(gameInstanceUUID as GameInstanceUUID)?.lastActive;
                 gameInstances[gameInstanceUUID] = {
                     WSCount: Object.values(group).length,
                     link: `https://justpoker.games/table/${gameInstanceUUID}`,
