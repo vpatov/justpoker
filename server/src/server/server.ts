@@ -40,6 +40,8 @@ import {
 } from '../../../ui/src/shared/models/system/email';
 import { CapacityLimiter } from './capacityLimiter';
 
+let totalGamesCreatedSinceDeploy = 0
+
 @Service()
 class Server {
     app: express.Application;
@@ -89,6 +91,7 @@ class Server {
                 totalWSCount: this.connectedClientManager.getNumberOfClients(),
                 capacitySettings: this.capacityLimiter.getCapacity(),
                 gameInstances: gameInstances,
+                totalGamesCreatedSinceDeploy: totalGamesCreatedSinceDeploy,
             });
         });
 
@@ -109,7 +112,7 @@ class Server {
                         createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
                     );
                 }, 30 * 1000);
-
+                totalGamesCreatedSinceDeploy++;
                 logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
                 res.send({ gameInstanceUUID: gameInstanceUUID });
             }
