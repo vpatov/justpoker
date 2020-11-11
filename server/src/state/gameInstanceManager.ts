@@ -177,7 +177,7 @@ export class GameInstanceManager {
         if (!gameInstance) {
             return undefined;
         }
-        const ledgerState = this.ledgerService.getLedger();
+        const ledgerState = gameInstance.ledger;
         return this.ledgerService.convertServerLedgerToUILedger(ledgerState);
     }
 

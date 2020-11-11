@@ -205,17 +205,19 @@ export class GameInstanceLogService {
     }
 
     private areAllHoleCardsVisible(playerUUID: PlayerUUID) {
+        this.updatePlayerCards(playerUUID);
         const playerSummary = this.currentHandLogEntry.playerSummaries.get(playerUUID);
         if (!playerSummary) {
             // TODO reproduce this bug and fix
             logger.error(
-                `areAllHoleCardsVisible got undefined playerSummary for ${playerUUID}.\n` +
+                `areAllHoleCardsVisible got undefined player for ${playerUUID}.\n` +
                     `Current hand log entry: ${JSON.stringify(this.currentHandLogEntry)}.\n` +
                     `Current players in gsm: ${JSON.stringify(this.gameStateManager.getPlayers())}`,
             );
             return false;
         }
         return playerSummary.holeCards.every((card) => card.visible);
+    
     }
 
     private sanitizePotSummaries(potSummaries: PotSummary[]): PotSummary[] {
