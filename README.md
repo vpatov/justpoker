@@ -1,4 +1,5 @@
 # JustPoker
+<img src="https://github.com/justpoker-team/justpoker/blob/master/docs/jp_koi.png?raw=true" alt="Image of JP Mascot" width="250"/>
 
 ##### Source code for the famous JustPoker website, where you can play private poker games with your friends
 
