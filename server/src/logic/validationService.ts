@@ -20,7 +20,7 @@ import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../u
 import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { Card, cardsAreEqual } from '../../../ui/src/shared/models/game/cards';
 import { MIN_VALUES, MAX_VALUES } from '../../../ui/src/shared/util/consts';
-import { INIT_HAND_STAGES, GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage, INIT_HAND_STAGES } from '../../../ui/src/shared/models/game/stateGraph';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -149,7 +149,10 @@ export class ValidationService {
     }
 
     validateJoinGameRequest(clientUUID: ClientUUID, request: JoinGameRequest): ValidationResponse {
-        const error = this.ensureClientIsNotInGame(clientUUID);
+        let error = this.ensureClientIsNotInGame(clientUUID);
+        if (error) return error;
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
         if (error) return error;
 
         if (request.name.length > MAX_NAME_LENGTH) {
@@ -177,6 +180,9 @@ export class ValidationService {
         if (error) {
             return error;
         }
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
+        if (error) return error;
 
         const seatNumber = request.seatNumber;
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
@@ -211,8 +217,12 @@ export class ValidationService {
     }
 
     validateJoinGameAndTableRequest(clientUUID: ClientUUID, request: JoinGameAndTableRequest): ValidationResponse {
-        const error = this.validateJoinGameRequest(clientUUID, request);
+        let error = this.validateJoinGameRequest(clientUUID, request);
         if (error) return error;
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
+        if (error) return error;
+
         if (!this.gsm.areOpenSeats()) {
             return {
                 errorType: ErrorType.ILLEGAL_ACTION,
@@ -526,7 +536,10 @@ export class ValidationService {
     }
 
     validateQuitGameRequest(clientUUID: ClientUUID): ValidationResponse {
-        const error = this.ensureClientIsInGame(clientUUID);
+        let error = this.ensureClientIsInGame(clientUUID);
+        if (error) return error;
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
         if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
@@ -545,6 +558,9 @@ export class ValidationService {
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
         error = this.ensurePlayerIsAtTable(player.uuid);
+        if (error) return error;
+
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
         if (error) return error;
 
         if (player.quitting) {

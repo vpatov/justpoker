@@ -30,7 +30,7 @@ export class StateGraphManager {
 
     canContinueGameCondition: Condition = {
         fn: () => this.gameStateManager.canDealNextHand(),
-        TRUE: GameStage.INITIALIZE_NEW_HAND,
+        TRUE: GameStage.INIT_HAND,
         FALSE: GameStage.NOT_IN_PROGRESS,
     };
 
@@ -67,13 +67,11 @@ export class StateGraphManager {
             [ClientActionType.JOINGAMEANDJOINTABLE, this.canContinueGameCondition],
             [ClientActionType.SITIN, this.canContinueGameCondition],
         ]),
-        [GameStage.INITIALIZE_NEW_HAND]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_HAND]]),
-        [GameStage.SHOW_START_OF_HAND]: new Map([
-            [ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND],
-        ]),
+        [GameStage.INIT_HAND]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND]]),
         [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([
             [ServerActionType.GAMEPLAY_TIMEOUT, this.isAllInRunOutCondition],
         ]),
+
         [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([
             [ServerActionType.GAMEPLAY_TIMEOUT, GameStage.WAITING_FOR_BET_ACTION],
         ]),
@@ -92,8 +90,7 @@ export class StateGraphManager {
 
     stageDelayMap: StageDelayMap = {
         [GameStage.NOT_IN_PROGRESS]: 0,
-        [GameStage.INITIALIZE_NEW_HAND]: 250,
-        [GameStage.SHOW_START_OF_HAND]: 400,
+        [GameStage.INIT_HAND]: 50,
         [GameStage.SHOW_START_OF_BETTING_ROUND]: 750,
         [GameStage.SET_CURRENT_PLAYER_TO_ACT]: 50, // TODO there does not need to be a delay here.
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
@@ -184,7 +181,7 @@ export class StateGraphManager {
     // a defined state transition path was executed. For example, if someone adds chips during the
     // WAITING_FOR_BET_ACTION stage, that should not trigger any timer restarts (this method shouldnt
     // be called)
-    initializeGameStage(stage: GameStage) {
+    initializeGameStage(stage: GameStage): void {
         // TODO write assertions checking for preconditions of each stage after entering stage
         this.gameStateManager.updateGameStage(stage);
 
@@ -193,12 +190,8 @@ export class StateGraphManager {
                 this.gameStateManager.clearStateOfHandInfo();
                 break;
             }
-            case GameStage.INITIALIZE_NEW_HAND: {
-                break;
-            }
 
-            // TODO consider renaming this to initialize new hand, and getting rid of the extra state above.
-            case GameStage.SHOW_START_OF_HAND: {
+            case GameStage.INIT_HAND: {
                 this.gamePlayService.initializeNewHand();
                 break;
             }
