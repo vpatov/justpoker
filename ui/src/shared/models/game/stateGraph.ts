@@ -28,4 +28,4 @@ export const enum GameStage {
     SET_CURRENT_PLAYER_TO_ACT = 'SET_CURRENT_PLAYER_TO_ACT',
 }
 
-export const INIT_HAND_STAGES = [GameStage.SHOW_START_OF_BETTING_ROUND];
+

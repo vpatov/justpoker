@@ -20,7 +20,7 @@ import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../u
 import { ClientUUID, PlayerUUID } from '../../../ui/src/shared/models/system/uuid';
 import { Card, cardsAreEqual } from '../../../ui/src/shared/models/game/cards';
 import { MIN_VALUES, MAX_VALUES } from '../../../ui/src/shared/util/consts';
-import { INIT_HAND_STAGES, GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 
 const MAX_NAME_LENGTH = 32;
 
@@ -227,7 +227,7 @@ export class ValidationService {
         let error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
 
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'switch seats');
+        error = this.validateNotInGameStages([GameStage.SHOW_START_OF_BETTING_ROUND], 'switch seats');
         if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
@@ -259,7 +259,7 @@ export class ValidationService {
         const error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
 
-        return this.validateNotInGameStages(INIT_HAND_STAGES, 'sit in/out');
+        return this.validateNotInGameStages([GameStage.SHOW_START_OF_BETTING_ROUND], 'sit in/out');
     }
 
     validateSitInAction(clientUUID: ClientUUID): ValidationResponse {
