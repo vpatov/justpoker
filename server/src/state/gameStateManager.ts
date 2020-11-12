@@ -16,7 +16,7 @@ import {
     BettingRoundActionType,
     Pot,
 } from '../../../ui/src/shared/models/game/betting';
-import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
+import { GameStage, INIT_HAND_STAGES } from '../../../ui/src/shared/models/game/stateGraph';
 import {
     Player,
     getCleanPlayer,
@@ -994,7 +994,7 @@ export class GameStateManager {
     }
 
     isGameInInitStage(): boolean {
-        return this.getGameStage() === GameStage.SHOW_START_OF_BETTING_ROUND;
+        return INIT_HAND_STAGES.includes(this.getGameStage());
     }
 
     removePlayerFromGame(playerUUID: PlayerUUID) {

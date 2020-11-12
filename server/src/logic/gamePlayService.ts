@@ -31,7 +31,6 @@ import {
     Event,
 } from '../../../ui/src/shared/models/api/api';
 import { assert } from 'console';
-import { GameStage } from '../../../ui/src/shared/models/game/stateGraph';
 
 @Service()
 export class GamePlayService {
