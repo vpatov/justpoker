@@ -75,7 +75,6 @@ export function dealCards() {
         easing: 'easeOutExpo',
         duration: duration,
         opacity: [0.3, 1],
-        delay: anime.stagger(25),
     });
 }
 
