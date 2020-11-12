@@ -283,7 +283,8 @@ export class StateGraphManager {
             case ClientActionType.SETCHIPS: {
                 const playerUUID = action.args[0];
                 const chipAmt = action.args[1];
-                this.gamePlayService.setChipsAdminAction(playerUUID, chipAmt);
+                const announced = action.args[2];
+                this.gamePlayService.setChipsAdminAction(playerUUID, chipAmt, announced);
                 break;
             }
             case ServerActionType.INCREMENT_BLINDS_SCHEDULE: {

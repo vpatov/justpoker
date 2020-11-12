@@ -752,25 +752,28 @@ export class GamePlayService {
         }
     }
 
-    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number): void {
+    // announced indiciates if the server message has be sent
+    setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number, announced: boolean): void {
         const player = this.gsm.getPlayer(playerUUID);
         const originalChips = player.chips;
+        const newChips = chipAmt + player.betAmount; // cannot remove live bet
         if (this.gsm.isPlayerInHand(playerUUID)) {
+            this.chatService.announceAdminAdjustChips(playerUUID, newChips, originalChips);
             this.gsm.queueAction({
                 actionType: ClientActionType.SETCHIPS,
-                args: [playerUUID, chipAmt],
+                args: [playerUUID, chipAmt, true],
             });
-            this.gsm.setPlayerWillAdminSetChips(playerUUID, chipAmt);
-            this.chatService.announceAdminAdjustChips(playerUUID, chipAmt, originalChips);
+            this.gsm.setPlayerWillAdminSetChips(playerUUID, newChips);
         } else {
-            const chipDifference = chipAmt - originalChips;
+            if (!announced) this.chatService.announceAdminAdjustChips(playerUUID, newChips, originalChips);
+            const chipDifference = newChips - originalChips;
             if (chipDifference !== 0) {
                 // ledger
                 const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
                 this.ledgerService.addBuyin(clientUUID, chipDifference);
-                this.ledgerService.setCurrentChips(clientUUID, chipAmt);
+                this.ledgerService.setCurrentChips(clientUUID, newChips);
             }
-            this.gsm.setPlayerChips(playerUUID, chipAmt);
+            this.gsm.setPlayerChips(playerUUID, newChips);
             this.gsm.setPlayerWillAdminSetChips(playerUUID, 0);
         }
     }

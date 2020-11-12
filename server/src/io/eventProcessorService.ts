@@ -162,7 +162,7 @@ export class EventProcessorService {
             validation: (uuid, req) => this.validationService.validateSetChipsRequest(uuid, req),
             perform: (uuid, request) => {
                 const player = this.gameStateManager.getPlayer(request.playerUUID);
-                this.gamePlayService.setChipsAdminAction(player.uuid, Number(request.chipAmount));
+                this.gamePlayService.setChipsAdminAction(player.uuid, Number(request.chipAmount), false);
             },
             updates: [ServerStateKey.GAMESTATE],
         },
