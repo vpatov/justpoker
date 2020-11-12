@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
         justifyContent: 'center',
-        transform: 'translateZ(-1px)',
+        transform: 'translateZ(-1px)', // need for proper deal animation in safari
     },
     folded: {
         opacity: 0,

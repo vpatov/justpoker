@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9))',
+        filter: 'drop-shadow(0 0.4vmin 0.4vmin rgba(0,0,0,0.9)) grayscale(0%)', // grayscale(0%) needed to reset filter in safari
         transform: 'translateY(-50%) translateX(-50%)',
         '&:hover $showAllButton': {
             opacity: 1,
