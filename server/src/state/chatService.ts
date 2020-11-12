@@ -121,9 +121,10 @@ export class ChatService {
         const player = this.gameStateManager.getPlayer(playerUUID);
         this.lastMessage = {
             ...this.serverMessageTemplate(),
-            content:
-                `An admin has adjusted ${player.name}'s stack from ${originalChips} ` +
-                `to ${chipAmt} chip${chipAmt > 1 ? 's' : ''}.`,
+            content: `An admin has set ${player.name}'s stack from ${originalChips} 
+                to ${chipAmt} chip${
+                chipAmt > 1 ? 's' : ''
+            }. The change will take place at the beginning of the next hand.`,
         };
         this.chatLog.messages.push(this.lastMessage);
         this.gameStateManager.addUpdatedKeys(ServerStateKey.CHAT);

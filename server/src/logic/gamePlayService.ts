@@ -751,15 +751,23 @@ export class GamePlayService {
     setChipsAdminAction(playerUUID: PlayerUUID, chipAmt: number): void {
         const player = this.gsm.getPlayer(playerUUID);
         const originalChips = player.chips;
-        const newChips = chipAmt + player.betAmount; // cannot remove live bet
-        const chipDifference = newChips - originalChips;
-        if (chipDifference !== 0) {
-            this.chatService.announceAdminAdjustChips(playerUUID, newChips, originalChips);
-            // ledger
-            const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
-            this.ledgerService.addBuyin(clientUUID, chipDifference);
-            this.ledgerService.setCurrentChips(clientUUID, newChips);
+        if (this.gsm.isPlayerInHand(playerUUID)) {
+            this.gsm.queueAction({
+                actionType: ClientActionType.SETCHIPS,
+                args: [playerUUID, chipAmt],
+            });
+            this.gsm.setPlayerWillAdminSetChips(playerUUID, chipAmt);
+            this.chatService.announceAdminAdjustChips(playerUUID, chipAmt, originalChips);
+        } else {
+            const chipDifference = chipAmt - originalChips;
+            if (chipDifference !== 0) {
+                // ledger
+                const clientUUID = this.gsm.getClientByPlayerUUID(playerUUID);
+                this.ledgerService.addBuyin(clientUUID, chipDifference);
+                this.ledgerService.setCurrentChips(clientUUID, chipAmt);
+            }
+            this.gsm.setPlayerChips(playerUUID, chipAmt);
+            this.gsm.setPlayerWillAdminSetChips(playerUUID, 0);
         }
-        this.gsm.setPlayerChips(playerUUID, newChips);
     }
 }

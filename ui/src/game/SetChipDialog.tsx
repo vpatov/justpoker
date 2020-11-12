@@ -39,7 +39,7 @@ function SetChipDialog(props) {
     const classes = useStyles();
     const { open, handleClose, name, stack, uuid } = props;
     const [chipAmt, setChipAmt] = useState(0);
-    const [mode, setMode] = React.useState('Add');
+    const [mode, setMode] = React.useState('Set');
 
     const resultingChips = computeResultingChips();
     const ChipFormatter = useChipFormatter();
@@ -89,9 +89,9 @@ function SetChipDialog(props) {
             <DialogTitle>{`Modify ${name}'s Chips`}</DialogTitle>
             <DialogContent>
                 <RadioGroup className={classes.radioGroup} value={mode} onChange={handleChange}>
+                    <FormControlLabel value="Set" control={<Radio />} label="Set Chips" />
                     <FormControlLabel value="Add" control={<Radio />} label="Add Chips" />
                     <FormControlLabel value="Subtract" control={<Radio />} label="Subtract Chips" />
-                    <FormControlLabel value="Set" control={<Radio />} label="Set Chips" />
                 </RadioGroup>
                 <TextFieldWrap
                     className={classes.field}
@@ -108,9 +108,12 @@ function SetChipDialog(props) {
                 <Typography>{`Current Chips: ${ChipFormatter(stack)}`}</Typography>
                 <Typography>{`Resulting Chips: ${ChipFormatter(resultingChips)}`}</Typography>
                 <Typography className={classes.warning}>
-                    {
-                        'Warning: this action will take effect immediately and may impact the gameplay of the current hand. You cannot remove chips from a player which are currently a live bet. The change will be recorded in the ledger.'
-                    }
+                    {`
+                        This action will take place after the completion of the current hand. 
+                        The players chips will be set to the resulting amount irregardless of the outcome of the current hand. 
+                        The change will be recorded in the ledger. 
+                        If this action is performed twice before the complection of the hand only the first action will be exectued.
+                        `}
                 </Typography>
             </DialogContent>
             <DialogActions>

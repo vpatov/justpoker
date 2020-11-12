@@ -251,9 +251,10 @@ export class StateGraphManager {
                 this.gamePlayService.updateLedgerAfterHand();
                 this.gamePlayService.savePreviousHandInfo();
                 this.gameStateManager.clearStateOfHandInfo();
-                this.gamePlayService.ejectStackedPlayers();
 
+                // execute chip adjustments and then eject stacked players
                 this.executeQueuedServerActions();
+                this.gamePlayService.ejectStackedPlayers();
                 this.gamePlayService.pauseGameIfNeeded();
 
                 break;
@@ -284,6 +285,12 @@ export class StateGraphManager {
                 const playerUUID = action.args[0];
                 const chipAmt = action.args[1];
                 this.gamePlayService.buyChipsPlayerAction(playerUUID, chipAmt);
+                break;
+            }
+            case ClientActionType.SETCHIPS: {
+                const playerUUID = action.args[0];
+                const chipAmt = action.args[1];
+                this.gamePlayService.setChipsAdminAction(playerUUID, chipAmt);
                 break;
             }
             case ServerActionType.INCREMENT_BLINDS_SCHEDULE: {
