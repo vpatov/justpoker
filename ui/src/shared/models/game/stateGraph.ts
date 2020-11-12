@@ -19,6 +19,7 @@ export function instanceOfCondition(edge: GraphEdge): edge is Condition {
 
 export const enum GameStage {
     NOT_IN_PROGRESS = 'NOT_IN_PROGRESS',
+    INIT_HAND = 'INIT_HAND',
     SHOW_START_OF_BETTING_ROUND = 'SHOW_START_OF_BETTING_ROUND',
     WAITING_FOR_BET_ACTION = 'WAITING_FOR_BET_ACTION',
     SHOW_BET_ACTION = 'SHOW_BET_ACTION',
@@ -28,4 +29,4 @@ export const enum GameStage {
     SET_CURRENT_PLAYER_TO_ACT = 'SET_CURRENT_PLAYER_TO_ACT',
 }
 
-
+export const INIT_HAND_STAGES = [GameStage.INIT_HAND, GameStage.SHOW_START_OF_BETTING_ROUND];

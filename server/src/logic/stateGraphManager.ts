@@ -30,7 +30,7 @@ export class StateGraphManager {
 
     canContinueGameCondition: Condition = {
         fn: () => this.gameStateManager.canDealNextHand(),
-        TRUE: GameStage.SHOW_START_OF_BETTING_ROUND,
+        TRUE: GameStage.INIT_HAND,
         FALSE: GameStage.NOT_IN_PROGRESS,
     };
 
@@ -67,9 +67,11 @@ export class StateGraphManager {
             [ClientActionType.JOINGAMEANDJOINTABLE, this.canContinueGameCondition],
             [ClientActionType.SITIN, this.canContinueGameCondition],
         ]),
+        [GameStage.INIT_HAND]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND]]),
         [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([
             [ServerActionType.GAMEPLAY_TIMEOUT, this.isAllInRunOutCondition],
         ]),
+
         [GameStage.SET_CURRENT_PLAYER_TO_ACT]: new Map([
             [ServerActionType.GAMEPLAY_TIMEOUT, GameStage.WAITING_FOR_BET_ACTION],
         ]),
@@ -88,6 +90,7 @@ export class StateGraphManager {
 
     stageDelayMap: StageDelayMap = {
         [GameStage.NOT_IN_PROGRESS]: 0,
+        [GameStage.INIT_HAND]: 50,
         [GameStage.SHOW_START_OF_BETTING_ROUND]: 750,
         [GameStage.SET_CURRENT_PLAYER_TO_ACT]: 50, // TODO there does not need to be a delay here.
         [GameStage.WAITING_FOR_BET_ACTION]: 0,
@@ -188,11 +191,13 @@ export class StateGraphManager {
                 break;
             }
 
+            case GameStage.INIT_HAND: {
+                this.gamePlayService.initializeNewHand();
+                break;
+            }
+
             case GameStage.SHOW_START_OF_BETTING_ROUND: {
                 this.gameStateManager.incrementBettingRoundStage();
-                if (this.gameStateManager.getBettingRoundStage() === BettingRoundStage.PREFLOP) {
-                    this.gamePlayService.initializeNewHand();
-                }
                 this.gamePlayService.resetBettingRoundActions();
                 this.gamePlayService.initializeBettingRound();
                 this.gamePlayService.updateIsAllInRunOut();

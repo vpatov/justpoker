@@ -422,8 +422,13 @@ export class GamePlayService {
         switch (bettingRoundStage) {
             case BettingRoundStage.PREFLOP: {
                 this.animationService.setDealCardsAnimation();
-                this.gsm.forEveryPlayerUUID((playerUUID) => {
-                    if (this.gsm.isPlayerReadyToPlay(playerUUID)) {
+                this.gsm.getSeatsDealtIn().forEach((playerSeat) => {
+                    const { playerUUID, seatNumber } = playerSeat;
+
+                    if (
+                        this.gsm.getPlayerSeatNumber(playerUUID) === seatNumber &&
+                        this.gsm.isPlayerReadyToPlay(playerUUID)
+                    ) {
                         this.dealHoleCards(playerUUID);
                         this.ledgerService.incrementHandsDealtIn(this.gsm.getClientByPlayerUUID(playerUUID));
                         this.gameInstanceLogService.updatePlayerCards(playerUUID);

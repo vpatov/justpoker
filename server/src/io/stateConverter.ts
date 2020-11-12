@@ -235,7 +235,8 @@ export class StateConverter {
             curBet: curBet,
             min: minBet,
             max: maxBet,
-            unqueueAllBettingRoundActions: gameStage === GameStage.FINISH_BETTING_ROUND,
+            unqueueAllBettingRoundActions:
+                gameStage === GameStage.INIT_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
             sizingButtons: getSizingButtons(),
             bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID, toAct),
             dealInNextHand: !hero.sittingOut,
