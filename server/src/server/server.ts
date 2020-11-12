@@ -39,6 +39,9 @@ import {
     EmailMessage,
 } from '../../../ui/src/shared/models/system/email';
 import { CapacityLimiter } from './capacityLimiter';
+import { getEpochTimeMs } from '../../../ui/src/shared/util/util';
+
+const gamesCreatedSinceDeploy: number[] = [];
 
 @Service()
 class Server {
@@ -81,7 +84,7 @@ class Server {
                 gameInstances[gameInstanceUUID] = {
                     WSCount: Object.values(group).length,
                     link: `https://justpoker.games/table/${gameInstanceUUID}`,
-                    lastActive: new Date(lastActive).toLocaleString(),
+                    lastActive: new Date(lastActive).toLocaleString('en-US', { timeZone: 'America/New_York' }),
                 };
             });
             res.send({
@@ -89,6 +92,8 @@ class Server {
                 totalWSCount: this.connectedClientManager.getNumberOfClients(),
                 capacitySettings: this.capacityLimiter.getCapacity(),
                 gameInstances: gameInstances,
+                gamesCreatedSinceDeploy: gamesCreatedSinceDeploy,
+                totalGamesCreatedSinceDeploy: gamesCreatedSinceDeploy.length,
             });
         });
 
@@ -109,7 +114,7 @@ class Server {
                         createServerMessageEvent(gameInstanceUUID, ServerMessageType.WELCOME),
                     );
                 }, 30 * 1000);
-
+                gamesCreatedSinceDeploy.push(getEpochTimeMs());
                 logger.info(`Creating new game with gameInstanceUUID: ${gameInstanceUUID}`);
                 res.send({ gameInstanceUUID: gameInstanceUUID });
             }
