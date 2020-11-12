@@ -73,6 +73,9 @@ export declare interface Player {
     /** The amount of chips that will be added to player's stack after hand. */
     willAddChips: number;
 
+    /** The amount of chips that player's stack will bet set to after hand. */
+    willAdminSetChips: number;
+
     /** Player cannot hide their cards. */
     cannotHideCards: boolean;
 }
@@ -126,6 +129,7 @@ export function getCleanPlayer(): Player {
         timeBanksLeft: 0,
         avatarKey: AvatarKeys.shark,
         willAddChips: 0,
+        willAdminSetChips: 0,
         cannotHideCards: false,
     };
 }

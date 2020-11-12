@@ -361,6 +361,10 @@ export class GameStateManager {
         this.getPlayer(playerUUID).willAddChips = numChips;
     }
 
+    setPlayerWillAdminSetChips(playerUUID: PlayerUUID, numChips: number): void {
+        this.getPlayer(playerUUID).willAdminSetChips = numChips;
+    }
+
     setPlayerAvatar(playerUUID: PlayerUUID, avatarKey: AvatarKeys) {
         this.getPlayer(playerUUID).avatarKey = avatarKey;
     }

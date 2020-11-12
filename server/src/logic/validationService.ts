@@ -757,6 +757,13 @@ export class ValidationService {
             };
         }
 
+        if (playerToModify.willAdminSetChips) {
+            return {
+                errorType: ErrorType.ILLEGAL_ACTION,
+                errorString: `Player ${req.playerUUID} already has admin set action queued for ${playerToModify.willAdminSetChips} amount.`,
+            };
+        }
+
         error = this.validateMinMaxValues(req.chipAmount, 0, MAX_VALUES.BUY_IN, 'buyIn');
         if (error) {
             return error;
