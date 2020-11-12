@@ -13,7 +13,6 @@ import {
     SetChipsRequest,
     BuyChipsRequest,
     SeatChangeRequest,
-    ChangeAvatarRequest,
 } from '../../../ui/src/shared/models/api/api';
 
 import { ValidationResponse, ErrorType, INTERNAL_SERVER_ERROR } from '../../../ui/src/shared/models/api/validation';
@@ -152,7 +151,7 @@ export class ValidationService {
         let error = this.ensureClientIsNotInGame(clientUUID);
         if (error) return error;
 
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'join game');
         if (error) return error;
 
         if (request.name.length > MAX_NAME_LENGTH) {
@@ -181,7 +180,7 @@ export class ValidationService {
             return error;
         }
 
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'join table');
         if (error) return error;
 
         const seatNumber = request.seatNumber;
@@ -220,7 +219,7 @@ export class ValidationService {
         let error = this.validateJoinGameRequest(clientUUID, request);
         if (error) return error;
 
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'join game and join table');
         if (error) return error;
 
         if (!this.gsm.areOpenSeats()) {
@@ -539,7 +538,7 @@ export class ValidationService {
         let error = this.ensureClientIsInGame(clientUUID);
         if (error) return error;
 
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'quit game');
         if (error) return error;
 
         const player = this.gsm.getPlayerByClientUUID(clientUUID);
@@ -560,7 +559,7 @@ export class ValidationService {
         error = this.ensurePlayerIsAtTable(player.uuid);
         if (error) return error;
 
-        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'sit down');
+        error = this.validateNotInGameStages(INIT_HAND_STAGES, 'leave table');
         if (error) return error;
 
         if (player.quitting) {

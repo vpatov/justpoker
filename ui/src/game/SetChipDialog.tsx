@@ -109,10 +109,10 @@ function SetChipDialog(props) {
                 <Typography>{`Resulting Chips: ${ChipFormatter(resultingChips)}`}</Typography>
                 <Typography className={classes.warning}>
                     {`
-                        This action will take place after the completion of the current hand. 
-                        The players chips will be set to the resulting amount irregardless of the outcome of the current hand. 
+                        If player is in hand action will take place after the completion of the current hand. 
+                        The player's chips will be set to the resulting amount regardless of the outcome of the current hand. 
                         The change will be recorded in the ledger. 
-                        If this action is performed twice before the complection of the hand only the first action will be exectued.
+                        If this action is performed twice before the complection of the hand, only the first action will be exectued.
                         `}
                 </Typography>
             </DialogContent>
