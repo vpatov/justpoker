@@ -7,6 +7,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
         justifyContent: 'center',
+        transform: 'translateZ(-1px)',
     },
     folded: {
         opacity: 0,
