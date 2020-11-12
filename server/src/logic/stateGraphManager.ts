@@ -67,10 +67,6 @@ export class StateGraphManager {
             [ClientActionType.JOINGAMEANDJOINTABLE, this.canContinueGameCondition],
             [ClientActionType.SITIN, this.canContinueGameCondition],
         ]),
-        // [GameStage.INITIALIZE_NEW_HAND]: new Map([[ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_HAND]]),
-        // [GameStage.SHOW_START_OF_HAND]: new Map([
-        //     [ServerActionType.GAMEPLAY_TIMEOUT, GameStage.SHOW_START_OF_BETTING_ROUND],
-        // ]),
         [GameStage.SHOW_START_OF_BETTING_ROUND]: new Map([
             [ServerActionType.GAMEPLAY_TIMEOUT, this.isAllInRunOutCondition],
         ]),
