@@ -217,7 +217,6 @@ export class GameInstanceLogService {
             return false;
         }
         return playerSummary.holeCards.every((card) => card.visible);
-    
     }
 
     private sanitizePotSummaries(potSummaries: PotSummary[]): PotSummary[] {

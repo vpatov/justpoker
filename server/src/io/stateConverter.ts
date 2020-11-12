@@ -160,7 +160,7 @@ export class StateConverter {
             areOpenSeats: this.gameStateManager.areOpenSeats(),
             gameParametersWillChangeAfterHand: this.gameStateManager.gameParametersWillChangeAfterHand(),
             computedMaxBuyin: this.gameStateManager.getMaxBuyin(),
-            isGameInHandInitStage: this.gameStateManager.isGameInHandInitStage(),
+            isGameInHandInitStage: this.gameStateManager.isGameInInitStage(),
             isHeroAtTable: heroPlayer?.isAtTable,
             isSpectator: !heroPlayer,
             numberOfSpectators: 0, // to be implemented
@@ -235,8 +235,7 @@ export class StateConverter {
             curBet: curBet,
             min: minBet,
             max: maxBet,
-            unqueueAllBettingRoundActions:
-                gameStage === GameStage.INITIALIZE_NEW_HAND || gameStage === GameStage.FINISH_BETTING_ROUND,
+            unqueueAllBettingRoundActions: gameStage === GameStage.FINISH_BETTING_ROUND,
             sizingButtons: getSizingButtons(),
             bettingActionButtons: this.getValidBettingRoundActions(clientUUID, heroPlayerUUID, toAct),
             dealInNextHand: !hero.sittingOut,

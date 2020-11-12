@@ -703,14 +703,9 @@ export class GameStateManager {
     isGameStageInBetweenHands(): boolean {
         return (
             this.gameState.gameStage === GameStage.NOT_IN_PROGRESS ||
-            this.gameState.gameStage === GameStage.INITIALIZE_NEW_HAND ||
             this.gameState.gameStage === GameStage.SHOW_WINNER ||
             this.gameState.gameStage === GameStage.POST_HAND_CLEANUP
         );
-    }
-
-    isGameInHandInitStage(): boolean {
-        return INIT_HAND_STAGES.indexOf(this.getGameStage()) > -1;
     }
 
     // is this still correct??
