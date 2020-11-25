@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createRef } from 'react';
 import classnames from 'classnames';
 
 import Hand from './Hand';
@@ -15,6 +15,7 @@ import PlayerMenu from './PlayerMenu';
 import PlayerLabel from './PlayerLabel';
 import { IconButton, Button } from '@material-ui/core';
 import { WsServer } from '../api/ws';
+import PlayerNotes from './PlayerNotes';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -78,6 +79,7 @@ function Player(props) {
     const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction, cannotHideCards } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const canShowHideCards = useSelector(selectCanShowHideCards);
+    const [playerNotesAnchor, setPlayerNotesAnchor] = useState(null)
 
     const handleClick = (event: any) => {
         event.preventDefault();
@@ -103,6 +105,12 @@ function Player(props) {
         return null;
     }
 
+    function togglePlayerNotes(anchor){
+        setPlayerNotesAnchor(playerNotesAnchor ? null : anchor.parentElement)
+        console.log('currentTarget', anchor.parentElement)
+    }
+
+
     const playerLabelComponent = getPlayerLabelComponent();
     const areAllCardsVisible = hand.cards.reduce((acc, card) => acc && card.visible, true);
     return (
@@ -120,6 +128,7 @@ function Player(props) {
                 player={player}
                 setHeroRotation={setHeroRotation}
                 virtualPositon={virtualPositon}
+                togglePlayerNotes={togglePlayerNotes}
             />
 
             <Hand hand={hand} folded={folded} hero={hero} cannotHideCards={cannotHideCards} playerUUID={uuid} />
@@ -134,6 +143,8 @@ function Player(props) {
                 </Button>
             ) : null}
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
+
+            <PlayerNotes anchorEl={playerNotesAnchor}/>
         </div>
     );
 }
