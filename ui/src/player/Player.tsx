@@ -1,4 +1,4 @@
-import React, { useState, createRef } from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
 
 import Hand from './Hand';
@@ -106,8 +106,7 @@ function Player(props) {
     }
 
     function togglePlayerNotes(anchor){
-        setPlayerNotesAnchor(playerNotesAnchor ? null : anchor.parentElement)
-        console.log('currentTarget', anchor.parentElement)
+        setPlayerNotesAnchor(playerNotesAnchor ? null : anchor)
     }
 
 
@@ -144,7 +143,7 @@ function Player(props) {
             ) : null}
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
 
-            <PlayerNotes anchorEl={playerNotesAnchor}/>
+            <PlayerNotes anchorEl={playerNotesAnchor} togglePlayerNotes={togglePlayerNotes}/>
         </div>
     );
 }
