@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
-    root: {backgroundColor: '#171719', color: 'white', width: 'fit-content', height: 'fit-content'},
+    root: {backgroundColor: '#17171980', color: 'white', width: 'fit-content', height: 'fit-content'},
     header: {
         // width: `${theme.custom.PLAYER_WIDTH}vmin`,
         width: '100%',
@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
         width: `${theme.custom.PLAYER_WIDTH}vmin`,
         minWidth: '60px',
         fontSize: '1.6vmin',
-        backgroundColor: '#171719',
+        backgroundColor: '#17171980',
         color: 'rgb(220,210,230)'
     },
 }));
