@@ -79,7 +79,7 @@ function Player(props) {
     const { hand, playerTimer, folded, uuid, sittingOut, hero, lastAction, cannotHideCards } = player;
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const canShowHideCards = useSelector(selectCanShowHideCards);
-    const [playerNotesAnchor, setPlayerNotesAnchor] = useState(null)
+    const [playerNotesAnchor, setPlayerNotesAnchor] = useState(null);
 
     const handleClick = (event: any) => {
         event.preventDefault();
@@ -105,10 +105,9 @@ function Player(props) {
         return null;
     }
 
-    function togglePlayerNotes(anchor){
-        setPlayerNotesAnchor(playerNotesAnchor ? null : anchor)
+    function togglePlayerNotes(anchor) {
+        setPlayerNotesAnchor(playerNotesAnchor ? null : anchor);
     }
-
 
     const playerLabelComponent = getPlayerLabelComponent();
     const areAllCardsVisible = hand.cards.reduce((acc, card) => acc && card.visible, true);
@@ -143,7 +142,7 @@ function Player(props) {
             ) : null}
             {playerLabelComponent ? <PlayerLabel>{playerLabelComponent}</PlayerLabel> : null}
 
-            <PlayerNotes anchorEl={playerNotesAnchor} togglePlayerNotes={togglePlayerNotes}/>
+            <PlayerNotes anchorEl={playerNotesAnchor} togglePlayerNotes={togglePlayerNotes} playerName={player.name} />
         </div>
     );
 }
