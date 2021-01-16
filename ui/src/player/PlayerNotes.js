@@ -90,6 +90,7 @@ function PlayerNotes(props) {
                     onChange={(e) => {
                         setNotes(e.target.value);
                     }}
+                    rowsMin={5}
                 ></TextareaAutosize>
             </Paper>
         </Popper>
