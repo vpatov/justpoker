@@ -10,7 +10,7 @@
 
 ### Setting up a local development environment
 Running docker is not necessary to develop locally.
-The server and the ui are separate packages, with their own dependencies.
+The server and the UI are separate packages, with their own dependencies.
 Due to a limitation in the configuration options of create-react-app, the shared TS interfaces/models are found in `ui/src/shared/models` as opposed to some other top-level directory.
 
 After cloning repo, run
