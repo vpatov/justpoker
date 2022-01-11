@@ -32,7 +32,9 @@ const useStyles = makeStyles((theme) => ({
         margin: 6,
         lineHeight: '100%',
     },
-    contactUs: {
+    supportButtons: {
+        display: 'grid',
+        gap: '0.5em',
         position: 'absolute',
         margin: 12,
         left: '0',
@@ -52,6 +54,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const donationLink: string = "https://www.buymeacoffee.com/justpoker";
+
 function Home(props) {
     const classes = useStyles();
     const [openEmail, SET_openEmail] = useState(false);
@@ -62,9 +66,14 @@ function Home(props) {
             <LandingLogo className={classnames(classes.title, { [classes.left]: smallHeight })} />
             <Typography className={classes.beta}>BETA!</Typography>
             <MakeGame />
-            <Button className={classes.contactUs} onClick={() => SET_openEmail(true)}>
-                Contact Us
-            </Button>
+            <div className={classes.supportButtons}>
+                <Button variant="outlined" color="inherit" onClick={() => SET_openEmail(true)}>
+                    Contact Us
+                </Button>
+                <Button variant="outlined" color="inherit" href={donationLink} target="_blank">
+                    Donate
+                </Button>
+            </div>
             <EmailDialog open={openEmail} onClose={() => SET_openEmail(false)} />
         </div>
     );
