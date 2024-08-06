@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function PlayerMenu(props) {
     const classes = useStyles();
-    const { anchorEl, handleClose, setHeroRotation, virtualPositon, player } = props;
+    const { anchorEl, handleClose, setHeroRotation, virtualPositon, player, togglePlayerNotes } = props;
     const { stack, name, uuid, admin, quitting, disconnected } = player as UiPlayer;
     const [chipsDialog, setChipsDialog] = useState(false);
     const [avatarDialog, SET_avatarDialog] = useState(false);
@@ -85,6 +85,7 @@ function PlayerMenu(props) {
             </>
         );
     }
+
     return (
         <Menu
             className={classes.root}
@@ -94,6 +95,7 @@ function PlayerMenu(props) {
             anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
         >
             <AddChipDialog open={chipsDialog} handleClose={handleCloseDialog} name={name} stack={stack} uuid={uuid} />
+            <MenuItem onClick={()=>{togglePlayerNotes(anchorEl); handleClose()}}>Player Notes</MenuItem>
             {isHeroAdmin ? <MenuItem onClick={() => setChipsDialog(true)}>Modify Chips</MenuItem> : null}
             {isHeroAdmin && !admin ? <MenuItem onClick={handleAddAdmin}>Make Admin</MenuItem> : null}
             {isHeroAdmin && isPlayerHero ? <MenuItem onClick={handleRemoveAdmin}>Remove as Admin</MenuItem> : null}
